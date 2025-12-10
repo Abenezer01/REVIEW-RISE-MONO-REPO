@@ -1,0 +1,38 @@
+# --------------------
+# Dependencies and Node
+# --------------------
+/node_modules
+*.tsbuildinfo
+pnpm-lock.yaml # If using multiple managers, otherwise keep lock files clean
+
+# --------------------
+# Build and Output Artifacts
+# --------------------
+# TypeScript compilation output
+/apps/**/dist
+/packages/**/dist
+
+# Next.js build cache
+.next
+.vercel
+
+# Runtime and Logging
+*.log
+npm-debug.log*
+.DS_Store
+
+# --------------------
+# Environment and Secrets (CRITICAL)
+# --------------------
+# Ignore all.env files (local secrets) but allow the example template
+.env
+.env.*
+!.env.example
+!apps/**/.env.example
+!packages/**/.env.example
+
+# --------------------
+# Prisma (Database) Artifacts
+# --------------------
+# Ignore local Prisma Client generation directories if defined differently
+/node_modules/.prisma
