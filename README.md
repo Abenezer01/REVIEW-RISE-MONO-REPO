@@ -78,28 +78,3 @@ pnpm dev:all	Starts all applications in watch/development mode
 pnpm build:all	Compiles TypeScript for all services and runs Next.js production build
 pnpm lint	Runs ESLint and Prettier across all apps/ and packages/
 pnpm test	Executes unit and integration tests across the entire codebase
-
-yaml
-Copy code
-
----
-
-This version is:  
-- Fully **Markdown formatted**  
-- Includes **tables for architecture, apps, and packages**  
-- Contains **setup instructions, commands, and links**  
-- Ready to place as `README.md` in your monorepo root  
-
----
-
-If you want, I can also **create detailed README.md templates for each app/package** based on this style so every folder has professional documentation automatically.  
-
-Do you want me to do that?
-
-
-
-
-
-
-You said:
-generate readme.md 
