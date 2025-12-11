@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,15 +7,14 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
+  id            String             @id @default(uuid())
+  email         String             @unique
   name          String?
   emailVerified DateTime?
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
   deletedAt     DateTime?
-
   sessions      Session[]
   roles         UserBusinessRole[]
 
@@ -36,29 +32,28 @@ model Session {
 }
 
 model Business {
-  id          String    @id @default(uuid())
-  name        String
-  slug        String    @unique
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-
+  id            String             @id @default(uuid())
+  name          String
+  slug          String             @unique
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  deletedAt     DateTime?
   locations     Location[]
-  userRoles     UserBusinessRole[]
   subscriptions Subscription[]
+  userRoles     UserBusinessRole[]
 
   @@index([name])
 }
 
 model Location {
-  id          String    @id @default(uuid())
-  name        String
-  address     String?
-  businessId  String
-  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
+  id         String    @id @default(uuid())
+  name       String
+  address    String?
+  businessId String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
 }
@@ -67,26 +62,26 @@ model Role {
   id          String             @id @default(uuid())
   name        String             @unique
   description String?
-  permissions RolePermission[]
-  userRoles   UserBusinessRole[]
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
+  permissions RolePermission[]
+  userRoles   UserBusinessRole[]
 }
 
 model Permission {
   id          String           @id @default(uuid())
-  action      String           @unique // e.g. "business:read", "location:create"
+  action      String           @unique
   description String?
-  roles       RolePermission[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
+  roles       RolePermission[]
 }
 
 model RolePermission {
   roleId       String
   permissionId String
-  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([roleId, permissionId])
 }
@@ -96,12 +91,12 @@ model UserBusinessRole {
   userId     String
   businessId String
   roleId     String
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  role       Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
+  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  role       Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, businessId, roleId])
   @@index([userId])
@@ -109,15 +104,15 @@ model UserBusinessRole {
 }
 
 model Subscription {
-  id             String    @id @default(uuid())
-  businessId     String
-  business       Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  plan           String
-  status         String // active, past_due, canceled
+  id               String    @id @default(uuid())
+  businessId       String
+  plan             String
+  status           String
   currentPeriodEnd DateTime
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  deletedAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+  business         Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
 }
