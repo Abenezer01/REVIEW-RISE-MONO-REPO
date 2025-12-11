@@ -1,0 +1,64 @@
+name: Continuous Integration (CI)
+
+on:
+  pull_request:
+    branches: [ develop, main ]
+  push:
+    branches: [ develop, main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: ci_user
+          POSTGRES_PASSWORD: ci_password
+          POSTGRES_DB: ci_test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: 1. Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 2. Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: 3. Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: 4. Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 5. Wait for Database Service to be Ready
+        run: |
+          echo "Waiting for PostgreSQL..."
+          while ! nc -z localhost 5432; do   
+            sleep 1
+          done
+        env:
+          DATABASE_URL: 'postgresql://ci_user:ci_password@localhost:5432/ci_test_db'
+
+      - name: 6. Run Lint Checks (Task 1.3)
+        run: pnpm run lint
+
+      - name: 7. Run All Tests (Task 1.2)
+        run: pnpm run test
+        env:
+          DATABASE_URL: 'postgresql://ci_user:ci_password@localhost:5432/ci_test_db'
+
+      - name: 8. Build All Artifacts (Task 1.4)
+        run: pnpm run build:all
