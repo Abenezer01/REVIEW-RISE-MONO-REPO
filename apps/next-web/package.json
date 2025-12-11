@@ -13,7 +13,8 @@
     "build:icons": "tsx src/assets/iconify-icons/bundle-icons-css.ts",
     "postinstall": "npm run build:icons",
     "clean": "rm -rf .next",
-    "clear": "rm -rf node_modules .next"
+    "clear": "rm -rf node_modules .next",
+    "test": "echo \"No tests specified for next-web\" && exit 0"
   },
   "dependencies": {
     "@emotion/cache": "11.14.0",
@@ -62,7 +63,6 @@
     "tsx": "4.20.6",
     "typescript": "5.9.3"
   },
-
   "overrides": {
     "rimraf": "5.0.7",
     "unicorn-magic": "0.1.0",
