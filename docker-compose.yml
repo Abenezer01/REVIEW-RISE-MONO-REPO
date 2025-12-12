@@ -8,8 +8,14 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: reviewrise_db
+      # Create app and admin users on startup
+      POSTGRES_INITDB_ARGS: "--auth-host=md5"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # Mount initialization script to create users
+      - ./packages/@platform/db/scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
 
 volumes:
   postgres_data:
+
+
