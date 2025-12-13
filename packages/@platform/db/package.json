@@ -15,11 +15,11 @@
     "test": "exit 0"
   },
   "dependencies": {
-    "@prisma/client": "^7.1.0"
+    "@prisma/client": "^5.22.0"
   },
   "devDependencies": {
     "@types/node": "^25.0.0",
-    "prisma": "^7.1.0",
+    "prisma": "^5.22.0",
     "typescript": "^5.3.3"
   }
 }
