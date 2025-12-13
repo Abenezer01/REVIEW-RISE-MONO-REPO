@@ -10,7 +10,9 @@
     "dev:all": "pnpm --parallel --filter \"./apps/*\" run dev",
     "build:all": "pnpm -r run build",
     "lint": "pnpm -r run lint",
-    "test": "pnpm -r run test"
+    "test": "pnpm -r run test",
+    "setup:envs": "node scripts/copy-envs.js",
+    "setup:app": "pnpm run setup:envs && docker-compose up -d"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
