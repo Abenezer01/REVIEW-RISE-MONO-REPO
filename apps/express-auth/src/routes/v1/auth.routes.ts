@@ -5,6 +5,8 @@ import {
     passwordResetLimiter,
     refreshTokenLimiter,
     forgotPasswordLimiter,
+    verifyEmailLimiter,
+    resendVerificationEmailLimiter,
 } from '../../middlewares/rateLimiter';
 import { register, login, refreshToken, forgotPassword, resetPassword, verifyEmail, resendVerificationEmail } from '../../controllers/auth.controller';
 
@@ -15,7 +17,7 @@ router.post('/login', loginAttemptLimiter, login);
 router.post('/refresh-token', refreshTokenLimiter, refreshToken);
 router.post('/forgot-password', forgotPasswordLimiter, forgotPassword);
 router.post('/reset-password', passwordResetLimiter, resetPassword);
-router.post('/verify-email', verifyEmail);
-router.post('/resend-verification', resendVerificationEmail);
+router.post('/verify-email', verifyEmailLimiter, verifyEmail);
+router.post('/resend-verification', resendVerificationEmailLimiter, resendVerificationEmail);
 
 export default router;

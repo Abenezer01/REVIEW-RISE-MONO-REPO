@@ -279,9 +279,6 @@ export const resetPassword = async (req: Request, res: Response) => {
     }
 };
 
-/**
- * Verify email with token
- */
 export const verifyEmail = async (req: Request, res: Response) => {
     const { token } = req.body;
 
@@ -339,9 +336,6 @@ export const verifyEmail = async (req: Request, res: Response) => {
     }
 };
 
-/**
- * Resend verification email
- */
 export const resendVerificationEmail = async (req: Request, res: Response) => {
     const { email } = req.body;
 
