@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import { prisma } from '@platform/db';
 import { generateToken } from '@platform/auth';
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
+import { requestIdMiddleware } from './middleware/request-id';
 
 dotenv.config();
 
@@ -15,22 +17,48 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(requestIdMiddleware);
 
 app.get('/', (req, res) => {
-    res.json({ message: 'Express Auth Service is running' });
+    const response = createSuccessResponse(
+        null,
+        'Express Auth Service is running',
+        200,
+        { requestId: req.id }
+    );
+    res.status(response.statusCode).json(response);
 });
 
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', service: 'express-auth' });
+    const response = createSuccessResponse(
+        { service: 'express-auth' },
+        'Service is healthy',
+        200,
+        { requestId: req.id }
+    );
+    res.status(response.statusCode).json(response);
 });
 
 app.get('/db-test', async (req, res) => {
     try {
         const userCount = await prisma.user.count();
-        res.json({ status: 'ok', userCount });
+        const response = createSuccessResponse(
+            { userCount },
+            'Database connection successful',
+            200,
+            { requestId: req.id }
+        );
+        res.status(response.statusCode).json(response);
     } catch (error) {
         console.error('Database connection error:', error);
-        res.status(500).json({ error: 'Database connection failed', details: error });
+        const response = createErrorResponse(
+            'Database connection failed',
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            500,
+            error,
+            req.id
+        );
+        res.status(response.statusCode).json(response);
     }
 });
 
@@ -48,13 +76,22 @@ app.get('/rbac-test', async (req, res) => {
         // Let's just generate a token
         const token = await generateToken({ id: userId, email });
         
-        res.json({ 
-            status: 'ok', 
-            token,
-            info: 'Token generated successfully using @platform/auth' 
-        });
+        const response = createSuccessResponse(
+            { token },
+            'Token generated successfully using @platform/auth',
+            200,
+            { requestId: req.id }
+        );
+        res.status(response.statusCode).json(response);
     } catch (error: any) {
-        res.status(500).json({ error: 'RBAC test failed', details: error.message });
+        const response = createErrorResponse(
+            'RBAC test failed',
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            500,
+            error.message,
+            req.id
+        );
+        res.status(response.statusCode).json(response);
     }
 });
 
