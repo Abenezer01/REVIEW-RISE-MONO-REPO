@@ -170,6 +170,9 @@ importers:
       '@platform/auth':
         specifier: workspace:*
         version: link:../../packages/@platform/auth
+      '@platform/contracts':
+        specifier: workspace:*
+        version: link:../../packages/@platform/contracts
       '@platform/db':
         specifier: workspace:*
         version: link:../../packages/@platform/db
