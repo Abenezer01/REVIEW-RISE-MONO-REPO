@@ -1,6 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
+  engineType = "library"
 }
 
 datasource db {
@@ -139,6 +140,16 @@ model Subscription {
 }
 
 model PasswordResetToken {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model EmailVerificationToken {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email     String
   token     String   @unique

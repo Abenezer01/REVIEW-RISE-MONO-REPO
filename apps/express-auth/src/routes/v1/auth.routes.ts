@@ -6,7 +6,7 @@ import {
     refreshTokenLimiter,
     forgotPasswordLimiter,
 } from '../../middlewares/rateLimiter';
-import { register, login, refreshToken, forgotPassword, resetPassword } from '../../controllers/auth.controller';
+import { register, login, refreshToken, forgotPassword, resetPassword, verifyEmail, resendVerificationEmail } from '../../controllers/auth.controller';
 
 const router = Router();
 
@@ -15,5 +15,7 @@ router.post('/login', loginAttemptLimiter, login);
 router.post('/refresh-token', refreshTokenLimiter, refreshToken);
 router.post('/forgot-password', forgotPasswordLimiter, forgotPassword);
 router.post('/reset-password', passwordResetLimiter, resetPassword);
+router.post('/verify-email', verifyEmail);
+router.post('/resend-verification', resendVerificationEmail);
 
 export default router;
