@@ -36,6 +36,13 @@ app.get('/db-test', async (req, res) => {
     }
 });
 
+app.use((req, res) => {
+    res.status(404).json({
+        error: "Endpoint not found",
+        message: "The requested endpoint does not exist. Please check the URL and method.",
+        requestedEndpoint: req.originalUrl
+    });
+});
 app.listen(PORT, () => {
     console.log(`Auth service running on port ${PORT}`);
 });

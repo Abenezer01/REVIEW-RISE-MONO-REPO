@@ -11,15 +11,21 @@
     "db:studio": "prisma studio",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "tsx prisma/seed.ts",
     "db:health": "tsx src/health.ts",
     "test": "exit 0"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
-    "@prisma/client": "^7.1.0"
+    "@prisma/client": "5.0.0"
   },
   "devDependencies": {
     "@types/node": "^25.0.0",
-    "prisma": "^7.1.0",
+    "dotenv": "^16.4.5",
+    "prisma": "5.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.3"
   }
 }

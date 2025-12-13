@@ -5,8 +5,16 @@ import bcrypt from 'bcryptjs';
 export const register = async (req: Request, res: Response) => {
     const { email, password, firstName, lastName } = req.body;
 
-    if (!email || !password || !firstName || !lastName) {
-        return res.status(400).json({ message: 'All fields are required' });
+    const missingFields = [];
+    if (!email) missingFields.push("email");
+    if (!password) missingFields.push("password");
+    if (!firstName) missingFields.push("firstName");
+    if (!lastName) missingFields.push("lastName");
+    if (missingFields.length > 0) {
+        return res.status(400).json({
+            message: `Missing required fields: ${missingFields.join(", ")}`,
+            missingFields
+        });
     }
 
     try {
@@ -25,6 +33,13 @@ export const register = async (req: Request, res: Response) => {
                 email,
                 password: hashedPassword,
                 name: `${firstName} ${lastName}`,
+                userRoles: {
+                    create: {
+                        role: {
+                            connect: { id: "a7477029-bf31-4100-9b5b-78915742e451" },
+                        },
+                    },
+                }
             },
         });
 
