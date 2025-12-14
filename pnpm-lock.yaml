@@ -203,6 +203,9 @@ importers:
       morgan:
         specifier: ^1.10.0
         version: 1.10.0
+      zod:
+        specifier: ^4.1.13
+        version: 4.1.13
     devDependencies:
       '@types/bcryptjs':
         specifier: ^3.0.0
@@ -8740,3 +8743,7 @@ packages:
     resolution: {integrity: sha512-H33jtSKf8Ijtb5BW6wua3G5DhnFjbFML36eFu+VdOoVY4HD9e7ggjqdM6639B+L87rjnR6Y+XeRzBXZdy52B/g==}
     dependencies:
       grammex: 3.1.12
+
+  /zod@4.1.13:
+    resolution: {integrity: sha512-AvvthqfqrAhNH9dnfmrfKzX5upOdjUVJYFqNSlkmGf64gRaTzlPwz99IHYnVs28qYAybvAlBV+H7pn0saFY4Ig==}
+    dev: false

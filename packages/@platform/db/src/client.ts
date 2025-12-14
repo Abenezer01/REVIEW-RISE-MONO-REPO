@@ -3,7 +3,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: '../../../.env' });
+dotenv.config({ path: '../../.env' });
 
 /**
  * Enhanced Prisma Client Configuration
@@ -106,7 +106,7 @@ if (process.env.NODE_ENV !== 'production') {
 export async function disconnectDatabase() {
     await prisma.$disconnect();
     // Also end the pools
-    await pool.end(); 
+    await pool.end();
     if (adminConnectionString !== connectionString) {
         await adminPool.end();
     }

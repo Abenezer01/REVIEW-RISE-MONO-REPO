@@ -47,14 +47,14 @@ app.get('/rbac-test', async (req, res) => {
         // NOTE: In a real flow, we'd ensure User and Business exist first. 
         // This is just to demonstrate type usage and import success.
         // We'll catch errors if DB constraints fail.
-
+        
         // Let's just generate a token
         const token = await generateToken({ id: userId, email });
-
-        res.json({
-            status: 'ok',
+        
+        res.json({ 
+            status: 'ok', 
             token,
-            info: 'Token generated successfully using @platform/auth'
+            info: 'Token generated successfully using @platform/auth' 
         });
     } catch (error: any) {
         res.status(500).json({ error: 'RBAC test failed', details: error.message });
@@ -71,14 +71,14 @@ app.get('/rbac-test', async (req, res) => {
         // NOTE: In a real flow, we'd ensure User and Business exist first. 
         // This is just to demonstrate type usage and import success.
         // We'll catch errors if DB constraints fail.
-
+        
         // Let's just generate a token
         const token = await generateToken({ id: userId, email });
-
-        res.json({
-            status: 'ok',
+        
+        res.json({ 
+            status: 'ok', 
             token,
-            info: 'Token generated successfully using @platform/auth'
+            info: 'Token generated successfully using @platform/auth' 
         });
     } catch (error: any) {
         res.status(500).json({ error: 'RBAC test failed', details: error.message });

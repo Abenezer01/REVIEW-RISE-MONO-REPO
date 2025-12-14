@@ -49,7 +49,7 @@ export class UserRepository extends BaseRepository<
             },
         });
     }
-    
+
     /**
      * Update user email (with verification reset)
      */
@@ -119,6 +119,31 @@ export class UserRepository extends BaseRepository<
             verified,
             unverified: total - verified,
         };
+    }
+    /**
+     * Create user with "Customer" role
+     */
+    async createCustomer(data: Prisma.UserCreateInput) {
+        const customerRole = await prisma.role.findUnique({
+            where: { name: 'Customer' },
+        });
+
+        if (!customerRole) {
+            throw new Error('Default Customer role not found in database');
+        }
+
+        return this.delegate.create({
+            data: {
+                ...data,
+                userRoles: {
+                    create: {
+                        role: {
+                            connect: { id: customerRole.id },
+                        },
+                    },
+                },
+            },
+        });
     }
 }
 
