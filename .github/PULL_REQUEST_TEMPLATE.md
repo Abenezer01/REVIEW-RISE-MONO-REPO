@@ -1,13 +1,31 @@
-# Description
+## Summary
+<!-- Briefly describe what this PR does and why -->
 
-Please include a summary of the changes and the related issue. 
+## Jira ID
+<!-- Link the Jira ticket (e.g. PROJ-123) -->
+- Jira: 
 
-# Checklist
+## Changes
+<!-- Optional but recommended -->
+- 
+- 
+- 
 
-- [ ] Code follows the style guidelines
-- [ ] Tests have been added / updated
-- [ ] Documentation has been updated
-- [ ] PR is linked to an issue
+## Tests
+<!-- Describe how this was tested -->
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Manual testing
 
-# Related Issue
-Closes # (issue number)
+Describe tests run:
+- 
+
+## Screenshots / Recordings
+<!-- UI changes only -->
+<!-- Drag and drop images or add links -->
+
+## Checklist
+- [ ] Code follows project standards
+- [ ] No unrelated changes included
+- [ ] Based on the correct base branch
+- [ ] No secrets or credentials added

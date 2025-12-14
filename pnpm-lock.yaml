@@ -720,6 +720,9 @@ importers:
       prisma:
         specifier: ^7.1.0
         version: 7.1.0(@types/react@19.2.6)(react-dom@19.2.0)(react@19.2.0)(typescript@5.9.3)
+      tsx:
+        specifier: ^4.7.0
+        version: 4.20.6
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
@@ -2902,7 +2905,7 @@ packages:
     resolution: {integrity: sha512-asx5hIG9Qmf/1oStypjanR7iKTv0gXQ1Ov/jfrX6kS/EO0OFni8orbmGCn0672NHR3kXHwpAwR+B368ZGN/2rA==}
     dependencies:
       '@types/ms': 2.1.0
-      '@types/node': 22.10.2
+      '@types/node': 25.0.0
     dev: true
 
   /@types/morgan@1.9.9:

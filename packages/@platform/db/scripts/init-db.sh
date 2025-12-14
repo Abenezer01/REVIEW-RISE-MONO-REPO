@@ -10,6 +10,7 @@ echo "Creating ReviewRise database users..."
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
     -- Create admin user (for migrations and schema management)
     CREATE USER reviewrise_admin WITH PASSWORD 'admin_password';
+    ALTER USER reviewrise_admin WITH CREATEDB;
     
     -- Create app user (for runtime application operations)
     CREATE USER reviewrise_app WITH PASSWORD 'app_password';

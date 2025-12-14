@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -66,6 +65,11 @@ model Business {
   id            String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String
   slug          String             @unique
+  description   String?
+  phone         String?
+  email         String?
+  website       String?
+  status        String             @default("active")
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
   deletedAt     DateTime?
@@ -75,6 +79,7 @@ model Business {
 
 
   @@index([name])
+  @@index([status])
 }
 
 model Location {
@@ -154,4 +159,19 @@ model UserBusinessRole {
   @@unique([userId, businessId, roleId])
   @@index([userId])
   @@index([businessId])
+}
+
+model Subscription {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId       String    @db.Uuid
+  plan             String
+  status           String
+  currentPeriodEnd DateTime
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+  business         Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([status])
 }
