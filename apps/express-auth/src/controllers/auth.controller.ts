@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
-import { userRepository, sessionRepository, passwordResetTokenRepository } from '@platform/db';
+import { userRepository, sessionRepository, passwordResetTokenRepository, emailVerificationTokenRepository } from '@platform/db';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { registerSchema } from '../validations/auth.validation';
@@ -280,56 +280,59 @@ export const verifyEmail = async (req: Request, res: Response) => {
     const { token } = req.body;
 
     if (!token) {
-        return res.status(400).json({ message: 'Verification token is required' });
+        return res.status(400).json(
+            createErrorResponse('Verification token is required', ErrorCode.BAD_REQUEST, 400)
+        );
     }
 
     try {
-        const verificationToken = await prisma.emailVerificationToken.findUnique({
-            where: { token },
-        });
+        const verificationToken = await emailVerificationTokenRepository.findByToken(token);
 
         if (!verificationToken) {
-            return res.status(400).json({ message: 'Invalid or expired verification token' });
+            return res.status(400).json(
+                createErrorResponse('Invalid or expired verification token', ErrorCode.BAD_REQUEST, 400)
+            );
         }
 
         if (verificationToken.expires < new Date()) {
-            await prisma.emailVerificationToken.delete({ where: { id: verificationToken.id } });
-            return res.status(400).json({ message: 'Verification token has expired. Please request a new one.' });
+            await emailVerificationTokenRepository.deleteToken(verificationToken.id);
+            return res.status(400).json(
+                createErrorResponse('Verification token has expired. Please request a new one.', ErrorCode.BAD_REQUEST, 400)
+            );
         }
 
-        const user = await prisma.user.findUnique({
-            where: { email: verificationToken.email }
-        });
+        const user = await userRepository.findByEmail(verificationToken.email);
 
         if (!user) {
-            return res.status(400).json({ message: 'User not found' });
+            return res.status(400).json(
+                createErrorResponse('User not found', ErrorCode.BAD_REQUEST, 400)
+            );
         }
 
         if (user.emailVerified) {
-            return res.status(400).json({ message: 'Email is already verified' });
+            return res.status(400).json(
+                createErrorResponse('Email is already verified', ErrorCode.BAD_REQUEST, 400)
+            );
         }
 
         // Update user's emailVerified field
-        await prisma.user.update({
-            where: { id: user.id },
-            data: { emailVerified: new Date() }
-        });
+        await userRepository.verifyEmail(user.id);
 
         // Delete the used token
-        await prisma.emailVerificationToken.delete({
-            where: { id: verificationToken.id }
-        });
+        await emailVerificationTokenRepository.deleteToken(verificationToken.id);
 
         // Delete all other verification tokens for this email
-        await prisma.emailVerificationToken.deleteMany({
-            where: { email: verificationToken.email }
-        });
+        await emailVerificationTokenRepository.deleteByEmail(verificationToken.email);
 
-        res.json({ message: 'Email verified successfully! You can now log in.' });
+        res.status(200).json(
+            createSuccessResponse({}, 'Email verified successfully! You can now log in.')
+        );
 
     } catch (error) {
         console.error('Email verification error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json(
+            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
+        );
     }
 };
 
@@ -340,27 +343,29 @@ export const resendVerificationEmail = async (req: Request, res: Response) => {
     const { email } = req.body;
 
     if (!email) {
-        return res.status(400).json({ message: 'Email is required' });
+        return res.status(400).json(
+            createErrorResponse('Email is required', ErrorCode.BAD_REQUEST, 400)
+        );
     }
 
     try {
-        const user = await prisma.user.findUnique({
-            where: { email },
-        });
+        const user = await userRepository.findByEmail(email);
 
         if (!user) {
             // Return success even if user not found to prevent enumeration
-            return res.json({ message: 'If an account exists with this email, a verification email has been sent.' });
+            return res.status(200).json(
+                createSuccessResponse({}, 'If an account exists with this email, a verification email has been sent.')
+            );
         }
 
         if (user.emailVerified) {
-            return res.status(400).json({ message: 'Email is already verified' });
+            return res.status(400).json(
+                createErrorResponse('Email is already verified', ErrorCode.BAD_REQUEST, 400)
+            );
         }
 
         // Delete any existing verification tokens for this email
-        await prisma.emailVerificationToken.deleteMany({
-            where: { email }
-        });
+        await emailVerificationTokenRepository.deleteByEmail(email);
 
         // Generate new verification token
         const verificationToken = crypto.randomUUID();
@@ -368,21 +373,23 @@ export const resendVerificationEmail = async (req: Request, res: Response) => {
         expiresAt.setHours(expiresAt.getHours() + 24); // 24 hours expiry
 
         // Save verification token to database
-        await prisma.emailVerificationToken.create({
-            data: {
-                email,
-                token: verificationToken,
-                expires: expiresAt
-            }
+        await emailVerificationTokenRepository.createToken({
+            email,
+            token: verificationToken,
+            expires: expiresAt
         });
 
         // Send verification email
         await sendVerificationEmail(email, verificationToken);
 
-        res.json({ message: 'Verification email has been sent. Please check your inbox.' });
+        res.status(200).json(
+            createSuccessResponse({}, 'Verification email has been sent. Please check your inbox.')
+        );
 
     } catch (error) {
         console.error('Resend verification error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json(
+            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
+        );
     }
 };
