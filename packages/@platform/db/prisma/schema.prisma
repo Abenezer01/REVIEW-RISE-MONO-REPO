@@ -78,7 +78,6 @@ model Location {
   business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
-  @@index([businessId, status])
 }
 
 model Role {
@@ -142,5 +141,4 @@ model Subscription {
 
   @@index([businessId])
   @@index([status])
-  @@index([stripeSubscriptionId])
 }
