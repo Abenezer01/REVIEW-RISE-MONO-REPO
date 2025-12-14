@@ -35,6 +35,21 @@ function getPoolConfig() {
     // SSL Settings
     config.ssl = {};
 
+    // Auto-disable SSL for localhost unless strictly required
+    const isLocal = connectionString.includes('localhost') || connectionString.includes('127.0.0.1');
+    if (isLocal && sslMode !== 'require' && sslMode !== 'verify-ca' && sslMode !== 'verify-full') {
+        try {
+            const url = new URL(connectionString);
+            url.searchParams.delete('sslmode');
+            return {
+                connectionString: url.toString(),
+            };
+        } catch (e) {
+            // Fallback if URL parsing fails
+            return { connectionString };
+        }
+    }
+
     // For prefer/require modes, enable SSL
     if (sslMode === 'prefer' || sslMode === 'require') {
         config.ssl.rejectUnauthorized = sslMode === 'require';
@@ -106,7 +121,7 @@ if (process.env.NODE_ENV !== 'production') {
 export async function disconnectDatabase() {
     await prisma.$disconnect();
     // Also end the pools
-    await pool.end(); 
+    await pool.end();
     if (adminConnectionString !== connectionString) {
         await adminPool.end();
     }
