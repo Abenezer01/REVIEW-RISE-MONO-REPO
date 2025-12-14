@@ -7,7 +7,7 @@ import {
     forgotPasswordLimiter,
     verifyEmailLimiter,
     resendVerificationEmailLimiter,
-} from '../../middlewares/rateLimiter';
+} from '../../middleware/rateLimiter';
 import { register, login, refreshToken, forgotPassword, resetPassword, verifyEmail, resendVerificationEmail } from '../../controllers/auth.controller';
 
 const router = Router();
