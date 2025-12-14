@@ -46,6 +46,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   userRoles     UserRole[]
+  userBusinessRoles UserBusinessRole[]
 }
 
 model UserRole {
@@ -70,6 +71,7 @@ model Business {
   deletedAt     DateTime?
   locations     Location[]
   subscriptions Subscription[]
+  userBusinessRoles UserBusinessRole[]
 
 
   @@index([name])
@@ -96,6 +98,7 @@ model Role {
   updatedAt   DateTime           @updatedAt
   permissions RolePermission[]
   userRoles   UserRole[]
+  userBusinessRoles UserBusinessRole[]
 }
 
 
@@ -133,5 +136,22 @@ model Subscription {
   deletedAt        DateTime?
   business         Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
+  @@index([businessId])
+}
+
+model UserBusinessRole {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String    @db.Uuid
+  businessId String    @db.Uuid
+  roleId     String    @db.Uuid
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  role       Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId, roleId])
+  @@index([userId])
   @@index([businessId])
 }
