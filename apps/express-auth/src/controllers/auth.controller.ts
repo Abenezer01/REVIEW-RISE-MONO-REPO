@@ -3,47 +3,26 @@ import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform
 import { userRepository, sessionRepository, passwordResetTokenRepository, emailVerificationTokenRepository } from '@platform/db';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-import { registerSchema } from '../validations/auth.validation';
+import {
+    registerSchema,
+    loginSchema,
+    refreshTokenSchema,
+    forgotPasswordSchema,
+    resetPasswordSchema,
+    verifyEmailSchema,
+    resendVerificationEmailSchema
+} from '../validations/auth.validation';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import { sendVerificationEmail } from '../services/notification.service';
 dotenv.config({ path: '../../../../.env' });
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const NOTIFICATIONS_SERVICE_URL = process.env.NOTIFICATIONS_SERVICE_URL;
 
 if (!JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined in environment variables");
 }
-
-if (!NOTIFICATIONS_SERVICE_URL) {
-    throw new Error("NOTIFICATIONS_SERVICE_URL is not defined in environment variables");
-}
-
-const sendVerificationEmail = async (email: string, token: string): Promise<void> => {
-    try {
-        const response = await fetch(`${NOTIFICATIONS_SERVICE_URL}/api/email/verification`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, token }),
-        });
-
-        const data = await response.json();
-
-        // Check contract response format: { success, data, message }
-        if (!response.ok || !data.success) {
-            throw new Error(data.message || `Notifications service responded with status: ${response.status}`);
-        }
-
-        console.log('✅ Verification email sent successfully via notifications service');
-    } catch (error) {
-        console.error('❌ Failed to send verification email:', error);
-        // Don't throw - we don't want email failures to block user registration
-        // In production, you might want to queue this for retry
-    }
-};
 
 export const register = async (req: Request, res: Response) => {
     try {
@@ -82,6 +61,7 @@ export const register = async (req: Request, res: Response) => {
             );
         }
 
+        // eslint-disable-next-line no-console
         console.error('Registration error:', error);
         res.status(500).json(
             createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
@@ -90,15 +70,9 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json(
-            createErrorResponse('Email and password are required', ErrorCode.BAD_REQUEST, 400)
-        );
-    }
-
     try {
+        const { email, password } = loginSchema.parse(req.body);
+
         const user = await userRepository.findByEmailWithRoles(email);
 
         if (!user || !user.password) {
@@ -116,10 +90,11 @@ export const login = async (req: Request, res: Response) => {
 
         // Check if email is verified
         if (!user.emailVerified) {
-            return res.status(403).json({
-                message: 'Please verify your email before logging in. Check your inbox for the verification link.',
-                requiresVerification: true
-            });
+            return res.status(403).json(
+                createErrorResponse('Please verify your email before logging in', ErrorCode.FORBIDDEN, 403, {
+                    requiresVerification: true
+                })
+            );
         }
 
         // Generate Access Token (JWT)
@@ -148,6 +123,18 @@ export const login = async (req: Request, res: Response) => {
         );
 
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            const validationErrors = error.issues.map(e => ({
+                field: e.path.join('.'),
+                message: e.message
+            }));
+
+            return res.status(400).json(
+                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
+            );
+        }
+
+        // eslint-disable-next-line no-console
         console.error('Login error:', error);
         res.status(500).json(
             createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
@@ -156,15 +143,9 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const refreshToken = async (req: Request, res: Response) => {
-    const { refreshToken } = req.body;
-
-    if (!refreshToken) {
-        return res.status(400).json(
-            createErrorResponse('Refresh token is required', ErrorCode.BAD_REQUEST, 400)
-        );
-    }
-
     try {
+        const { refreshToken } = refreshTokenSchema.parse(req.body);
+
         const session = await sessionRepository.findSession(refreshToken);
 
         if (!session) {
@@ -192,6 +173,18 @@ export const refreshToken = async (req: Request, res: Response) => {
         );
 
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            const validationErrors = error.issues.map(e => ({
+                field: e.path.join('.'),
+                message: e.message
+            }));
+
+            return res.status(400).json(
+                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
+            );
+        }
+
+        // eslint-disable-next-line no-console
         console.error('Refresh token error:', error);
         res.status(500).json(
             createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
@@ -200,21 +193,15 @@ export const refreshToken = async (req: Request, res: Response) => {
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {
-    const { email } = req.body;
-
-    if (!email) {
-        return res.status(400).json(
-            createErrorResponse('Email is required', ErrorCode.BAD_REQUEST, 400)
-        );
-    }
-
     try {
+        const { email } = forgotPasswordSchema.parse(req.body);
+
         const user = await userRepository.findByEmail(email);
 
         if (!user) {
             // Return success even if user not found to prevent enumeration
             return res.status(200).json(
-                createSuccessResponse(null, 'A password reset email has been sent.')
+                createSuccessResponse({}, 'A password reset email has been sent.')
             );
         }
 
@@ -224,8 +211,6 @@ export const forgotPassword = async (req: Request, res: Response) => {
         expires.setHours(expires.getHours() + 1); // 1 hour expiry
 
         // Save token to database
-        // Note: We might need to handle cleanup of old tokens or make sure email is unique in the reset token table if we want only one active token
-        // For now, simple create is fine, or we could delete existing ones for this email first
         await passwordResetTokenRepository.createToken({
             email,
             token,
@@ -238,9 +223,21 @@ export const forgotPassword = async (req: Request, res: Response) => {
         // In a real app: await sendEmail(user.email, "Password Reset", `Use this token: ${token}`);
 
         res.status(200).json(
-            createSuccessResponse(null, 'A password reset email has been sent.')
+            createSuccessResponse({}, 'A password reset email has been sent.')
         );
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            const validationErrors = error.issues.map(e => ({
+                field: e.path.join('.'),
+                message: e.message
+            }));
+
+            return res.status(400).json(
+                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
+            );
+        }
+
+        // eslint-disable-next-line no-console
         console.error('Forgot password error:', error);
         res.status(500).json(
             createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
@@ -249,15 +246,9 @@ export const forgotPassword = async (req: Request, res: Response) => {
 };
 
 export const resetPassword = async (req: Request, res: Response) => {
-    const { token, newPassword } = req.body;
-
-    if (!token || !newPassword) {
-        return res.status(400).json(
-            createErrorResponse('Token and new password are required', ErrorCode.BAD_REQUEST, 400)
-        );
-    }
-
     try {
+        const { token, newPassword } = resetPasswordSchema.parse(req.body);
+
         const resetToken = await passwordResetTokenRepository.findByToken(token);
 
         if (!resetToken) {
@@ -288,14 +279,23 @@ export const resetPassword = async (req: Request, res: Response) => {
         // Delete the used token
         await passwordResetTokenRepository.deleteToken(resetToken.id);
 
-        // Optional: Delete all other tokens for this email?
-        // await prisma.passwordResetToken.deleteMany({ where: { email: resetToken.email } });
-
         res.status(200).json(
-            createSuccessResponse(null, 'Password reset successful')
+            createSuccessResponse({}, 'Password reset successful')
         );
 
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            const validationErrors = error.issues.map(e => ({
+                field: e.path.join('.'),
+                message: e.message
+            }));
+
+            return res.status(400).json(
+                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
+            );
+        }
+
+        // eslint-disable-next-line no-console
         console.error('Reset password error:', error);
         res.status(500).json(
             createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
@@ -304,15 +304,9 @@ export const resetPassword = async (req: Request, res: Response) => {
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
-    const { token } = req.body;
-
-    if (!token) {
-        return res.status(400).json(
-            createErrorResponse('Verification token is required', ErrorCode.BAD_REQUEST, 400)
-        );
-    }
-
     try {
+        const { token } = verifyEmailSchema.parse(req.body);
+
         const verificationToken = await emailVerificationTokenRepository.findByToken(token);
 
         if (!verificationToken) {
@@ -356,6 +350,18 @@ export const verifyEmail = async (req: Request, res: Response) => {
         );
 
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            const validationErrors = error.issues.map(e => ({
+                field: e.path.join('.'),
+                message: e.message
+            }));
+
+            return res.status(400).json(
+                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
+            );
+        }
+
+        // eslint-disable-next-line no-console
         console.error('Email verification error:', error);
         res.status(500).json(
             createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
@@ -364,15 +370,9 @@ export const verifyEmail = async (req: Request, res: Response) => {
 };
 
 export const resendVerificationEmail = async (req: Request, res: Response) => {
-    const { email } = req.body;
-
-    if (!email) {
-        return res.status(400).json(
-            createErrorResponse('Email is required', ErrorCode.BAD_REQUEST, 400)
-        );
-    }
-
     try {
+        const { email } = resendVerificationEmailSchema.parse(req.body);
+
         const user = await userRepository.findByEmail(email);
 
         if (!user) {
@@ -411,6 +411,18 @@ export const resendVerificationEmail = async (req: Request, res: Response) => {
         );
 
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            const validationErrors = error.issues.map(e => ({
+                field: e.path.join('.'),
+                message: e.message
+            }));
+
+            return res.status(400).json(
+                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
+            );
+        }
+
+        // eslint-disable-next-line no-console
         console.error('Resend verification error:', error);
         res.status(500).json(
             createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
