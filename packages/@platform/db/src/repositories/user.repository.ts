@@ -121,6 +121,22 @@ export class UserRepository extends BaseRepository<
         };
     }
     /**
+     * Find user by email with roles
+     */
+    async findByEmailWithRoles(email: string) {
+        return this.delegate.findUnique({
+            where: { email },
+            include: {
+                userRoles: {
+                    include: {
+                        role: true,
+                    },
+                },
+            },
+        });
+    }
+    
+    /**
      * Create user with "Customer" role
      */
     async createCustomer(data: Prisma.UserCreateInput) {
