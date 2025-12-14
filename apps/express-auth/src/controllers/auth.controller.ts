@@ -1,16 +1,13 @@
 import { Request, Response } from 'express';
 import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
-import { userRepository } from '@platform/db';
+import { userRepository, sessionRepository } from '@platform/db';
 import bcrypt from 'bcryptjs';
-import dotenv from 'dotenv';
 import { z } from 'zod';
 import { registerSchema } from '../validations/auth.validation';
-
-dotenv.config({ path: '../../.env' });
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-dotenv.config({ path: '.env.example' });
+dotenv.config({ path: '../../../../.env' });
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -66,22 +63,25 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required' });
+        return res.status(400).json(
+            createErrorResponse('Email and password are required', ErrorCode.BAD_REQUEST, 400)
+        );
     }
 
     try {
-        const user = await prisma.user.findUnique({
-            where: { email },
-            include: { userRoles: { include: { role: true } } }
-        });
+        const user = await userRepository.findByEmailWithRoles(email);
 
         if (!user || !user.password) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json(
+                createErrorResponse('Invalid credentials', ErrorCode.UNAUTHORIZED, 401)
+            );
         }
 
         const isValidPassword = await bcrypt.compare(password, user.password);
         if (!isValidPassword) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json(
+                createErrorResponse('Invalid credentials', ErrorCode.UNAUTHORIZED, 401)
+            );
         }
 
         // Generate Access Token (JWT)
@@ -96,23 +96,24 @@ export const login = async (req: Request, res: Response) => {
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiry
 
-        await prisma.session.create({
-            data: {
-                sessionToken: refreshToken,
-                userId: user.id,
-                expires: expiresAt,
-            }
+        await sessionRepository.createSession({
+            sessionToken: refreshToken,
+            userId: user.id,
+            expires: expiresAt,
         });
 
-        res.json({
-            message: 'Login successful',
-            accessToken,
-            refreshToken
-        });
+        res.status(200).json(
+            createSuccessResponse({
+                accessToken,
+                refreshToken
+            }, 'Login successful')
+        );
 
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json(
+            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
+        );
     }
 };
 
@@ -120,37 +121,42 @@ export const refreshToken = async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-        return res.status(400).json({ message: 'Refresh token is required' });
+        return res.status(400).json(
+            createErrorResponse('Refresh token is required', ErrorCode.BAD_REQUEST, 400)
+        );
     }
 
     try {
-        const session = await prisma.session.findUnique({
-            where: { sessionToken: refreshToken },
-            include: { user: { include: { userRoles: { include: { role: true } } } } }
-        });
+        const session = await sessionRepository.findSession(refreshToken);
 
         if (!session) {
-            return res.status(401).json({ message: 'Invalid refresh token' });
+            return res.status(401).json(
+                createErrorResponse('Invalid refresh token', ErrorCode.UNAUTHORIZED, 401)
+            );
         }
 
         if (session.expires < new Date()) {
-            await prisma.session.delete({ where: { id: session.id } });
-            return res.status(401).json({ message: 'Refresh token expired' });
+            await sessionRepository.deleteSession(session.id);
+            return res.status(401).json(
+                createErrorResponse('Refresh token expired', ErrorCode.UNAUTHORIZED, 401)
+            );
         }
 
         const user = session.user;
         const newAccessToken = jwt.sign(
-            { userId: user.id, email: user.email, roles: user.userRoles.map(ur => ur.role.name) },
+            { userId: user.id, email: user.email, roles: user.userRoles.map((ur: any) => ur.role.name) },
             JWT_SECRET,
             { expiresIn: '15m' }
         );
 
-        res.json({
-            accessToken: newAccessToken
-        });
+        res.status(200).json(
+            createSuccessResponse({ accessToken: newAccessToken }, 'Token refreshed successfully')
+        );
 
     } catch (error) {
         console.error('Refresh token error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json(
+            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
+        );
     }
 };
