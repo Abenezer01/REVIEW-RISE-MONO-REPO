@@ -3,41 +3,52 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider   = "postgresql"
 }
 
-model User {
-  id            String             @id @default(uuid())
-  email         String             @unique
-  name          String?
-  phone         String?
-  emailVerified DateTime?
-  image         String?
-  status        String             @default("active")
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  deletedAt     DateTime?
-  sessions      Session[]
-  roles         UserBusinessRole[]
+model Account {
+  id                 String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String  @db.Uuid
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
 
-  @@index([email])
-  @@index([status])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id           String   @id @default(uuid())
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   sessionToken String   @unique
-  userId       String
+  userId       String   @db.Uuid
   expires      DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
-  @@index([userId])
+model User {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  roles         UserBusinessRole[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
 }
 
 model Business {
-  id            String             @id @default(uuid())
+  id            String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String
   slug          String             @unique
   description   String?
@@ -57,27 +68,20 @@ model Business {
 }
 
 model Location {
-  id         String    @id @default(uuid())
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name       String
   address    String?
-  city       String?
-  state      String?
-  zipCode    String?
-  country    String?   @default("US")
-  phone      String?
-  status     String    @default("active")
-  businessId String
+  businessId String    @db.Uuid
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
   business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
-  @@index([businessId, status])
 }
 
 model Role {
-  id          String             @id @default(uuid())
+  id          String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String             @unique
   description String?
   createdAt   DateTime           @default(now())
@@ -87,7 +91,7 @@ model Role {
 }
 
 model Permission {
-  id          String           @id @default(uuid())
+  id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   action      String           @unique
   description String?
   createdAt   DateTime         @default(now())
@@ -96,19 +100,22 @@ model Permission {
 }
 
 model RolePermission {
-  roleId       String
-  permissionId String
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  roleId       String     @db.Uuid
+  permissionId String     @db.Uuid
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
   role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
-  @@id([roleId, permissionId])
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
 }
 
 model UserBusinessRole {
-  id         String    @id @default(uuid())
-  userId     String
-  businessId String
-  roleId     String
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String    @db.Uuid
+  businessId String    @db.Uuid
+  roleId     String    @db.Uuid
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
@@ -122,21 +129,16 @@ model UserBusinessRole {
 }
 
 model Subscription {
-  id                   String    @id @default(uuid())
-  businessId           String
-  plan                 String
-  status               String
-  currentPeriodEnd     DateTime
-  stripeSubscriptionId String?   @unique
-  stripeCustomerId     String?
-  trialEndsAt          DateTime?
-  canceledAt           DateTime?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-  deletedAt            DateTime?
-  business             Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId       String    @db.Uuid
+  plan             String
+  status           String
+  currentPeriodEnd DateTime
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+  business         Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
   @@index([status])
-  @@index([stripeSubscriptionId])
 }
