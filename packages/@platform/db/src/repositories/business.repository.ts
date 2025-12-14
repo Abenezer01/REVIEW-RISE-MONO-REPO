@@ -70,80 +70,6 @@ export class BusinessRepository extends BaseRepository<
     }
 
     /**
-     * Find business with team members and their roles
-     */
-    async findWithTeam(id: string) {
-        return this.delegate.findUnique({
-            where: { id },
-            include: {
-                userRoles: {
-                    where: {
-                        deletedAt: null,
-                    },
-                    include: {
-                        user: {
-                            select: {
-                                id: true,
-                                email: true,
-                                name: true,
-                                image: true,
-                            },
-                        },
-                        role: {
-                            select: {
-                                id: true,
-                                name: true,
-                                description: true,
-                            },
-                        },
-                    },
-                    orderBy: {
-                        createdAt: 'asc',
-                    },
-                },
-            },
-        });
-    }
-
-    /**
-     * Create business with owner
-     */
-    async createWithOwner(
-        businessData: Omit<Prisma.BusinessCreateInput, 'userRoles'>,
-        ownerId: string,
-        ownerRoleId: string
-    ) {
-        return this.transaction(async (tx) => {
-            // Create business
-            const business = await tx.business.create({
-                data: businessData,
-            });
-
-            // Assign owner role
-            await tx.userBusinessRole.create({
-                data: {
-                    userId: ownerId,
-                    businessId: business.id,
-                    roleId: ownerRoleId,
-                },
-            });
-
-            // Return business with owner
-            return tx.business.findUnique({
-                where: { id: business.id },
-                include: {
-                    userRoles: {
-                        include: {
-                            user: true,
-                            role: true,
-                        },
-                    },
-                },
-            });
-        });
-    }
-
-    /**
      * Check if slug is available
      */
     async isSlugAvailable(slug: string, excludeId?: string): Promise<boolean> {
@@ -175,47 +101,6 @@ export class BusinessRepository extends BaseRepository<
         }
 
         return slug;
-    }
-
-    /**
-     * Find businesses by user ID
-     */
-    async findByUserId(userId: string) {
-        return this.delegate.findMany({
-            where: {
-                userRoles: {
-                    some: {
-                        userId,
-                        deletedAt: null,
-                    },
-                },
-                deletedAt: null,
-            },
-            include: {
-                userRoles: {
-                    where: {
-                        userId,
-                        deletedAt: null,
-                    },
-                    include: {
-                        role: true,
-                    },
-                },
-                subscriptions: {
-                    where: {
-                        deletedAt: null,
-                        status: 'active',
-                    },
-                    take: 1,
-                    orderBy: {
-                        currentPeriodEnd: 'desc',
-                    },
-                },
-            },
-            orderBy: {
-                createdAt: 'desc',
-            },
-        });
     }
 
     /**
@@ -264,75 +149,6 @@ export class BusinessRepository extends BaseRepository<
             withActiveSubscription,
             withoutSubscription: active - withActiveSubscription,
         };
-    }
-
-    /**
-     * Add team member to business
-     */
-    async addTeamMember(businessId: string, userId: string, roleId: string) {
-        return prisma.userBusinessRole.create({
-            data: {
-                businessId,
-                userId,
-                roleId,
-            },
-            include: {
-                user: true,
-                role: true,
-            },
-        });
-    }
-
-    /**
-     * Remove team member from business
-     */
-    async removeTeamMember(businessId: string, userId: string) {
-        return prisma.userBusinessRole.updateMany({
-            where: {
-                businessId,
-                userId,
-                deletedAt: null,
-            },
-            data: {
-                deletedAt: new Date(),
-            },
-        });
-    }
-
-    /**
-     * Update team member role
-     */
-    async updateTeamMemberRole(
-        businessId: string,
-        userId: string,
-        newRoleId: string
-    ) {
-        return this.transaction(async (tx) => {
-            // Soft delete old role assignment
-            await tx.userBusinessRole.updateMany({
-                where: {
-                    businessId,
-                    userId,
-                    deletedAt: null,
-                },
-                data: {
-                    deletedAt: new Date(),
-                },
-            });
-
-            // Create new role assignment
-            return tx.userBusinessRole.create({
-                data: {
-                    businessId,
-                    userId,
-                    roleId: newRoleId,
-                },
-                include: {
-                    user: true,
-                    role: true,
-                },
-            });
-        });
     }
 }
 

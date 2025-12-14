@@ -52,9 +52,6 @@ export class RoleRepository extends BaseRepository<
             where: { id },
             include: {
                 userRoles: {
-                    where: {
-                        deletedAt: null,
-                    },
                     include: {
                         user: {
                             select: {
@@ -62,13 +59,6 @@ export class RoleRepository extends BaseRepository<
                                 email: true,
                                 name: true,
                                 image: true,
-                            },
-                        },
-                        business: {
-                            select: {
-                                id: true,
-                                name: true,
-                                slug: true,
                             },
                         },
                     },
@@ -241,9 +231,7 @@ export class RoleRepository extends BaseRepository<
             this.delegate.count({
                 where: {
                     userRoles: {
-                        some: {
-                            deletedAt: null,
-                        },
+                        some: {},
                     },
                 },
             }),
