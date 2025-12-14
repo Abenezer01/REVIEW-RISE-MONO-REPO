@@ -135,7 +135,7 @@ export class UserRepository extends BaseRepository<
             },
         });
     }
-    
+
     /**
      * Create user with "Customer" role
      */
@@ -159,6 +159,16 @@ export class UserRepository extends BaseRepository<
                     },
                 },
             },
+        });
+    }
+
+    /**
+     * Update user password
+     */
+    async updatePassword(id: string, password: string) {
+        return this.delegate.update({
+            where: { id },
+            data: { password },
         });
     }
 }

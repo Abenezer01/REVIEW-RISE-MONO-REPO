@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
-import { userRepository, sessionRepository } from '@platform/db';
+import { userRepository, sessionRepository, passwordResetTokenRepository } from '@platform/db';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { registerSchema } from '../validations/auth.validation';
@@ -165,44 +165,47 @@ export const forgotPassword = async (req: Request, res: Response) => {
     const { email } = req.body;
 
     if (!email) {
-        return res.status(400).json({ message: 'Email is required' });
+        return res.status(400).json(
+            createErrorResponse('Email is required', ErrorCode.BAD_REQUEST, 400)
+        );
     }
 
     try {
-        const user = await prisma.user.findUnique({
-            where: { email },
-        });
+        const user = await userRepository.findByEmail(email);
 
         if (!user) {
             // Return success even if user not found to prevent enumeration
-            return res.json({ message: 'A password reset email has been sent.' });
+            return res.status(200).json(
+                createSuccessResponse(null, 'A password reset email has been sent.')
+            );
         }
 
         // Generate reset token
         const token = crypto.randomUUID();
-        const expiresAt = new Date();
-        expiresAt.setHours(expiresAt.getHours() + 1); // 1 hour expiry
+        const expires = new Date();
+        expires.setHours(expires.getHours() + 1); // 1 hour expiry
 
         // Save token to database
         // Note: We might need to handle cleanup of old tokens or make sure email is unique in the reset token table if we want only one active token
         // For now, simple create is fine, or we could delete existing ones for this email first
-        await prisma.passwordResetToken.create({
-            data: {
-                email,
-                token,
-                expires: expiresAt
-            }
+        await passwordResetTokenRepository.createToken({
+            email,
+            token,
+            expires
         });
 
         // Mock sending email
         console.log(`[MOCK EMAIL] Password reset token for ${email}: ${token}`);
         // In a real app: await sendEmail(user.email, "Password Reset", `Use this token: ${token}`);
 
-        res.json({ message: 'A password reset email has been sent.' });
-
+        res.status(200).json(
+            createSuccessResponse(null, 'A password reset email has been sent.')
+        );
     } catch (error) {
         console.error('Forgot password error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json(
+            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
+        );
     }
 };
 
@@ -210,50 +213,53 @@ export const resetPassword = async (req: Request, res: Response) => {
     const { token, newPassword } = req.body;
 
     if (!token || !newPassword) {
-        return res.status(400).json({ message: 'Token and new password are required' });
+        return res.status(400).json(
+            createErrorResponse('Token and new password are required', ErrorCode.BAD_REQUEST, 400)
+        );
     }
 
     try {
-        const resetToken = await prisma.passwordResetToken.findUnique({
-            where: { token },
-        });
+        const resetToken = await passwordResetTokenRepository.findByToken(token);
 
         if (!resetToken) {
-            return res.status(400).json({ message: 'Invalid or expired token' });
+            return res.status(400).json(
+                createErrorResponse('Invalid or expired token', ErrorCode.BAD_REQUEST, 400)
+            );
         }
 
         if (resetToken.expires < new Date()) {
-            await prisma.passwordResetToken.delete({ where: { id: resetToken.id } });
-            return res.status(400).json({ message: 'Invalid or expired token' });
+            await passwordResetTokenRepository.deleteToken(resetToken.id);
+            return res.status(400).json(
+                createErrorResponse('Invalid or expired token', ErrorCode.BAD_REQUEST, 400)
+            );
         }
 
-        const user = await prisma.user.findUnique({
-            where: { email: resetToken.email }
-        });
+        const user = await userRepository.findByEmail(resetToken.email);
 
         if (!user) {
-            return res.status(400).json({ message: 'User no longer exists' });
+            return res.status(400).json(
+                createErrorResponse('User no longer exists', ErrorCode.BAD_REQUEST, 400)
+            );
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        await prisma.user.update({
-            where: { id: user.id },
-            data: { password: hashedPassword }
-        });
+        await userRepository.updatePassword(user.id, hashedPassword);
 
         // Delete the used token
-        await prisma.passwordResetToken.delete({
-            where: { id: resetToken.id }
-        });
+        await passwordResetTokenRepository.deleteToken(resetToken.id);
 
         // Optional: Delete all other tokens for this email?
         // await prisma.passwordResetToken.deleteMany({ where: { email: resetToken.email } });
 
-        res.json({ message: 'Password reset successful' });
+        res.status(200).json(
+            createSuccessResponse(null, 'Password reset successful')
+        );
 
     } catch (error) {
         console.error('Reset password error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json(
+            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
+        );
     }
 };
