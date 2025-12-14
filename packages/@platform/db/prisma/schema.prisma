@@ -94,7 +94,6 @@ model Location {
   business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
-  @@index([businessId, status])
 }
 
 model Role {
@@ -130,22 +129,6 @@ model RolePermission {
   @@index([permissionId])
 }
 
-
-
-model Subscription {
-  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId       String    @db.Uuid
-  plan             String
-  status           String
-  currentPeriodEnd DateTime
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  deletedAt        DateTime?
-  business         Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-
-  @@index([businessId])
-}
-
 model UserBusinessRole {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId     String    @db.Uuid
@@ -161,6 +144,26 @@ model UserBusinessRole {
   @@unique([userId, businessId, roleId])
   @@index([userId])
   @@index([businessId])
+}
+
+model Subscription {
+  id                   String    @id @default(uuid())
+  businessId           String
+  plan                 String
+  status               String
+  currentPeriodEnd     DateTime
+  stripeSubscriptionId String?   @unique
+  stripeCustomerId     String?
+  trialEndsAt          DateTime?
+  canceledAt           DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  deletedAt            DateTime?
+  business             Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([status])
+  @@index([stripeSubscriptionId])
 }
 
 model PasswordResetToken {
