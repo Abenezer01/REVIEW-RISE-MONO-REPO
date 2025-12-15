@@ -200,8 +200,8 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
         if (!user) {
             // Return success even if user not found to prevent enumeration
-            return res.status(200).json(
-                createSuccessResponse({}, 'A password reset email has been sent.')
+            return res.status(401).json(
+                createErrorResponse('Invalid credentials', ErrorCode.UNAUTHORIZED, 401)
             );
         }
 
