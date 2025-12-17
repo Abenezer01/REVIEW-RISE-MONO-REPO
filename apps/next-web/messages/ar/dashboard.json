@@ -1,0 +1,31 @@
+{
+  "overview": {
+    "title": "نظرة عامة على لوحة التحكم",
+    "welcome": "مرحباً بعودتك",
+    "totalReviews": "إجمالي المراجعات",
+    "averageRating": "متوسط التقييم",
+    "responseRate": "معدل الاستجابة",
+    "pendingReviews": "المراجعات المعلقة"
+  },
+  "stats": {
+    "thisWeek": "هذا الأسبوع",
+    "thisMonth": "هذا الشهر",
+    "thisYear": "هذا العام",
+    "allTime": "كل الوقت"
+  },
+  "reviews": {
+    "title": "المراجعات",
+    "recent": "المراجعات الأخيرة",
+    "positive": "إيجابية",
+    "negative": "سلبية",
+    "neutral": "محايدة",
+    "reply": "رد",
+    "viewAll": "عرض جميع المراجعات"
+  },
+  "actions": {
+    "respondToReview": "الرد على المراجعة",
+    "generateResponse": "إنشاء رد بالذكاء الاصطناعي",
+    "viewDetails": "عرض التفاصيل",
+    "markAsRead": "وضع علامة كمقروء"
+  }
+}

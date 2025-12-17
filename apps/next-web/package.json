@@ -17,6 +17,8 @@
     "test": "echo \"No tests specified for next-web\" && exit 0"
   },
   "dependencies": {
+    "@casl/ability": "^6.7.3",
+    "@casl/react": "^5.0.0",
     "@emotion/cache": "11.14.0",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
@@ -25,14 +27,24 @@
     "@mui/material": "7.3.5",
     "@mui/material-nextjs": "7.3.5",
     "@mui/utils": "7.3.5",
+    "@mui/x-data-grid": "^8.22.0",
+    "@platform/contracts": "workspace:*",
+    "@platform/i18n": "workspace:*",
+    "@platform/utils": "workspace:*",
+    "@tanstack/react-query": "^5.90.12",
     "classnames": "2.5.1",
+    "formik": "^2.4.9",
+    "lodash": "^4.17.21",
     "next": "16.0.3",
+    "next-intl": "^4.6.1",
     "react": "19.2.0",
     "react-colorful": "5.6.1",
     "react-dom": "19.2.0",
+    "react-hot-toast": "^2.4.1",
     "react-perfect-scrollbar": "1.5.8",
     "react-use": "17.6.0",
-    "server-only": "0.0.1"
+    "server-only": "0.0.1",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@iconify/json": "2.2.408",

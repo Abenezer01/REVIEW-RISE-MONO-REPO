@@ -48,7 +48,10 @@
       ],
       "@views/*": [
         "./src/views/*"
-      ]
+      ],
+      "@platform/utils": ["../../packages/@platform/utils/src/index.ts"],
+      "@platform/contracts": ["../../packages/@platform/contracts/src/index.ts"],
+      "@platform/i18n": ["../../packages/@platform/i18n/src/index.ts"]
     }
   },
   "include": [

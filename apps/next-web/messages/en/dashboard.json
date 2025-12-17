@@ -1,0 +1,31 @@
+{
+  "overview": {
+    "title": "Dashboard Overview",
+    "welcome": "Welcome back",
+    "totalReviews": "Total Reviews",
+    "averageRating": "Average Rating",
+    "responseRate": "Response Rate",
+    "pendingReviews": "Pending Reviews"
+  },
+  "stats": {
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "thisYear": "This Year",
+    "allTime": "All Time"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "recent": "Recent Reviews",
+    "positive": "Positive",
+    "negative": "Negative",
+    "neutral": "Neutral",
+    "reply": "Reply",
+    "viewAll": "View All Reviews"
+  },
+  "actions": {
+    "respondToReview": "Respond to Review",
+    "generateResponse": "Generate AI Response",
+    "viewDetails": "View Details",
+    "markAsRead": "Mark as Read"
+  }
+}

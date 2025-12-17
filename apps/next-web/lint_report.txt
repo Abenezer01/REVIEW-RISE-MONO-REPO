@@ -1,0 +1,342 @@
+
+> @apps/next-web@5.0.0 lint C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web
+> eslint . --ext .js,.jsx,.ts,.tsx
+
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\app\[locale]\layout.tsx
+   9:1   error  There should be at least one empty line between import groups                                 import/order
+  10:1   error  `next/navigation` import should occur before import of `@mui/material/InitColorSchemeScript`  import/order
+  13:15  error  'ChildrenType' is defined but never used                                                      @typescript-eslint/no-unused-vars
+  16:1   error  `@platform/i18n` import should occur before type import of `@core/types`                      import/order
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\app\[locale]\page.tsx
+  10:5  error  Expected blank line before this statement  padding-line-between-statements
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\app\page.tsx
+  1:1  error  There should be at least one empty line between import groups  import/order
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\LocaleSwitcher.tsx
+  3:1  error  There should be at least one empty line between import groups          import/order
+  4:1  error  There should be at least one empty line between import groups          import/order
+  4:1  error  `@/i18n/routing` import should occur after import of `@platform/i18n`  import/order
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\dialog\confirmation-dialog.tsx
+   1:1  error  There should be at least one empty line between import groups  import/order
+   2:1  error  Imports "ComponentType" are only used as type                  @typescript-eslint/consistent-type-imports
+   2:1  error  `react` import should occur before import of `@mui/material`   import/order
+  12:1  error  Expected blank line before this statement                      padding-line-between-statements
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\dialog\delete-confirmation-dialog.tsx
+  1:1  error  Expected 1 empty line after import statement not followed by another import  import/newline-after-import
+  1:1  error  Imports "ConfirmationDialogProps" are only used as type                      @typescript-eslint/consistent-type-imports
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\drawer\side-drawer.tsx
+  1:1   error  There should be at least one empty line between import groups                              import/order
+  2:1   error  Imports "BoxProps" are only used as type                                                   @typescript-eslint/consistent-type-imports
+  2:1   error  There should be at least one empty line between import groups                              import/order
+  3:1   error  There should be at least one empty line between import groups                              import/order
+  4:1   error  There should be at least one empty line between import groups                              import/order
+  4:1   error  `src/@core/components/icon` import should occur before import of `@/hooks/useTranslation`  import/order
+  4:18  error  Unable to resolve path to module 'src/@core/components/icon'                               import/no-unresolved
+  5:37  error  Unable to resolve path to module '../data-collection-guide'                                import/no-unresolved
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\custom-autocomplete.tsx
+   1:1   error  There should be at least one empty line between import groups                                                                                                                                                                                                                                                                                                                              import/order
+  34:50  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  57:3   error  Expected blank line before this statement                                                                                                                                                                                                                                                                                                                                                  padding-line-between-statements
+  57:3   error  Expected newline before return statement                                                                                                                                                                                                                                                                                                                                                   newline-before-return
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\custom-date-box.tsx
+  2:1   error  There should be at least one empty line between import groups           import/order
+  3:1   error  There should be at least one empty line between import groups           import/order
+  3:1   error  `react` import should occur before import of `@mui/material`            import/order
+  4:18  error  Unable to resolve path to module 'src/@core/components/icon'            import/no-unresolved
+  5:29  error  Unable to resolve path to module 'src/@core/components/mui/text-field'  import/no-unresolved
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\custom-multi-file-selector.tsx
+   1:1   error  There should be at least one empty line between import groups                          import/order
+   2:1   error  There should be at least one empty line between import groups                          import/order
+   3:1   error  There should be at least one empty line between import groups                          import/order
+   3:1   error  `@/hooks/useTranslation` import should occur after import of `src/types/general/file`  import/order
+   4:22  error  Unable to resolve path to module '@iconify/react'                                      import/no-unresolved
+   5:1   error  All imports in the declaration are only used as types. Use `import type`               @typescript-eslint/consistent-type-imports
+   5:28  error  Unable to resolve path to module 'src/types/general/file'                              import/no-unresolved
+  22:7   error  Expected blank line before this statement                                              padding-line-between-statements
+  28:5   error  Expected blank line before this statement                                              padding-line-between-statements
+  36:29  error  'index' is defined but never used                                                      @typescript-eslint/no-unused-vars
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\custom-number-range.tsx
+  1:1   error  There should be at least one empty line between import groups  import/order
+  3:1   error  Imports "FieldProps" are only used as type                     @typescript-eslint/consistent-type-imports
+  3:31  error  FieldProps not found in 'formik'                               import/named
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\custom-phone-box.tsx
+   2:1   error  There should be at least one empty line between import groups                import/order
+   3:1   error  There should be at least one empty line between import groups                import/order
+   3:1   error  `react` import should occur before import of `@mui/material`                 import/order
+   4:8   error  Unable to resolve path to module 'react-international-phone/style.css'       import/no-unresolved
+   5:35  error  Unable to resolve path to module 'src/context/required-fields-context'       import/no-unresolved
+   6:26  error  Unable to resolve path to module 'src/views/components/phone/custome-phone'  import/no-unresolved
+  14:3   error  Expected blank line before this statement                                    padding-line-between-statements
+  16:3   error  Expected blank line before this statement                                    padding-line-between-statements
+  16:3   error  Expected newline before return statement                                     newline-before-return
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\custom-radio-box.tsx
+   2:1   error  There should be at least one empty line between import groups           import/order
+   3:1   error  There should be at least one empty line between import groups           import/order
+   3:1   error  `react` import should occur before import of `@mui/material`            import/order
+   4:35  error  Unable to resolve path to module 'src/context/required-fields-context'  import/no-unresolved
+  13:3   error  Expected blank line before this statement                               padding-line-between-statements
+  13:3   error  Expected newline before return statement                                newline-before-return
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\custom-select-multi.tsx
+  1:1  error  There should be at least one empty line between import groups  import/order
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\custom-select.tsx
+   2:1   error  There should be at least one empty line between import groups           import/order
+   3:1   error  There should be at least one empty line between import groups           import/order
+   3:1   error  `react` import should occur before import of `@mui/material`            import/order
+   4:29  error  Unable to resolve path to module 'src/@core/components/mui/text-field'  import/no-unresolved
+   5:35  error  Unable to resolve path to module 'src/context/required-fields-context'  import/no-unresolved
+  23:5   error  Expected blank line before this statement                               padding-line-between-statements
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\custom-switch.tsx
+  1:1  error  There should be at least one empty line between import groups  import/order
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\custom-text-box.tsx
+   2:1   error  There should be at least one empty line between import groups           import/order
+   3:1   error  There should be at least one empty line between import groups           import/order
+   3:1   error  `react` import should occur before import of `@mui/material`            import/order
+   4:29  error  Unable to resolve path to module 'src/@core/components/mui/text-field'  import/no-unresolved
+   5:35  error  Unable to resolve path to module 'src/context/required-fields-context'  import/no-unresolved
+  75:5   error  Expected blank line before this statement                               padding-line-between-statements
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\custome-file-selector.tsx
+   1:1   error  There should be at least one empty line between import groups                   import/order
+   2:1   error  There should be at least one empty line between import groups                   import/order
+   3:1   error  There should be at least one empty line between import groups                   import/order
+   4:1   error  `@iconify/react` import should occur before import of `@/hooks/useTranslation`  import/order
+   4:22  error  Unable to resolve path to module '@iconify/react'                               import/no-unresolved
+  14:3   error  Expected blank line before this statement                                       padding-line-between-statements
+  14:3   error  Expected newline before return statement                                        newline-before-return
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\form-wrapper.tsx
+    2:29  error  'Dialog' is defined but never used                                                                   @typescript-eslint/no-unused-vars
+    2:37  error  'DialogTitle' is defined but never used                                                              @typescript-eslint/no-unused-vars
+    2:50  error  'DialogContent' is defined but never used                                                            @typescript-eslint/no-unused-vars
+    2:65  error  'DialogActions' is defined but never used                                                            @typescript-eslint/no-unused-vars
+    2:80  error  'Typography' is defined but never used                                                               @typescript-eslint/no-unused-vars
+    3:1   error  Imports "FormikProps", "FormikHelpers", "FormikValues" and "FormikErrors" are only used as type      @typescript-eslint/consistent-type-imports
+    3:1   error  There should be at least one empty line between import groups                                        import/order
+    3:18  error  FormikProps not found in 'formik'                                                                    import/named
+    3:31  error  FormikHelpers not found in 'formik'                                                                  import/named
+    3:46  error  FormikValues not found in 'formik'                                                                   import/named
+    3:60  error  FormikErrors not found in 'formik'                                                                   import/named
+    4:1   error  There should be at least one empty line between import groups                                        import/order
+    4:1   error  `next/router` import should occur before import of `@mui/lab`                                        import/order
+    5:1   error  There should be at least one empty line between import groups                                        import/order
+    5:23  error  Unable to resolve path to module 'react-hot-toast'                                                   import/no-unresolved
+    6:1   error  There should be at least one empty line between import groups                                        import/order
+    7:1   error  `src/context/required-fields-context` import should occur before import of `@/hooks/useTranslation`  import/order
+    7:35  error  Unable to resolve path to module 'src/context/required-fields-context'                               import/no-unresolved
+    8:1   error  `src/layouts/components/Translations` import should occur before import of `@/hooks/useTranslation`  import/order
+    8:26  error  Unable to resolve path to module 'src/layouts/components/Translations'                               import/no-unresolved
+    9:1   error  All imports in the declaration are only used as types. Use `import type`                             @typescript-eslint/consistent-type-imports
+    9:1   error  `src/types/requests` import should occur before import of `@/hooks/useTranslation`                   import/order
+    9:43  error  Unable to resolve path to module 'src/types/requests'                                                import/no-unresolved
+   10:1   error  `src/utils/parse/clean-error` import should occur before import of `@/hooks/useTranslation`          import/order
+   10:28  error  Unable to resolve path to module 'src/utils/parse/clean-error'                                       import/no-unresolved
+   11:1   error  `src/views/components/page/page` import should occur before import of `@/hooks/useTranslation`       import/order
+   11:18  error  Unable to resolve path to module 'src/views/components/page/page'                                    import/no-unresolved
+   12:1   error  All imports in the declaration are only used as types. Use `import type`                             @typescript-eslint/consistent-type-imports
+   12:1   error  There should be at least one empty line between import groups                                        import/order
+   12:1   error  `yup` import should occur before import of `@/hooks/useTranslation`                                  import/order
+   12:22  error  Unable to resolve path to module 'yup'                                                               import/no-unresolved
+   13:1   error  There should be at least one empty line between import groups                                        import/order
+   13:1   error  `react` import should occur before import of `@mui/lab`                                              import/order
+   17:11  error  'ConfirmDialogProps' is defined but never used                                                       @typescript-eslint/no-unused-vars
+   52:3   error  'showTitle' is assigned a value but never used                                                       @typescript-eslint/no-unused-vars
+   56:3   error  'fullLayout' is assigned a value but never used                                                      @typescript-eslint/no-unused-vars
+   58:3   error  'headerActions' is assigned a value but never used                                                   @typescript-eslint/no-unused-vars
+   67:3   error  Expected line before comment                                                                         lines-around-comment
+   74:5   error  Expected blank line before this statement                                                            padding-line-between-statements
+   76:7   error  Expected blank line before this statement                                                            padding-line-between-statements
+   78:7   error  Expected blank line before this statement                                                            padding-line-between-statements
+   83:7   error  Expected blank line before this statement                                                            padding-line-between-statements
+   86:7   error  Expected blank line before this statement                                                            padding-line-between-statements
+  116:7   error  Expected blank line before this statement                                                            padding-line-between-statements
+  199:5   error  Expected blank line before this statement                                                            padding-line-between-statements
+  199:5   error  Expected newline before return statement                                                             newline-before-return
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\week-picker.tsx
+   2:32  error  Unable to resolve path to module '@mui/x-date-pickers/AdapterDateFns'        import/no-unresolved
+   3:28  error  Unable to resolve path to module '@mui/x-date-pickers/DatePicker'            import/no-unresolved
+   4:38  error  Unable to resolve path to module '@mui/x-date-pickers/LocalizationProvider'  import/no-unresolved
+   5:58  error  Unable to resolve path to module 'date-fns'                                  import/no-unresolved
+   6:1   error  There should be at least one empty line between import groups                import/order
+   7:1   error  There should be at least one empty line between import groups                import/order
+   7:1   error  `react` import should occur before import of `@mui/material`                 import/order
+   8:29  error  Unable to resolve path to module 'src/@core/components/mui/text-field'       import/no-unresolved
+  35:5   error  Expected blank line before this statement                                    padding-line-between-statements
+  41:5   error  Expected blank line before this statement                                    padding-line-between-statements
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\layouts\other\other-detail-drawer.tsx
+   6:1   error  There should be at least one empty line between import groups                                                    import/order
+   6:25  error  Unable to resolve path to module 'lodash'                                                                        import/no-unresolved
+   7:1   error  There should be at least one empty line between import groups                                                    import/order
+   7:1   error  `react` import should occur before import of `@mui/material/Box`                                                 import/order
+   8:1   error  There should be at least one empty line between import groups                                                    import/order
+   9:1   error  `src/configs/app-constants` import should occur before import of `@/hooks/useTranslation`                        import/order
+   9:29  error  Unable to resolve path to module 'src/configs/app-constants'                                                     import/no-unresolved
+  10:1   error  `src/views/components/custom/files-drawer` import should occur before import of `@/hooks/useTranslation`         import/order
+  10:24  error  Unable to resolve path to module 'src/views/components/custom/files-drawer'                                      import/no-unresolved
+  11:1   error  `src/views/pages/resources/details/desc-collapse` import should occur before import of `@/hooks/useTranslation`  import/order
+  11:26  error  Unable to resolve path to module 'src/views/pages/resources/details/desc-collapse'                               import/no-unresolved
+  12:1   error  `src/views/shared/drawer/side-drawer` import should occur before import of `@/hooks/useTranslation`              import/order
+  12:30  error  Unable to resolve path to module 'src/views/shared/drawer/side-drawer'                                           import/no-unresolved
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\listing\export.tsx
+    7:1   error  There should be at least one empty line between import groups  import/order
+    8:1   error  There should be at least one empty line between import groups  import/order
+    8:1   error  `react` import should occur before import of `@mui/lab`        import/order
+   11:1   error  Expected line before comment                                   lines-around-comment
+   27:5   error  Expected line before comment                                   lines-around-comment
+   29:5   error  Expected line before comment                                   lines-around-comment
+   31:5   error  Expected line before comment                                   lines-around-comment
+   35:1   error  Expected blank line before this statement                      padding-line-between-statements
+   77:46  error  'Translations' is not defined                                  react/jsx-no-undef
+   83:53  error  'Translations' is not defined                                  react/jsx-no-undef
+  108:49  error  'Translations' is not defined                                  react/jsx-no-undef
+  115:42  error  'Translations' is not defined                                  react/jsx-no-undef
+  126:61  error  Expected blank line before this statement                      padding-line-between-statements
+  131:61  error  Expected blank line before this statement                      padding-line-between-statements
+  137:57  error  'Translations' is not defined                                  react/jsx-no-undef
+  154:46  error  'Translations' is not defined                                  react/jsx-no-undef
+  164:42  error  'Translations' is not defined                                  react/jsx-no-undef
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\listing\filter.tsx
+  3:1   error  Imports "FormikProps" are only used as type                             @typescript-eslint/consistent-type-imports
+  3:1   error  There should be at least one empty line between import groups           import/order
+  3:18  error  FormikProps not found in 'formik'                                       import/named
+  4:1   error  There should be at least one empty line between import groups           import/order
+  4:1   error  `react` import should occur before import of `@mui/lab`                 import/order
+  5:26  error  Unable to resolve path to module 'src/layouts/components/Translations'  import/no-unresolved
+  6:30  error  Unable to resolve path to module 'src/views/shared/drawer/side-drawer'  import/no-unresolved
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\listing\header.tsx
+    6:29  error  Unable to resolve path to module 'src/@core/components/mui/text-field'            import/no-unresolved
+    9:1   error  There should be at least one empty line between import groups                     import/order
+    9:18  error  Unable to resolve path to module 'src/@core/components/icon'                      import/no-unresolved
+   10:1   error  There should be at least one empty line between import groups                     import/order
+   11:1   error  There should be at least one empty line between import groups                     import/order
+   11:1   error  `react` import should occur before import of `@mui/material/Box`                  import/order
+   12:1   error  There should be at least one empty line between import groups                     import/order
+   13:1   error  All imports in the declaration are only used as types. Use `import type`          @typescript-eslint/consistent-type-imports
+   13:1   error  `src/types/general/listing` import should occur before import of `./filter`       import/order
+   13:36  error  Unable to resolve path to module 'src/types/general/listing'                      import/no-unresolved
+   14:1   error  `src/layouts/components/acl/Can` import should occur before import of `./filter`  import/order
+   14:32  error  Unable to resolve path to module 'src/layouts/components/acl/Can'                 import/no-unresolved
+   15:1   error  There should be at least one empty line between import groups                     import/order
+   15:1   error  `@mui/material` import should occur before import of `./filter`                   import/order
+   16:1   error  Imports "ExportConfigValues" and "ExportFieldOption" are only used as type        @typescript-eslint/consistent-type-imports
+   63:3   error  Expected line before comment                                                      lines-around-comment
+   65:3   error  Expected blank line before this statement                                         padding-line-between-statements
+   71:3   error  Expected blank line before this statement                                         padding-line-between-statements
+   74:3   error  Expected blank line before this statement                                         padding-line-between-statements
+   78:9   error  'performSearch' is assigned a value but never used                                @typescript-eslint/no-unused-vars
+   80:5   error  Expected blank line before this statement                                         padding-line-between-statements
+   88:5   error  Expected blank line before this statement                                         padding-line-between-statements
+  100:3   error  Expected blank line before this statement                                         padding-line-between-statements
+  102:6   error  Expected blank line before this statement                                         padding-line-between-statements
+  117:3   error  Expected blank line before this statement                                         padding-line-between-statements
+  117:3   error  Expected newline before return statement                                          newline-before-return
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\listing\index.tsx
+    1:1   error  Imports "GridProps" are only used as type                                                  @typescript-eslint/consistent-type-imports
+    2:1   error  All imports in the declaration are only used as types. Use `import type`                   @typescript-eslint/consistent-type-imports
+    2:1   error  There should be at least one empty line between import groups                              import/order
+    2:28  error  Unable to resolve path to module '@mui/x-data-grid'                                        import/no-unresolved
+    3:1   error  There should be at least one empty line between import groups                              import/order
+    3:1   error  `react` import should occur before import of `@mui/material`                               import/order
+    4:1   error  There should be at least one empty line between import groups                              import/order
+    5:1   error  Imports "CreateActionConfig" are only used as type                                         @typescript-eslint/consistent-type-imports
+    5:1   error  There should be at least one empty line between import groups                              import/order
+    5:1   error  `src/types/general/listing` import should occur before import of `@/hooks/useTranslation`  import/order
+    5:63  error  Unable to resolve path to module 'src/types/general/listing'                               import/no-unresolved
+   12:1   error  All imports in the declaration are only used as types. Use `import type`                   @typescript-eslint/consistent-type-imports
+   13:1   error  There should be at least one empty line between import groups                              import/order
+   14:1   error  Imports "GetRequestParams" and "Pagination" are only used as type                          @typescript-eslint/consistent-type-imports
+   14:1   error  `@platform/contracts` import should occur before import of `@/hooks/useTranslation`        import/order
+   22:3   error  'baseUrl' is defined but never used                                                        @typescript-eslint/no-unused-vars
+  100:3   error  Expected blank line before this statement                                                  padding-line-between-statements
+  108:7   error  Expected blank line before this statement                                                  padding-line-between-statements
+  117:3   error  Expected blank line before this statement                                                  padding-line-between-statements
+  182:3   error  Expected blank line before this statement                                                  padding-line-between-statements
+  182:3   error  Expected newline before return statement                                                   newline-before-return
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\listing\list-types\grid-listing.tsx
+  1:1   error  Imports "GridProps" are only used as type                     @typescript-eslint/consistent-type-imports
+  2:29  error  Unable to resolve path to module 'src/configs/app-constants'  import/no-unresolved
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\listing\list-types\list-listing.tsx
+  2:29  error  Unable to resolve path to module 'src/configs/app-constants'  import/no-unresolved
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\listing\list-types\masonry-listing.tsx
+  1:1  error  There should be at least one empty line between import groups  import/order
+  2:1  error  `react` import should occur before import of `@mui/lab`        import/order
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\listing\list-types\table-listing.tsx
+   2:1   error  Imports "GridColDef", "GridPaginationModel" and "GridRowId" are only used as type  @typescript-eslint/consistent-type-imports
+   2:1   error  There should be at least one empty line between import groups                      import/order
+   2:70  error  Unable to resolve path to module '@mui/x-data-grid'                                import/no-unresolved
+   3:1   error  There should be at least one empty line between import groups                      import/order
+   3:1   error  `react` import should occur before import of `@mui/material`                       import/order
+   4:1   error  All imports in the declaration are only used as types. Use `import type`           @typescript-eslint/consistent-type-imports
+   4:28  error  Unable to resolve path to module 'src/types/requests/pagination'                   import/no-unresolved
+  17:3   error  Expected blank line before this statement                                          padding-line-between-statements
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\listing\row-options.tsx
+   1:1   error  `@iconify/react` import should occur after import of `react`                                            import/order
+   1:22  error  Unable to resolve path to module '@iconify/react'                                                       import/no-unresolved
+   2:1   error  There should be at least one empty line between import groups                                           import/order
+   2:1   error  `@mui/material` import should occur after import of `react`                                             import/order
+   3:1   error  Imports "MouseEvent" are only used as type                                                              @typescript-eslint/consistent-type-imports
+   3:1   error  There should be at least one empty line between import groups                                           import/order
+   4:1   error  All imports in the declaration are only used as types. Use `import type`                                @typescript-eslint/consistent-type-imports
+   4:1   error  There should be at least one empty line between import groups                                           import/order
+   4:29  error  Unable to resolve path to module 'src/types/general/permission'                                         import/no-unresolved
+   5:1   error  There should be at least one empty line between import groups                                           import/order
+   5:1   error  `../dialog/delete-confirmation-dialog` import should occur after import of `src/configs/action-status`  import/order
+   6:17  error  Unable to resolve path to module 'src/layouts/components/acl/Can'                                       import/no-unresolved
+   7:19  error  Unable to resolve path to module 'react-hot-toast'                                                      import/no-unresolved
+   8:26  error  Unable to resolve path to module '@tanstack/react-query'                                                import/no-unresolved
+   9:35  error  Unable to resolve path to module 'src/services/model-action/model-action-service'                       import/no-unresolved
+  10:31  error  Unable to resolve path to module 'src/configs/action-status'                                            import/no-unresolved
+  56:14  error  'err' is defined but never used                                                                         @typescript-eslint/no-unused-vars
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\listing\shared-item-view-card.tsx
+  1:1   error  There should be at least one empty line between import groups             import/order
+  2:1   error  All imports in the declaration are only used as types. Use `import type`  @typescript-eslint/consistent-type-imports
+  2:1   error  There should be at least one empty line between import groups             import/order
+  2:1   error  `react` import should occur before import of `@mui/material`              import/order
+  3:33  error  Unable to resolve path to module 'src/utils/formatter/date'               import/no-unresolved
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\pagination\index.tsx
+   1:1  error  There should be at least one empty line between import groups  import/order
+  21:5  error  Expected blank line before this statement                      padding-line-between-statements
+  28:5  error  Expected blank line before this statement                      padding-line-between-statements
+  30:5  error  Expected blank line before this statement                      padding-line-between-statements
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\i18n\request.ts
+  1:1  error  There should be at least one empty line between import groups  import/order
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\middleware.ts
+  1:1  error  There should be at least one empty line between import groups  import/order
+
+✖ 262 problems (262 errors, 0 warnings)
+  181 errors and 0 warnings potentially fixable with the `--fix` option.
+
+ ELIFECYCLE  Command failed with exit code 1.

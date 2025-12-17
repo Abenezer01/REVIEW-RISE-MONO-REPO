@@ -1,0 +1,43 @@
+{
+  "app": {
+    "name": "ReviewRise",
+    "description": "إدارة تحسين محركات البحث المحلية والمراجعات بالذكاء الاصطناعي"
+  },
+  "navigation": {
+    "home": "الرئيسية",
+    "dashboard": "لوحة التحكم",
+    "reviews": "المراجعات",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج"
+  },
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "search": "بحث",
+    "filter": "تصفية",
+    "export": "تصدير",
+    "import": "استيراد",
+    "close": "إغلاق",
+    "submit": "إرسال",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجح",
+    "warning": "تحذير",
+    "info": "معلومات",
+    "confirm": "تأكيد",
+    "yes": "نعم",
+    "no": "لا",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "finish": "إنهاء"
+  },
+  "language": {
+    "select": "اختر اللغة",
+    "english": "الإنجليزية",
+    "arabic": "العربية"
+  }
+}
