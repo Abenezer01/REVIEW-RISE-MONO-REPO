@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react';
 
-import { Container, Typography, useMediaQuery } from '@mui/material';
+import { Container, GridSize, Typography, useMediaQuery } from '@mui/material';
 import type { GridColDef } from '@mui/x-data-grid';
 
 
@@ -98,10 +98,10 @@ const ItemsListing = <T extends object>({
     };
   };
   breakpoints?: {
-    xs?: number | boolean;
-    sm?: number | boolean;
-    md?: number | boolean;
-    lg?: number | boolean;
+    xs?: GridSize;
+    sm?: GridSize;
+    md?: GridSize;
+    lg?: GridSize;
   };
 }) => {
   const t = useTranslation();
