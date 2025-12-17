@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { useApiGet } from './useApi'
+
 import type { PaginatedResponse, GetRequestParams } from '@platform/contracts'
+
+import { useApiGet } from './useApi'
 
 export const usePaginatedList = <T = any>(
     key: string[],
@@ -34,9 +36,11 @@ export const usePaginatedList = <T = any>(
         setPage,
         pageSize,
         setPageSize,
+
         // Map contract meta fields to convenience helpers
         hasMore: meta ? (meta.page || 1) < (meta.lastPage || 1) : false,
         total: meta?.total ?? 0,
+
         // Expose full meta if needed
         meta
     }

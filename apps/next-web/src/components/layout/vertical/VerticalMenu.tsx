@@ -1,5 +1,8 @@
 'use client'
 
+// Next Imports
+import { useParams } from 'next/navigation'
+
 // MUI Imports
 import { useTheme } from '@mui/material/styles'
 
@@ -36,9 +39,6 @@ const RenderExpandIcon = ({ open, transitionDuration }: RenderExpandIconProps) =
     <i className='tabler-chevron-right' />
   </StyledVerticalNavExpandIcon>
 )
-
-// Next Imports
-import { useParams } from 'next/navigation'
 
 const VerticalMenu = ({ scrollMenu }: Props) => {
   // Hooks

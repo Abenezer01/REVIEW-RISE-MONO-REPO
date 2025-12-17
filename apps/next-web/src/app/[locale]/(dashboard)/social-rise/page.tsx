@@ -3,10 +3,11 @@
 
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
+
 import { useApiGet } from '@/hooks/useApi'
 
 const SocialRisePage = () => {
-    const { data } = useApiGet(['social-campaigns'], '/social/campaigns', {}, { enabled: false })
+    useApiGet(['social-campaigns'], '/social/campaigns', {}, { enabled: false })
 
     return (
         <Grid container spacing={6}>

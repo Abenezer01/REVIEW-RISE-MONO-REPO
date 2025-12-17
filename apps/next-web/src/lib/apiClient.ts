@@ -33,6 +33,7 @@ apiClient.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             // Redirect to login or clear auth state
         }
+
         return Promise.reject(error)
     }
 )
