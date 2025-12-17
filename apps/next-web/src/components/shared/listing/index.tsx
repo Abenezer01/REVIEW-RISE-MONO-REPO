@@ -1,6 +1,7 @@
 import { Fragment, useState } from 'react';
 
-import { Container, GridSize, Typography, useMediaQuery } from '@mui/material';
+import type { GridSize } from '@mui/material';
+import { Container, Typography, useMediaQuery } from '@mui/material';
 import type { GridColDef } from '@mui/x-data-grid';
 
 
