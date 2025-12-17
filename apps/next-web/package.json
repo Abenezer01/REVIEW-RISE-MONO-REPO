@@ -44,7 +44,8 @@
     "react-perfect-scrollbar": "1.5.8",
     "react-use": "17.6.0",
     "server-only": "0.0.1",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@iconify/json": "2.2.408",

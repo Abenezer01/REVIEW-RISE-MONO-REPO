@@ -1,3 +1,5 @@
+'use client'
+
 // MUI Imports
 import { useTheme } from '@mui/material/styles'
 
@@ -35,10 +37,15 @@ const RenderExpandIcon = ({ open, transitionDuration }: RenderExpandIconProps) =
   </StyledVerticalNavExpandIcon>
 )
 
+// Next Imports
+import { useParams } from 'next/navigation'
+
 const VerticalMenu = ({ scrollMenu }: Props) => {
   // Hooks
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
+  const params = useParams()
+  const { locale } = params
 
   // Vars
   const { isBreakpointReached, transitionDuration } = verticalNavOptions
@@ -68,11 +75,17 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        <MenuItem href='/dashboard' icon={<i className='tabler-smart-home' />}>
+        <MenuItem href={`/${locale}/dashboard`} icon={<i className='tabler-smart-home' />}>
           Dashboard
         </MenuItem>
-        <MenuItem href='/reviews' icon={<i className='tabler-star' />}>
-          Reviews
+        <MenuItem href={`/${locale}/admin`} icon={<i className='tabler-settings' />}>
+          Admin Panel
+        </MenuItem>
+        <MenuItem href={`/${locale}/social-rise`} icon={<i className='tabler-social' />}>
+          SocialRise
+        </MenuItem>
+        <MenuItem href={`/${locale}/seo-intelligence`} icon={<i className='tabler-report-analytics' />}>
+          SEO Intelligence
         </MenuItem>
       </Menu>
       {/* <Menu
