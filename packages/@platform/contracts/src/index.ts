@@ -27,6 +27,5 @@ export type {
     ApiResponse,
     PaginatedResponse,
     ApiError,
-    ApiMeta,
-    ErrorCode
+    ApiMeta
 } from './responses';
