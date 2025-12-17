@@ -4,9 +4,8 @@ type Props = {
     params: Promise<{ locale: string }>
 }
 
-// Redirect locale root to home page
-export default async function LocaleRootPage({ params }: Props) {
+export default async function Page({ params }: Props) {
     const { locale } = await params
 
-    redirect(`/${locale}/home`)
+    redirect(`/${locale}/dashboard`)
 }

@@ -13,6 +13,9 @@ type Props = ChildrenType & {
   direction: Direction
 }
 
+// React Query Wrapper
+import ReactQueryProvider from '@components/ReactQueryProvider'
+
 const Providers = async (props: Props) => {
   // Props
   const { children, direction } = props
@@ -26,7 +29,9 @@ const Providers = async (props: Props) => {
     <VerticalNavProvider>
       <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
         <ThemeProvider direction={direction} systemMode={systemMode}>
-          {children}
+          <ReactQueryProvider>
+            {children}
+          </ReactQueryProvider>
         </ThemeProvider>
       </SettingsProvider>
     </VerticalNavProvider>
