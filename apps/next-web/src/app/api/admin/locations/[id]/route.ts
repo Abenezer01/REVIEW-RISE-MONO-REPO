@@ -1,5 +1,5 @@
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { locationRepository } from '@platform/db';
 import { z } from 'zod';
@@ -24,11 +24,12 @@ const updateLocationSchema = z.object({
 });
 
 export async function GET(
-    request: Request,
-    { params }: { params: { id: string } }
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
     try {
-        const location = await locationRepository.findWithBusiness(params.id);
+        const location = await locationRepository.findWithBusiness(id);
 
         if (!location) {
             return NextResponse.json(
@@ -42,8 +43,8 @@ export async function GET(
         );
     } catch (error) {
         console.error('Error fetching location:', error);
-        
-return NextResponse.json(
+
+        return NextResponse.json(
             createErrorResponse('Failed to fetch location', 'INTERNAL_SERVER_ERROR', 500, error),
             { status: 500 }
         );
@@ -51,9 +52,10 @@ return NextResponse.json(
 }
 
 export async function PATCH(
-    request: Request,
-    { params }: { params: { id: string } }
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
     try {
         const body = await request.json();
         const validation = updateLocationSchema.safeParse(body);
@@ -68,15 +70,15 @@ export async function PATCH(
         const data: UpdateLocationRequest = validation.data;
 
         // Ensure we don't accidentally wipe platformIds if not provided, assuming repository handles partial updates correctly which it should.
-        const location = await locationRepository.update(params.id, data);
+        const location = await locationRepository.update(id, data);
 
         return NextResponse.json(
             createSuccessResponse(location as unknown as LocationDto, 'Location updated successfully')
         );
     } catch (error) {
         console.error('Error updating location:', error);
-        
-return NextResponse.json(
+
+        return NextResponse.json(
             createErrorResponse('Failed to update location', 'INTERNAL_SERVER_ERROR', 500, error),
             { status: 500 }
         );
@@ -84,19 +86,20 @@ return NextResponse.json(
 }
 
 export async function DELETE(
-    request: Request,
-    { params }: { params: { id: string } }
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
     try {
-        await locationRepository.delete(params.id);
+        await locationRepository.delete(id);
 
         return NextResponse.json(
             createSuccessResponse(null, 'Location deleted successfully')
         );
     } catch (error) {
         console.error('Error deleting location:', error);
-        
-return NextResponse.json(
+
+        return NextResponse.json(
             createErrorResponse('Failed to delete location', 'INTERNAL_SERVER_ERROR', 500, error),
             { status: 500 }
         );
