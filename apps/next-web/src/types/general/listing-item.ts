@@ -6,7 +6,7 @@ import type { AbilityRule } from './permission';
 export interface ListingItemStatus {
     label: string;
     color: 'success' | 'warning' | 'error' | 'info' | 'default';
-    variant?: 'filled' | 'outlined' | 'soft';
+    variant?: 'filled' | 'outlined' | 'tonal';
 }
 
 /**

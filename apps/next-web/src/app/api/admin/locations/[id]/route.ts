@@ -1,5 +1,6 @@
 
-import { type NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { locationRepository } from '@platform/db';
 import { z } from 'zod';
@@ -25,9 +26,10 @@ const updateLocationSchema = z.object({
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    context: { params: Promise<{ id: string }> }
 ) {
-    const { id } = await params;
+    const { id } = await context.params;
+
     try {
         const location = await locationRepository.findWithBusiness(id);
 
@@ -53,9 +55,10 @@ export async function GET(
 
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    context: { params: Promise<{ id: string }> }
 ) {
-    const { id } = await params;
+    const { id } = await context.params;
+
     try {
         const body = await request.json();
         const validation = updateLocationSchema.safeParse(body);
@@ -87,9 +90,10 @@ export async function PATCH(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    context: { params: Promise<{ id: string }> }
 ) {
-    const { id } = await params;
+    const { id } = await context.params;
+
     try {
         await locationRepository.delete(id);
 

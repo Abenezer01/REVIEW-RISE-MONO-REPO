@@ -40,7 +40,7 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
         currentPageOnly: false,
     },
 }) => {
-    const t = useTranslation();
+    const t = useTranslation('common');
 
     const handleClose = () => {
         toggle();
@@ -58,7 +58,7 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
     };
 
     return (
-        <CustomSideDrawer title="Export Options" handleClose={handleClose} open={open}>
+        <CustomSideDrawer title={t('common.export')} handleClose={handleClose} open={open}>
             {() => (
                 <Formik
                     initialValues={initialExportValues}
@@ -72,13 +72,13 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
                                 <Grid size={12}>
                                     <FormControl fullWidth>
                                         <InputLabel id="export-format-label">
-                                            {t.t("Export Format")}
+                                            {t('common.exportFormat')}
                                         </InputLabel>
                                         <Select
                                             labelId="export-format-label"
                                             id="format"
                                             name="format"
-                                            label={t.t("Export Format")}
+                                            label={t('common.exportFormat')}
                                             value={formik.values.format}
                                             onChange={formik.handleChange}
                                             error={formik.touched.format && Boolean(formik.errors.format)}
@@ -103,14 +103,14 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
                                                 color="primary"
                                             />
                                         }
-                                        label={t.t("Export only current page's records")}
+                                        label={t("common.exportCurrentPageOnly")}
                                     />
                                 </Grid>
 
                                 {/* 3. Fields Selector (Checkboxes) */}
                                 <Grid size={12}>
                                     <Typography variant="subtitle1" sx={{ mb: 2 }}>
-                                        {t.t("Select Fields")}
+                                        {t("common.selectFields")}
                                     </Typography>
                                     <Box sx={{ maxHeight: 250, overflowY: 'auto', border: '1px solid #ccc', p: 2, borderRadius: 1 }}>
                                         {availableFields.map(field => (
@@ -134,7 +134,7 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
                                                         color="default"
                                                     />
                                                 }
-                                                label={t.t(field.headerName)}
+                                                label={t(field.headerName)}
                                             />
                                         ))}
                                     </Box>
@@ -151,7 +151,7 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
                                         color="primary"
                                     >
                                         <span>
-                                            {t.t("Export")}
+                                            {t("common.export")}
                                         </span>
                                     </LoadingButton>
 
@@ -161,7 +161,7 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
                                         variant="outlined"
                                         color="secondary"
                                     >
-                                        {t.t("Cancel")}
+                                        {t("common.cancel")}
                                     </Button>
                                 </Grid>
                             </Grid>

@@ -24,7 +24,7 @@ const LocaleSwitcher = () => {
         const newLocale = event.target.value as Locale
 
         startTransition(() => {
-            router.replace(pathname, { locale: newLocale })
+            router.replace(pathname as any, { locale: newLocale })
         })
     }
 

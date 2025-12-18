@@ -38,7 +38,10 @@
     "finish": "Finish",
     "retry": "Retry",
     "no-items": "No items found",
-    "items-selected": "items selected"
+    "items-selected": "items selected",
+    "exportFormat": "Export Format",
+    "exportCurrentPageOnly": "Export only current page's records",
+    "selectFields": "Select Fields"
   },
   "form": {
     "success-created": "created successfully",

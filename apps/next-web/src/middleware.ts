@@ -9,7 +9,7 @@ import { locales, defaultLocale } from '@platform/i18n'
 const intlMiddleware = createMiddleware({
   locales,
   defaultLocale,
-  localePrefix: 'as-needed'
+  localePrefix: 'always'
 })
 
 export function middleware(request: NextRequest) {

@@ -15,7 +15,7 @@ export const createBatchAdapter = <T>(
 export const createStatus = (
     label: string,
     color: 'success' | 'warning' | 'error' | 'info' | 'default' = 'default',
-    variant: 'filled' | 'outlined' | 'soft' = 'filled'
+    variant: 'filled' | 'outlined' | 'tonal' = 'filled'
 ) => ({
     label,
     color,

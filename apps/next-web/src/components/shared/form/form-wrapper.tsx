@@ -88,7 +88,7 @@ const FormPageWrapper = <T extends FormikValues>({
       if (onCancel) {
         onCancel();
       } else {
-        router.push(baseUrl);
+        router.push(baseUrl as any);
       }
 
       toast.success(`${title} ${t(edit ? 'form.success-updated' : 'form.success-created')}`);
@@ -123,12 +123,12 @@ const FormPageWrapper = <T extends FormikValues>({
           errors[key] = details[key][0];
         }
       });
-      
-return errors;
+
+      return errors;
     }
 
-    
-return {};
+
+    return {};
   };
 
 
@@ -164,7 +164,7 @@ return {};
 
 
   const handleCancel = () => {
-    router.push(baseUrl);
+    router.push(baseUrl as any);
   };
 
   const content = (
