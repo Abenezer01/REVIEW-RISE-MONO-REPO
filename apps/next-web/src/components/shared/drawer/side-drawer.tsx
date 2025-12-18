@@ -3,9 +3,6 @@ import React from 'react';
 import type { BoxProps } from '@mui/material';
 import { Box, Drawer, IconButton, styled, Typography } from '@mui/material';
 
-
-import { useTranslation } from '@/hooks/useTranslation';
-
 interface CustomSideDrawerProps {
   open: boolean;
   handleClose: () => void;
@@ -23,8 +20,6 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 }));
 
 const CustomSideDrawer: React.FC<CustomSideDrawerProps> = ({ open, handleClose, title, translatedTitle, children, width }) => {
-  const transl = useTranslation();
-
   return (
     <div className="customizer">
       <Drawer
@@ -40,7 +35,7 @@ const CustomSideDrawer: React.FC<CustomSideDrawerProps> = ({ open, handleClose, 
         }}
       >
         <Header>
-          <Typography variant="h5">{translatedTitle || transl(title || '')}</Typography>
+          <Typography variant="h5">{translatedTitle || title || ''}</Typography>
           <IconButton
             size="small"
             onClick={handleClose}

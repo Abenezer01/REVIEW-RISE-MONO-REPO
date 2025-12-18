@@ -5,14 +5,14 @@ import { Box, Button, Grid } from "@mui/material";
 import type { FormikProps } from "formik";
 import { Formik } from "formik";
 
-import useTranslation from "@/hooks/useTranslation";
+import { useTranslation } from '@/hooks/useTranslation';
 import CustomSideDrawer from "../drawer/side-drawer";
 
 interface FilterListProps {
   open: boolean;
   toggle: () => void;
-  handleFilter: (filters: any) => void; // Function to fetch data based on filters
-  FilterComponentItems: React.ComponentType<{ formik: FormikProps<any> }>; // Correct prop type definition
+  handleFilter: (filters: any) => void;
+  FilterComponentItems: React.ComponentType<{ formik: FormikProps<any> }>;
   initialValues: any;
 }
 
@@ -23,6 +23,8 @@ const FilterList: React.FC<FilterListProps> = ({
   FilterComponentItems,
   initialValues = {},
 }) => {
+  const t = useTranslation('common');
+
   const handleClose = () => {
     toggle();
   };
@@ -31,9 +33,6 @@ const FilterList: React.FC<FilterListProps> = ({
     handleFilter(values);
     setStatus({ success: true });
   };
-
-  const trans = useTranslation()
-
 
   return (
     <CustomSideDrawer title="Filter" handleClose={handleClose} open={open}>
@@ -58,20 +57,19 @@ const FilterList: React.FC<FilterListProps> = ({
                         variant="contained"
                         color="primary"
                       >
-                        <span>
-                          {trans("Search")}
-                        </span>
+                        <span>{t('common.search')}</span>
                       </LoadingButton>
                       <Button
                         onClick={() => {
-                          formik.resetForm({});
+                          formik.resetForm();
+                          toggle();
                         }}
                         sx={{ ml: 2 }}
                         type="reset"
                         variant="contained"
                         color="secondary"
                       >
-                        {trans("cancel")}
+                        {t('common.cancel')}
                       </Button>
                     </Grid>
                   </Grid>

@@ -67,6 +67,32 @@ export class LocationRepository extends BaseRepository<
     }
 
     /**
+     * Update location details
+     */
+    async update(id: string, data: Prisma.LocationUpdateInput) {
+        return this.delegate.update({
+            where: { id },
+            data,
+            include: {
+                business: true,
+            },
+        });
+    }
+
+    /**
+     * Soft delete location
+     */
+    async delete(id: string) {
+        return this.delegate.update({
+            where: { id },
+            data: {
+                deletedAt: new Date(),
+                status: 'archived',
+            },
+        });
+    }
+
+    /**
      * Count locations for a business
      */
     async countByBusinessId(businessId: string): Promise<number> {
@@ -77,7 +103,44 @@ export class LocationRepository extends BaseRepository<
     }
 
     /**
-     * Search locations by name or address
+     * Search locations by name or address (Admin usage with filtering)
+     */
+    async list(
+        filters: {
+            businessId?: string;
+            status?: string;
+            search?: string;
+        },
+        options?: { take?: number; skip?: number }
+    ) {
+        const where: Prisma.LocationWhereInput = {
+            deletedAt: null,
+            ...(filters.businessId && { businessId: filters.businessId }),
+            ...(filters.status && { status: filters.status }),
+            ...(filters.search && {
+                OR: [
+                    { name: { contains: filters.search, mode: 'insensitive' } },
+                    { address: { contains: filters.search, mode: 'insensitive' } },
+                ],
+            }),
+        };
+
+        const [items, total] = await Promise.all([
+            this.delegate.findMany({
+                where,
+                take: options?.take,
+                skip: options?.skip,
+                orderBy: { createdAt: 'desc' },
+                include: { business: true },
+            }),
+            this.delegate.count({ where }),
+        ]);
+
+        return { items, total };
+    }
+
+    /**
+     * Search locations by name or address (Legacy/Simple)
      */
     async search(
         query: string,
@@ -141,3 +204,4 @@ export class LocationRepository extends BaseRepository<
 
 // Export singleton instance
 export const locationRepository = new LocationRepository();
+

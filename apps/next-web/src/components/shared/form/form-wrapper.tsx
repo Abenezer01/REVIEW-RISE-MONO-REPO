@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react'; // <-- Imported useState
 
-import { useRouter } from 'next/router';
+import { useRouter } from '@/i18n/routing';
 
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Grid } from '@mui/material'; // <-- Imported Dialog components
@@ -46,6 +46,7 @@ interface FormPageWrapperProps<T extends FormikValues> {
   baseUrl?: string;
   headerActions?: any[];
   onActionSuccess?: (response: ApiResponse<T>, payload: { data: T; files: any[] }) => void;
+  renderPage?: boolean;
 }
 
 const FormPageWrapper = <T extends FormikValues>({
@@ -59,9 +60,10 @@ const FormPageWrapper = <T extends FormikValues>({
   getPayload,
   createActionFunc,
   baseUrl = '',
-  onActionSuccess
+  onActionSuccess,
+  renderPage = true
 }: FormPageWrapperProps<T>) => {
-  const intl = useTranslation();
+  const t = useTranslation('common');
   const router = useRouter();
   const requiredFields = getRequiredFields(validationSchema);
 
@@ -73,7 +75,7 @@ const FormPageWrapper = <T extends FormikValues>({
 
   // Core API submission logic, extracted for reuse
   const executeSubmit = async (values: T, helpers: FormikHelpers<T>) => {
-    const { setStatus, setSubmitting } = helpers;
+    const { setStatus, setSubmitting, setErrors } = helpers;
     const payload = getPayload(values);
 
     try {
@@ -88,21 +90,40 @@ const FormPageWrapper = <T extends FormikValues>({
         router.push(baseUrl);
       }
 
-      toast.success(`${intl(title)} ${intl(edit ? 'common.form.success-updated' : 'common.form.success-created')}`);
+      toast.success(`${title} ${t(edit ? 'form.success-updated' : 'form.success-created')}`);
     } catch (err: any) {
-      const apiError = err as ApiResponse;
+      const apiError = (err.response && err.response.data) ? err.response.data : err as ApiResponse;
 
       setStatus({ success: false });
 
-      // setErrors(parseError(apiError) as FormikErrors<T>);
+      setErrors(parseError(apiError) as any);
       setSubmitting(false);
 
       if (apiError.error && typeof apiError.error === 'string') {
         toast.error(apiError.error);
-      } else if (apiError.error) {
-        toast.error(`${intl(edit ? 'error-update' : 'error-create')} ${intl(title)}`);
+      } else if (apiError.error && apiError.error?.message) {
+        toast.error(apiError.error.message);
+      }
+      else if (apiError.error) {
+        toast.error(`${t(edit ? 'form.error-update' : 'form.error-create')} ${title}`);
       }
     }
+  };
+
+
+  const parseError = (error: ApiResponse): Record<string, string> => {
+    if (error.error && typeof error.error === 'object' && (error.error as any).details) {
+      const details = (error.error as any).details;
+      const errors: Record<string, string> = {};
+      Object.keys(details).forEach((key) => {
+        // Take the first error message for each field
+        if (Array.isArray(details[key]) && details[key].length > 0) {
+          errors[key] = details[key][0];
+        }
+      });
+      return errors;
+    }
+    return {};
   };
 
 
@@ -141,59 +162,67 @@ const FormPageWrapper = <T extends FormikValues>({
     router.push(baseUrl);
   };
 
+  const content = (
+    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
+      {(formik: FormikProps<T>) => (
+        <>
+          {/* 🌟 Confirmation Dialog Rendering 🌟 */}
+          {edit && (
+            <ConfirmationDialog
+              open={isConfirmDialogOpen}
+              handleClose={handleDialogClose}
+              onConfirm={handleConfirm}
+              title={t('dialog.confirm-edit-title')}
+              content={t('dialog.confirm-edit-message')}
+              onCancel={handleDialogClose} />
+          )}
+
+          <form onSubmit={formik.handleSubmit}>
+            <RequiredFieldsContext.Provider value={requiredFields}>
+              <Grid container>
+                <Grid size={12}>
+                  <Box>{children(formik)}</Box>
+                </Grid>
+                <Grid size={12} sx={{ mt: 5 }}>
+                  <LoadingButton
+                    loading={formik.isSubmitting}
+                    loadingPosition="center"
+                    disabled={formik.isSubmitting || !formik.isValid}
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                  >
+                    {t(edit ? 'common.save' : 'common.submit')}
+                  </LoadingButton>
+                  <Button
+                    onClick={() => {
+                      formik.resetForm();
+                      onCancel ? onCancel() : handleCancel();
+                    }}
+                    sx={{ ml: 2 }}
+                    variant="contained"
+                    color="secondary"
+                  >
+                    {t('common.cancel')}
+                  </Button>
+                </Grid>
+              </Grid>
+            </RequiredFieldsContext.Provider>
+          </form>
+        </>
+      )}
+    </Formik>
+  );
+
+  if (renderPage === false) {
+    return content;
+  }
+
   return (
     <Page titleId={title}
       title={translatedTitle}
     >
-      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
-        {(formik: FormikProps<T>) => (
-          <>
-            {/* 🌟 Confirmation Dialog Rendering 🌟 */}
-            {edit && (
-              <ConfirmationDialog
-                open={isConfirmDialogOpen}
-                handleClose={handleDialogClose}
-                onConfirm={handleConfirm}
-                title={intl('common.dialog.confirm-edit-title')}
-                content={intl('common.dialog.confirm-edit-message')}
-                onCancel={handleDialogClose} />
-            )}
-
-            <form onSubmit={formik.handleSubmit}>
-              <RequiredFieldsContext.Provider value={requiredFields}>
-                <Grid container>
-                  <Grid size={12}>
-                    <Box>{children(formik)}</Box>
-                  </Grid>
-                  <Grid size={12} sx={{ mt: 5 }}>
-                    <LoadingButton
-                      loading={formik.isSubmitting}
-                      loadingPosition="center"
-                      disabled={formik.isSubmitting || !formik.isValid}
-                      type="submit"
-                      variant="contained"
-                      color="primary"
-                    >
-                      {intl(edit ? 'save' : 'submit')}
-                    </LoadingButton>
-                    <Button
-                      onClick={() => {
-                        formik.resetForm();
-                        onCancel ? onCancel() : handleCancel();
-                      }}
-                      sx={{ ml: 2 }}
-                      variant="contained"
-                      color="secondary"
-                    >
-                      {intl("cancel")}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </RequiredFieldsContext.Provider>
-            </form>
-          </>
-        )}
-      </Formik>
+      {content}
     </Page>
   );
 };

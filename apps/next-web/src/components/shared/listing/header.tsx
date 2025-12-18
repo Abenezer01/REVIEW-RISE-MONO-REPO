@@ -63,6 +63,7 @@ interface ListHeaderProps {
 
 const ListHeader = (props: ListHeaderProps) => {
   const { title, features } = props;
+  const t = useTranslation('common');
 
   const { filter, export: exportFeature, search } = features
 
@@ -73,7 +74,6 @@ const ListHeader = (props: ListHeaderProps) => {
     setFilterOpen(!filterOpen);
   };
 
-  const transl = useTranslation();
   const [exportOpen, setExportOpen] = useState<boolean>(false);
 
   const toggleExport = () => {
@@ -158,7 +158,6 @@ const ListHeader = (props: ListHeaderProps) => {
         }}
       >
         <Box>
-          <Typography variant="h5">{transl(props.title)}</Typography>
         </Box>
         <Box
           sx={{
@@ -172,7 +171,6 @@ const ListHeader = (props: ListHeaderProps) => {
             <CustomTextField
               value={searchTerm}
               sx={{ mr: 4 }}
-              placeholder={"Search " + transl(title)}
               onChange={handleSearchChange}
             />
           )}
@@ -185,7 +183,6 @@ const ListHeader = (props: ListHeaderProps) => {
             }}
           >
             {props.createActionConfig.show &&
-              ability.can(props.createActionConfig.permission.action, props.createActionConfig.permission.subject) &&
               (props.createActionConfig.onlyIcon ? (
                 <IconButton color="primary" onClick={props.createActionConfig.onClick}>
                   <i className="tabler:plus text-2xl" />
@@ -193,7 +190,7 @@ const ListHeader = (props: ListHeaderProps) => {
               ) : (
                 <Button onClick={props.createActionConfig.onClick} variant="contained" sx={{ '& svg': { mr: 2 } }}>
                   <i className="tabler:plus text-2xl" />
-                  {transl('common.create')}
+                  {t('common.create')}
                 </Button>
               ))}
             {filter?.enabled && (
@@ -203,7 +200,7 @@ const ListHeader = (props: ListHeaderProps) => {
                 sx={{ "& svg": { mr: 2 }, ml: 2 }}
               >
                 <i className="tabler:adjustments text-2xl" />
-                {transl("filter")}
+                {t('common.filter')}
               </Button>
             )}
             {exportFeature?.enabled && exportFeature.onExport && (
@@ -213,7 +210,7 @@ const ListHeader = (props: ListHeaderProps) => {
                 sx={{ "& svg": { mr: 2 }, ml: 2 }}
               >
                 <i className="tabler:file-export text-2xl" />
-                {transl("export")}
+                {t('common.export')}
               </Button>
             )}
           </Box>

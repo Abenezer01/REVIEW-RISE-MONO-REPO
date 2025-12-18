@@ -16,6 +16,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "add": "Add",
+    "create": "Create",
     "search": "Search",
     "filter": "Filter",
     "export": "Export",
@@ -33,7 +34,20 @@
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
-    "finish": "Finish"
+    "finish": "Finish",
+    "retry": "Retry",
+    "no-items": "No items found",
+    "items-selected": "items selected"
+  },
+  "form": {
+    "success-created": "created successfully",
+    "success-updated": "updated successfully",
+    "error-create": "Failed to create",
+    "error-update": "Failed to update"
+  },
+  "dialog": {
+    "confirm-edit-title": "Confirm Edit",
+    "confirm-edit-message": "Are you sure you want to edit this item?"
   },
   "language": {
     "select": "Select Language",

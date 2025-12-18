@@ -23,6 +23,8 @@ import GridListing from './list-types/grid-listing';
 import ListListing from './list-types/list-listing';
 import MasonryListing from './list-types/masonry-listing';
 import TableListing from './list-types/table-listing';
+import { SkeletonTable, SkeletonCard, SkeletonGrid, EmptyState, ErrorState } from './states';
+import type { EmptyStateProps, ErrorStateProps } from './states';
 
 
 const ItemsListing = <T extends object>({
@@ -44,7 +46,10 @@ const ItemsListing = <T extends object>({
   searchKeys = [],
   createActionConfig = defaultCreateActionConfig,
   features = {},
-  breakpoints
+  breakpoints,
+  error,
+  onRetry,
+  emptyStateConfig
 }: {
   items: T[];
   pagination?: Pagination | null;
@@ -104,8 +109,11 @@ const ItemsListing = <T extends object>({
     md?: GridSize;
     lg?: GridSize;
   };
+  error?: Error | null;
+  onRetry?: () => void;
+  emptyStateConfig?: EmptyStateProps;
 }) => {
-  const t = useTranslation();
+  const t = useTranslation('common');
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
   const [fetchRequestParams, setFetchRequestParams] = useState<GetRequestParams>(defaultGetRequestParams);
@@ -162,17 +170,29 @@ const ItemsListing = <T extends object>({
         />
       )}
 
-      {isLoading ? (
-        <Typography variant="h6" align="center" sx={{ m: 5 }}>
-          {t('common.loading')}
-        </Typography>
+      {error ? (
+        <ErrorState
+          message={error.message || 'An error occurred while loading data'}
+          onRetry={onRetry}
+          showDetails={process.env.NODE_ENV === 'development'}
+          details={error.stack}
+        />
+      ) : isLoading ? (
+        <>
+          {adjustedType === ITEMS_LISTING_TYPE.table.value && <SkeletonTable rows={5} columns={tableProps?.headers?.length || 4} />}
+          {adjustedType === ITEMS_LISTING_TYPE.grid.value && <SkeletonGrid count={6} columns={breakpoints as any} />}
+          {(adjustedType === ITEMS_LISTING_TYPE.list.value || adjustedType === ITEMS_LISTING_TYPE.masonry.value) && <SkeletonCard count={4} />}
+        </>
       ) : (
         Array.isArray(items) && (
           <Fragment>
             {items.length === 0 ? (
-              <Typography variant="h6" align="center" sx={{ m: 5 }}>
-                No items available
-              </Typography>
+              <EmptyState
+                title={emptyStateConfig?.title}
+                description={emptyStateConfig?.description}
+                action={emptyStateConfig?.action}
+                illustration={emptyStateConfig?.illustration}
+              />
             ) : (
               <>
                 {listingComponents[adjustedType] || listingComponents.default}

@@ -83,15 +83,19 @@ model Business {
 }
 
 model Location {
-  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name       String
-  address    String?
-  status     String    @default("active")
-  businessId String    @db.Uuid
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  deletedAt  DateTime?
-  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  address     String?
+  timezone    String?
+  platformIds Json?
+  tags        String[]
+  lastSync    DateTime?
+  status      String    @default("active")
+  businessId  String    @db.Uuid
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
 }

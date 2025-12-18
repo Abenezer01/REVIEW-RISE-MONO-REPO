@@ -27,5 +27,24 @@
     "generateResponse": "Generate AI Response",
     "viewDetails": "View Details",
     "markAsRead": "Mark as Read"
+  },
+  "locations": {
+    "title": "Location Management",
+    "listTitle": "Locations",
+    "createTitle": "Create Location",
+    "editTitle": "Edit Location",
+    "form": {
+      "name": "Location Name",
+      "businessId": "Account ID",
+      "address": "Address",
+      "timezone": "Timezone",
+      "status": "Status",
+      "active": "Active",
+      "archived": "Archived",
+      "platformConnections": "Platform Connections",
+      "googlePlaceId": "Google Place ID",
+      "facebookPageId": "Facebook Page ID",
+      "deleteConfirm": "Are you sure you want to delete this location?"
+    }
   }
 }
