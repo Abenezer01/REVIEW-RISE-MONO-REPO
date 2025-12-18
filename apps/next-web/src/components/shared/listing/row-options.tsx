@@ -6,28 +6,21 @@ import { IconButton, Menu, MenuItem } from '@mui/material';
 import toast from 'react-hot-toast';
 
 import type { AbilityRule } from '@/types/general/permission';
+import type { ListingItemAction } from '@/types/general/listing-item';
 
 
 import DeleteConfirmationDialog from '../dialog/delete-confirmation-dialog';
-import Can from '../layouts/other/Can';
 
-interface RowOption {
-  name: string;
-  icon: string;
-  onClick: () => void;
-  permission: AbilityRule;
-}
-
-interface RowOptionsProps<T extends { id?: string }> {
+interface RowOptionsProps<T extends { id?: string | number }> {
   item: T;
-  options?: RowOption[];
+  options?: ListingItemAction[];
   onEdit?: (item: T) => void;
   onDelete?: () => Promise<void> | void;
   deletePermissionRule?: AbilityRule;
   editPermissionRule?: AbilityRule;
 }
 
-const RowOptions = <T extends { id?: string }>({
+const RowOptions = <T extends { id?: string | number }>({
   item,
   options,
   onEdit,
@@ -66,8 +59,18 @@ const RowOptions = <T extends { id?: string }>({
 
   return (
     <>
-      <IconButton size="small" onClick={handleRowOptionsClick}>
-        <i className="tabler:dots-vertical" />
+      <IconButton
+        size="small"
+        onClick={handleRowOptionsClick}
+        sx={{
+          color: 'text.secondary',
+          '&:hover': {
+            backgroundColor: (theme) => `rgba(${theme.palette.primary.mainChannel} / 0.08)`,
+            color: 'primary.main'
+          }
+        }}
+      >
+        <i className="tabler-dots-vertical text-[22px]" />
       </IconButton>
 
       <Menu
@@ -80,28 +83,55 @@ const RowOptions = <T extends { id?: string }>({
         PaperProps={{ style: { minWidth: '8rem' } }}
       >
         {options?.map((option, index) => (
-          <MenuItem key={index} onClick={option.onClick} sx={{ '& svg': { mr: 2 } }}>
-            <i className={option.icon + ' text-[20px]'} />
-            {option.name}
+          <MenuItem
+            key={index}
+            onClick={() => {
+              option.onClick();
+              handleRowOptionsClose();
+            }}
+            sx={{
+              gap: 3,
+              '& i': { color: 'text.secondary' },
+              '&:hover i': { color: option.variant === 'danger' ? 'error.main' : 'primary.main' },
+              color: option.variant === 'danger' ? 'error.main' : 'text.primary'
+            }}
+          >
+            {typeof option.icon === 'string' ? (
+              <i className={option.icon + ' text-[20px]'} />
+            ) : (
+              option.icon
+            )}
+            {option.label}
           </MenuItem>
         ))}
 
         {onEdit && editPermissionRule && (
-          <Can do={editPermissionRule.action} on={editPermissionRule.subject}>
-            <MenuItem onClick={handleEdit} sx={{ '& svg': { mr: 2 } }}>
-              <i className="tabler:edit text-[20px]" />
-              Edit
-            </MenuItem>
-          </Can>
+          <MenuItem
+            onClick={handleEdit}
+            sx={{
+              gap: 3,
+              '& i': { color: 'text.secondary' },
+              '&:hover i': { color: 'primary.main' }
+            }}
+          >
+            <i className="tabler:edit text-[20px]" />
+            Edit
+          </MenuItem>
         )}
 
         {onDelete && deletePermissionRule && (
-          <Can do={deletePermissionRule.action} on={deletePermissionRule.subject}>
-            <MenuItem onClick={handleOpenDeleteDialog} sx={{ '& svg': { mr: 2 } }}>
-              <i className="tabler:trash text-[20px]" />
-              Delete
-            </MenuItem>
-          </Can>
+          <MenuItem
+            onClick={handleOpenDeleteDialog}
+            sx={{
+              gap: 3,
+              '& i': { color: 'text.secondary' },
+              '&:hover i': { color: 'error.main' },
+              '&:hover': { color: 'error.main' }
+            }}
+          >
+            <i className="tabler:trash text-[20px]" />
+            Delete
+          </MenuItem>
         )}
       </Menu>
 

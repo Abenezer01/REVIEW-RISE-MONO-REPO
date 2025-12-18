@@ -8,22 +8,10 @@ import {
     FormControlLabel
 } from '@mui/material';
 
-import { useTranslation } from '@/hooks/useTranslation';
+import useTranslation from '@/hooks/useTranslation';
 import CustomSwitch from '../form/custom-switch';
 import CustomSideDrawer from '../drawer/side-drawer';
-
-// Define the shape of a single field option
-export type ExportFieldOption = {
-    key: string;
-    label: string;
-};
-
-// Define the shape of the export configuration passed from the form
-export type ExportConfigValues = {
-    format: 'csv' | 'excel' | 'pdf' | string;
-    fields: string[]; // Array of selected field keys
-    currentPageOnly: boolean;
-};
+import type { ExportConfigValues, ExportFieldOption } from '@/types/general/listing';
 
 interface ExportComponentOptionProps {
     open: boolean;
@@ -48,11 +36,11 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
     availableFormats = ["csv", "excel", "pdf"],
     initialExportValues = {
         format: 'csv',
-        fields: availableFields.map(field => field.key),
+        fields: availableFields.map(field => field.field),
         currentPageOnly: false,
     },
 }) => {
-    const t = useTranslation();
+    const t = useTranslation('common');
 
     const handleClose = () => {
         toggle();
@@ -70,7 +58,7 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
     };
 
     return (
-        <CustomSideDrawer title="Export Options" handleClose={handleClose} open={open}>
+        <CustomSideDrawer title={t('common.export')} handleClose={handleClose} open={open}>
             {() => (
                 <Formik
                     initialValues={initialExportValues}
@@ -84,13 +72,13 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
                                 <Grid size={12}>
                                     <FormControl fullWidth>
                                         <InputLabel id="export-format-label">
-                                            {t("Export Format")}
+                                            {t('common.exportFormat')}
                                         </InputLabel>
                                         <Select
                                             labelId="export-format-label"
                                             id="format"
                                             name="format"
-                                            label={t("Export Format")}
+                                            label={t('common.exportFormat')}
                                             value={formik.values.format}
                                             onChange={formik.handleChange}
                                             error={formik.touched.format && Boolean(formik.errors.format)}
@@ -115,29 +103,29 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
                                                 color="primary"
                                             />
                                         }
-                                        label={t("Export only current page's records")}
+                                        label={t("common.exportCurrentPageOnly")}
                                     />
                                 </Grid>
 
                                 {/* 3. Fields Selector (Checkboxes) */}
                                 <Grid size={12}>
                                     <Typography variant="subtitle1" sx={{ mb: 2 }}>
-                                        {t("Select Fields")}
+                                        {t("common.selectFields")}
                                     </Typography>
                                     <Box sx={{ maxHeight: 250, overflowY: 'auto', border: '1px solid #ccc', p: 2, borderRadius: 1 }}>
                                         {availableFields.map(field => (
                                             <FormControlLabel
-                                                key={field.key}
+                                                key={field.field}
                                                 control={
                                                     <Checkbox
-                                                        checked={formik.values.fields.includes(field.key)}
+                                                        checked={formik.values.fields.includes(field.field)}
                                                         onChange={() => {
                                                             const set = new Set(formik.values.fields);
 
-                                                            if (set.has(field.key)) {
-                                                                set.delete(field.key);
+                                                            if (set.has(field.field)) {
+                                                                set.delete(field.field);
                                                             } else {
-                                                                set.add(field.key);
+                                                                set.add(field.field);
                                                             }
 
                                                             formik.setFieldValue('fields', Array.from(set));
@@ -146,7 +134,7 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
                                                         color="default"
                                                     />
                                                 }
-                                                label={t(field.label)}
+                                                label={t(field.headerName)}
                                             />
                                         ))}
                                     </Box>
@@ -163,7 +151,7 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
                                         color="primary"
                                     >
                                         <span>
-                                            {t("Export")}
+                                            {t("common.export")}
                                         </span>
                                     </LoadingButton>
 
@@ -173,7 +161,7 @@ const ExportComponentOption: React.FC<ExportComponentOptionProps> = ({
                                         variant="outlined"
                                         color="secondary"
                                     >
-                                        {t("Cancel")}
+                                        {t("common.cancel")}
                                     </Button>
                                 </Grid>
                             </Grid>

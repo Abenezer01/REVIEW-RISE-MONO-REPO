@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment } from 'react';
 
 import TablePagination from '@mui/material/TablePagination';
 import Typography from '@mui/material/Typography';
@@ -14,26 +14,20 @@ interface CustomTablePaginationProps {
 }
 
 const CustomTablePagination: React.FC<CustomTablePaginationProps> = ({ onPaginationChange, pagination }) => {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(pagination?.pageSize || 10);
+  // Use props directly, fallback to defaults
+  const page = (pagination?.page || 1) - 1; // Convert 1-indexed to 0-indexed for MUI
+  const rowsPerPage = pagination?.pageSize || 10;
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-    setPage(newPage);
-
     if (pagination?.pageSize) {
-      onPaginationChange(pagination.pageSize, newPage + 1); // Adjust page number (+1) to match your backend's page numbering
+      onPaginationChange(pagination.pageSize, newPage + 1); // Convert 0-indexed to 1-indexed
     }
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newRowsPerPage = parseInt(event.target.value, 10);
 
-    setRowsPerPage(newRowsPerPage);
-    setPage(0);
-
-    if (pagination?.pageSize) {
-      onPaginationChange(newRowsPerPage, 1); // Reset to the first page when changing rows per page
-    }
+    onPaginationChange(newRowsPerPage, 1); // Reset to first page
   };
 
   const totalRows = pagination?.total || 0;

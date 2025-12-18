@@ -11,11 +11,13 @@
     "logout": "Logout"
   },
   "common": {
+    "apply": "Apply",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
     "add": "Add",
+    "create": "Create",
     "search": "Search",
     "filter": "Filter",
     "export": "Export",
@@ -33,7 +35,26 @@
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
-    "finish": "Finish"
+    "finish": "Finish",
+    "retry": "Retry",
+    "no-items": "No items found",
+    "items-selected": "items selected",
+    "exportFormat": "Export Format",
+    "exportCurrentPageOnly": "Export only current page's records",
+    "selectFields": "Select Fields"
+  },
+  "form": {
+    "success-created": "created successfully",
+    "success-updated": "updated successfully",
+    "error-create": "Failed to create",
+    "error-update": "Failed to update",
+    "search-placeholder": "Type to search...",
+    "type-min-chars": "Type at least {minChars} characters",
+    "no-results": "No results found"
+  },
+  "dialog": {
+    "confirm-edit-title": "Confirm Edit",
+    "confirm-edit-message": "Are you sure you want to edit this item?"
   },
   "language": {
     "select": "Select Language",

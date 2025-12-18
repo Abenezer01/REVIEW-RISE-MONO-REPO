@@ -10,5 +10,16 @@ export const defaultCreateActionConfig = {
   show: true,
   permission: { action: '', subject: '' },
   onlyIcon: false,
-  onClick: () => {}
+  onClick: () => { }
 };
+
+export interface ExportFieldOption {
+  field: string;
+  headerName: string;
+}
+
+export interface ExportConfigValues {
+  format: string;
+  fields: string[];
+  currentPageOnly: boolean;
+}

@@ -58,6 +58,42 @@ const DataTable = <T extends { id: string | number }>({
                     pageSizeOptions={[5, 10, 25, 50]}
                     autoHeight
                     disableRowSelectionOnClick
+                    sx={{
+                        border: 0,
+                        '& .MuiDataGrid-columnHeaders': {
+                            backgroundColor: (theme) => (theme.palette.mode === 'light' ? '#f9fafb' : '#1f2937'),
+                            color: 'text.secondary',
+                            fontSize: '0.8125rem',
+                            fontWeight: 500,
+                            textTransform: 'uppercase',
+                            letterSpacing: '1px',
+                            borderBottom: (theme) => `1px solid ${theme.palette.divider}`
+                        },
+                        '& .MuiDataGrid-row': {
+                            '&:hover': {
+                                backgroundColor: (theme) => (theme.palette.mode === 'light' ? '#f3f4f6' : '#374151'),
+                                cursor: 'pointer',
+                                transition: 'background-color 0.2s ease-in-out'
+                            }
+                        },
+                        '& .MuiDataGrid-cell': {
+                            borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+                            fontSize: '0.875rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            color: 'text.secondary',
+                            '&[data-field="name"]': {
+                                color: 'text.primary',
+                                fontWeight: 600
+                            }
+                        },
+                        '& .MuiDataGrid-footerContainer': {
+                            borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+                            '& .MuiTablePagination-root': {
+                                color: 'text.secondary'
+                            }
+                        }
+                    }}
                     {...props}
                 />
             </Card>

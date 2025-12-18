@@ -5,6 +5,7 @@
 import { useTheme } from '@mui/material/styles'
 
 // Third-party Imports
+import { useTranslations } from 'next-intl'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
 // Type Imports
@@ -12,6 +13,7 @@ import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Me
 
 // Component Imports
 import { Menu, MenuItem, SubMenu } from '@menu/vertical-menu'
+import { Link } from '@/i18n/routing'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
@@ -49,6 +51,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
   const { user } = useAuth()
+  const t = useTranslations('dashboard')
 
   // Vars
   const { isBreakpointReached, transitionDuration } = verticalNavOptions
@@ -71,7 +74,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         return (
           <SubMenu
             key={index}
-            label={item.title}
+            label={t(item.title as any)}
             icon={item.icon ? <i className={item.icon} /> : undefined}
           >
             {renderMenuItems(item.children)}
@@ -82,10 +85,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
       return (
         <MenuItem
           key={index}
-          href={item.href}
+          component={<Link href={(item.href as any) || '/'} />}
           icon={item.icon ? <i className={item.icon} /> : undefined}
         >
-          {item.title}
+          {t(item.title as any)}
         </MenuItem>
       )
     })

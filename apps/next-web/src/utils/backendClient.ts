@@ -1,6 +1,6 @@
 import { headers, cookies } from 'next/headers'
 
-import axios, { type AxiosRequestConfig } from 'axios'
+import axios, { type AxiosRequestConfig, isAxiosError } from 'axios'
 
 interface BackendClientOptions extends AxiosRequestConfig {
   baseUrl?: string
@@ -44,7 +44,7 @@ export async function backendClient<T = any>(
 
     return response.data
   } catch (error: any) {
-    if (axios.isAxiosError(error) && error.response) {
+    if (isAxiosError(error) && error.response) {
       // Propagate the error message from backend if available
       const message = error.response.data?.message || error.response.data?.error?.message || error.response.data?.error || error.message
 

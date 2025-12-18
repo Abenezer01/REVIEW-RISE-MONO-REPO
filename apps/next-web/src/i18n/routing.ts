@@ -10,7 +10,19 @@ export const routing = defineRouting({
     defaultLocale,
 
     // Prefix the default locale
-    localePrefix: 'always'
+    localePrefix: 'always',
+
+    pathnames: {
+        '/': '/',
+        '/dashboard': {
+            en: '/dashboard',
+            ar: '/dashboard' // Could be '/لوحة-التحكم' if desired, but keeping same for now or providing example
+        },
+        '/reviews': {
+            en: '/reviews',
+            ar: '/reviews'
+        }
+    }
 })
 
 // Lightweight wrappers around Next.js' navigation APIs

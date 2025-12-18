@@ -27,14 +27,14 @@ const TableListing = <T,>({ columns, items, pagination, onPagination, isLoading 
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Card>
+    <Box sx={{ width: '100%', mb: 6 }}>
+      <Card sx={{ borderRadius: 1.5, border: (theme) => `1px solid ${theme.palette.divider}`, boxShadow: 'none' }}>
         <DataGrid
-          rows={items} // Use items from state
-          pageSizeOptions={[5, 10, 25]}
+          rows={items}
+          pageSizeOptions={[5, 10, 25, 50]}
           autoHeight
           pagination
-          rowHeight={62}
+          rowHeight={64}
           rowCount={pagination?.total}
           columns={columns}
           paginationMode="server"
@@ -42,6 +42,48 @@ const TableListing = <T,>({ columns, items, pagination, onPagination, isLoading 
           paginationModel={paginationModel}
           onPaginationModelChange={handlePaginationModelChange}
           loading={isLoading}
+          sx={{
+            border: 0,
+            '& .MuiDataGrid-columnHeaders': {
+              backgroundColor: (theme) => theme.palette.background.default,
+              color: 'text.secondary',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.17px',
+              borderBottom: (theme) => `1px solid ${theme.palette.divider}`
+            },
+            '& .MuiDataGrid-cell': {
+              fontSize: '0.875rem',
+              color: 'text.primary',
+              borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+              alignContent: 'center',
+              '&:focus': {
+                outline: 'none'
+              }
+            },
+            '& .MuiDataGrid-row': {
+              '&:hover': {
+                backgroundColor: (theme) => theme.palette.action.hover,
+                cursor: 'pointer',
+                transition: 'background-color 0.2s ease-in-out',
+              }
+            },
+            '& .MuiDataGrid-footerContainer': {
+              borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+              '& .MuiTablePagination-root': {
+                color: 'text.secondary'
+              }
+            },
+
+            // Remove cell focus outline
+            '& .MuiDataGrid-cell:focus-within': {
+              outline: 'none'
+            },
+            '& .MuiDataGrid-columnHeader:focus': {
+              outline: 'none'
+            }
+          }}
         />
       </Card>
     </Box>

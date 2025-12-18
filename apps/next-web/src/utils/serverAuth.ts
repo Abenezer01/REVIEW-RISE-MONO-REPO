@@ -17,44 +17,38 @@ export const getServerUser = async (): Promise<User | null> => {
     }
 
     if (AUTH_SERVICE_URL) {
-       try {
-         const apiResponse = await backendClient<any>('/v1/auth/me', {
-            baseUrl: AUTH_SERVICE_URL
-         })
+      try {
+        const apiResponse = await backendClient<any>('/v1/auth/me', {
+          baseUrl: AUTH_SERVICE_URL
+        })
 
-         const data = apiResponse?.data ?? apiResponse
-         const u = data?.user
+        const data = apiResponse?.data ?? apiResponse
+        const u = data?.user
 
-         if (u) {
-           return {
-             id: u.id,
-             email: u.email,
-             role: u.role
-           }
-         }
+        if (u) {
+          return {
+            id: u.id,
+            email: u.email,
+            role: u.role
+          }
+        }
 
-         return null
-       } catch (err) {
-         const cookieStoreInner = await cookies()
-
-         const status = (err as any)?.status
-         
-         if (status === 401) {
-           cookieStoreInner.delete('accessToken')
-         }
-
-         return null
-       }
+        return null
+      } catch {
+        // We cannot delete cookies in a Server Component during render.
+        // Just return null, and let middleware or client-side handle the invalid session.
+        return null
+      }
     }
 
     // Fallback/Mock for development if no backend
     if (accessToken.value) {
-       return {
-            id: '1',
-            email: 'admin@admin.com',
-            firstName: 'Admin',
-            role: 'admin'
-       }
+      return {
+        id: '1',
+        email: 'admin@admin.com',
+        firstName: 'Admin',
+        role: 'admin'
+      }
     }
 
     return null

@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react';
 
 import type { GridSize } from '@mui/material';
-import { Container, Typography, useMediaQuery } from '@mui/material';
+import { Container, useMediaQuery } from '@mui/material';
 import type { GridColDef } from '@mui/x-data-grid';
 
 
@@ -9,20 +9,21 @@ import type { GetRequestParams, Pagination } from '@platform/contracts';
 
 import { defaultGetRequestParams } from '@platform/contracts';
 
-import type { CreateActionConfig } from '@/types/general/listing';
+import type { CreateActionConfig , ExportConfigValues, ExportFieldOption } from '@/types/general/listing';
 import { defaultCreateActionConfig } from '@/types/general/listing';
 
 
 
 import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig';
-import { useTranslation } from '@/hooks/useTranslation';
 import PaginationComponent from '../pagination';
-import type { ExportConfigValues, ExportFieldOption } from "./export";
+
 import ListHeader from './header';
 import GridListing from './list-types/grid-listing';
 import ListListing from './list-types/list-listing';
 import MasonryListing from './list-types/masonry-listing';
 import TableListing from './list-types/table-listing';
+import type { EmptyStateProps } from './states';
+import { EmptyState, ErrorState, SkeletonCard, SkeletonGrid, SkeletonTable } from './states';
 
 
 const ItemsListing = <T extends object>({
@@ -44,7 +45,10 @@ const ItemsListing = <T extends object>({
   searchKeys = [],
   createActionConfig = defaultCreateActionConfig,
   features = {},
-  breakpoints
+  breakpoints,
+  error,
+  onRetry,
+  emptyStateConfig
 }: {
   items: T[];
   pagination?: Pagination | null;
@@ -85,6 +89,7 @@ const ItemsListing = <T extends object>({
         action: string;
         subject: string;
       };
+      component?: React.ComponentType<any>;
     };
     export?: {
       enabled: boolean;
@@ -104,8 +109,10 @@ const ItemsListing = <T extends object>({
     md?: GridSize;
     lg?: GridSize;
   };
+  error?: Error | null;
+  onRetry?: () => void;
+  emptyStateConfig?: EmptyStateProps;
 }) => {
-  const t = useTranslation();
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
   const [fetchRequestParams, setFetchRequestParams] = useState<GetRequestParams>(defaultGetRequestParams);
@@ -162,17 +169,29 @@ const ItemsListing = <T extends object>({
         />
       )}
 
-      {isLoading ? (
-        <Typography variant="h6" align="center" sx={{ m: 5 }}>
-          {t('common.loading')}
-        </Typography>
+      {error ? (
+        <ErrorState
+          message={error.message || 'An error occurred while loading data'}
+          onRetry={onRetry}
+          showDetails={process.env.NODE_ENV === 'development'}
+          details={error.stack}
+        />
+      ) : isLoading ? (
+        <>
+          {adjustedType === ITEMS_LISTING_TYPE.table.value && <SkeletonTable rows={5} columns={tableProps?.headers?.length || 4} />}
+          {adjustedType === ITEMS_LISTING_TYPE.grid.value && <SkeletonGrid count={6} columns={breakpoints as any} />}
+          {(adjustedType === ITEMS_LISTING_TYPE.list.value || adjustedType === ITEMS_LISTING_TYPE.masonry.value) && <SkeletonCard count={4} />}
+        </>
       ) : (
         Array.isArray(items) && (
           <Fragment>
             {items.length === 0 ? (
-              <Typography variant="h6" align="center" sx={{ m: 5 }}>
-                No items available
-              </Typography>
+              <EmptyState
+                title={emptyStateConfig?.title}
+                description={emptyStateConfig?.description}
+                action={emptyStateConfig?.action}
+                illustration={emptyStateConfig?.illustration}
+              />
             ) : (
               <>
                 {listingComponents[adjustedType] || listingComponents.default}

@@ -10,13 +10,13 @@ export type MenuItem = {
 
 const menuData: MenuItem[] = [
   {
-    title: 'Dashboard',
+    title: 'navigation.dashboard',
     href: '/dashboard',
     icon: 'tabler-smart-home',
     allowedRoles: [ROLES.ADMIN]
   },
   {
-    title: 'Reviews',
+    title: 'navigation.reviews',
     href: '/reviews',
     icon: 'tabler-star',
     allowedRoles: [ROLES.ADMIN]

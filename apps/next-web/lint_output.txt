@@ -1,0 +1,14 @@
+npm warn config ignoring workspace config at C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web/.npmrc
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\layout\vertical\Navigation.tsx
+  10:1  error  `@mui/material/styles` import should occur before import of `@/i18n/routing`  import/order
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\components\shared\form\business-autocomplete.tsx
+  31:29  warning  React Hook useCallback received a function whose dependencies are unknown. Pass an inline function instead  react-hooks/exhaustive-deps
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web\src\utils\backendClient.ts
+  47:9  warning  Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead  import/no-named-as-default-member
+
+✖ 3 problems (1 error, 2 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

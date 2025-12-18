@@ -1,6 +1,0 @@
-
-> @apps/next-web@5.0.0 lint C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web
-> eslint . --ext .js,.jsx,.ts,.tsx "--file" "src/components/shared/form/form-wrapper.tsx"
-
-Invalid option '--file' - perhaps you meant '--rule'?
- ELIFECYCLE  Command failed with exit code 2.

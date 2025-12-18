@@ -1,0 +1,1 @@
+npm warn config ignoring workspace config at C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-RISE-MONO-REPO\apps\next-web/.npmrc
