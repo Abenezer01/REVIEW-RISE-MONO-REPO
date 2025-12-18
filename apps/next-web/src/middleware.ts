@@ -1,6 +1,7 @@
-import createMiddleware from 'next-intl/middleware'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+
+import createMiddleware from 'next-intl/middleware'
 
 import { locales, defaultLocale } from '@platform/i18n'
 
@@ -39,6 +40,7 @@ export function middleware(request: NextRequest) {
   // If user is authenticated and tries to access login page, redirect to dashboard
   if (accessToken && isPublicPath) {
     const locale = pathnameHasLocale ? pathname.split('/')[1] : defaultLocale
+
     return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url))
   }
 
@@ -51,6 +53,7 @@ export function middleware(request: NextRequest) {
 
     const locale = pathnameHasLocale ? pathname.split('/')[1] : defaultLocale
     const loginUrl = new URL(`/${locale}/login`, request.url)
+
     loginUrl.searchParams.set('returnUrl', pathname)
 
     return NextResponse.redirect(loginUrl)
