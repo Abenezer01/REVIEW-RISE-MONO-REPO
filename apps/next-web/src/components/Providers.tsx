@@ -3,24 +3,23 @@
 import type { ChildrenType, Direction } from '@core/types'
 
 // Context Imports
-import { VerticalNavProvider } from '@menu/contexts/verticalNavContext'
-import { SettingsProvider } from '@core/contexts/settingsContext'
 import ThemeProvider from '@components/theme'
+import { SettingsProvider } from '@core/contexts/settingsContext'
+import { VerticalNavProvider } from '@menu/contexts/verticalNavContext'
 
 // Util Imports
 import { getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/serverHelpers'
 
 import { AuthProvider } from '@/contexts/AuthContext'
 
-import { getServerUser } from '@/utils/serverAuth'
 import TokenRefresher from '@/components/TokenRefresher'
+import { getServerUser } from '@/utils/serverAuth'
 
 type Props = ChildrenType & {
   direction: Direction
 }
 
 // React Query Wrapper
-import ReactQueryProvider from '@components/ReactQueryProvider'
 
 const Providers = async (props: Props) => {
   // Props
