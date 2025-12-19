@@ -60,5 +60,70 @@
     "select": "Select Language",
     "english": "English",
     "arabic": "Arabic"
+  },
+  "seoAnalyzer": {
+    "hero": {
+      "badge": "FREE AI-POWERED SEO ANALYSIS",
+      "title": "Discover Your Website's SEO Score in Seconds",
+      "subtitle": "Comprehensive SEO analysis powered by advanced AI algorithms",
+      "inputPlaceholder": "Enter your website URL (e.g., www.example.com)",
+      "ctaButton": "Analyze Now",
+      "freeResults": "✓ Free AI results • ✓ No sign-up required • ✓ Completely free"
+    },
+    "stats": {
+      "sitesAnalyzed": "50K+",
+      "sitesAnalyzedLabel": "Sites Analyzed",
+      "accuracy": "98%",
+      "accuracyLabel": "Accuracy Rate",
+      "rating": "4.9/5",
+      "ratingLabel": "User Rating",
+      "availability": "24/7",
+      "availabilityLabel": "Availability"
+    },
+    "features": {
+      "title": "What You'll Discover",
+      "subtitle": "Comprehensive SEO analysis powered by advanced AI algorithms",
+      "seoHealth": {
+        "title": "SEO Health Score",
+        "description": "Get a comprehensive 0-100 visibility score based on 80+ metrics",
+        "feature1": "Over 80 technical rating",
+        "feature2": "Competitor comparison",
+        "feature3": "Detailed actionable link"
+      },
+      "technicalAnalysis": {
+        "title": "Technical Analysis",
+        "description": "Deep-dive into technical SEO issues affecting your website",
+        "feature1": "Page speed analysis",
+        "feature2": "Mobile optimization",
+        "feature3": "Security & HTTPS"
+      },
+      "smartRecommendations": {
+        "title": "Smart Recommendations",
+        "description": "AI-generated action items to improve your search visibility",
+        "feature1": "Prioritized fixes",
+        "feature2": "Step-by-step guides",
+        "feature3": "Impact estimates"
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Get your complete SEO analysis in 3 simple steps",
+      "step1": {
+        "title": "Enter Your URL",
+        "description": "Simply enter your website URL into the analyzer, No payment, no forms."
+      },
+      "step2": {
+        "title": "AI Analysis",
+        "description": "Our advanced AI scans 80+ SEO factors, including overall health, meta usage, and backlinks for you."
+      },
+      "step3": {
+        "title": "Get Your Report",
+        "description": "Receive your complete SEO health score with actionable recommendations to boost your rankings."
+      }
+    },
+    "cta": {
+      "title": "Ready to Improve Your SEO?",
+      "button": "Analyze Your Website Now"
+    }
   }
 }

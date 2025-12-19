@@ -12,7 +12,7 @@ import { requestIdMiddleware } from './middleware/request-id';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3010;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(helmet());
