@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 'use client'
 
 // React Imports
@@ -5,6 +6,8 @@ import { createContext, useContext, useState, useCallback, useMemo } from 'react
 
 // Next Imports
 import { useRouter } from 'next/navigation'
+
+import { useLocale } from 'next-intl'
 
 // Type Imports
 import type { ChildrenType } from '@core/types'
@@ -36,6 +39,7 @@ export const AuthProvider = ({ children, user: initialUser }: ChildrenType & { u
 
   // Hooks
   const router = useRouter()
+  const locale = useLocale()
 
   // No need for client-side initAuth since we pass initialUser from server
 
@@ -45,8 +49,16 @@ export const AuthProvider = ({ children, user: initialUser }: ChildrenType & { u
     const params = new URLSearchParams(window.location.search)
     const returnUrl = params.get('returnUrl')
 
-    router.push(returnUrl || '/dashboard')
-  }, [router])
+    if (returnUrl) {
+      router.push(`/${locale}${returnUrl}`)
+
+      return
+    }
+
+    const isAdmin = userData.role?.toLowerCase() === 'admin'
+
+    router.push(`/${locale}/${isAdmin ? 'admin' : 'dashboard'}`)
+  }, [router, locale])
 
   const logout = useCallback(async () => {
     try {

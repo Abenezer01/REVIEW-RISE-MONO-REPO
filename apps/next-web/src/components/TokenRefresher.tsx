@@ -1,6 +1,9 @@
+/* eslint-disable import/no-unresolved */
 'use client'
 
 import { useEffect, useRef } from 'react'
+
+import { Toaster } from 'react-hot-toast'
 
 import { useAuth } from '@/contexts/AuthContext'
 import { getAuthTokenStatus, refreshAccessToken } from '@/app/actions/token'
@@ -81,5 +84,5 @@ export default function TokenRefresher() {
     }
   }, [user, logout])
 
-  return null
+  return <Toaster position="top-right" />
 }

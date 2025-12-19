@@ -2,6 +2,9 @@
   "navigation": {
     "dashboard": "Dashboard",
     "reviews": "Reviews",
+    "social-rise": "SocialRise",
+    "seo-intelligence": "SEO Intelligence",
+    "locations": "Locations",
     "home": "Home",
     "about": "About"
   },

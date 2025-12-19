@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import { notFound } from 'next/navigation'
 
 // Next Imports

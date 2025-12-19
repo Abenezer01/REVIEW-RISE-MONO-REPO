@@ -16,7 +16,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 
 // Third-party Imports
 import classnames from 'classnames'
-import { toast } from 'react-toastify'
+import { toast } from 'react-hot-toast'
 
 // Type Imports
 import type { SystemMode } from '@core/types'
@@ -83,7 +83,7 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
 
   useEffect(() => {
     if (state?.success && state.user) {
-      toast.success('Login successful!', { toastId: 'login-success' })
+      toast.success('Login successful!', { id: 'login-success' })
       login(state.user)
     } else if (state?.success === false && state?.message) {
       toast.error(state.message)

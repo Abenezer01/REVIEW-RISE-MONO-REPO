@@ -11,16 +11,34 @@ export type MenuItem = {
 const menuData: MenuItem[] = [
   {
     title: 'navigation.dashboard',
-    href: '/dashboard',
+    href: '/admin',
     icon: 'tabler-smart-home',
     allowedRoles: [ROLES.ADMIN]
   },
   {
     title: 'navigation.reviews',
-    href: '/reviews',
+    href: '/admin/reviews',
     icon: 'tabler-star',
     allowedRoles: [ROLES.ADMIN]
   },
+  {
+    title: 'navigation.social-rise',
+    href: '/admin/social-rise',
+    icon: 'tabler-brand-twitter',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
+    title: 'navigation.seo-intelligence',
+    href: '/admin/seo-intelligence',
+    icon: 'tabler-search',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
+    title: 'navigation.locations',
+    href: '/admin/locations',
+    icon: 'tabler-map-pin',
+    allowedRoles: [ROLES.ADMIN]
+  }
 ]
 
 export default menuData

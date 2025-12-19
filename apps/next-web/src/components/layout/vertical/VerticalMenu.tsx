@@ -5,7 +5,7 @@
 import { useTheme } from '@mui/material/styles'
 
 // Third-party Imports
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
 // Type Imports
@@ -13,7 +13,7 @@ import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Me
 
 // Component Imports
 import { Menu, MenuItem, SubMenu } from '@menu/vertical-menu'
-import { Link } from '@/i18n/routing'
+
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
@@ -23,7 +23,10 @@ import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNav
 
 // Style Imports
 import menuItemStyles from '@core/styles/vertical/menuItemStyles'
+
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
+
+import { Link } from '@/i18n/routing'
 
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -52,6 +55,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const verticalNavOptions = useVerticalNav()
   const { user } = useAuth()
   const t = useTranslations('dashboard')
+  const locale = useLocale() as string
 
   // Vars
   const { isBreakpointReached, transitionDuration } = verticalNavOptions
@@ -82,10 +86,16 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         )
       }
 
+      const baseHref = (item.href as any) || '/'
+      const localizedHref = `/${locale}${baseHref}`
+
       return (
         <MenuItem
           key={index}
+          href={localizedHref as any}
           component={<Link href={(item.href as any) || '/'} />}
+          exactMatch={item.href === '/admin'}
+          activeUrl={item.href as any}
           icon={item.icon ? <i className={item.icon} /> : undefined}
         >
           {t(item.title as any)}

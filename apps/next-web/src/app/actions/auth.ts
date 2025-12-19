@@ -7,6 +7,7 @@ import { z } from 'zod'
 
 import { backendClient } from '@/utils/backendClient'
 import { ROLES } from '@/configs/roles'
+import menuData, { type MenuItem } from '@/configs/menu'
 
 import type { User } from '@/contexts/AuthContext'
 
@@ -79,6 +80,20 @@ export async function loginAction(prevState: LoginResponse | null, formData: For
         return {
           success: false,
           message: 'Invalid user role - please contact administrator'
+        }
+      }
+
+      const hasAccess = (() => {
+        const check = (items: MenuItem[]): boolean =>
+          items.some(item => (item.allowedRoles?.includes(userRole as any) ?? false) || (item.children ? check(item.children) : false))
+
+        return check(menuData)
+      })()
+
+      if (userRole === ROLES.OWNER && !hasAccess) {
+        return {
+          success: false,
+          message: 'Access Denied: Your account does not have required menu permissions'
         }
       }
     }
