@@ -2,7 +2,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { locationRepository } from '@platform/db';
 import { z } from 'zod';
 import type {
     UpdateLocationRequest,
@@ -31,6 +30,7 @@ export async function GET(
     const { id } = await context.params;
 
     try {
+        const { locationRepository } = await import('@platform/db');
         const location = await locationRepository.findWithBusiness(id);
 
         if (!location) {
@@ -60,6 +60,7 @@ export async function PATCH(
     const { id } = await context.params;
 
     try {
+        const { locationRepository } = await import('@platform/db');
         const body = await request.json();
         const validation = updateLocationSchema.safeParse(body);
 
@@ -95,6 +96,8 @@ export async function DELETE(
     const { id } = await context.params;
 
     try {
+        const { locationRepository } = await import('@platform/db');
+        
         await locationRepository.delete(id);
 
         return NextResponse.json(

@@ -1,7 +1,6 @@
 
 import { NextResponse } from 'next/server';
 
-import { locationRepository } from '@platform/db';
 import { z } from 'zod';
 import type {
     CreateLocationRequest,
@@ -27,6 +26,8 @@ const createLocationSchema = z.object({
 
 export async function GET(request: Request) {
     try {
+        const { locationRepository } = await import('@platform/db');
+
         const { searchParams } = new URL(request.url);
 
         const page = parseInt(searchParams.get('page') || '1');
@@ -55,7 +56,7 @@ export async function GET(request: Request) {
         );
     } catch (error) {
         console.error('Error fetching locations:', error);
-        
+
 return NextResponse.json(
             createErrorResponse('Failed to fetch locations', 'INTERNAL_SERVER_ERROR', 500, error),
             { status: 500 }
@@ -65,6 +66,8 @@ return NextResponse.json(
 
 export async function POST(request: Request) {
     try {
+        const { locationRepository } = await import('@platform/db');
+
         const body = await request.json();
         const validation = createLocationSchema.safeParse(body);
 
@@ -90,7 +93,7 @@ export async function POST(request: Request) {
         );
     } catch (error) {
         console.error('Error creating location:', error);
-        
+
 return NextResponse.json(
             createErrorResponse('Failed to create location', 'INTERNAL_SERVER_ERROR', 500, error),
             { status: 500 }
