@@ -10,7 +10,8 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({ ope
     title: 'Delete Confirmation',
     content: 'Are you sure you want to delete this item?',
     onConfirm: onConfirm,
-    onCancel
+    onCancel,
+    type: 'delete'
   };
 
   return <ConfirmationDialog {...confirmationDialogProps} />;

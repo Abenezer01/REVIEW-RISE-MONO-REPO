@@ -22,6 +22,7 @@ export { SubscriptionRepository, subscriptionRepository } from './subscription.r
 export { SessionRepository, sessionRepository } from './session.repository';
 export { PasswordResetTokenRepository, passwordResetTokenRepository } from './password-reset-token.repository';
 export { EmailVerificationTokenRepository, emailVerificationTokenRepository } from './email-verification-token.repository';
+export { AuditLogRepository, auditLogRepository } from './audit-log.repository';
 
 // Import repositories for the convenience object
 import { userRepository } from './user.repository';
@@ -33,6 +34,7 @@ import { subscriptionRepository } from './subscription.repository';
 import { sessionRepository } from './session.repository';
 import { passwordResetTokenRepository } from './password-reset-token.repository';
 import { emailVerificationTokenRepository } from './email-verification-token.repository';
+import { auditLogRepository } from './audit-log.repository';
 
 // Re-export all repositories as a single object for convenience
 export const repositories = {
@@ -45,5 +47,6 @@ export const repositories = {
     session: sessionRepository,
     passwordResetToken: passwordResetTokenRepository,
     emailVerificationToken: emailVerificationTokenRepository,
+    auditLog: auditLogRepository,
 } as const;
 

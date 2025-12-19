@@ -88,22 +88,36 @@ export async function getUserRolesForBusiness(userId: string, businessId: string
 }
 
 /**
- * Get all roles for a user across all businesses
+ * Get all roles for a user across all businesses AND global platform roles
  * Useful for JWT payload
  */
 export async function getUserRoles(userId: string) {
-  const roles = await prisma.userBusinessRole.findMany({
-    where: { userId },
-    include: { role: true },
-  });
+  const [businessRoles, globalRoles] = await Promise.all([
+    prisma.userBusinessRole.findMany({
+      where: { userId },
+      include: { role: true },
+    }),
+    prisma.userRole.findMany({
+      where: { userId },
+      include: { role: true },
+    })
+  ]);
   
   // Return a map of businessId -> roleNames[]
   const result: Record<string, string[]> = {};
-  for (const r of roles) {
+  
+  // Process business roles
+  for (const r of businessRoles) {
     if (!result[r.businessId]) {
       result[r.businessId] = [];
     }
     result[r.businessId].push(r.role.name);
   }
+
+  // Process global roles (key: 'platform')
+  if (globalRoles.length > 0) {
+    result['platform'] = globalRoles.map(r => r.role.name);
+  }
+
   return result;
 }

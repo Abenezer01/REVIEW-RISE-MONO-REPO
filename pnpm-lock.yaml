@@ -76,55 +76,6 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
 
-  apps/express-admin-portal:
-    dependencies:
-      cors:
-        specifier: ^2.8.5
-        version: 2.8.5
-      dotenv:
-        specifier: ^16.3.1
-        version: 16.3.1
-      express:
-        specifier: ^4.18.2
-        version: 4.19.2
-      helmet:
-        specifier: ^7.1.0
-        version: 7.1.0
-      morgan:
-        specifier: ^1.10.0
-        version: 1.10.0
-    devDependencies:
-      '@types/cors':
-        specifier: ^2.8.17
-        version: 2.8.17
-      '@types/express':
-        specifier: ^4.17.21
-        version: 4.17.21
-      '@types/morgan':
-        specifier: ^1.9.9
-        version: 1.9.9
-      '@types/node':
-        specifier: ^20.10.6
-        version: 20.10.6
-      '@typescript-eslint/eslint-plugin':
-        specifier: 8.46.2
-        version: 8.46.2(@typescript-eslint/parser@8.46.2)(eslint@8.57.1)(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: 8.46.2
-        version: 8.46.2(eslint@8.57.1)(typescript@5.9.3)
-      eslint:
-        specifier: ^8.56.0
-        version: 8.57.1
-      jest:
-        specifier: ^29.7.0
-        version: 29.7.0(@types/node@20.10.6)
-      tsx:
-        specifier: ^4.7.0
-        version: 4.20.6
-      typescript:
-        specifier: ^5.3.3
-        version: 5.9.3
-
   apps/express-ai:
     dependencies:
       cors:
@@ -487,12 +438,18 @@ importers:
       '@platform/contracts':
         specifier: workspace:*
         version: link:../../packages/@platform/contracts
+      '@platform/db':
+        specifier: workspace:^
+        version: link:../../packages/@platform/db
       '@platform/i18n':
         specifier: workspace:*
         version: link:../../packages/@platform/i18n
       '@platform/utils':
         specifier: workspace:*
         version: link:../../packages/@platform/utils
+      '@prisma/client':
+        specifier: ^7.1.0
+        version: 7.1.0(prisma@7.1.0)(typescript@5.9.3)
       '@tanstack/react-query':
         specifier: ^5.90.12
         version: 5.90.12(react@19.2.0)

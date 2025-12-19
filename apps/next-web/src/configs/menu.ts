@@ -16,6 +16,12 @@ const menuData: MenuItem[] = [
     allowedRoles: [ROLES.ADMIN]
   },
   {
+    title: 'navigation.accounts',
+    href: '/admin/accounts',
+    icon: 'tabler-users',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
     title: 'navigation.reviews',
     href: '/admin/reviews',
     icon: 'tabler-star',

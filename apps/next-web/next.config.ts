@@ -15,7 +15,8 @@ const nextConfig: NextConfig = {
       }
     ]
   },
-  transpilePackages: ['@platform/utils', '@platform/contracts', '@platform/i18n']
+  transpilePackages: ['@platform/utils', '@platform/contracts', '@platform/i18n', '@platform/db'],
+  serverExternalPackages: ['@prisma/client', '@prisma/client-runtime-utils']
 }
 
 export default withNextIntl(nextConfig)

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 'use client'
 
 // React Imports
@@ -54,6 +55,41 @@ const UserDropdown = () => {
     !open ? setOpen(true) : setOpen(false)
   }
 
+  const displayName = () => {
+    const first = user?.firstName?.trim()
+    const last = user?.lastName?.trim()
+
+    if (first || last) {
+      return `${first || ''}${last ? ` ${last}` : ''}`.trim()
+    }
+
+    const deriveFromHandle = () => {
+      const handle = (user?.username && !user.username.includes('@')) ? user.username : (user?.email || '')
+      const local = handle.split('@')[0]
+      const parts = local.split(/[._-]+/).filter(Boolean)
+      const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+      const friendly = parts.length ? parts.map(cap).join(' ') : cap(local)
+
+      return friendly || 'User'
+    }
+
+    if (user?.username) {
+      return user.username.includes('@') ? deriveFromHandle() : user.username
+    }
+
+    if (user?.email) return deriveFromHandle()
+
+    return 'John Doe'
+  }
+
+  const getInitials = () => {
+    const first = user?.firstName?.trim() || ''
+    const last = user?.lastName?.trim() || ''
+    const initials = `${first.charAt(0)}${last.charAt(0)}`
+
+    return initials || (user?.email?.charAt(0).toUpperCase() || 'J')
+  }
+
   const handleDropdownClose = (event?: MouseEvent<HTMLLIElement> | (MouseEvent | TouchEvent), url?: string) => {
     if (url) {
       router.push(url)
@@ -81,11 +117,13 @@ const UserDropdown = () => {
       >
         <Avatar
           ref={anchorRef}
-          alt='John Doe'
-          src='/images/avatars/1.png'
+          alt={displayName()}
+          src={user?.avatar}
           onClick={handleDropdownOpen}
           className='cursor-pointer bs-[38px] is-[38px]'
-        />
+        >
+          {!user?.avatar && getInitials()}
+        </Avatar>
       </Badge>
       <Popper
         open={open}
@@ -106,10 +144,12 @@ const UserDropdown = () => {
               <ClickAwayListener onClickAway={e => handleDropdownClose(e as MouseEvent | TouchEvent)}>
                 <MenuList>
                   <div className='flex items-center plb-2 pli-6 gap-2' tabIndex={-1}>
-                    <Avatar alt={user?.firstName || 'John Doe'} src={user?.avatar || '/images/avatars/1.png'} />
+                    <Avatar alt={displayName()} src={user?.avatar || undefined}>
+                      {!user?.avatar && getInitials()}
+                    </Avatar>
                     <div className='flex items-start flex-col'>
                       <Typography className='font-medium' color='text.primary'>
-                        {user?.firstName || 'John Doe'} {user?.lastName || ''}
+                        {displayName()}
                       </Typography>
                       <Typography variant='caption'>{user?.email || 'admin@reviewrise.com'}</Typography>
                     </div>

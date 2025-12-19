@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../../../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -46,6 +47,7 @@ model User {
   sessions      Session[]
   userRoles     UserRole[]
   userBusinessRoles UserBusinessRole[]
+  auditLogs     AuditLog[]
 }
 
 model UserRole {
@@ -178,6 +180,22 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
   
   @@index([email])
+}
+
+model AuditLog {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @db.Uuid
+  action      String
+  entityType  String
+  entityId    String   @db.Uuid
+  details     Json?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([entityId])
+  @@index([createdAt])
 }
 
 model EmailVerificationToken {
