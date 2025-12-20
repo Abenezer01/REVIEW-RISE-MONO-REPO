@@ -48,6 +48,7 @@ model User {
   userRoles     UserRole[]
   userBusinessRoles UserBusinessRole[]
   auditLogs     AuditLog[]
+  seoSnapshots  SeoSnapshot[]
 }
 
 model UserRole {
@@ -206,5 +207,24 @@ model EmailVerificationToken {
   createdAt DateTime @default(now())
 
   @@index([email])
+}
+
+model SeoSnapshot {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  url             String
+  healthScore     Int
+  
+  // Store structured JSON data for flexibility
+  categoryScores  Json      
+  recommendations Json      
+  seoElements     Json      
+  
+  userId          String?   @db.Uuid
+  user            User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  createdAt       DateTime  @default(now())
+  
+  @@index([userId])
+  @@index([url])
 }
 
