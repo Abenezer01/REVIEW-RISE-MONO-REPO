@@ -17,6 +17,7 @@ export default function Header() {
             priority
             style={{ height: 'auto', width: 'auto', maxHeight: '40px' }}
           />
+          AdRise
         </div>
         <nav className="nav">
           <a href="#features">Features</a>

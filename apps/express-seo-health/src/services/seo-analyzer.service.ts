@@ -81,9 +81,11 @@ export async function analyzeSEOHealth(url: string, userId?: string) {
                 }
             });
             snapshotId = snapshot.id;
+            // eslint-disable-next-line no-console
             console.log(`SEO Snapshot persisted for ${url} (ID: ${snapshotId}, User: ${userId || 'Anonymous'})`);
-        } catch(e) { 
-            console.error('Failed to save SEO snapshot to DB:', e); 
+        } catch { 
+            // ignore
+            // console.error('Failed to save SEO snapshot to DB:', e); 
             // Don't throw, let the analysis return even if save fails
         }
 
@@ -92,7 +94,7 @@ export async function analyzeSEOHealth(url: string, userId?: string) {
             snapshotId
         };
 
-    } catch (error: any) {
-        throw new Error(`SEO analysis failed: ${error.message}`);
+    } catch (err: any) {
+        throw new Error(`SEO analysis failed: ${err.message}`);
     }
 }

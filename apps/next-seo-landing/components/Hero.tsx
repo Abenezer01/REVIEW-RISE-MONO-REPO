@@ -53,7 +53,7 @@ export default function Hero() {
         </div>
         
         <h1 className="title">
-          Discover Your Website's SEO Score<br />in Seconds
+          Discover Your Website&apos;s SEO Score<br />in Seconds
         </h1>
 
         {!loading && !result && (

@@ -27,7 +27,7 @@ export default function Features() {
   return (
     <section className="features" id="features">
       <div className="container">
-        <h2 className="section-title">What You'll Discover</h2>
+        <h2 className="section-title">What You&apos;ll Discover</h2>
         <p className="section-subtitle">
           Comprehensive SEO analysis powered by advanced AI algorithms
         </p>

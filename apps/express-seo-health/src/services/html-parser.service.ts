@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import robotsParser from 'robots-parser';
+
 import { resolve } from 'dns/promises';
 
 export interface ExtractedData {
@@ -137,7 +137,7 @@ export async function extractSEOData(url: string, html: string, fetchResult: any
             const absoluteCanonical = new URL(canonicalHref, url).href;
             const absoluteFinal = new URL(fetchResult.finalUrl).href; // Normalize trailing slash?
             canonicalMatches = absoluteCanonical.replace(/\/$/, '') === absoluteFinal.replace(/\/$/, '');
-        } catch (e) { }
+        } catch { /* ignore */ }
     } else {
         // If no canonical, technically it matches if it's the only version, but rule implies "tag missing or incorrect". 
         // If missing, matches = false.
@@ -202,7 +202,7 @@ export async function extractSEOData(url: string, html: string, fetchResult: any
         const robotsUrl = `${urlObj.origin}/robots.txt`;
         const robotsRes = await axios.get(robotsUrl, { timeout: 3000, validateStatus: () => true });
         validRobots = robotsRes.status === 200;
-    } catch (e) {}
+    } catch { /* ignore */ }
 
     // Sitemap (Heuristic)
     let sitemapDetected = false;
@@ -210,7 +210,7 @@ export async function extractSEOData(url: string, html: string, fetchResult: any
         const sitemapUrl = `${urlObj.origin}/sitemap.xml`;
         const sitemapRes = await axios.get(sitemapUrl, { method: 'HEAD', timeout: 3000, validateStatus: () => true });
         sitemapDetected = sitemapRes.status === 200;
-    } catch (e) {}
+    } catch { /* ignore */ }
 
     // Structured Data
     const schemaDetected = $('script[type="application/ld+json"]').length > 0;
@@ -221,14 +221,14 @@ export async function extractSEOData(url: string, html: string, fetchResult: any
         const adsUrl = `${urlObj.origin}/ads.txt`;
         const adsRes = await axios.get(adsUrl, { method: 'HEAD', timeout: 3000, validateStatus: () => true });
         adsTxtPresent = adsRes.status === 200;
-    } catch (e) {}
+    } catch { /* ignore */ }
 
     // SPF (DNS)
     let hasSpf = false;
     try {
         const txtRecords = await resolve(hostname, 'TXT');
         hasSpf = txtRecords.some(records => records.some(r => r.includes('v=spf1')));
-    } catch (e) {}
+    } catch { /* ignore */ }
 
     // Analytics
     const scriptsText = $('script').text() + $('script').map((_, el) => $(el).attr('src')).get().join(' ');

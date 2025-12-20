@@ -24,10 +24,11 @@ export const analyzeSEO = async (req: Request, res: Response) => {
 
         const { url } = validationResult.data;
         
+        // eslint-disable-next-line no-console
         console.log(`[SEO Analysis] Starting analysis for: ${url}`);
 
         // Try to get User ID from header (Basic implementation)
-        let userId: string | undefined = undefined;
+        const userId: string | undefined = undefined;
         // const authHeader = req.headers.authorization;
         // if (authHeader && authHeader.startsWith('Bearer ')) {
         //     const token = authHeader.split(' ')[1];
@@ -43,6 +44,7 @@ export const analyzeSEO = async (req: Request, res: Response) => {
         const analysis = await analyzeSEOHealth(url, userId);
         
         const duration = Date.now() - startTime;
+        // eslint-disable-next-line no-console
         console.log(`[SEO Analysis] Completed for ${url} in ${duration}ms - Score: ${analysis.healthScore}/100`);
         
         // Log the analysis
@@ -59,6 +61,7 @@ export const analyzeSEO = async (req: Request, res: Response) => {
 
     } catch (error: any) {
         const duration = Date.now() - startTime;
+        // eslint-disable-next-line no-console
         console.error(`[SEO Analysis] Failed after ${duration}ms:`, error.message);
         
         const response = createErrorResponse(
@@ -74,6 +77,7 @@ export const analyzeSEO = async (req: Request, res: Response) => {
 };
 
 function logAnalysis(url: string, score: number, ip: string, userId?: string) {
+    // eslint-disable-next-line no-console
     console.log(`[Log] URL: ${url}, Score: ${score}, IP: ${ip}, User: ${userId || 'Anonymous'}, Timestamp: ${new Date().toISOString()}`);
 }
 

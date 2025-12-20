@@ -95,7 +95,7 @@ async function checkRobotsTxt(baseUrl: string, targetUrl: string, userAgent: str
     // If robots.txt doesn't exist, allow by default
     return true;
     
-  } catch (error) {
+  } catch {
     // If we can't fetch robots.txt, allow by default
     return true;
   }

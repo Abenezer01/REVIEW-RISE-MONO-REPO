@@ -12,7 +12,6 @@ export function evaluateRules(data: any) {
 
     seoRules.categories.forEach(category => {
         let categoryPoints = 0;
-        const categoryResults: any[] = [];
         
         // Calculate points per rule assuming equal weight distribution within category maxPoints
         // OR we can assign points based on pass/fail validation count
