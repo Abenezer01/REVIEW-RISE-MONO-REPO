@@ -12,7 +12,7 @@ export class RankIngestionController {
       const { keywords }: BulkIngestRanksDTO = req.body;
 
       if (!Array.isArray(keywords) || keywords.length === 0) {
-        res.status(400).json(createErrorResponse('keywords array is required', 400));
+        res.status(400).json(createErrorResponse('keywords array is required', 'BAD_REQUEST', 400));
         return;
       }
 
@@ -50,7 +50,7 @@ export class RankIngestionController {
       );
     } catch (error) {
       console.error('Error ingesting ranks:', error);
-      res.status(500).json(createErrorResponse('Failed to ingest rank data', 500));
+      res.status(500).json(createErrorResponse('Failed to ingest rank data', 'INTERNAL_SERVER_ERROR', 500));
     }
   }
 
@@ -60,14 +60,65 @@ export class RankIngestionController {
    */
   async ingestFromCSV(req: Request, res: Response): Promise<void> {
     try {
-      // This would be implemented with a file upload middleware
-      // For now, return a placeholder response
-      res.status(501).json(
-        createErrorResponse('CSV upload endpoint not yet implemented', 501)
-      );
+      // Expecting JSON with csvContent because multipart setup is not present
+      const { csvContent, businessId } = req.body;
+
+      if (!csvContent || typeof csvContent !== 'string') {
+        res.status(400).json(createErrorResponse('csvContent string is required', 'BAD_REQUEST', 400));
+        return;
+      }
+      
+      const lines = csvContent.split('\n');
+      // Format: keyword, rankPosition, mapPackPosition, rankingUrl, capturedAt
+      // Skip header
+      const dataRows = lines.slice(1).filter(l => l.trim().length > 0);
+      
+      const ranksToCreate = [];
+      const errors = [];
+
+      // We need keyword IDs. If CSV provides Keyword TEXT, we need to map it.
+      // This requires fetching all keywords for the business.
+      if (!businessId) {
+         res.status(400).json(createErrorResponse('businessId is required for CSV ingestion', 'BAD_REQUEST', 400));
+         return;
+      }
+
+      const { keywordRepository, keywordRankRepository } = await import('@platform/db');
+      const businessKeywords = await keywordRepository.findByBusiness(businessId as string, { limit: 1000 });
+      const keywordMap = new Map(businessKeywords.map(k => [k.keyword.toLowerCase(), k.id]));
+
+      for (const line of dataRows) {
+        const [text, rank, mapRank, url, date] = line.split(',').map(s => s.trim());
+        
+        const keywordId = keywordMap.get(text.toLowerCase());
+        if (!keywordId) {
+          errors.push(`Keyword not found: ${text}`);
+          continue;
+        }
+
+        ranksToCreate.push({
+          keywordId,
+          rankPosition: rank ? parseInt(rank) : null,
+          mapPackPosition: mapRank ? parseInt(mapRank) : null,
+          rankingUrl: url || null,
+          capturedAt: date ? new Date(date) : new Date(),
+          device: 'desktop'
+        });
+      }
+
+      if (ranksToCreate.length > 0) {
+        await keywordRankRepository.createBatch(ranksToCreate);
+      }
+
+      res.status(201).json(createSuccessResponse({
+        message: `Processed ${lines.length - 1} lines`,
+        ingested: ranksToCreate.length,
+        errors: errors.length > 0 ? errors : undefined
+      }));
+
     } catch (error) {
       console.error('Error ingesting from CSV:', error);
-      res.status(500).json(createErrorResponse('Failed to ingest from CSV', 500));
+      res.status(500).json(createErrorResponse('Failed to ingest from CSV', 'INTERNAL_SERVER_ERROR', 500));
     }
   }
 }

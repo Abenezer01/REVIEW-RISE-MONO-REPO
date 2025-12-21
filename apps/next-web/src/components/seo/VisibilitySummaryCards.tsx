@@ -1,70 +1,53 @@
 'use client';
 
 import React from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
-import { styled } from '@mui/material/styles';
 import type { VisibilityMetricDTO } from '@platform/contracts';
+import MetricCard from '@/components/shared/analytics/MetricCard';
+import Box from '@mui/material/Box';
+import LinearProgress from '@mui/material/LinearProgress';
 
 interface VisibilitySummaryCardsProps {
   metrics: VisibilityMetricDTO | null;
   loading?: boolean;
 }
 
-const StyledCard = styled(Card)(({ theme }) => ({
-  height: '100%',
-  border: `1px solid ${theme.palette.divider}`,
-  boxShadow: 'none',
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: theme.shadows[4],
-  },
-}));
+// Simple Inline SVG Icons
+const MapIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <map name="map" />
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
+    </svg>
+);
 
-const MetricValue = styled(Typography)(({ theme }) => ({
-  fontSize: '2rem',
-  fontWeight: 700,
-  color: theme.palette.text.primary,
-  marginBottom: theme.spacing(1),
-}));
+const ChartIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M18 20V10"></path>
+        <path d="M12 20V4"></path>
+        <path d="M6 20v-6"></path>
+    </svg>
+);
 
-const MetricLabel = styled(Typography)(({ theme }) => ({
-  color: theme.palette.text.secondary,
-  fontSize: '0.875rem',
-  fontWeight: 500,
-  marginBottom: theme.spacing(2),
-}));
+const TrophyIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M8 21h8m-4-9l9-6-9-6-9 6 9 6zm-9 0v6h18v-6"></path>
+    </svg>
+);
 
-const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-  height: 6,
-  borderRadius: 5,
-  [`&.${linearProgressClasses.colorPrimary}`]: {
-    backgroundColor: theme.palette.grey[200],
-  },
-  [`& .${linearProgressClasses.bar}`]: {
-    borderRadius: 5,
-  },
-}));
+const StarIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+    </svg>
+);
 
 const VisibilitySummaryCards: React.FC<VisibilitySummaryCardsProps> = ({ metrics, loading }) => {
   if (loading || !metrics) {
-    // Render skeletons or loading state
     return (
       <Grid container spacing={3}>
         {[1, 2, 3, 4].map((item) => (
           <Grid size={{ xs: 12, md: 3 }} key={item}>
-            <StyledCard>
-              <CardContent>
-                <Box sx={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Typography color="text.secondary">Loading...</Typography>
-                </Box>
-              </CardContent>
-            </StyledCard>
+            <MetricCard title="Loading..." value="-" loading={true} />
           </Grid>
         ))}
       </Grid>
@@ -73,80 +56,72 @@ const VisibilitySummaryCards: React.FC<VisibilitySummaryCardsProps> = ({ metrics
 
   return (
     <Grid container spacing={3}>
+      {/* Map Pack Visibility */}
       <Grid size={{ xs: 12, md: 3 }}>
-        <StyledCard>
-          <CardContent>
-            <MetricLabel>Map Pack Visibility</MetricLabel>
-            <MetricValue>{metrics.mapPackVisibility.toFixed(1)}%</MetricValue>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Box sx={{ width: '100%', mr: 1 }}>
-                <BorderLinearProgress variant="determinate" value={metrics.mapPackVisibility} color="primary" />
-              </Box>
-            </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-              {metrics.mapPackAppearances} appearances in {metrics.totalTrackedKeywords} keywords
-            </Typography>
-          </CardContent>
-        </StyledCard>
+        <MetricCard
+           title="Map Pack Visibility"
+           value={`${metrics.mapPackVisibility.toFixed(1)}%`}
+           icon={<MapIcon />}
+           color="primary"
+           footer={
+             <Box>
+                 <LinearProgress variant="determinate" value={metrics.mapPackVisibility} color="primary" sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }} />
+                 <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
+                    {metrics.mapPackAppearances} appearances
+                 </p>
+             </Box>
+           }
+        />
       </Grid>
 
+      {/* Share of Voice */}
       <Grid size={{ xs: 12, md: 3 }}>
-        <StyledCard>
-          <CardContent>
-            <MetricLabel>Share of Voice</MetricLabel>
-            <MetricValue>{metrics.shareOfVoice.toFixed(1)}%</MetricValue>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Box sx={{ width: '100%', mr: 1 }}>
-                <BorderLinearProgress variant="determinate" value={metrics.shareOfVoice} color="secondary" />
-              </Box>
-            </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-              Based on keyword search volume
-            </Typography>
-          </CardContent>
-        </StyledCard>
+        <MetricCard
+           title="Share of Voice"
+           value={`${metrics.shareOfVoice.toFixed(1)}%`}
+           icon={<ChartIcon />}
+           color="secondary"
+           footer={
+             <Box>
+                 <LinearProgress variant="determinate" value={metrics.shareOfVoice} color="secondary" sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }} />
+                 <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
+                    Weighted by volume
+                 </p>
+             </Box>
+           }
+        />
       </Grid>
 
+      {/* Organic Rankings */}
       <Grid size={{ xs: 12, md: 3 }}>
-        <StyledCard>
-          <CardContent>
-            <MetricLabel>Organic Rankings</MetricLabel>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-              <Typography variant="body2" color="text.secondary">Top 3</Typography>
-              <Typography variant="body2" fontWeight="bold">{metrics.top3Count}</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-              <Typography variant="body2" color="text.secondary">Top 10</Typography>
-              <Typography variant="body2" fontWeight="bold">{metrics.top10Count}</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography variant="body2" color="text.secondary">Top 20</Typography>
-              <Typography variant="body2" fontWeight="bold">{metrics.top20Count}</Typography>
-            </Box>
-          </CardContent>
-        </StyledCard>
+        <MetricCard
+           title="Organic Rankings"
+           value={metrics.top3Count}
+           icon={<TrophyIcon />}
+           color="success"
+           footer={
+             <Box sx={{ display: 'flex', gap: 2, fontSize: '0.875rem', color: 'text.secondary' }}>
+                <span>Top 10: <strong>{metrics.top10Count}</strong></span>
+                <span>Top 20: <strong>{metrics.top20Count}</strong></span>
+             </Box>
+           }
+        />
       </Grid>
 
+      {/* SERP Features */}
       <Grid size={{ xs: 12, md: 3 }}>
-        <StyledCard>
-          <CardContent>
-            <MetricLabel>SERP Features</MetricLabel>
-            <Grid container spacing={1}>
-              <Grid size={{ xs: 6 }}>
-                <Box sx={{ textAlign: 'center', p: 1, bgcolor: 'action.hover', borderRadius: 1 }}>
-                  <Typography variant="h6" color="primary.main">{metrics.localPackCount}</Typography>
-                  <Typography variant="caption" display="block">Local Pack</Typography>
-                </Box>
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <Box sx={{ textAlign: 'center', p: 1, bgcolor: 'action.hover', borderRadius: 1 }}>
-                  <Typography variant="h6" color="info.main">{metrics.featuredSnippetCount}</Typography>
-                  <Typography variant="caption" display="block">Snippets</Typography>
-                </Box>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </StyledCard>
+        <MetricCard
+           title="SERP Features"
+           value={metrics.featuredSnippetCount + metrics.localPackCount}
+           icon={<StarIcon />}
+           color="warning"
+           footer={
+             <Box sx={{ display: 'flex', gap: 2, fontSize: '0.875rem', color: 'text.secondary' }}>
+                <span>Local: <strong>{metrics.localPackCount}</strong></span>
+                <span>Snippets: <strong>{metrics.featuredSnippetCount}</strong></span>
+             </Box>
+           }
+        />
       </Grid>
     </Grid>
   );

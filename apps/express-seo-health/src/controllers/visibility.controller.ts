@@ -155,16 +155,65 @@ export class VisibilityController {
         return;
       }
 
-      // This is a simplified implementation
-      // In a real scenario, you'd build the 2D matrix based on keywords and time periods
+      // Fetch keywords first
+      const { keywordRepository, keywordRankRepository } = await import('@platform/db');
+      
+      const keywords = await keywordRepository.findByBusiness(businessId as string, {
+        limit: 50 // Limit to top 50 keywords for heatmap to avoid overload
+      });
+
+      if (keywords.length === 0) {
+        res.json(createSuccessResponse({
+           keywords: [],
+           periods: [],
+           data: [],
+           metric: metric as string
+        }));
+        return;
+      }
+
+      const keywordIds = keywords.map(k => k.id);
+      const start = new Date(startDate as string);
+      const end = new Date(endDate as string);
+
+      // Fetch all ranks for these keywords in the period
+      const ranks = await keywordRankRepository.findRanksForKeywords(keywordIds, start, end);
+
+      // Generate dates array (daily steps)
+      const periods: string[] = [];
+      const current = new Date(start);
+      while (current <= end) {
+        periods.push(current.toISOString().split('T')[0]);
+        current.setDate(current.getDate() + 1);
+      }
+
+      // Build data matrix
+      // periods x keywords? Or keywords x periods. 
+      // DTO says data: number[][] - usually rows x cols.
+      // Heatmap component expects: keywords rows, dates columns.
+      // So data[keywordIndex][dateIndex]
+
+      const data: (number | null)[][] = keywords.map(k => {
+        const keywordRanks = ranks.filter(r => r.keywordId === k.id);
+        
+        return periods.map(dateStr => {
+           // Find rank for this date
+           // capturedAt might include time, so match just date part
+           const rank = keywordRanks.find(r => r.capturedAt.toISOString().startsWith(dateStr));
+           return rank?.rankPosition ?? null;
+        });
+      });
 
       res.json(
         createSuccessResponse({
           businessId,
           locationId: locationId || undefined,
-          keywords: [], // Array of keyword names
-          periods: [], // Array of time period labels
-          data: [], // 2D array of metric values
+          keywords: keywords.map(k => k.keyword), // Names
+          periods,
+          data: data as number[][], // Cast to number[][] (nulls handled by frontend usually or need 0?)
+          // Wait, DTO allows nulls? Interface says number[][]. Ideally null for no rank.
+          // Let's assume frontend handles null or we pass 0. 
+          // My generic heatmap component handles null.
           metric: metric as string,
         })
       );

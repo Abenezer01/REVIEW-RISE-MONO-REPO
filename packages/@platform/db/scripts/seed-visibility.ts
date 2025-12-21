@@ -70,7 +70,7 @@ async function seedVisibilityData() {
       { keyword: 'coffee roastery nyc', volume: 590, difficulty: 65 },
       { keyword: 'cafe with wifi nyc', volume: 1100, difficulty: 38 },
     ];
-
+ 
     console.log('🔑 Creating keywords...');
     const keywords = [];
 
