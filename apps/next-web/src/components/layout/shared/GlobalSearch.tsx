@@ -36,6 +36,7 @@ const GlobalSearch = () => {
         value={searchValue}
         onChange={e => setSearchValue(e.target.value)}
         placeholder='Search...'
+        id='global-search-input'
         sx={{
           '& .MuiOutlinedInput-root': {
             '& fieldset': { border: 'none' },

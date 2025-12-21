@@ -80,6 +80,7 @@ model Business {
   subscriptions Subscription[]
   userBusinessRoles UserBusinessRole[]
   jobs          Job[]
+  reviewSyncLogs ReviewSyncLog[]
 
 
   @@index([name])
@@ -101,6 +102,7 @@ model Location {
   deletedAt   DateTime?
   business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
   jobs        Job[]
+  reviewSyncLogs ReviewSyncLog[]
 
   @@index([businessId])
 }
@@ -201,6 +203,47 @@ model AuditLog {
   @@index([createdAt])
 }
 
+model ReviewSyncLog {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  
+  // Context
+  businessId  String    @db.Uuid
+  locationId  String    @db.Uuid
+  platform    String    // google, facebook, etc.
+  
+  // Status
+  status      String    // success, failed
+  errorMessage String?
+  errorStack  String?
+  
+  // Metrics
+  reviewsSynced Int     @default(0)
+  durationMs  Int?
+  
+  // Raw Data (for debugging)
+  requestData Json?
+  responseData Json?
+  
+  // Relation to the Job that created this log
+  jobId       String?   @db.Uuid
+  
+  // Timestamps
+  startedAt   DateTime
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location    Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  job         Job?      @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  @@index([businessId])
+  @@index([locationId])
+  @@index([platform])
+  @@index([status])
+  @@index([createdAt])
+}
+
 model EmailVerificationToken {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email     String
@@ -240,6 +283,7 @@ model Job {
   locationId  String?   @db.Uuid
   business    Business? @relation(fields: [businessId], references: [id], onDelete: SetNull)
   location    Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  reviewSyncLogs ReviewSyncLog[]
 
   // Data
   payload     Json?     // Snapshot of input data

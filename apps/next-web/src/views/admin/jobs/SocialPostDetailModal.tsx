@@ -99,7 +99,7 @@ const SocialPostDetailModal = ({ open, onClose, job }: SocialPostDetailModalProp
                     <Typography variant='h5' fontWeight={700} sx={{ letterSpacing: -0.5 }}>
                         Social Post Details
                     </Typography>
-                    <Typography variant='body2' color='text.secondary' sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography component="div" variant='body2' color='text.secondary' sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         Job ID: <Chip label={job.id} size='small' variant='outlined' sx={{ height: 20, fontFamily: 'monospace', fontSize: '0.75rem', borderRadius: 1 }} />
                     </Typography>
                 </Box>

@@ -525,6 +525,88 @@ async function main() {
 
     console.log(`✅ Created 3 failed jobs\n`);
 
+    // 10. Create Review Sync Logs
+    console.log('📝 Creating review sync logs...');
+
+    // Log 1: Successful Google Sync for ACME Downtown
+    await prisma.reviewSyncLog.create({
+        data: {
+            businessId: business1.id,
+            locationId: '11111111-1111-1111-1111-111111111111',
+            platform: 'google',
+            status: 'success',
+            reviewsSynced: 15,
+            durationMs: 1250,
+            startedAt: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
+            completedAt: new Date(Date.now() - 1000 * 60 * 60 + 1250),
+            requestData: {
+                accountId: 'accounts/12345',
+                locationId: 'locations/67890',
+                pageSize: 50
+            },
+            responseData: {
+                reviews: [
+                    { id: 'r1', rating: 5, comment: 'Great service!' },
+                    { id: 'r2', rating: 4, comment: 'Good food.' }
+                ],
+                nextPageToken: null
+            }
+        }
+    });
+
+    // Log 2: Failed Facebook Sync for ACME Uptown (Linked to Failed Job)
+    await prisma.reviewSyncLog.create({
+        data: {
+            businessId: business1.id,
+            locationId: '22222222-2222-2222-2222-222222222222',
+            platform: 'facebook',
+            status: 'failed',
+            errorMessage: 'Facebook Graph API Error: Session expired',
+            errorStack: 'Error: Session expired\n    at FacebookClient.getReviews (src/clients/facebook.ts:45:12)\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)',
+            durationMs: 500,
+            startedAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+            completedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 + 500),
+            jobId: '66666666-6666-6666-6666-666666666666',
+            requestData: {
+                pageId: '1029384756',
+                fields: 'rating,review_text,created_time'
+            },
+            responseData: {
+                error: {
+                    message: 'Session has expired',
+                    type: 'OAuthException',
+                    code: 190
+                }
+            }
+        }
+    });
+
+    // Log 3: Successful Yelp Sync for Tech Cafe
+    await prisma.reviewSyncLog.create({
+        data: {
+            businessId: business2.id,
+            locationId: '33333333-3333-3333-3333-333333333333',
+            platform: 'yelp',
+            status: 'success',
+            reviewsSynced: 5,
+            durationMs: 800,
+            startedAt: new Date(Date.now() - 1000 * 60 * 30), // 30 mins ago
+            completedAt: new Date(Date.now() - 1000 * 60 * 30 + 800),
+            requestData: {
+                businessId: 'tech-cafe-sf',
+                limit: 20
+            },
+            responseData: {
+                reviews: [
+                    { id: 'y1', rating: 5, text: 'Best coffee in town!' }
+                ],
+                total: 150
+            }
+        }
+    });
+
+    console.log(`✅ Created 3 review sync logs\n`);
+
     console.log('✨ Seed completed successfully!\n');
     console.log('Summary:');
     console.log('  - 4 roles (Owner, Admin, Manager, Staff)');

@@ -46,25 +46,25 @@ const menuData: MenuItem[] = [
     allowedRoles: [ROLES.ADMIN]
   },
   {
-    title: 'navigation.jobs',
+    title: 'navigation.failed-jobs',
+    href: '/admin/failed-jobs',
+    icon: 'tabler-alert-circle',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
+    title: 'navigation.logs',
     icon: 'tabler-cpu',
     allowedRoles: [ROLES.ADMIN],
     children: [
       {
-        title: 'navigation.failed-jobs',
-        href: '/admin/jobs/failed',
-        icon: 'tabler-alert-circle',
-        allowedRoles: [ROLES.ADMIN]
-      },
-      {
         title: 'navigation.social-media-post-logs',
-        href: '/admin/jobs/social-posts',
+        href: '/admin/logs/social-posts',
         icon: 'tabler-brand-twitter',
         allowedRoles: [ROLES.ADMIN]
       },
       {
         title: 'navigation.review-sync-logs',
-        href: '/admin/jobs/reviews',
+        href: '/admin/logs/reviews',
         icon: 'tabler-refresh',
         allowedRoles: [ROLES.ADMIN]
       }

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import { Box, Button, Stack, Typography } from '@mui/material';
 
 import { useTranslation } from '@/hooks/useTranslation';
@@ -11,13 +12,15 @@ export interface EmptyStateProps {
         icon?: React.ReactNode;
     };
     illustration?: React.ReactNode;
+    icon?: string;
 }
 
 export const EmptyState = ({
     title,
     description,
     action,
-    illustration
+    illustration,
+    icon
 }: EmptyStateProps) => {
     const t = useTranslation('common');
 
@@ -42,7 +45,7 @@ export const EmptyState = ({
 
             {!illustration && (
                 <Box sx={{ mb: 3, fontSize: 64, opacity: 0.3 }}>
-                    <i className="tabler:inbox" />
+                    <i className={icon || "tabler:inbox"} />
                 </Box>
             )}
 

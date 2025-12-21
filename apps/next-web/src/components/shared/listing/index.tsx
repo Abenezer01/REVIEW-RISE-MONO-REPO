@@ -196,6 +196,7 @@ const ItemsListing = <T extends object>({
                 description={emptyStateConfig?.description}
                 action={emptyStateConfig?.action}
                 illustration={emptyStateConfig?.illustration}
+                icon={emptyStateConfig?.icon}
               />
             ) : (
               <>

@@ -15,12 +15,13 @@ export class JobRepository extends BaseRepository<
   }
 
   /**
-   * Find failed jobs with comprehensive filtering
+   * Find jobs with comprehensive filtering
    */
-  async findFailedJobs(options: {
+  async findJobs(options: {
     page?: number;
     limit?: number;
     type?: string[];
+    status?: string | string[];
     businessId?: string;
     locationId?: string;
     fromDate?: Date;
@@ -28,12 +29,18 @@ export class JobRepository extends BaseRepository<
     search?: string;
     platform?: string;
   }) {
-    const { page = 1, limit = 10, type, businessId, locationId, fromDate, toDate, search, platform } = options;
+    const { page = 1, limit = 10, type, status, businessId, locationId, fromDate, toDate, search, platform } = options;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.JobWhereInput = {
-      status: 'failed',
-    };
+    const where: Prisma.JobWhereInput = {};
+
+    if (status) {
+      if (Array.isArray(status)) {
+        where.status = { in: status };
+      } else {
+        where.status = status;
+      }
+    }
 
     if (type && type.length > 0) {
       where.type = { in: type };
@@ -88,7 +95,13 @@ export class JobRepository extends BaseRepository<
       this.delegate.count({ where }),
     ]);
 
-    return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   /**

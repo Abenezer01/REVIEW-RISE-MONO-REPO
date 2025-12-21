@@ -25,6 +25,7 @@ export { EmailVerificationTokenRepository, emailVerificationTokenRepository } fr
 export { AuditLogRepository, auditLogRepository } from './audit-log.repository';
 export { SeoSnapshotRepository, seoSnapshotRepository } from './seo-snapshot.repository';
 export { JobRepository, jobRepository } from './job.repository';
+export { ReviewSyncLogRepository, reviewSyncLogRepository } from './review-sync-log.repository';
 
 // Import repositories for the convenience object
 import { userRepository } from './user.repository';
@@ -39,6 +40,7 @@ import { emailVerificationTokenRepository } from './email-verification-token.rep
 import { auditLogRepository } from './audit-log.repository';
 import { seoSnapshotRepository } from './seo-snapshot.repository';
 import { jobRepository } from './job.repository';
+import { reviewSyncLogRepository } from './review-sync-log.repository';
 
 // Re-export all repositories as a single object for convenience
 export const repositories = {
@@ -54,4 +56,5 @@ export const repositories = {
     auditLog: auditLogRepository,
     seoSnapshot: seoSnapshotRepository,
     job: jobRepository,
+    reviewSyncLog: reviewSyncLogRepository,
 } as const;

@@ -28,6 +28,25 @@ const TableListing = <T,>({ columns, items, pagination, onPagination, isLoading,
     onPagination && onPagination(newPaginationModel.pageSize, newPaginationModel.page + 1);
   };
 
+  const indexColumn: GridColDef = {
+    field: 'rowNumber',
+    headerName: '#',
+    width: 70,
+    sortable: false,
+    renderCell: (params) => {
+      // Calculate global index based on pagination
+      // params.api.getRowIndexRelativeToVisibleRows(params.id) is 0-based index on current page
+      // But since we use server-side pagination, we need to calculate manually
+      
+      const currentRowIndex = items.findIndex((item: any) => item.id === params.row.id);
+      
+      return (pagination?.page - 1) * pagination?.pageSize + currentRowIndex + 1;
+    }
+  };
+
+  // Prepend index column to existing columns
+  const allColumns = [indexColumn, ...columns];
+
   return (
     <Box sx={{ width: '100%', mb: 6 }}>
       <Card sx={{ borderRadius: 1.5, border: (theme) => `1px solid ${theme.palette.divider}`, boxShadow: 'none' }}>
@@ -38,7 +57,7 @@ const TableListing = <T,>({ columns, items, pagination, onPagination, isLoading,
           pagination
           rowHeight={64}
           rowCount={pagination?.total}
-          columns={columns}
+          columns={allColumns}
           paginationMode="server"
           disableRowSelectionOnClick
           paginationModel={paginationModel}

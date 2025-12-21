@@ -1,8 +1,8 @@
 /* eslint-disable import/no-unresolved */
-import JobList from '@/views/admin/jobs/JobList'
+import ReviewSyncList from '@/views/admin/jobs/ReviewSyncList'
 
 const ReviewSyncJobsPage = () => {
-  return <JobList initialType="reviews" />
+  return <ReviewSyncList />
 }
 
 export default ReviewSyncJobsPage
