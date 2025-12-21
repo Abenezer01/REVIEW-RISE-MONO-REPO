@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react'
 
+import { LoadingButton } from '@mui/lab'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
@@ -26,6 +27,7 @@ import ItemsListing from '@components/shared/listing'
 import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 
 import { getJobs, retryJob, resolveJob, ignoreJob } from '@/app/actions/job'
+
 import JobDetailModal from './JobDetailModal'
 
 const getJobTypeColor = (type: string): any => {
@@ -55,6 +57,7 @@ const JobList = () => {
 
   const [selectedJob, setSelectedJob] = useState<any>(null)
   const [openDetail, setOpenDetail] = useState(false)
+  const [loadingExport, setLoadingExport] = useState(false)
 
   const fetchData = async () => {
     setLoading(true)
@@ -117,6 +120,66 @@ const JobList = () => {
       if (selectedJob?.id === id) setOpenDetail(false)
     } else {
       toast.error(res.error || 'Failed to ignore job')
+    }
+  }
+
+  const convertToCSV = (data: any[]) => {
+    const headers = ['Job ID', 'Type', 'Business', 'Error Details', 'Retries', 'Created At']
+
+    const rows = data.map(job => [
+      job.id,
+      job.type,
+      job.business?.name || 'N/A',
+      `"${(job.error?.message || '').replace(/"/g, '""')}"`,
+      `${job.retryCount}/${job.maxRetries}`,
+      new Date(job.createdAt).toLocaleString()
+    ])
+
+    return [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n')
+  }
+
+  const downloadCSV = (content: string, fileName: string) => {
+    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+
+    link.setAttribute('href', url)
+    link.setAttribute('download', fileName)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  const handleExport = async () => {
+    setLoadingExport(true)
+
+    try {
+      // Fetch all filtered jobs (up to a reasonable limit, e.g., 1000)
+      const res = await getJobs({
+        page: 1,
+        limit: 1000,
+        ...filters
+      })
+
+      if (res.success && res.data.length > 0) {
+        const csvContent = convertToCSV(res.data)
+
+        downloadCSV(csvContent, `failed_jobs_${new Date().toISOString().split('T')[0]}.csv`)
+        toast.success(`Exported ${res.data.length} jobs`)
+      } else if (res.success && res.data.length === 0) {
+        toast.info('No jobs to export')
+      } else {
+        toast.error(res.error || 'Failed to fetch jobs for export')
+      }
+    } catch (error) {
+      console.error('Export error:', error)
+      toast.error('An error occurred during export')
+    } finally {
+      setLoadingExport(false)
     }
   }
 
@@ -311,7 +374,7 @@ const JobList = () => {
                         if (!selected) {
                             return <Typography color='text.secondary'>Filter by Type</Typography>
                         }
-                        
+
                         return selected.replace('_', ' ');
                     }
                 }}
@@ -342,7 +405,15 @@ const JobList = () => {
               </CustomTextField>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 4 }} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                 {/* Placeholder for future date picker or actions */}
+              <LoadingButton
+                variant='contained'
+                startIcon={<i className='tabler-download' />}
+                loading={loadingExport}
+                loadingPosition='start'
+                onClick={handleExport}
+              >
+                Export CSV
+              </LoadingButton>
             </Grid>
           </Grid>
         </CardContent>
