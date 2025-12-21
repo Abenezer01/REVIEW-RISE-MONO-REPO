@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../../../../node_modules/.prisma/client"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -79,6 +79,7 @@ model Business {
   locations     Location[]
   subscriptions Subscription[]
   userBusinessRoles UserBusinessRole[]
+  jobs          Job[]
 
 
   @@index([name])
@@ -99,6 +100,7 @@ model Location {
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
   business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  jobs        Job[]
 
   @@index([businessId])
 }
@@ -228,3 +230,36 @@ model SeoSnapshot {
   @@index([url])
 }
 
+model Job {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type        String    // reviews, social_posts, seo_crawls, ai_tasks
+  status      String    // pending, processing, completed, failed, resolved, ignored
+  
+  // Relations
+  businessId  String?   @db.Uuid
+  locationId  String?   @db.Uuid
+  business    Business? @relation(fields: [businessId], references: [id], onDelete: SetNull)
+  location    Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+
+  // Data
+  payload     Json?     // Snapshot of input data
+  result      Json?     // Output or metadata
+  error       Json?     // Detailed error info (message, stack, code)
+
+  // Retry logic
+  retryCount  Int       @default(0)
+  maxRetries  Int       @default(3)
+
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  startedAt   DateTime?
+  completedAt DateTime?
+  failedAt    DateTime?
+
+  @@index([type])
+  @@index([status])
+  @@index([businessId])
+  @@index([locationId])
+  @@index([createdAt])
+}

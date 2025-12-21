@@ -5,7 +5,7 @@
  * Import repositories from this file to use in your application.
  * 
  * @example
- * import { userRepository, businessRepository } from '@platform/db/repositories';
+ * import { userRepository, businessRepository } from '@platform/db';
  * 
  * const user = await userRepository.findByEmail('user@example.com');
  * const businesses = await businessRepository.findByUserId(user.id);
@@ -24,6 +24,7 @@ export { PasswordResetTokenRepository, passwordResetTokenRepository } from './pa
 export { EmailVerificationTokenRepository, emailVerificationTokenRepository } from './email-verification-token.repository';
 export { AuditLogRepository, auditLogRepository } from './audit-log.repository';
 export { SeoSnapshotRepository, seoSnapshotRepository } from './seo-snapshot.repository';
+export { JobRepository, jobRepository } from './job.repository';
 
 // Import repositories for the convenience object
 import { userRepository } from './user.repository';
@@ -37,6 +38,7 @@ import { passwordResetTokenRepository } from './password-reset-token.repository'
 import { emailVerificationTokenRepository } from './email-verification-token.repository';
 import { auditLogRepository } from './audit-log.repository';
 import { seoSnapshotRepository } from './seo-snapshot.repository';
+import { jobRepository } from './job.repository';
 
 // Re-export all repositories as a single object for convenience
 export const repositories = {
@@ -51,5 +53,5 @@ export const repositories = {
     emailVerificationToken: emailVerificationTokenRepository,
     auditLog: auditLogRepository,
     seoSnapshot: seoSnapshotRepository,
+    job: jobRepository,
 } as const;
-

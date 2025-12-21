@@ -1,6 +1,3 @@
-// Export Prisma client and types
-export * from '@prisma/client';
-
 // Export enhanced Prisma clients
 export { prisma, prismaAdmin, disconnectDatabase } from './client';
 

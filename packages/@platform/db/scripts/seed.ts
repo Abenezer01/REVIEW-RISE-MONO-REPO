@@ -442,6 +442,89 @@ async function main() {
 
     console.log(`✅ Created 2 subscriptions\n`);
 
+    // 9. Create Failed Jobs
+    console.log('⚠️ Creating failed jobs...');
+    
+    // Job 1: Review Fetch Failure
+    await prisma.job.upsert({
+        where: { id: '66666666-6666-6666-6666-666666666666' },
+        update: {},
+        create: {
+            id: '66666666-6666-6666-6666-666666666666',
+            type: 'reviews',
+            status: 'failed',
+            businessId: business1.id,
+            locationId: '11111111-1111-1111-1111-111111111111',
+            error: {
+                message: 'Google API rate limit exceeded',
+                code: 'RATE_LIMIT_EXCEEDED',
+                details: 'Quota 1000/1000 used'
+            },
+            payload: {
+                source: 'google',
+                days: 30
+            },
+            retryCount: 3,
+            maxRetries: 3,
+            failedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+            createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000),
+        },
+    });
+
+    // Job 2: Social Post Failure
+    await prisma.job.upsert({
+        where: { id: '77777777-7777-7777-7777-777777777777' },
+        update: {},
+        create: {
+            id: '77777777-7777-7777-7777-777777777777',
+            type: 'social_posts',
+            status: 'failed',
+            businessId: business2.id,
+            locationId: '33333333-3333-3333-3333-333333333333',
+            error: {
+                message: 'Invalid image format',
+                code: 'INVALID_FORMAT',
+                details: 'Image must be JPG or PNG'
+            },
+            payload: {
+                platform: 'facebook',
+                content: 'Check out our new latte art!',
+                media: ['image.webp']
+            },
+            retryCount: 1,
+            maxRetries: 3,
+            failedAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+            createdAt: new Date(Date.now() - 25 * 60 * 60 * 1000),
+        },
+    });
+
+    // Job 3: AI Task Failure
+    await prisma.job.upsert({
+        where: { id: '88888888-8888-8888-8888-888888888888' },
+        update: {},
+        create: {
+            id: '88888888-8888-8888-8888-888888888888',
+            type: 'ai_tasks',
+            status: 'failed',
+            businessId: business1.id,
+            error: {
+                message: 'OpenAI API timeout',
+                code: 'TIMEOUT',
+                details: 'Request took longer than 30s'
+            },
+            payload: {
+                prompt: 'Generate a response to a positive review about our steak',
+                model: 'gpt-4'
+            },
+            retryCount: 5,
+            maxRetries: 5,
+            failedAt: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+            createdAt: new Date(Date.now() - 40 * 60 * 1000),
+        },
+    });
+
+    console.log(`✅ Created 3 failed jobs\n`);
+
     console.log('✨ Seed completed successfully!\n');
     console.log('Summary:');
     console.log('  - 4 roles (Owner, Admin, Manager, Staff)');
@@ -452,6 +535,7 @@ async function main() {
     console.log('  - 3 locations');
     console.log('  - 3 user-business-role assignments');
     console.log('  - 2 active subscriptions');
+    console.log('  - 3 failed jobs');
 }
 
 main()

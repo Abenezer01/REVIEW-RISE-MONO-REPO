@@ -3,7 +3,7 @@
 
 // React Imports
 import { useRef, useState } from 'react'
-import type { MouseEvent } from 'react'
+import type { MouseEvent as ReactMouseEvent } from 'react'
 
 // Next Imports
 import { useRouter } from 'next/navigation'
@@ -90,7 +90,7 @@ const UserDropdown = () => {
     return initials || (user?.email?.charAt(0).toUpperCase() || 'J')
   }
 
-  const handleDropdownClose = (event?: MouseEvent<HTMLLIElement> | (MouseEvent | TouchEvent), url?: string) => {
+  const handleDropdownClose = (event?: ReactMouseEvent | MouseEvent | TouchEvent, url?: string) => {
     if (url) {
       router.push(url)
     }
@@ -158,6 +158,10 @@ const UserDropdown = () => {
                   <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e)}>
                     <i className='tabler-user' />
                     <Typography color='text.primary'>My Profile</Typography>
+                  </MenuItem>
+                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e)}>
+                    <i className='tabler-settings' />
+                    <Typography color='text.primary'>Settings</Typography>
                   </MenuItem>
                   <div className='flex items-center plb-2 pli-3'>
                     <Button

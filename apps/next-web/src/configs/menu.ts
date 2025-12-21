@@ -44,6 +44,12 @@ const menuData: MenuItem[] = [
     href: '/admin/locations',
     icon: 'tabler-map-pin',
     allowedRoles: [ROLES.ADMIN]
+  },
+  {
+    title: 'navigation.jobs',
+    href: '/admin/jobs',
+    icon: 'tabler-cpu',
+    allowedRoles: [ROLES.ADMIN]
   }
 ]
 
