@@ -150,6 +150,26 @@ export class BusinessRepository extends BaseRepository<
             withoutSubscription: active - withActiveSubscription,
         };
     }
+
+    /**
+     * Find businesses by user ID
+     */
+    async findByUser(userId: string) {
+        return this.delegate.findMany({
+            where: {
+                userBusinessRoles: {
+                    some: {
+                        userId: userId,
+                        deletedAt: null,
+                    },
+                },
+                deletedAt: null,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+    }
 }
 
 // Export singleton instance

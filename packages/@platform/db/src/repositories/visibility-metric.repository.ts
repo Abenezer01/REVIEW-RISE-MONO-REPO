@@ -34,11 +34,11 @@ export class VisibilityMetricRepository extends BaseRepository<
       ...(filters?.periodType && { periodType: filters.periodType }),
       ...(filters?.startDate || filters?.endDate
         ? {
-            periodStart: {
-              ...(filters.startDate && { gte: filters.startDate }),
-              ...(filters.endDate && { lte: filters.endDate }),
-            },
-          }
+          periodStart: {
+            ...(filters.startDate && { gte: filters.startDate }),
+            ...(filters.endDate && { lte: filters.endDate }),
+          },
+        }
         : {}),
     };
 
@@ -105,7 +105,7 @@ export class VisibilityMetricRepository extends BaseRepository<
       where: {
         businessId_locationId_periodStart_periodEnd_periodType: {
           businessId,
-          locationId,
+          locationId: locationId as any,
           periodStart,
           periodEnd,
           periodType,

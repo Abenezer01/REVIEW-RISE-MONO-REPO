@@ -7,9 +7,13 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
 
+import { useAuth } from '@/contexts/AuthContext';
 import VisibilitySummaryCards from '@/components/seo/VisibilitySummaryCards';
 import KeywordsTable from '@/components/seo/KeywordsTable';
 import VisibilityTrendsChart from './VisibilityTrendsChart';
@@ -20,7 +24,9 @@ import type { VisibilityMetricDTO, KeywordDTO } from '@platform/contracts';
 const API_URL = 'http://localhost:3012/api/v1';
 
 const VisibilityDashboard = () => {
+  const { user } = useAuth();
   const [businessId, setBusinessId] = useState<string | null>(null);
+  const [businesses, setBusinesses] = useState<any[]>([]);
   const [metrics, setMetrics] = useState<VisibilityMetricDTO | null>(null);
   const [historicalMetrics, setHistoricalMetrics] = useState<VisibilityMetricDTO[]>([]);
   const [heatmapData, setHeatmapData] = useState<any>(null);
@@ -30,10 +36,34 @@ const VisibilityDashboard = () => {
 
   const theme = useTheme();
 
-  // Fetch business ID first (simulation of context)
+  // Fetch user businesses on mount
   useEffect(() => {
-    // Context logic would go here
-  }, []);
+    const fetchUserBusinesses = async () => {
+      if (!user?.id) return;
+
+      try {
+        // In a real app, this might be an internal Next.js API route or direct call if server component
+        // But since we created /api/admin/users/[id]/businesses, let's use it.
+        // Note: The new route returns { data: [...] } standard response structure
+        const response = await axios.get(`/api/admin/users/${user.id}/businesses`);
+
+        if (response.data?.data && response.data.data.length > 0) {
+          setBusinesses(response.data.data);
+          // Auto-select first business
+          setBusinessId(response.data.data[0].id);
+        } else {
+          setError('No businesses found for this user.');
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Error fetching user businesses:', err);
+        setError('Failed to load user businesses.');
+        setLoading(false);
+      }
+    };
+
+    fetchUserBusinesses();
+  }, [user?.id]);
 
   const fetchData = useCallback(async (id: string) => {
     setLoading(true);
@@ -50,15 +80,15 @@ const VisibilityDashboard = () => {
 
       // 2. Fetch Historical Metrics for Chart
       const historyPromise = axios.get(`${API_URL}/visibility/metrics`, {
-        params: { 
-            businessId: id, 
-            periodType: 'daily', 
-            startDate: thirtyDaysAgo.toISOString(), 
-            endDate: today.toISOString(),
-            limit: 30 
+        params: {
+          businessId: id,
+          periodType: 'daily',
+          startDate: thirtyDaysAgo.toISOString(),
+          endDate: today.toISOString(),
+          limit: 30
         }
       });
-      
+
       // 3. Fetch Keywords
       const keywordsPromise = axios.get(`${API_URL}/keywords`, {
         params: { businessId: id, limit: 50 }
@@ -66,20 +96,20 @@ const VisibilityDashboard = () => {
 
       // 4. Fetch Heatmap Data
       const heatmapPromise = axios.get(`${API_URL}/visibility/heatmap`, {
-        params: { 
-            businessId: id, 
-            startDate: thirtyDaysAgo.toISOString(), 
-            endDate: today.toISOString() 
+        params: {
+          businessId: id,
+          startDate: thirtyDaysAgo.toISOString(),
+          endDate: today.toISOString()
         }
       });
 
       const [metricsRes, historyRes, keywordsRes, heatmapRes] = await Promise.all([
-          metricsPromise,
-          historyPromise,
-          keywordsPromise,
-          heatmapPromise
+        metricsPromise,
+        historyPromise,
+        keywordsPromise,
+        heatmapPromise
       ]);
-      
+
       if (metricsRes.data?.data?.[0]) {
         setMetrics(metricsRes.data.data[0]);
       } else {
@@ -95,26 +125,34 @@ const VisibilityDashboard = () => {
       }
 
       if (heatmapRes.data?.data) {
-         const apiData = heatmapRes.data.data;
-         const transformedHeatmap = {
-            dates: apiData.periods,
-            keywords: apiData.keywords.map((kw: string, index: number) => ({
-                id: `kw-${index}`, // fallback ID
-                keyword: kw,
-                // data is [keywordIndex][dateIndex]
-                ranks: apiData.data[index]
-            }))
-         };
-         setHeatmapData(transformedHeatmap);
+        const apiData = heatmapRes.data.data;
+        const transformedHeatmap = {
+          dates: apiData.periods,
+          keywords: apiData.keywords.map((kw: string, index: number) => ({
+            id: `kw-${index}`, // fallback ID
+            keyword: kw,
+            // data is [keywordIndex][dateIndex]
+            ranks: apiData.data[index]
+          }))
+        };
+        setHeatmapData(transformedHeatmap);
       }
 
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      setError('Failed to load dashboard data. Please check connection to SEO service.');
+      // Don't overwrite "No businesses found" error if it was that
+      setError(prev => prev || 'Failed to load dashboard data. Please check connection to SEO service.');
     } finally {
       setLoading(false);
     }
   }, []);
+
+  // Fetch data when businessId changes
+  useEffect(() => {
+    if (businessId) {
+      fetchData(businessId);
+    }
+  }, [businessId, fetchData]);
 
   const handleRefresh = () => {
     if (businessId) {
@@ -122,33 +160,22 @@ const VisibilityDashboard = () => {
     }
   };
 
-  const handleIdSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const id = formData.get('businessId') as string;
-    if (id) {
-      setBusinessId(id);
-      fetchData(id);
-    }
+  const handleBusinessChange = (event: SelectChangeEvent) => {
+    setBusinessId(event.target.value);
   };
-
-  const lineChartSeries = [
-      { dataKey: 'mapPackVisibility', color: theme.palette.primary.main, label: 'Map Pack %' },
-      { dataKey: 'shareOfVoice', color: theme.palette.secondary.main, label: 'Share of Voice' }
-  ];
 
   const sortedHistory = useMemo(() => {
     if (!historicalMetrics?.length) return [];
-    return [...historicalMetrics].sort((a, b) => 
-        new Date(a.periodStart).getTime() - new Date(b.periodStart).getTime()
+    return [...historicalMetrics].sort((a, b) =>
+      new Date(a.periodStart).getTime() - new Date(b.periodStart).getTime()
     );
   }, [historicalMetrics]);
 
   // Adapt heatmap data for Grid
   const heatmapRows = heatmapData?.keywords?.map((k: any) => ({
-      id: k.id,
-      label: k.keyword,
-      values: k.ranks
+    id: k.id,
+    label: k.keyword,
+    values: k.ranks
   })) || [];
 
   return (
@@ -162,30 +189,38 @@ const VisibilityDashboard = () => {
             Track your map pack presence and organic ranking performance
           </Typography>
         </Box>
-        <Box>
+        <Stack direction="row" spacing={2} alignItems="center">
+          {businesses.length > 1 && (
+            <FormControl sx={{ minWidth: 200 }} size="small">
+              <Select
+                value={businessId || ''}
+                onChange={handleBusinessChange}
+                displayEmpty
+              >
+                {businesses.map((b) => (
+                  <MenuItem key={b.id} value={b.id}>{b.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
           {businessId && (
             <Button variant="outlined" onClick={handleRefresh}>
               Refresh Data
             </Button>
           )}
-        </Box>
+        </Stack>
       </Stack>
 
-      {!businessId ? (
+      {!businessId && loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+          <Typography>Loading your business profile...</Typography>
+        </Box>
+      ) : !businessId ? (
         <Box sx={{ mt: 4, p: 4, border: '1px dashed grey', borderRadius: 2, textAlign: 'center' }}>
-          <Typography variant="h6" gutterBottom>Enter Business ID to View Data</Typography>
-          <Typography variant="body2" color="text.secondary" paragraph>
-            (Check your database or seed script output for a valid UUID)
+          <Typography variant="h6" gutterBottom>No Business Found</Typography>
+          <Typography variant="body2" color="text.secondary">
+            {error || 'Your account does not appear to be linked to any businesses.'}
           </Typography>
-          <form onSubmit={handleIdSubmit} style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-            <input 
-              name="businessId" 
-              placeholder="e.g. 5d5bb42e-..." 
-              style={{ padding: '8px', width: '300px', borderRadius: '4px', border: '1px solid #ccc' }} 
-              required
-            />
-            <Button type="submit" variant="contained">Load Dashboard</Button>
-          </form>
         </Box>
       ) : (
         <>
@@ -197,30 +232,30 @@ const VisibilityDashboard = () => {
 
           <Box sx={{ mb: 4 }}>
             <Typography variant="h6" gutterBottom fontWeight="medium">
-             Current Performance
+              Current Performance
             </Typography>
             <VisibilitySummaryCards metrics={metrics} loading={loading} />
           </Box>
-          
-           <Stack direction={{ xs: 'column', lg: 'row' }} spacing={4} mb={4}>
-              <Box sx={{ flex: 1, minWidth: 0 }}> 
-                 <VisibilityTrendsChart 
-                    data={sortedHistory} 
-                    loading={loading}
-                 />
-              </Box>
-           </Stack>
 
-           <Box sx={{ mb: 4, height: 500 }}>
-             <HeatmapGrid 
-                rows={heatmapRows} 
-                columns={heatmapData?.dates || []} 
-                title="Keyword Ranking History"
+          <Stack direction={{ xs: 'column', lg: 'row' }} spacing={4} mb={4}>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <VisibilityTrendsChart
+                data={sortedHistory}
                 loading={loading}
-                colorMode="ranking"
-                height={500}
-             />
-           </Box>
+              />
+            </Box>
+          </Stack>
+
+          <Box sx={{ mb: 4, height: 500 }}>
+            <HeatmapGrid
+              rows={heatmapRows}
+              columns={heatmapData?.dates || []}
+              title="Keyword Ranking History"
+              loading={loading}
+              colorMode="ranking"
+              height={500}
+            />
+          </Box>
 
           <Box>
             <Typography variant="h6" gutterBottom fontWeight="medium">

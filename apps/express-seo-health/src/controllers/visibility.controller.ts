@@ -19,7 +19,7 @@ export class VisibilityController {
       } = req.query;
 
       if (!businessId) {
-        res.status(400).json(createErrorResponse('businessId is required', 400));
+        res.status(400).json(createErrorResponse('businessId is required', 'BAD_REQUEST', 400));
         return;
       }
 
@@ -60,7 +60,7 @@ export class VisibilityController {
       );
     } catch (error) {
       console.error('Error fetching visibility metrics:', error);
-      res.status(500).json(createErrorResponse('Failed to fetch visibility metrics', 500));
+      res.status(500).json(createErrorResponse('Failed to fetch visibility metrics', 'INTERNAL_SERVER_ERROR', 500));
     }
   }
 
@@ -74,7 +74,7 @@ export class VisibilityController {
       if (!businessId || !startDate || !endDate) {
         res
           .status(400)
-          .json(createErrorResponse('businessId, startDate, and endDate are required', 400));
+          .json(createErrorResponse('businessId, startDate, and endDate are required', 'BAD_REQUEST', 400));
         return;
       }
 
@@ -97,7 +97,7 @@ export class VisibilityController {
       );
     } catch (error) {
       console.error('Error computing Share of Voice:', error);
-      res.status(500).json(createErrorResponse('Failed to compute Share of Voice', 500));
+      res.status(500).json(createErrorResponse('Failed to compute Share of Voice', 'INTERNAL_SERVER_ERROR', 500));
     }
   }
 
@@ -111,7 +111,7 @@ export class VisibilityController {
       if (!businessId || !startDate || !endDate) {
         res
           .status(400)
-          .json(createErrorResponse('businessId, startDate, and endDate are required', 400));
+          .json(createErrorResponse('businessId, startDate, and endDate are required', 'BAD_REQUEST', 400));
         return;
       }
 
@@ -137,7 +137,7 @@ export class VisibilityController {
       );
     } catch (error) {
       console.error('Error fetching SERP features:', error);
-      res.status(500).json(createErrorResponse('Failed to fetch SERP features', 500));
+      res.status(500).json(createErrorResponse('Failed to track SERP features', 'INTERNAL_SERVER_ERROR', 500));
     }
   }
 
@@ -151,23 +151,23 @@ export class VisibilityController {
       if (!businessId || !startDate || !endDate) {
         res
           .status(400)
-          .json(createErrorResponse('businessId, startDate, and endDate are required', 400));
+          .json(createErrorResponse('businessId, startDate, and endDate are required', 'BAD_REQUEST', 400));
         return;
       }
 
       // Fetch keywords first
       const { keywordRepository, keywordRankRepository } = await import('@platform/db');
-      
+
       const keywords = await keywordRepository.findByBusiness(businessId as string, {
         limit: 50 // Limit to top 50 keywords for heatmap to avoid overload
       });
 
       if (keywords.length === 0) {
         res.json(createSuccessResponse({
-           keywords: [],
-           periods: [],
-           data: [],
-           metric: metric as string
+          keywords: [],
+          periods: [],
+          data: [],
+          metric: metric as string
         }));
         return;
       }
@@ -195,12 +195,12 @@ export class VisibilityController {
 
       const data: (number | null)[][] = keywords.map(k => {
         const keywordRanks = ranks.filter(r => r.keywordId === k.id);
-        
+
         return periods.map(dateStr => {
-           // Find rank for this date
-           // capturedAt might include time, so match just date part
-           const rank = keywordRanks.find(r => r.capturedAt.toISOString().startsWith(dateStr));
-           return rank?.rankPosition ?? null;
+          // Find rank for this date
+          // capturedAt might include time, so match just date part
+          const rank = keywordRanks.find(r => r.capturedAt.toISOString().startsWith(dateStr));
+          return rank?.rankPosition ?? null;
         });
       });
 
@@ -219,7 +219,7 @@ export class VisibilityController {
       );
     } catch (error) {
       console.error('Error generating heatmap data:', error);
-      res.status(500).json(createErrorResponse('Failed to generate heatmap data', 500));
+      res.status(500).json(createErrorResponse('Failed to fetch heatmap data', 'INTERNAL_SERVER_ERROR', 500));
     }
   }
 
@@ -236,6 +236,7 @@ export class VisibilityController {
           .json(
             createErrorResponse(
               'businessId, periodType, periodStart, and periodEnd are required',
+              'BAD_REQUEST',
               400
             )
           );
@@ -259,7 +260,7 @@ export class VisibilityController {
       );
     } catch (error) {
       console.error('Error computing metrics:', error);
-      res.status(500).json(createErrorResponse('Failed to compute metrics', 500));
+      res.status(500).json(createErrorResponse('Failed to trigger computation', 'INTERNAL_SERVER_ERROR', 500));
     }
   }
 }
