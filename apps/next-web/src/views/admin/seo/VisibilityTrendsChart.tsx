@@ -11,7 +11,7 @@ import type { ApexOptions } from 'apexcharts'
 import type { VisibilityMetricDTO } from '@platform/contracts'
 
 // Styled Component Imports
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
+const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 interface VisibilityTrendsChartProps {
   data: VisibilityMetricDTO[];
@@ -31,68 +31,61 @@ const VisibilityTrendsChart = ({ data, loading }: VisibilityTrendsChartProps) =>
       data: data.map(d => Number(d.shareOfVoice.toFixed(1)))
     }
   ]
-
+  const divider = 'var(--mui-palette-divider)'
+  const textDisabled = 'var(--mui-palette-text-disabled)'
   const options: ApexOptions = {
     chart: {
       parentHeightOffset: 0,
-      zoom: { enabled: false },
-      toolbar: { show: false },
-      fontFamily: theme.typography.fontFamily
+      toolbar: { show: false }
     },
-    colors: [theme.palette.primary.main, theme.palette.warning.main],
-    stroke: {
-      width: 3,
-      curve: 'smooth'
-    },
+    tooltip: { shared: false },
     dataLabels: { enabled: false },
-    grid: {
-      borderColor: theme.palette.divider,
-      xaxis: {
-        lines: { show: true } 
+
+    legend: {
+      position: 'top',
+      horizontalAlign: 'left',
+      labels: { colors: 'var(--mui-palette-text-secondary)' },
+      fontSize: '13px',
+      markers: {
+        offsetY: 2,
+        offsetX: theme.direction === 'rtl' ? 7 : -4
       },
-      padding: {
-        top: -10,
-        bottom: -5
-      }
+      itemMargin: { horizontal: 9 }
     },
-    xaxis: {
-      categories: data.map(d => new Date(d.periodStart).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })),
-      axisBorder: { show: false },
-      axisTicks: { show: false },
-      labels: {
-        style: {
-          colors: theme.palette.text.disabled,
-          fontSize: '12px'
-        }
+    fill: {
+      opacity: 1,
+      type: 'solid'
+    },
+    grid: {
+      show: true,
+      borderColor: divider,
+      xaxis: {
+        lines: { show: true }
       }
     },
     yaxis: {
       labels: {
-        style: {
-          colors: theme.palette.text.disabled,
-          fontSize: '12px'
-        }
+        style: { colors: textDisabled, fontSize: '13px' }
       }
     },
-    legend: {
-      show: true,
-      position: 'top',
-      horizontalAlign: 'left',
+    xaxis: {
+      axisBorder: { show: false },
+      axisTicks: { color: divider },
+      crosshairs: {
+        stroke: { color: divider }
+      },
       labels: {
-          colors: theme.palette.text.secondary
-      }
-    },
-    tooltip: {
-        theme: theme.palette.mode
+        style: { colors: textDisabled, fontSize: '13px' }
+      },
+
     }
   }
-
   if (loading) {
-      return (
-          <Card sx={{ height: 460, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              Loading Chart...
-          </Card>
-      )
+    return (
+      <Card sx={{ height: 460, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        Loading Chart...
+      </Card>
+    )
   }
 
   return (

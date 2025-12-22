@@ -37,9 +37,9 @@ const TableListing = <T,>({ columns, items, pagination, onPagination, isLoading,
       // Calculate global index based on pagination
       // params.api.getRowIndexRelativeToVisibleRows(params.id) is 0-based index on current page
       // But since we use server-side pagination, we need to calculate manually
-      
+
       const currentRowIndex = items.findIndex((item: any) => item.id === params.row.id);
-      
+
       return (pagination?.page - 1) * pagination?.pageSize + currentRowIndex + 1;
     }
   };

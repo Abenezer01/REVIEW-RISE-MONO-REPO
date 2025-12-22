@@ -1,4 +1,3 @@
-import React from 'react';
 import VisibilityDashboard from '@/views/admin/seo/VisibilityDashboard';
 
 export const metadata = {
