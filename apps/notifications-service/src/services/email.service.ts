@@ -84,10 +84,6 @@ export const sendVerificationEmail = async (email: string, token: string): Promi
     });
 };
 
-/**
- * TODO: When ready to use a real email provider, replace the sendEmail function above.
- * 
- * Example with nodemailer:
  * 
  * import nodemailer from 'nodemailer';
  * 
