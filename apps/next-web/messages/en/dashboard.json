@@ -13,7 +13,11 @@
     "social-media-post-logs": "Social Media Post Logs",
     "review-sync-logs": "Review Sync Logs",
     "home": "Home",
-    "about": "About"
+    "about": "About",
+    "smart-reviews": "SmartReviews",
+    "gbp-rocket": "GBPRocket",
+    "ad-rise": "AdRise",
+    "brand-rise": "BrandRise"
   },
   "overview": {
     "title": "Dashboard Overview",

@@ -52,6 +52,30 @@ const menuData: MenuItem[] = [
     allowedRoles: [ROLES.ADMIN]
   },
   {
+    title: 'navigation.smart-reviews',
+    href: '/admin/smart-reviews',
+    icon: 'tabler-sparkles',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
+    title: 'navigation.gbp-rocket',
+    href: '/admin/gbp-rocket',
+    icon: 'tabler-rocket',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
+    title: 'navigation.ad-rise',
+    href: '/admin/ad-rise',
+    icon: 'tabler-badge-ad',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
+    title: 'navigation.brand-rise',
+    href: '/admin/brand-rise',
+    icon: 'tabler-palette',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
     title: 'navigation.failed-jobs',
     href: '/admin/failed-jobs',
     icon: 'tabler-alert-circle',
