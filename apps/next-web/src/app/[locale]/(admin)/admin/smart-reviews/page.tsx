@@ -9,7 +9,7 @@ const AdminSmartReviewsPage = () => {
           SmartReviews™
         </Typography>
         <Typography variant='body1'>
-          Admin tools for AI-powered review responses and management.
+          Coming soon feature.
         </Typography>
       </Grid>
     </Grid>

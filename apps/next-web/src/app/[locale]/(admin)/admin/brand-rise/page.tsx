@@ -9,7 +9,7 @@ const AdminBrandRisePage = () => {
           BrandRise™
         </Typography>
         <Typography variant='body1'>
-          Admin tools for brand identity, assets, and guidelines.
+          Coming soon feature.
         </Typography>
       </Grid>
     </Grid>

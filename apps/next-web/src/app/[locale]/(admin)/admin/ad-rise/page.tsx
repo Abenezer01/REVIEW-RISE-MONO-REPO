@@ -9,7 +9,7 @@ const AdminAdRisePage = () => {
           AdRise™
         </Typography>
         <Typography variant='body1'>
-          Admin tools for advertising campaigns and performance tracking.
+          Coming soon feature.
         </Typography>
       </Grid>
     </Grid>

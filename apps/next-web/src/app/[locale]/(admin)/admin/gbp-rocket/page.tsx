@@ -9,7 +9,7 @@ const AdminGBPRocketPage = () => {
           GBPRocket™
         </Typography>
         <Typography variant='body1'>
-          Admin tools for Google Business Profile optimization and sync.
+          Coming soon feature.
         </Typography>
       </Grid>
     </Grid>
