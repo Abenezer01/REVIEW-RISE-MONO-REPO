@@ -49,7 +49,8 @@ const ItemsListing = <T extends object>({
   breakpoints,
   error,
   onRetry,
-  emptyStateConfig
+  emptyStateConfig,
+  showEmptyTable
 }: {
   items: T[];
   pagination?: Pagination | null;
@@ -93,6 +94,7 @@ const ItemsListing = <T extends object>({
         subject: string;
       };
       component?: React.ComponentType<any>;
+      placeholder?: string;
     };
     export?: {
       enabled: boolean;
@@ -115,6 +117,7 @@ const ItemsListing = <T extends object>({
   error?: Error | null;
   onRetry?: () => void;
   emptyStateConfig?: EmptyStateProps;
+  showEmptyTable?: boolean;
 }) => {
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
@@ -190,7 +193,7 @@ const ItemsListing = <T extends object>({
       ) : (
         Array.isArray(items) && (
           <Fragment>
-            {items.length === 0 ? (
+            {items.length === 0 && !showEmptyTable ? (
               <EmptyState
                 title={emptyStateConfig?.title}
                 description={emptyStateConfig?.description}

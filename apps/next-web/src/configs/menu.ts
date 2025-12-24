@@ -99,6 +99,25 @@ const menuData: MenuItem[] = [
         allowedRoles: [ROLES.ADMIN]
       }
     ]
+  },
+  {
+    title: 'navigation.settings',
+    icon: 'tabler-settings',
+    allowedRoles: [ROLES.ADMIN],
+    children: [
+      {
+        title: 'navigation.system-settings',
+        href: '/admin/settings/system',
+        icon: 'tabler-tool',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.feature-flags',
+        href: '/admin/settings/feature-flags',
+        icon: 'tabler-flag',
+        allowedRoles: [ROLES.ADMIN]
+      }
+    ]
   }
 ]
 
