@@ -7,6 +7,7 @@ import useTranslation from '@/hooks/useTranslation';
 import CustomTextField from '@core/components/mui/TextField';
 import ExportComponentOption from './export';
 import FilterList from './filter-list';
+import InlineFilter from './inline-filter';
 
 import type { CreateActionConfig, ExportConfigValues, ExportFieldOption } from '@/types/general/listing';
 
@@ -24,6 +25,7 @@ interface ListHeaderProps {
         subject: string;
       };
       component?: React.ComponentType<any>;
+      position?: 'sidebar' | 'top';
     };
     search?: {
       enabled: boolean;
@@ -57,6 +59,7 @@ const ListHeader = memo((props: ListHeaderProps) => {
   const t = useTranslation('common');
 
   const { filter, export: exportFeature, search } = features
+  const filterPosition = filter?.position || 'top';
 
   // ** Props
   const [filterOpen, setFilterOpen] = useState<boolean>(false);
@@ -115,7 +118,7 @@ const ListHeader = memo((props: ListHeaderProps) => {
 
   return (
     <Fragment>
-      {filter?.enabled && filter.component && (
+      {filter?.enabled && filter.component && filterPosition === 'sidebar' && (
         <FilterList
           open={filterOpen}
           toggle={toggleFilter}
@@ -213,6 +216,17 @@ const ListHeader = memo((props: ListHeaderProps) => {
           </Box>
         </Box>
       </Box>
+      {filter?.enabled && filter.component && filterPosition === 'top' && (
+        <InlineFilter
+          open={filterOpen}
+          toggle={toggleFilter}
+          handleFilter={handleFilterSubmit}
+          FilterComponentItems={filter.component}
+          initialValues={{
+            is_child: false,
+          }}
+        />
+      )}
     </Fragment>
   );
 });
