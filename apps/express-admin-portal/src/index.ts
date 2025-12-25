@@ -27,12 +27,12 @@ app.get('/', (req, res) => {
 });
 
 // Error Handling
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ status: 'error', message: 'Internal Server Error' });
 });
 
 // Start Server
 app.listen(port, () => {
-  console.log(`🚀 Admin Portal Service running on port ${port}`);
+  console.info(`🚀 Admin Portal Service running on port ${port}`);
 });
