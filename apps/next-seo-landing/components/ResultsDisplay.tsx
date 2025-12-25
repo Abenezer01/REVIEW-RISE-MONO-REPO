@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { 
-  Download, 
-  Share2, 
+import {
+  Download,
+  Share2,
   Zap,
   TrendingUp,
   Clock,
@@ -29,7 +29,7 @@ interface ResultsDisplayProps {
 export default function ResultsDisplay({ result }: ResultsDisplayProps) {
   const [expandedIssue, setExpandedIssue] = useState<number | null>(null);
   const [showStickyBar, setShowStickyBar] = useState(false);
-  
+
   // Determine score verdict
   const getScoreVerdict = (score: number) => {
     if (score >= 85) return { label: 'Excellent', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' };
@@ -52,7 +52,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
   return (
     <>
       <div className="results-container">
-        
+
         {/* Result Context Bar */}
         <div className="context-bar">
           <div className="context-info">
@@ -80,7 +80,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
             <div className="score-verdict" style={{ background: verdict.bg }}>
               <span style={{ color: verdict.color }}>{verdict.label}</span>
             </div>
-            
+
             <div className="score-legend">
               <div className="legend-item">
                 <div className="legend-bar poor"></div>
@@ -116,7 +116,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                 <div className="stat-label">Load Time</div>
               </div>
             </div>
-            
+
             <div className="cta-group">
               <button className="btn-primary-cta">
                 <Download size={18} />
@@ -132,10 +132,10 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
 
         {/* Main Content Grid */}
         <div className="content-grid">
-          
+
           {/* Left Column */}
           <div className="left-column">
-            
+
             {/* SEO Breakdown */}
             <section className="section">
               <h2 className="section-title">SEO Health Breakdown</h2>
@@ -144,7 +144,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                   const Icon = cat.icon;
                   const percentage = cat.data?.percentage || 0;
                   const scoreColor = percentage >= 70 ? '#10b981' : percentage >= 50 ? '#f59e0b' : '#ef4444';
-                  
+
                   return (
                     <div key={cat.key} className="breakdown-row">
                       <div className="breakdown-icon" style={{ background: `${scoreColor}15`, color: scoreColor }}>
@@ -174,7 +174,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                 <h2 className="section-title">Critical Issues</h2>
                 <span className="issues-count">{criticalIssues} found</span>
               </div>
-              
+
               <div className="issues-list">
                 {result.recommendations
                   .filter(r => r.priority === 'high')
@@ -195,7 +195,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                           {expandedIssue === idx ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
                         </button>
                       </div>
-                      
+
                       <div className="issue-meta">
                         <span className="meta-tag critical">Critical</span>
                         <span className="meta-tag impact">+15-20% CTR</span>
@@ -228,11 +228,11 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
 
           {/* Right Column */}
           <div className="right-column">
-            
+
             {/* AI Recommendations */}
             <section className="section">
               <h2 className="section-title">Top Recommendations</h2>
-              
+
               <div className="recommendations-list">
                 {[
                   { title: 'Optimize Title Tags', impact: '+25% Traffic', effort: 'Easy', priority: 'Quick Win' },
@@ -855,7 +855,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
         .btn-upgrade {
           width: 100%;
           background: white;
-          color: #6366f1;
+          color: var(--accent-solid);
           border: none;
           padding: 14px;
           border-radius: 10px;

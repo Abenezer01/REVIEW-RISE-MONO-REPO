@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
@@ -55,7 +55,7 @@ const AccountList = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [accountToDelete, setAccountToDelete] = useState<any>(null)
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true)
 
     const res = await getAccounts({
@@ -70,11 +70,11 @@ const AccountList = () => {
     }
 
     setLoading(false)
-  }
+  }, [page, rowsPerPage, filters])
 
   useEffect(() => {
     fetchData()
-  }, [page, rowsPerPage, filters])
+  }, [fetchData])
 
   const handleFilterChange = (field: string, value: string) => {
     setFilters(prev => ({ ...prev, [field]: value }))
@@ -352,7 +352,7 @@ const AccountList = () => {
         hasListHeader={false}
         createActionConfig={{
           show: false,
-          onClick: () => {},
+          onClick: () => { },
           onlyIcon: false,
           permission: { action: 'create', subject: 'account' }
         }}

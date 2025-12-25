@@ -6,14 +6,14 @@ import { createStatus, createAction, createBatchAdapter } from './adapter-utils'
  * Location type (from your API/database)
  */
 interface Location {
-    id: number;
+    id: string;
     name: string;
     address: string;
     city?: string;
     state?: string;
     zipCode?: string;
     status: 'active' | 'inactive' | 'pending';
-    businessId?: number;
+    businessId?: string;
     businessName?: string;
     createdAt?: string;
     updatedAt?: string;
@@ -85,8 +85,8 @@ export const adaptLocationsToListingItems = createBatchAdapter(adaptLocationToLi
  * Factory function to create location adapter with custom action handlers
  */
 export const createLocationAdapter = (
-    onEdit: (id: number) => void,
-    onDelete: (id: number) => void
+    onEdit: (id: string) => void,
+    onDelete: (id: string) => void
 ): ListingItemAdapter<Location> => {
     return (location) => {
         const baseItem = adaptLocationToListingItem(location);

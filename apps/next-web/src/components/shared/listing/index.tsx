@@ -1,5 +1,5 @@
 /* eslint-disable import/no-unresolved */
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useMemo, useCallback, lazy, Suspense } from 'react';
 
 import type { GridSize } from '@mui/material';
 import { Container, useMediaQuery } from '@mui/material';
@@ -10,7 +10,7 @@ import type { GetRequestParams, Pagination } from '@platform/contracts';
 
 import { defaultGetRequestParams } from '@platform/contracts';
 
-import type { CreateActionConfig , ExportConfigValues, ExportFieldOption } from '@/types/general/listing';
+import type { CreateActionConfig, ExportConfigValues, ExportFieldOption } from '@/types/general/listing';
 import { defaultCreateActionConfig } from '@/types/general/listing';
 
 
@@ -19,12 +19,14 @@ import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig';
 import PaginationComponent from '../pagination';
 
 import ListHeader from './header';
-import GridListing from './list-types/grid-listing';
-import ListListing from './list-types/list-listing';
-import MasonryListing from './list-types/masonry-listing';
-import TableListing from './list-types/table-listing';
 import type { EmptyStateProps } from './states';
 import { EmptyState, ErrorState, SkeletonCard, SkeletonGrid, SkeletonTable } from './states';
+
+// Lazy load list type components for better code splitting
+const GridListing = lazy(() => import('./list-types/grid-listing'));
+const ListListing = lazy(() => import('./list-types/list-listing'));
+const MasonryListing = lazy(() => import('./list-types/masonry-listing'));
+const TableListing = lazy(() => import('./list-types/table-listing'));
 
 
 const ItemsListing = <T extends object>({
@@ -123,44 +125,67 @@ const ItemsListing = <T extends object>({
 
   const [fetchRequestParams, setFetchRequestParams] = useState<GetRequestParams>(defaultGetRequestParams);
 
-  const onPagination =
-    onPaginationChange ||
-    ((pageSize: any, page: any) => {
-      const fetchParam: GetRequestParams = {
-        ...fetchRequestParams,
-        ...additionalParams,
-        pagination: { pageSize: pageSize, page: page }
-      };
+  // Memoize pagination handler to prevent unnecessary re-renders
+  const onPagination = useMemo(
+    () =>
+      onPaginationChange ||
+      ((pageSize: any, page: any) => {
+        const fetchParam: GetRequestParams = {
+          ...fetchRequestParams,
+          ...additionalParams,
+          pagination: { pageSize: pageSize, page: page }
+        };
 
-      fetchDataFunction(fetchParam);
-    });
+        fetchDataFunction(fetchParam);
+      }),
+    [onPaginationChange, fetchRequestParams, additionalParams, fetchDataFunction]
+  );
 
-  const handleFilter = (values: { [key: string]: any }) => {
-    setFetchRequestParams({ ...fetchRequestParams, filter: values });
+  // Memoize filter handler
+  const handleFilter = useCallback((values: { [key: string]: any }) => {
+    setFetchRequestParams((prev) => ({ ...prev, filter: values }));
     fetchDataFunction({ ...fetchRequestParams, filter: values });
-  };
+  }, [fetchDataFunction, fetchRequestParams]);
 
-  const adjustedType = getAdjustedListingType(type, isSmallScreen);
+  // Memoize adjusted type calculation
+  const adjustedType = useMemo(() => getAdjustedListingType(type, isSmallScreen), [type, isSmallScreen]);
 
-  const listingComponents = {
-    [ITEMS_LISTING_TYPE.masonry.value]: ItemViewComponent && <MasonryListing ItemViewComponent={ItemViewComponent} items={items} />,
-    [ITEMS_LISTING_TYPE.list.value]: ItemViewComponent && <ListListing ItemViewComponent={ItemViewComponent} items={items} />,
+  // Memoize listing components to prevent recreation on every render
+  const listingComponents = useMemo(() => ({
+    [ITEMS_LISTING_TYPE.masonry.value]: ItemViewComponent && (
+      <Suspense fallback={<SkeletonCard count={4} />}>
+        <MasonryListing ItemViewComponent={ItemViewComponent as any} items={items} />
+      </Suspense>
+    ),
+    [ITEMS_LISTING_TYPE.list.value]: ItemViewComponent && (
+      <Suspense fallback={<SkeletonCard count={4} />}>
+        <ListListing ItemViewComponent={ItemViewComponent as any} items={items} />
+      </Suspense>
+    ),
     [ITEMS_LISTING_TYPE.grid.value]: ItemViewComponent && (
-      <GridListing ItemViewComponent={ItemViewComponent} items={items} breakpoints={breakpoints} />
+      <Suspense fallback={<SkeletonGrid count={6} columns={breakpoints as any} />}>
+        <GridListing ItemViewComponent={ItemViewComponent as any} items={items} breakpoints={breakpoints} />
+      </Suspense>
     ),
     [ITEMS_LISTING_TYPE.table.value]: tableProps?.headers && (
-      <TableListing
-        isLoading={isLoading}
-        pagination={pagination as Pagination}
-        onPagination={onPagination}
-        items={items}
-        columns={tableProps?.headers}
-        getRowClassName={tableProps?.getRowClassName}
-        onRowClick={tableProps?.onRowClick}
-      />
+      <Suspense fallback={<SkeletonTable rows={5} columns={tableProps?.headers?.length || 4} />}>
+        <TableListing
+          isLoading={isLoading}
+          pagination={pagination as Pagination}
+          onPagination={onPagination}
+          items={items}
+          columns={tableProps?.headers}
+          getRowClassName={tableProps?.getRowClassName}
+          onRowClick={tableProps?.onRowClick}
+        />
+      </Suspense>
     ),
-    default: ItemViewComponent && <GridListing ItemViewComponent={ItemViewComponent} items={items} />
-  };
+    default: ItemViewComponent && (
+      <Suspense fallback={<SkeletonGrid count={6} columns={breakpoints as any} />}>
+        <GridListing ItemViewComponent={ItemViewComponent as any} items={items} />
+      </Suspense>
+    )
+  }), [ItemViewComponent, items, breakpoints, tableProps, isLoading, pagination, onPagination]);
 
   return (
     <>

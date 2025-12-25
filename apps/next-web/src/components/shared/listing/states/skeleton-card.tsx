@@ -1,10 +1,12 @@
+import { memo } from 'react';
+
 import { Card, CardContent, Skeleton, Stack } from '@mui/material';
 
 interface SkeletonCardProps {
     count?: number;
 }
 
-export const SkeletonCard = ({ count = 6 }: SkeletonCardProps) => {
+export const SkeletonCard = memo(({ count = 6 }: SkeletonCardProps) => {
     return (
         <>
             {Array.from({ length: count }).map((_, index) => (
@@ -24,4 +26,7 @@ export const SkeletonCard = ({ count = 6 }: SkeletonCardProps) => {
             ))}
         </>
     );
-};
+});
+
+SkeletonCard.displayName = 'SkeletonCard';
+

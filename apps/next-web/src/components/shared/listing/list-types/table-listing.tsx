@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, memo } from 'react';
 
 import { Box, Card } from '@mui/material';
 import type { GridColDef, GridPaginationModel, GridRowParams } from '@mui/x-data-grid';
@@ -16,7 +16,7 @@ interface TableListingProps<T> {
   onRowClick?: (params: GridRowParams) => void;
 }
 
-const TableListing = <T,>({ columns, items, pagination, onPagination, isLoading, getRowClassName, onRowClick }: TableListingProps<T>) => {
+const TableListing = memo(<T,>({ columns, items, pagination, onPagination, isLoading, getRowClassName, onRowClick }: TableListingProps<T>) => {
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: pagination?.page - 1,
@@ -28,24 +28,23 @@ const TableListing = <T,>({ columns, items, pagination, onPagination, isLoading,
     onPagination && onPagination(newPaginationModel.pageSize, newPaginationModel.page + 1);
   };
 
-  const indexColumn: GridColDef = {
+  // Memoize index column to prevent recreation
+  const indexColumn: GridColDef = useMemo(() => ({
     field: 'rowNumber',
     headerName: '#',
     width: 70,
     sortable: false,
     renderCell: (params) => {
       // Calculate global index based on pagination
-      // params.api.getRowIndexRelativeToVisibleRows(params.id) is 0-based index on current page
-      // But since we use server-side pagination, we need to calculate manually
-      
       const currentRowIndex = items.findIndex((item: any) => item.id === params.row.id);
-      
-      return (pagination?.page - 1) * pagination?.pageSize + currentRowIndex + 1;
-    }
-  };
 
-  // Prepend index column to existing columns
-  const allColumns = [indexColumn, ...columns];
+      
+return (pagination?.page - 1) * pagination?.pageSize + currentRowIndex + 1;
+    }
+  }), [items, pagination]);
+
+  // Memoize all columns to prevent recreation
+  const allColumns = useMemo(() => [indexColumn, ...columns], [indexColumn, columns]);
 
   return (
     <Box sx={{ width: '100%', mb: 6 }}>
@@ -111,6 +110,9 @@ const TableListing = <T,>({ columns, items, pagination, onPagination, isLoading,
       </Card>
     </Box>
   );
-};
+}) as <T>(props: TableListingProps<T>) => React.JSX.Element;
+
+(TableListing as any).displayName = 'TableListing';
 
 export default TableListing;
+

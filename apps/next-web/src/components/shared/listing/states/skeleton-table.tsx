@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 import { Skeleton, TableBody, TableCell, TableContainer, TableRow, Table } from '@mui/material';
 
 interface SkeletonTableProps {
@@ -5,7 +7,7 @@ interface SkeletonTableProps {
     columns?: number;
 }
 
-export const SkeletonTable = ({ rows = 5, columns = 4 }: SkeletonTableProps) => {
+export const SkeletonTable = memo(({ rows = 5, columns = 4 }: SkeletonTableProps) => {
     return (
         <TableContainer>
             <Table>
@@ -23,4 +25,7 @@ export const SkeletonTable = ({ rows = 5, columns = 4 }: SkeletonTableProps) => 
             </Table>
         </TableContainer>
     );
-};
+});
+
+SkeletonTable.displayName = 'SkeletonTable';
+

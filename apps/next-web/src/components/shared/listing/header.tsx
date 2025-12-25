@@ -1,5 +1,4 @@
-/* eslint-disable import/no-unresolved */
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useCallback, memo } from 'react';
 
 import { Box, Button, IconButton, Typography } from '@mui/material';
 
@@ -55,7 +54,7 @@ interface ListHeaderProps {
   title: string;
 }
 
-const ListHeader = (props: ListHeaderProps) => {
+const ListHeader = memo((props: ListHeaderProps) => {
   const { title, features } = props;
   const t = useTranslation('common');
 
@@ -64,22 +63,22 @@ const ListHeader = (props: ListHeaderProps) => {
   // ** Props
   const [filterOpen, setFilterOpen] = useState<boolean>(false);
 
-  const toggleFilter = () => {
-    setFilterOpen(!filterOpen);
-  };
+  const toggleFilter = useCallback(() => {
+    setFilterOpen((prev) => !prev);
+  }, []);
 
   const [exportOpen, setExportOpen] = useState<boolean>(false);
 
-  const toggleExport = () => {
-    setExportOpen(!exportOpen);
-  };
+  const toggleExport = useCallback(() => {
+    setExportOpen((prev) => !prev);
+  }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
 
 
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const term = event.target.value;
 
     setSearchTerm(term);
@@ -90,16 +89,16 @@ const ListHeader = (props: ListHeaderProps) => {
 
     const newTimerId = setTimeout(() => {
       search?.onSearch?.(term, features?.search?.searchKeys || []);
-    }, 2000);
+    }, 500); // Reduced from 2000ms to 500ms for better UX
 
     setTimerId(newTimerId);
-  };
+  }, [timerId, search, features?.search?.searchKeys]);
 
-  const handleFilterSubmit = (values: Record<string, any>) => {
+  const handleFilterSubmit = useCallback((values: Record<string, any>) => {
     filter?.onFilter?.(values);
-  };
+  }, [filter]);
 
-  const handleExportSubmit = (exportConfig: {
+  const handleExportSubmit = useCallback((exportConfig: {
     format: string;
     fields: string[];
     currentPageOnly: boolean;
@@ -113,7 +112,7 @@ const ListHeader = (props: ListHeaderProps) => {
         },
       });
     }
-  };
+  }, [exportFeature]);
 
 
   return (
@@ -219,6 +218,8 @@ const ListHeader = (props: ListHeaderProps) => {
       </Box>
     </Fragment>
   );
-};
+});
+
+ListHeader.displayName = 'ListHeader';
 
 export default ListHeader;
