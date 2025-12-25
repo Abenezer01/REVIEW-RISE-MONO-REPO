@@ -7,7 +7,8 @@ RUN corepack enable && corepack prepare pnpm@9 --activate
 
 WORKDIR /app
 
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+# Copy workspace configuration files
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml tsconfig.json ./
 COPY packages/@platform/*/package.json ./packages/@platform/
 COPY apps/express-seo-health/package.json ./apps/express-seo-health/
 

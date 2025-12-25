@@ -10,7 +10,8 @@ WORKDIR /app
 # Install libc6-compat for Next.js compatibility
 RUN apk add --no-cache libc6-compat
 
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+# Copy workspace configuration files
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml tsconfig.json ./
 COPY packages/@platform/*/package.json ./packages/@platform/
 COPY apps/next-web/package.json ./apps/next-web/
 

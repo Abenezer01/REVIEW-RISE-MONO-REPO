@@ -9,7 +9,7 @@ WORKDIR /app
 
 RUN apk add --no-cache libc6-compat
 
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml tsconfig.json ./
 COPY packages/@platform/*/package.json ./packages/@platform/
 COPY apps/next-seo-landing/package.json ./apps/next-seo-landing/
 
