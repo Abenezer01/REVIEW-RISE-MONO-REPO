@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import { LoadingButton } from '@mui/lab'
 import Card from '@mui/material/Card'
@@ -63,7 +63,7 @@ const JobList = ({ initialType = '' }: Props) => {
   const [openDetail, setOpenDetail] = useState(false)
   const [loadingExport, setLoadingExport] = useState(false)
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true)
 
     const res = await getJobs({
@@ -80,11 +80,11 @@ const JobList = ({ initialType = '' }: Props) => {
     }
 
     setLoading(false)
-  }
+  }, [page, rowsPerPage, filters])
 
   useEffect(() => {
     fetchData()
-  }, [page, rowsPerPage, filters])
+  }, [fetchData])
 
   const handleFilterChange = (field: string, value: string) => {
     setFilters(prev => ({ ...prev, [field]: value }))
@@ -206,11 +206,11 @@ const JobList = ({ initialType = '' }: Props) => {
       minWidth: 150,
       renderCell: (params) => (
         <CustomChip
-            size='small'
-            variant='tonal'
-            color={getJobTypeColor(params.value)}
-            label={params.value.replace('_', ' ')}
-            sx={{ textTransform: 'capitalize', fontWeight: 500 }}
+          size='small'
+          variant='tonal'
+          color={getJobTypeColor(params.value)}
+          label={params.value.replace('_', ' ')}
+          sx={{ textTransform: 'capitalize', fontWeight: 500 }}
         />
       )
     },
@@ -221,7 +221,7 @@ const JobList = ({ initialType = '' }: Props) => {
       valueGetter: (value, row) => row?.business?.name || 'N/A',
       renderCell: (params) => (
         <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.primary' }}>
-            {params.value}
+          {params.value}
         </Typography>
       )
     },
@@ -247,27 +247,27 @@ const JobList = ({ initialType = '' }: Props) => {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant='body2' fontWeight={500}>
-                {params.row.retryCount}/{params.row.maxRetries}
-            </Typography>
+          <Typography variant='body2' fontWeight={500}>
+            {params.row.retryCount}/{params.row.maxRetries}
+          </Typography>
         </Box>
       )
     },
     {
-        field: 'createdAt',
-        headerName: 'Created At',
-        minWidth: 180,
-        valueFormatter: (value: string) => new Date(value).toLocaleString(),
-        renderCell: (params) => (
-            <Stack>
-                <Typography variant='body2' sx={{ fontWeight: 500 }}>
-                    {new Date(params.value).toLocaleDateString()}
-                </Typography>
-                <Typography variant='caption' color='text.secondary'>
-                    {new Date(params.value).toLocaleTimeString()}
-                </Typography>
-            </Stack>
-        )
+      field: 'createdAt',
+      headerName: 'Created At',
+      minWidth: 180,
+      valueFormatter: (value: string) => new Date(value).toLocaleString(),
+      renderCell: (params) => (
+        <Stack>
+          <Typography variant='body2' sx={{ fontWeight: 500 }}>
+            {new Date(params.value).toLocaleDateString()}
+          </Typography>
+          <Typography variant='caption' color='text.secondary'>
+            {new Date(params.value).toLocaleTimeString()}
+          </Typography>
+        </Stack>
+      )
     },
     {
       field: 'actions',
@@ -291,14 +291,14 @@ const JobList = ({ initialType = '' }: Props) => {
             </IconButton>
           </Tooltip>
           {params.row.status === 'failed' && (
-             <Tooltip title='Retry Job'>
-                <IconButton
+            <Tooltip title='Retry Job'>
+              <IconButton
                 size='small'
                 onClick={() => handleRetry(params.row.id)}
                 sx={{ color: 'text.secondary', ml: 1, '&:hover': { color: 'success.main', bgcolor: 'success.lighter' } }}
-                >
+              >
                 <i className='tabler-refresh' />
-                </IconButton>
+              </IconButton>
             </Tooltip>
           )}
         </Box>
@@ -313,13 +313,13 @@ const JobList = ({ initialType = '' }: Props) => {
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{
-                  p: 1.5,
-                  borderRadius: 1.5,
-                  bgcolor: (theme) => `rgba(${theme.palette.error.mainChannel} / 0.1)`,
-                  color: 'error.main',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                p: 1.5,
+                borderRadius: 1.5,
+                bgcolor: (theme) => `rgba(${theme.palette.error.mainChannel} / 0.1)`,
+                color: 'error.main',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
                 <i className='tabler-alert-triangle' style={{ fontSize: '1.5rem' }} />
               </Box>
@@ -335,12 +335,12 @@ const JobList = ({ initialType = '' }: Props) => {
           }
           action={
             <Box sx={{ display: 'flex', gap: 1, mt: 1, mr: 1 }}>
-                <CustomChip
-                    label={`${total} Jobs Found`}
-                    size='small'
-                    variant='tonal'
-                    color='primary'
-                />
+              <CustomChip
+                label={`${total} Jobs Found`}
+                size='small'
+                variant='tonal'
+                color='primary'
+              />
             </Box>
           }
           sx={{ pb: 3 }}
@@ -373,38 +373,38 @@ const JobList = ({ initialType = '' }: Props) => {
                 value={filters.type}
                 onChange={e => handleFilterChange('type', e.target.value)}
                 SelectProps={{
-                    displayEmpty: true,
-                    renderValue: (selected: any) => {
-                        if (!selected) {
-                            return <Typography color='text.secondary'>Filter by Type</Typography>
-                        }
-
-                        return selected.replace('_', ' ');
+                  displayEmpty: true,
+                  renderValue: (selected: any) => {
+                    if (!selected) {
+                      return <Typography color='text.secondary'>Filter by Type</Typography>
                     }
+
+                    return selected.replace('_', ' ');
+                  }
                 }}
               >
                 <MenuItem value=''>
-                    <Typography color='text.secondary'>All Types</Typography>
+                  <Typography color='text.secondary'>All Types</Typography>
                 </MenuItem>
                 <MenuItem value='reviews'>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <i className='tabler-star' /> Reviews
-                    </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <i className='tabler-star' /> Reviews
+                  </Box>
                 </MenuItem>
                 <MenuItem value='social_posts'>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <i className='tabler-brand-twitter' /> Social Posts
-                    </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <i className='tabler-brand-twitter' /> Social Posts
+                  </Box>
                 </MenuItem>
                 <MenuItem value='seo_crawls'>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <i className='tabler-seo' /> SEO Crawls
-                    </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <i className='tabler-seo' /> SEO Crawls
+                  </Box>
                 </MenuItem>
                 <MenuItem value='ai_tasks'>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <i className='tabler-brain' /> AI Tasks
-                    </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <i className='tabler-brain' /> AI Tasks
+                  </Box>
                 </MenuItem>
               </CustomTextField>
             </Grid>
@@ -442,10 +442,10 @@ const JobList = ({ initialType = '' }: Props) => {
         }}
         hasListHeader={false}
         createActionConfig={{
-            show: false,
-            onlyIcon: false,
-            onClick: () => {},
-            permission: { action: 'read', subject: 'job' }
+          show: false,
+          onlyIcon: false,
+          onClick: () => { },
+          permission: { action: 'read', subject: 'job' }
         }}
       />
 

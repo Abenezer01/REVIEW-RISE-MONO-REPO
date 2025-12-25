@@ -4,6 +4,10 @@ export { prisma, prismaAdmin, disconnectDatabase } from './client';
 // Export all repositories
 export * from './repositories';
 
+// Export services
+export { VisibilityComputationService, visibilityComputationService } from './services/visibility-computation.service';
+export { RankTrackingService, rankTrackingService } from './services/rank-tracking.service';
+
 // Export health check utilities
 export * from './health';
 

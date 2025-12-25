@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import { useTheme } from '@mui/material/styles'
 import Card from '@mui/material/Card'
@@ -48,7 +48,7 @@ const ReviewSyncList = () => {
     endDate: null as Date | null
   })
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true)
 
     const res = await getReviewSyncLogs({
@@ -70,11 +70,11 @@ const ReviewSyncList = () => {
     }
 
     setLoading(false)
-  }
+  }, [page, rowsPerPage, filters])
 
   useEffect(() => {
     fetchData()
-  }, [page, rowsPerPage, filters])
+  }, [fetchData])
 
   const handleFilterChange = (field: string, value: any) => {
     setFilters(prev => ({ ...prev, [field]: value }))
@@ -83,33 +83,33 @@ const ReviewSyncList = () => {
 
   const handleDateChange = (type: 'start' | 'end', date: Date | null) => {
     setFilters(prev => ({
-        ...prev,
-        startDate: type === 'start' ? date : prev.startDate,
-        endDate: type === 'end' ? date : prev.endDate
+      ...prev,
+      startDate: type === 'start' ? date : prev.startDate,
+      endDate: type === 'end' ? date : prev.endDate
     }))
     setPage(0)
   }
 
   const handleRetry = async (jobId: string) => {
     if (!jobId) {
-        toast.error('Cannot retry: No associated job found')
-    
-        return
+      toast.error('Cannot retry: No associated job found')
+
+      return
     }
 
     const res = await retryJob(jobId)
-    
-    if (res.success) {
-        toast.success('Job retried successfully')
 
-        // We might not see status update immediately in logs unless a new log is created
-        fetchData()
-    
-        if (selectedJob?.jobId === jobId) {
-            setOpenDetail(false)
-        }
+    if (res.success) {
+      toast.success('Job retried successfully')
+
+      // We might not see status update immediately in logs unless a new log is created
+      fetchData()
+
+      if (selectedJob?.jobId === jobId) {
+        setOpenDetail(false)
+      }
     } else {
-        toast.error(res.error || 'Failed to retry job')
+      toast.error(res.error || 'Failed to retry job')
     }
   }
 
@@ -145,21 +145,21 @@ const ReviewSyncList = () => {
       valueGetter: (value, row) => row?.business?.name || 'N/A',
       renderCell: (params) => (
         <Stack direction='row' spacing={1.5} alignItems='center'>
-            <Avatar
-                src={params.row.business?.logo}
-                alt={params.row.business?.name}
-                sx={{ width: 28, height: 28, fontSize: '0.75rem' }}
-            >
-                {params.row.business?.name?.charAt(0)}
-            </Avatar>
-            <Stack>
-                <Typography variant='body2' fontWeight={500} color='text.primary'>
-                    {params.row.business?.name || 'N/A'}
-                </Typography>
-                <Typography variant='caption' color='text.secondary'>
-                    {params.row.location?.name || 'All Locations'}
-                </Typography>
-            </Stack>
+          <Avatar
+            src={params.row.business?.logo}
+            alt={params.row.business?.name}
+            sx={{ width: 28, height: 28, fontSize: '0.75rem' }}
+          >
+            {params.row.business?.name?.charAt(0)}
+          </Avatar>
+          <Stack>
+            <Typography variant='body2' fontWeight={500} color='text.primary'>
+              {params.row.business?.name || 'N/A'}
+            </Typography>
+            <Typography variant='caption' color='text.secondary'>
+              {params.row.location?.name || 'All Locations'}
+            </Typography>
+          </Stack>
         </Stack>
       )
     },
@@ -171,100 +171,100 @@ const ReviewSyncList = () => {
         const platform = params.value || 'unknown';
 
         const iconMap: Record<string, string> = {
-            google: 'tabler-brand-google',
-            facebook: 'tabler-brand-facebook',
-            instagram: 'tabler-brand-instagram',
-            twitter: 'tabler-brand-twitter',
-            linkedin: 'tabler-brand-linkedin',
-            tripadvisor: 'tabler-brand-tripadvisor',
-            yelp: 'tabler-brand-yelp'
+          google: 'tabler-brand-google',
+          facebook: 'tabler-brand-facebook',
+          instagram: 'tabler-brand-instagram',
+          twitter: 'tabler-brand-twitter',
+          linkedin: 'tabler-brand-linkedin',
+          tripadvisor: 'tabler-brand-tripadvisor',
+          yelp: 'tabler-brand-yelp'
         };
 
         return (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <i className={iconMap[platform.toLowerCase()] || 'tabler-world'} style={{ fontSize: '1.2rem' }} />
-                <Typography variant='body2' sx={{ textTransform: 'capitalize' }}>
-                    {platform}
-                </Typography>
-            </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <i className={iconMap[platform.toLowerCase()] || 'tabler-world'} style={{ fontSize: '1.2rem' }} />
+            <Typography variant='body2' sx={{ textTransform: 'capitalize' }}>
+              {platform}
+            </Typography>
+          </Box>
         );
       }
     },
     {
-        field: 'status',
-        headerName: 'Status',
-        minWidth: 120,
-        renderCell: (params) => {
-            const isRetrying = params.row.job?.status === 'pending' || params.row.job?.status === 'processing'
-            
-            if (isRetrying && params.value === 'failed') {
-                 return (
-                    <CustomChip
-                        size='small'
-                        variant='tonal'
-                        color='warning'
-                        label='Retrying'
-                        icon={<i className='tabler-loader animate-spin' />}
-                        sx={{ textTransform: 'capitalize', fontWeight: 500 }}
-                    />
-                )
-            }
+      field: 'status',
+      headerName: 'Status',
+      minWidth: 120,
+      renderCell: (params) => {
+        const isRetrying = params.row.job?.status === 'pending' || params.row.job?.status === 'processing'
 
-            return (
-                <CustomChip
-                    size='small'
-                    variant='tonal'
-                    color={getStatusColor(params.value)}
-                    label={params.value}
-                    sx={{ textTransform: 'capitalize', fontWeight: 500 }}
-                />
-            )
+        if (isRetrying && params.value === 'failed') {
+          return (
+            <CustomChip
+              size='small'
+              variant='tonal'
+              color='warning'
+              label='Retrying'
+              icon={<i className='tabler-loader animate-spin' />}
+              sx={{ textTransform: 'capitalize', fontWeight: 500 }}
+            />
+          )
         }
+
+        return (
+          <CustomChip
+            size='small'
+            variant='tonal'
+            color={getStatusColor(params.value)}
+            label={params.value}
+            sx={{ textTransform: 'capitalize', fontWeight: 500 }}
+          />
+        )
+      }
     },
     {
-        field: 'reviewsSynced',
-        headerName: 'Synced',
-        width: 100,
-        align: 'center',
-        headerAlign: 'center',
-        renderCell: (params) => (
-            <Typography variant='body2' fontWeight={600}>
-                {params.value}
-            </Typography>
-        )
+      field: 'reviewsSynced',
+      headerName: 'Synced',
+      width: 100,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Typography variant='body2' fontWeight={600}>
+          {params.value}
+        </Typography>
+      )
     },
     {
-        field: 'durationMs',
-        headerName: 'Duration',
-        width: 100,
-        valueGetter: (value) => {
-            if (value) {
-                return `${(value / 1000).toFixed(1)}s`
-            }
-            
-            return '-'
-        },
-        renderCell: (params) => (
-            <Typography variant='body2' color='text.secondary'>
-                {params.value}
-            </Typography>
-        )
+      field: 'durationMs',
+      headerName: 'Duration',
+      width: 100,
+      valueGetter: (value) => {
+        if (value) {
+          return `${(value / 1000).toFixed(1)}s`
+        }
+
+        return '-'
+      },
+      renderCell: (params) => (
+        <Typography variant='body2' color='text.secondary'>
+          {params.value}
+        </Typography>
+      )
     },
     {
-        field: 'createdAt',
-        headerName: 'Date',
-        minWidth: 180,
-        valueGetter: (value, row) => row.createdAt,
-        renderCell: (params) => (
-            <Stack>
-                <Typography variant='body2'>
-                    {new Date(params.value).toLocaleDateString()}
-                </Typography>
-                <Typography variant='caption' color='text.secondary'>
-                    {new Date(params.value).toLocaleTimeString()}
-                </Typography>
-            </Stack>
-        )
+      field: 'createdAt',
+      headerName: 'Date',
+      minWidth: 180,
+      valueGetter: (value, row) => row.createdAt,
+      renderCell: (params) => (
+        <Stack>
+          <Typography variant='body2'>
+            {new Date(params.value).toLocaleDateString()}
+          </Typography>
+          <Typography variant='caption' color='text.secondary'>
+            {new Date(params.value).toLocaleTimeString()}
+          </Typography>
+        </Stack>
+      )
     },
     {
       field: 'actions',
@@ -275,32 +275,32 @@ const ReviewSyncList = () => {
       headerAlign: 'right',
       renderCell: (params) => (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-            {params.row.status === 'failed' && params.row.jobId && (
-                <Tooltip title="Retry Job">
-                    <IconButton
-                        size='small'
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleRetry(params.row.jobId);
-                        }}
-                        color='primary'
-                    >
-                        <i className='tabler-refresh' />
-                    </IconButton>
-                </Tooltip>
-            )}
-            <Tooltip title="View Details">
-                <IconButton
-                    size='small'
-                    onClick={() => {
-                        setSelectedJob(params.row)
-                        setOpenDetail(true)
-                    }}
-                    sx={{ color: 'text.secondary' }}
-                >
-                    <i className='tabler-eye' />
-                </IconButton>
+          {params.row.status === 'failed' && params.row.jobId && (
+            <Tooltip title="Retry Job">
+              <IconButton
+                size='small'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRetry(params.row.jobId);
+                }}
+                color='primary'
+              >
+                <i className='tabler-refresh' />
+              </IconButton>
             </Tooltip>
+          )}
+          <Tooltip title="View Details">
+            <IconButton
+              size='small'
+              onClick={() => {
+                setSelectedJob(params.row)
+                setOpenDetail(true)
+              }}
+              sx={{ color: 'text.secondary' }}
+            >
+              <i className='tabler-eye' />
+            </IconButton>
+          </Tooltip>
         </Box>
       )
     }
@@ -312,17 +312,17 @@ const ReviewSyncList = () => {
         <CardHeader
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <IconButton 
-                  onClick={fetchData}
-                  sx={{
-                    p: 1.5,
-                    borderRadius: 1.5,
-                    bgcolor: (theme) => `rgba(${theme.palette.info.mainChannel} / 0.1)`,
-                    color: 'info.main',
-                    '&:hover': {
-                        bgcolor: (theme) => `rgba(${theme.palette.info.mainChannel} / 0.2)`,
-                    }
-                  }}
+              <IconButton
+                onClick={fetchData}
+                sx={{
+                  p: 1.5,
+                  borderRadius: 1.5,
+                  bgcolor: (theme) => `rgba(${theme.palette.info.mainChannel} / 0.1)`,
+                  color: 'info.main',
+                  '&:hover': {
+                    bgcolor: (theme) => `rgba(${theme.palette.info.mainChannel} / 0.2)`,
+                  }
+                }}
               >
                 <i className='tabler-refresh' style={{ fontSize: '1.5rem' }} />
               </IconButton>
@@ -338,12 +338,12 @@ const ReviewSyncList = () => {
           }
           action={
             <Box sx={{ display: 'flex', gap: 1, mt: 1, mr: 1 }}>
-                <CustomChip
-                    label={`${total} Logs`}
-                    size='small'
-                    variant='tonal'
-                    color='primary'
-                />
+              <CustomChip
+                label={`${total} Logs`}
+                size='small'
+                variant='tonal'
+                color='primary'
+              />
             </Box>
           }
           sx={{ pb: 3 }}
@@ -401,24 +401,24 @@ const ReviewSyncList = () => {
             </Grid>
 
             <Grid size={{ xs: 12, md: 5 }}>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                    <CustomTextField
-                        fullWidth
-                        type="date"
-                        label="Start Date"
-                        value={filters.startDate ? filters.startDate.toISOString().split('T')[0] : ''}
-                        onChange={(e) => handleDateChange('start', e.target.value ? new Date(e.target.value) : null)}
-                        InputLabelProps={{ shrink: true }}
-                    />
-                    <CustomTextField
-                        fullWidth
-                        type="date"
-                        label="End Date"
-                        value={filters.endDate ? filters.endDate.toISOString().split('T')[0] : ''}
-                        onChange={(e) => handleDateChange('end', e.target.value ? new Date(e.target.value) : null)}
-                        InputLabelProps={{ shrink: true }}
-                    />
-                </Box>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <CustomTextField
+                  fullWidth
+                  type="date"
+                  label="Start Date"
+                  value={filters.startDate ? filters.startDate.toISOString().split('T')[0] : ''}
+                  onChange={(e) => handleDateChange('start', e.target.value ? new Date(e.target.value) : null)}
+                  InputLabelProps={{ shrink: true }}
+                />
+                <CustomTextField
+                  fullWidth
+                  type="date"
+                  label="End Date"
+                  value={filters.endDate ? filters.endDate.toISOString().split('T')[0] : ''}
+                  onChange={(e) => handleDateChange('end', e.target.value ? new Date(e.target.value) : null)}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Box>
             </Grid>
           </Grid>
         </CardContent>
@@ -447,15 +447,15 @@ const ReviewSyncList = () => {
         }}
         hasListHeader={false}
         createActionConfig={{
-            show: false,
-            onlyIcon: false,
-            onClick: () => {},
-            permission: { action: 'read', subject: 'job' }
+          show: false,
+          onlyIcon: false,
+          onClick: () => { },
+          permission: { action: 'read', subject: 'job' }
         }}
         emptyStateConfig={{
-            title: 'No Review Sync Logs',
-            description: 'There are no review sync logs matching your criteria.',
-            icon: 'tabler:clipboard-list'
+          title: 'No Review Sync Logs',
+          description: 'There are no review sync logs matching your criteria.',
+          icon: 'tabler:clipboard-list'
         }}
       />
 

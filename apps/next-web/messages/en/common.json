@@ -41,7 +41,8 @@
     "items-selected": "items selected",
     "exportFormat": "Export Format",
     "exportCurrentPageOnly": "Export only current page's records",
-    "selectFields": "Select Fields"
+    "selectFields": "Select Fields",
+    "confirmDelete": "Are you sure you want to delete this item?"
   },
   "form": {
     "success-created": "created successfully",

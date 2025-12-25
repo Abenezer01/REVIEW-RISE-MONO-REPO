@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 import Grid from '@mui/material/Grid';
 import { Card, CardContent, Skeleton, Stack } from '@mui/material';
 
@@ -6,7 +8,7 @@ interface SkeletonGridProps {
     columns?: { xs?: number; sm?: number; md?: number; lg?: number };
 }
 
-export const SkeletonGrid = ({
+export const SkeletonGrid = memo(({
     count = 6,
     columns = { xs: 12, sm: 6, md: 4, lg: 3 }
 }: SkeletonGridProps) => {
@@ -28,4 +30,7 @@ export const SkeletonGrid = ({
             ))}
         </Grid>
     );
-};
+});
+
+SkeletonGrid.displayName = 'SkeletonGrid';
+

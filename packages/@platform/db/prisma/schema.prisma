@@ -78,6 +78,8 @@ model Business {
   locations     Location[]
   subscriptions Subscription[]
   userBusinessRoles UserBusinessRole[]
+  keywords      Keyword[]
+  visibilityMetrics VisibilityMetric[]
   jobs          Job[]
   reviewSyncLogs ReviewSyncLog[]
 
@@ -100,6 +102,8 @@ model Location {
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
   business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  keywords    Keyword[]
+  visibilityMetrics VisibilityMetric[]
   jobs        Job[]
   reviewSyncLogs ReviewSyncLog[]
 
@@ -270,6 +274,103 @@ model SeoSnapshot {
   @@index([userId])
   @@index([url])
 }
+
+// Keyword tracking for SERP visibility
+model Keyword {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId      String    @db.Uuid
+  locationId      String?   @db.Uuid
+  keyword         String
+  searchVolume    Int?      // Monthly search volume
+  difficulty      Float?    // Keyword difficulty score (0-100)
+  tags            String[]  // Categories/grouping
+  status          String    @default("active") // active, paused, archived
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+  
+  business        Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location        Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  ranks           KeywordRank[]
+  
+  @@index([businessId])
+  @@index([locationId])
+  @@index([status])
+}
+
+// Historical rank data snapshots
+model KeywordRank {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  keywordId             String    @db.Uuid
+  rankPosition          Int?      // Organic rank position (null if not ranked in top 100)
+  mapPackPosition       Int?      // Position in Map Pack (1-3, null if not present)
+  
+  // SERP features presence
+  hasFeaturedSnippet    Boolean   @default(false)
+  hasPeopleAlsoAsk      Boolean   @default(false)
+  hasLocalPack          Boolean   @default(false)
+  hasKnowledgePanel     Boolean   @default(false)
+  hasImagePack          Boolean   @default(false)
+  hasVideoCarousel      Boolean   @default(false)
+  
+  // URL that ranked
+  rankingUrl            String?
+  
+  // Location/device context
+  searchLocation        String?   // City, Country, or coordinate
+  device                String    @default("desktop") // desktop, mobile, tablet
+  
+  // Metadata
+  capturedAt            DateTime  @default(now())
+  createdAt             DateTime  @default(now())
+  
+  keyword               Keyword   @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  
+  @@index([keywordId])
+  @@index([capturedAt])
+}
+
+// Aggregated visibility metrics (computed)
+model VisibilityMetric {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId            String    @db.Uuid
+  locationId            String?   @db.Uuid
+  
+  // Time period this metric covers
+  periodStart           DateTime
+  periodEnd             DateTime
+  periodType            String    // daily, weekly, monthly
+  
+  // Map Pack visibility
+  mapPackAppearances    Int       @default(0)
+  totalTrackedKeywords  Int       @default(0)
+  mapPackVisibility     Float     @default(0) // Percentage (0-100)
+  
+  // Organic rankings
+  top3Count             Int       @default(0)
+  top10Count            Int       @default(0)
+  top20Count            Int       @default(0)
+  
+  // Share of Voice (weighted by search volume)
+  shareOfVoice          Float     @default(0) // Percentage (0-100)
+  
+  // SERP feature counts
+  featuredSnippetCount  Int       @default(0)
+  localPackCount        Int       @default(0)
+  
+  // Metadata
+  computedAt            DateTime  @default(now())
+  createdAt             DateTime  @default(now())
+  
+  business              Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location              Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  
+  @@unique([businessId, locationId, periodStart, periodEnd, periodType])
+  @@index([businessId])
+  @@index([locationId])
+  @@index([periodStart, periodEnd])
+}
+
 
 model Job {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid

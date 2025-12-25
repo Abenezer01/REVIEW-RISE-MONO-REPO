@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import { useTheme } from '@mui/material/styles'
 import Card from '@mui/material/Card'
@@ -48,7 +48,7 @@ const SocialPostList = () => {
     endDate: null as Date | null
   })
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true)
 
     const res = await getJobs({
@@ -70,11 +70,11 @@ const SocialPostList = () => {
     }
 
     setLoading(false)
-  }
+  }, [page, rowsPerPage, filters])
 
   useEffect(() => {
     fetchData()
-  }, [page, rowsPerPage, filters])
+  }, [fetchData])
 
   const handleFilterChange = (field: string, value: any) => {
     setFilters(prev => ({ ...prev, [field]: value }))
@@ -83,9 +83,9 @@ const SocialPostList = () => {
 
   const handleDateChange = (type: 'start' | 'end', date: Date | null) => {
     setFilters(prev => ({
-        ...prev,
-        startDate: type === 'start' ? date : prev.startDate,
-        endDate: type === 'end' ? date : prev.endDate
+      ...prev,
+      startDate: type === 'start' ? date : prev.startDate,
+      endDate: type === 'end' ? date : prev.endDate
     }))
     setPage(0)
   }
@@ -122,21 +122,21 @@ const SocialPostList = () => {
       valueGetter: (value, row) => row?.business?.name || 'N/A',
       renderCell: (params) => (
         <Stack direction='row' spacing={1.5} alignItems='center'>
-            <Avatar
-                src={params.row.business?.logo}
-                alt={params.row.business?.name}
-                sx={{ width: 28, height: 28, fontSize: '0.75rem' }}
-            >
-                {params.row.business?.name?.charAt(0)}
-            </Avatar>
-            <Stack>
-                <Typography variant='body2' fontWeight={500} color='text.primary'>
-                    {params.row.business?.name || 'N/A'}
-                </Typography>
-                <Typography variant='caption' color='text.secondary'>
-                    {params.row.location?.name || 'All Locations'}
-                </Typography>
-            </Stack>
+          <Avatar
+            src={params.row.business?.logo}
+            alt={params.row.business?.name}
+            sx={{ width: 28, height: 28, fontSize: '0.75rem' }}
+          >
+            {params.row.business?.name?.charAt(0)}
+          </Avatar>
+          <Stack>
+            <Typography variant='body2' fontWeight={500} color='text.primary'>
+              {params.row.business?.name || 'N/A'}
+            </Typography>
+            <Typography variant='caption' color='text.secondary'>
+              {params.row.location?.name || 'All Locations'}
+            </Typography>
+          </Stack>
         </Stack>
       )
     },
@@ -149,20 +149,20 @@ const SocialPostList = () => {
         const platform = params.row.payload?.platform || 'unknown';
 
         const iconMap: Record<string, string> = {
-            google: 'tabler-brand-google',
-            facebook: 'tabler-brand-facebook',
-            instagram: 'tabler-brand-instagram',
-            twitter: 'tabler-brand-twitter',
-            linkedin: 'tabler-brand-linkedin'
+          google: 'tabler-brand-google',
+          facebook: 'tabler-brand-facebook',
+          instagram: 'tabler-brand-instagram',
+          twitter: 'tabler-brand-twitter',
+          linkedin: 'tabler-brand-linkedin'
         };
 
         return (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <i className={iconMap[platform.toLowerCase()] || 'tabler-world'} style={{ fontSize: '1.2rem' }} />
-                <Typography variant='body2' sx={{ textTransform: 'capitalize' }}>
-                    {platform}
-                </Typography>
-            </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <i className={iconMap[platform.toLowerCase()] || 'tabler-world'} style={{ fontSize: '1.2rem' }} />
+            <Typography variant='body2' sx={{ textTransform: 'capitalize' }}>
+              {platform}
+            </Typography>
+          </Box>
         );
       }
     },
@@ -173,49 +173,49 @@ const SocialPostList = () => {
       valueGetter: (value, row) => row.payload?.type || 'organic',
       renderCell: (params) => (
         <CustomChip
-            size='small'
-            variant='tonal'
-            color={params.value === 'paid' ? 'primary' : 'secondary'}
-            label={params.value || 'organic'}
-            sx={{ textTransform: 'capitalize' }}
+          size='small'
+          variant='tonal'
+          color={params.value === 'paid' ? 'primary' : 'secondary'}
+          label={params.value || 'organic'}
+          sx={{ textTransform: 'capitalize' }}
         />
       )
     },
     {
-        field: 'status',
-        headerName: 'Status',
-        minWidth: 140,
-        renderCell: (params) => (
-            <CustomChip
-                size='small'
-                variant='tonal'
-                color={getStatusColor(params.value)}
-                label={params.value}
-                sx={{ textTransform: 'capitalize', fontWeight: 500 }}
-            />
-        )
+      field: 'status',
+      headerName: 'Status',
+      minWidth: 140,
+      renderCell: (params) => (
+        <CustomChip
+          size='small'
+          variant='tonal'
+          color={getStatusColor(params.value)}
+          label={params.value}
+          sx={{ textTransform: 'capitalize', fontWeight: 500 }}
+        />
+      )
     },
     {
-        field: 'scheduledTime',
-        headerName: 'Scheduled For',
-        minWidth: 180,
-        valueGetter: (value, row) => row.payload?.scheduledTime || row.createdAt,
-        renderCell: (params) => (
-            <Typography variant='body2'>
-                {params.value ? new Date(params.value).toLocaleString() : '-'}
-            </Typography>
-        )
+      field: 'scheduledTime',
+      headerName: 'Scheduled For',
+      minWidth: 180,
+      valueGetter: (value, row) => row.payload?.scheduledTime || row.createdAt,
+      renderCell: (params) => (
+        <Typography variant='body2'>
+          {params.value ? new Date(params.value).toLocaleString() : '-'}
+        </Typography>
+      )
     },
     {
-        field: 'publishedTime',
-        headerName: 'Published At',
-        minWidth: 180,
-        valueGetter: (value, row) => row.completedAt,
-        renderCell: (params) => (
-            <Typography variant='body2' color='text.secondary'>
-                {params.value ? new Date(params.value).toLocaleString() : '-'}
-            </Typography>
-        )
+      field: 'publishedTime',
+      headerName: 'Published At',
+      minWidth: 180,
+      valueGetter: (value, row) => row.completedAt,
+      renderCell: (params) => (
+        <Typography variant='body2' color='text.secondary'>
+          {params.value ? new Date(params.value).toLocaleString() : '-'}
+        </Typography>
+      )
     },
     {
       field: 'actions',
@@ -226,14 +226,14 @@ const SocialPostList = () => {
       headerAlign: 'right',
       renderCell: (params) => (
         <IconButton
-            size='small'
-            onClick={() => {
-                setSelectedJob(params.row)
-                setOpenDetail(true)
-            }}
-            sx={{ color: 'text.secondary' }}
+          size='small'
+          onClick={() => {
+            setSelectedJob(params.row)
+            setOpenDetail(true)
+          }}
+          sx={{ color: 'text.secondary' }}
         >
-            <i className='tabler-eye' />
+          <i className='tabler-eye' />
         </IconButton>
       )
     }
@@ -246,13 +246,13 @@ const SocialPostList = () => {
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{
-                  p: 1.5,
-                  borderRadius: 1.5,
-                  bgcolor: (theme) => `rgba(${theme.palette.primary.mainChannel} / 0.1)`,
-                  color: 'primary.main',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                p: 1.5,
+                borderRadius: 1.5,
+                bgcolor: (theme) => `rgba(${theme.palette.primary.mainChannel} / 0.1)`,
+                color: 'primary.main',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
                 <i className='tabler-social' style={{ fontSize: '1.5rem' }} />
               </Box>
@@ -268,12 +268,12 @@ const SocialPostList = () => {
           }
           action={
             <Box sx={{ display: 'flex', gap: 1, mt: 1, mr: 1 }}>
-                <CustomChip
-                    label={`${total} Posts`}
-                    size='small'
-                    variant='tonal'
-                    color='primary'
-                />
+              <CustomChip
+                label={`${total} Posts`}
+                size='small'
+                variant='tonal'
+                color='primary'
+              />
             </Box>
           }
           sx={{ pb: 3 }}
@@ -334,24 +334,24 @@ const SocialPostList = () => {
             </Grid>
 
             <Grid size={{ xs: 12, md: 5 }}>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                    <CustomTextField
-                        fullWidth
-                        type="date"
-                        label="Start Date"
-                        value={filters.startDate ? filters.startDate.toISOString().split('T')[0] : ''}
-                        onChange={(e) => handleDateChange('start', e.target.value ? new Date(e.target.value) : null)}
-                        InputLabelProps={{ shrink: true }}
-                    />
-                    <CustomTextField
-                        fullWidth
-                        type="date"
-                        label="End Date"
-                        value={filters.endDate ? filters.endDate.toISOString().split('T')[0] : ''}
-                        onChange={(e) => handleDateChange('end', e.target.value ? new Date(e.target.value) : null)}
-                        InputLabelProps={{ shrink: true }}
-                    />
-                </Box>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <CustomTextField
+                  fullWidth
+                  type="date"
+                  label="Start Date"
+                  value={filters.startDate ? filters.startDate.toISOString().split('T')[0] : ''}
+                  onChange={(e) => handleDateChange('start', e.target.value ? new Date(e.target.value) : null)}
+                  InputLabelProps={{ shrink: true }}
+                />
+                <CustomTextField
+                  fullWidth
+                  type="date"
+                  label="End Date"
+                  value={filters.endDate ? filters.endDate.toISOString().split('T')[0] : ''}
+                  onChange={(e) => handleDateChange('end', e.target.value ? new Date(e.target.value) : null)}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Box>
             </Grid>
           </Grid>
         </CardContent>
@@ -380,10 +380,10 @@ const SocialPostList = () => {
         }}
         hasListHeader={false}
         createActionConfig={{
-            show: false,
-            onlyIcon: false,
-            onClick: () => {},
-            permission: { action: 'read', subject: 'job' }
+          show: false,
+          onlyIcon: false,
+          onClick: () => { },
+          permission: { action: 'read', subject: 'job' }
         }}
       />
 

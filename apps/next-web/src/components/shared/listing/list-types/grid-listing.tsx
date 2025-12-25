@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 import type { GridProps, GridSize } from '@mui/material';
 import { Box, Grid } from '@mui/material';
 
@@ -16,7 +18,7 @@ interface GridListingProps<T> {
   };
 }
 
-const GridListing = <T extends object>({
+const GridListing = memo(<T extends object>({
   items,
   ItemViewComponent,
   spacing = gridSpacing,
@@ -43,6 +45,9 @@ const GridListing = <T extends object>({
       </Grid>
     </Box>
   );
-};
+}) as <T extends object>(props: GridListingProps<T>) => React.JSX.Element;
+
+(GridListing as any).displayName = 'GridListing';
 
 export default GridListing;
+
