@@ -113,6 +113,7 @@ const AppReactToastify = (props: Props) => {
 
   const defaultPosition: ToastPosition = 'top-right'
   const configPosition = (themeConfig as any).toastPosition as ToastPosition | undefined
+
   const position = direction === 'rtl' 
     ? positionMap[configPosition || defaultPosition] || defaultPosition
     : configPosition || defaultPosition
