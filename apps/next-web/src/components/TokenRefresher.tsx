@@ -60,8 +60,27 @@ export default function TokenRefresher() {
             isRefreshingRef.current = false
           }
         } else if (!status.isValid && !status.expiresAt) {
-          console.warn('[TokenRefresher] No valid token found, logging out...')
-          await logout()
+          isRefreshingRef.current = true
+
+          try {
+            const result = await refreshAccessToken()
+
+            if (result.success) {
+              retryCountRef.current = 0
+            } else {
+              if (result.shouldLogout) {
+                await logout()
+              } else {
+                const count = retryCountRef.current
+                const delay = Math.min(1000 * Math.pow(2, count), 30000)
+
+                retryCountRef.current = count + 1
+                timeoutId = setTimeout(checkToken, delay)
+              }
+            }
+          } finally {
+            isRefreshingRef.current = false
+          }
         } else {
           // Token is fine
           retryCountRef.current = 0

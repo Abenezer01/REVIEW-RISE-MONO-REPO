@@ -63,7 +63,6 @@ model UserRole {
   @@index([roleId])
 }
 
-
 model Business {
   id            String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String
@@ -121,7 +120,6 @@ model Role {
   userRoles   UserRole[]
   userBusinessRoles UserBusinessRole[]
 }
-
 
 model Permission {
   id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -408,3 +406,35 @@ model Job {
   @@index([locationId])
   @@index([createdAt])
 }
+
+model FeatureFlag {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String   @unique
+  description  String?
+  
+  // Control logic
+  isEnabled    Boolean  @default(false)
+  rolloutPercentage Int @default(100)
+  rules        Json?    // Flexible targeting rules (e.g. specific users, emails, regions)
+  
+  // Metadata
+  owner        String?
+  tags         String[]
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([name])
+}
+
+model SystemSetting {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key         String   @unique
+  value       Json
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+}
+

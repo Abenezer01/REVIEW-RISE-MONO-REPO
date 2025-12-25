@@ -54,7 +54,6 @@
       "@platform/contracts": ["../../packages/@platform/contracts/src/index.ts"],
       "@platform/i18n": ["../../packages/@platform/i18n/src/index.ts"],
       "@platform/db": ["../../packages/@platform/db/src/index.ts"],
-      "@platform/shared-ui": ["../../packages/@platform/shared-ui/src/index.ts"],
       "@platform/shared-ui/*": ["../../packages/@platform/shared-ui/src/*"]
     }
   },

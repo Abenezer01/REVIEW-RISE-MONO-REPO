@@ -9,6 +9,20 @@ import { locales, defaultLocale } from '@platform/i18n'
 import menuData from '@/configs/menu'
 import { ROLES } from '@/configs/roles'
 
+const isJwtExpired = (token: string): boolean => {
+  try {
+    const parts = token.split('.')
+
+    if (parts.length < 2) return true
+    const payload = JSON.parse(atob(parts[1]))
+    const exp = typeof payload.exp === 'number' ? payload.exp * 1000 : 0
+
+    return exp <= Date.now()
+  } catch {
+    return true
+  }
+}
+
 const getRoleFromToken = (token: string): string | null => {
   try {
     const parts = token.split('.')
@@ -71,9 +85,13 @@ const intlMiddleware = createMiddleware({
   localePrefix: 'always'
 })
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const accessToken = request.cookies.get('accessToken')
+  const accessTokenCookie = request.cookies.get('accessToken')
+  const refreshTokenCookie = request.cookies.get('refreshToken')
+  let accessTokenValue = accessTokenCookie?.value || null
+  let refreshedThisRequest = false
+  let refreshResponseCookie: string | null = null
 
   // Public paths that don't require authentication (without locale prefix)
   const publicPaths = ['/login', '/register', '/forgot-password']
@@ -97,10 +115,35 @@ export function middleware(request: NextRequest) {
   // Check if the current path is public
   const isPublicPath = publicPaths.some(path => pathWithoutLocale.startsWith(path))
 
+  // Attempt server-side refresh if needed
+  if ((!accessTokenValue || isJwtExpired(accessTokenValue)) && refreshTokenCookie && !isPublicPath) {
+    try {
+      const refreshUrl = new URL('/api/auth/refresh-token', request.url)
+
+      const res = await fetch(refreshUrl, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ refreshToken: refreshTokenCookie.value })
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+
+        if (data?.accessToken) {
+          accessTokenValue = data.accessToken as string
+          refreshedThisRequest = true
+          refreshResponseCookie = data.accessToken as string
+        }
+      }
+    } catch {
+      // ignore network errors; fallback to normal flow
+    }
+  }
+
   // If user is authenticated and tries to access login page, redirect to admin
-  if (accessToken && isPublicPath) {
+  if (accessTokenValue && isPublicPath) {
     const locale = pathnameHasLocale ? pathname.split('/')[1] : defaultLocale
-    const role = getRoleFromToken(accessToken.value)
+    const role = getRoleFromToken(accessTokenValue)
     const returnUrlParam = request.nextUrl.searchParams.get('returnUrl') || '/admin'
     const match = matchMenu(menuData, returnUrlParam)
 
@@ -110,23 +153,59 @@ export function middleware(request: NextRequest) {
       (match.allowedRoles.includes(role) || (role === ROLES.ADMIN && match.allowedRoles.includes(ROLES.ADMIN)))
     ) {
 
-      return NextResponse.redirect(new URL(`/${locale}${returnUrlParam}`, request.url))
+      const redirectResponse = NextResponse.redirect(new URL(`/${locale}${returnUrlParam}`, request.url))
+
+      if (refreshedThisRequest && refreshResponseCookie) {
+        redirectResponse.cookies.set('accessToken', refreshResponseCookie, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          path: '/',
+          maxAge: 60 * 60 * 24 * 7
+        })
+      }
+
+      return redirectResponse
     }
 
     const fallback = findFirstAllowedMenuPath(menuData, role)
 
     if (fallback) {
 
-      return NextResponse.redirect(new URL(`/${locale}${fallback}`, request.url))
+      const redirectResponse = NextResponse.redirect(new URL(`/${locale}${fallback}`, request.url))
+
+      if (refreshedThisRequest && refreshResponseCookie) {
+        redirectResponse.cookies.set('accessToken', refreshResponseCookie, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          path: '/',
+          maxAge: 60 * 60 * 24 * 7
+        })
+      }
+
+      return redirectResponse
     }
 
     const notFoundUrl = new URL(`/${locale}/not-found`, request.url)
 
-    return NextResponse.rewrite(notFoundUrl)
+    const rewriteResponse = NextResponse.rewrite(notFoundUrl)
+
+    if (refreshedThisRequest && refreshResponseCookie) {
+      rewriteResponse.cookies.set('accessToken', refreshResponseCookie, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7
+      })
+    }
+
+    return rewriteResponse
   }
 
   // If user is not authenticated and tries to access protected page
-  if (!accessToken && !isPublicPath) {
+  if (!accessTokenValue && !isPublicPath) {
     // Allow access to static files
     if (pathname.startsWith('/_next') || pathname.includes('.')) {
 
@@ -155,12 +234,12 @@ export function middleware(request: NextRequest) {
   }
 
   // Role-based route guard: only allow access to routes permitted by menu configuration
-  if (accessToken && pathWithoutLocale.startsWith('/admin')) {
+  if (accessTokenValue && pathWithoutLocale.startsWith('/admin')) {
     const locale = pathnameHasLocale ? pathname.split('/')[1] : defaultLocale
 
     const notFoundUrl = new URL(`/${locale}/not-found`, request.url)
 
-    const role = getRoleFromToken(accessToken.value)
+    const role = getRoleFromToken(accessTokenValue)
 
     const match = matchMenu(menuData, pathWithoutLocale)
 
@@ -172,13 +251,37 @@ export function middleware(request: NextRequest) {
 
       if (!isAllowed) {
 
-        return NextResponse.rewrite(notFoundUrl)
+        const rewriteResponse = NextResponse.rewrite(notFoundUrl)
+
+        if (refreshedThisRequest && refreshResponseCookie) {
+          rewriteResponse.cookies.set('accessToken', refreshResponseCookie, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 60 * 60 * 24 * 7
+          })
+        }
+
+        return rewriteResponse
       }
     }
   }
 
   // Apply next-intl middleware for locale handling
-  return intlMiddleware(request)
+  const intlResponse = intlMiddleware(request)
+
+  if (refreshedThisRequest && refreshResponseCookie) {
+    intlResponse.cookies.set('accessToken', refreshResponseCookie, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7
+    })
+  }
+
+  return intlResponse
 }
 
 export const config = {

@@ -6,6 +6,7 @@
     "seo-intelligence": "SEO Intelligence",
     "locations": "Locations",
     "accounts": "Accounts",
+    "subscription-issues": "Subscription Issues",
     "jobs": "Jobs",
     "logs": "Logs",
     "failed-jobs": "Failed Jobs",
@@ -14,7 +15,14 @@
     "home": "Home",
     "about": "About",
     "seo-overview": "Overview",
-    "seo-visibility": "SERP Visibility"
+    "seo-visibility": "SERP Visibility",
+    "smart-reviews": "SmartReviews",
+    "gbp-rocket": "GBPRocket",
+    "ad-rise": "AdRise",
+    "brand-rise": "BrandRise",
+    "settings": "Settings",
+    "system-settings": "System Settings",
+    "feature-flags": "Feature Flags"
   },
   "overview": {
     "title": "Dashboard Overview",
