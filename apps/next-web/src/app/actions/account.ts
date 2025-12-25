@@ -80,6 +80,11 @@ export async function getAccount(id: string) {
           include: {
             role: true
           }
+        },
+        userBusinessRoles: {
+          include: {
+            business: true
+          }
         }
       }
     })

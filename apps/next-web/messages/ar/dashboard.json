@@ -46,5 +46,24 @@
     "generateResponse": "إنشاء رد بالذكاء الاصطناعي",
     "viewDetails": "عرض التفاصيل",
     "markAsRead": "وضع علامة كمقروء"
+  },
+  "locations": {
+    "title": "إدارة الفروع",
+    "listTitle": "الفروع",
+    "createTitle": "إضافة فرع",
+    "editTitle": "تعديل الفرع",
+    "form": {
+      "name": "اسم الفرع",
+      "businessId": "الحساب",
+      "address": "العنوان",
+      "timezone": "المنطقة الزمنية",
+      "status": "الحالة",
+      "active": "نشط",
+      "archived": "مؤرشف",
+      "platformConnections": "ربط المنصات",
+      "googlePlaceId": "معرف مكان جوجل",
+      "facebookPageId": "معرف صفحة فيسبوك",
+      "deleteConfirm": "هل أنت متأكد من رغبتك في حذف هذا الفرع؟"
+    }
   }
 }

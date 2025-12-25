@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 'use client'
 
 import { useMemo, useState, useCallback } from 'react'

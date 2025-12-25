@@ -271,7 +271,7 @@ const AccountDetail = () => {
             </TabPanel>
 
             <TabPanel value='locations' sx={{ p: 0 }}>
-              <AccountLocations data={data} />
+              <AccountLocations />
             </TabPanel>
 
             <TabPanel value='users' sx={{ p: 0 }}>
