@@ -409,6 +409,14 @@ async function main() {
 
     console.log(`✅ Assigned users to businesses\n`);
 
+    console.log('🗑️ Deleting existing audit logs...');
+    await prisma.auditLog.deleteMany({});
+    console.log('✅ Deleted audit logs');
+
+    console.log('🗑️ Deleting existing subscriptions...');
+    await prisma.subscription.deleteMany({});
+    console.log('✅ Deleted subscriptions\n');
+
     // 8. Create Sample Subscriptions
     console.log('💳 Creating subscriptions...');
     await prisma.subscription.upsert({
@@ -441,6 +449,102 @@ async function main() {
     });
 
     console.log(`✅ Created 2 subscriptions\n`);
+
+    // 8.1 Create Problematic Subscriptions (for Subscription Issues feature)
+    console.log('💳 Creating problematic subscriptions...');
+    // Unpaid subscription (e.g., payment failed on renewal)
+    await prisma.subscription.upsert({
+      where: { id: '99999999-9999-9999-9999-999999999999' },
+      update: {},
+      create: {
+        id: '99999999-9999-9999-9999-999999999999',
+        businessId: business1.id,
+        plan: 'professional',
+        status: 'unpaid',
+        currentPeriodEnd: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+        stripeSubscriptionId: 'sub_test_acme_unpaid',
+        stripeCustomerId: 'cus_test_acme_123',
+      },
+    });
+    // Incomplete subscription (e.g., payment method requires action)
+    await prisma.subscription.upsert({
+      where: { id: '00000000-0000-0000-0000-000000000000' },
+      update: {},
+      create: {
+        id: '00000000-0000-0000-0000-000000000000',
+        businessId: business2.id,
+        plan: 'starter',
+        status: 'incomplete',
+        currentPeriodEnd: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now (but incomplete)
+        stripeSubscriptionId: 'sub_test_tech_incomplete',
+        stripeCustomerId: 'cus_test_tech_123',
+      },
+    });
+    // Incomplete_expired subscription (e.g., payment action not taken in time)
+    await prisma.subscription.upsert({
+      where: { id: '11111111-1111-1111-1111-111111111111' },
+      update: {},
+      create: {
+        id: '11111111-1111-1111-1111-111111111111',
+        businessId: business1.id,
+        plan: 'basic',
+        status: 'incomplete_expired',
+        currentPeriodEnd: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+        stripeSubscriptionId: 'sub_test_acme_incomplete_expired',
+        stripeCustomerId: 'cus_test_acme_123',
+      },
+    });
+    console.log(`✅ Created 3 problematic subscriptions\n`);
+
+    // 8.2 Create Audit Logs for Problematic Subscriptions
+    console.log('📝 Creating audit logs for problematic subscriptions...');
+
+    // Audit log for unpaid subscription (Insufficient funds)
+    await prisma.auditLog.create({
+      data: {
+        userId: user2.id, // Admin user
+        action: 'subscription:issue_contacted',
+        entityType: 'Subscription',
+        entityId: '99999999-9999-9999-9999-999999999999', // Unpaid subscription
+        details: {
+          reason: 'Insufficient funds or exceeded credit limit',
+          status: 'contacted',
+          notes: 'Customer contacted regarding payment failure due to insufficient funds.',
+        },
+      },
+    });
+
+    // Audit log for incomplete subscription (Fraud suspicion)
+    await prisma.auditLog.create({
+      data: {
+        userId: user2.id, // Admin user
+        action: 'subscription:issue_contacted',
+        entityType: 'Subscription',
+        entityId: '00000000-0000-0000-0000-000000000000', // Incomplete subscription
+            details: {
+          reason: 'Fraud suspicion or security flags',
+          status: 'contacted',
+          notes: 'Payment flagged for potential fraud, customer notified for verification.',
+        },
+      },
+    });
+
+    // Audit log for incomplete_expired subscription (Technical or processing issues)
+    await prisma.auditLog.create({
+      data: {
+        userId: user2.id, // Admin user
+        action: 'subscription:issue_contacted',
+        entityType: 'Subscription',
+        entityId: '11111111-1111-1111-1111-111111111111', // Incomplete_expired subscription
+            details: {
+          reason: 'Technical or processing issues',
+          status: 'contacted',
+          notes: 'Payment failed due to a technical issue during processing. Retrying payment.',
+        },
+      },
+    });
+
+    console.log(`✅ Created 3 audit logs for problematic subscriptions\n`);
 
     // 9. Create Failed Jobs
     console.log('⚠️ Creating failed jobs...');

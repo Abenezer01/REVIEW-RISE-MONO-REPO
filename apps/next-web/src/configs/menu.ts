@@ -22,6 +22,12 @@ const menuData: MenuItem[] = [
     allowedRoles: [ROLES.ADMIN]
   },
   {
+    title: 'navigation.subscription-issues',
+    href: '/admin/subscription-issues',
+    icon: 'tabler-credit-card-off',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
     title: 'navigation.reviews',
     href: '/admin/reviews',
     icon: 'tabler-star',
@@ -55,6 +61,30 @@ const menuData: MenuItem[] = [
     allowedRoles: [ROLES.ADMIN]
   },
   {
+    title: 'navigation.smart-reviews',
+    href: '/admin/smart-reviews',
+    icon: 'tabler-sparkles',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
+    title: 'navigation.gbp-rocket',
+    href: '/admin/gbp-rocket',
+    icon: 'tabler-rocket',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
+    title: 'navigation.ad-rise',
+    href: '/admin/ad-rise',
+    icon: 'tabler-badge-ad',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
+    title: 'navigation.brand-rise',
+    href: '/admin/brand-rise',
+    icon: 'tabler-palette',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
     title: 'navigation.failed-jobs',
     href: '/admin/failed-jobs',
     icon: 'tabler-alert-circle',
@@ -75,6 +105,25 @@ const menuData: MenuItem[] = [
         title: 'navigation.review-sync-logs',
         href: '/admin/logs/reviews',
         icon: 'tabler-refresh',
+        allowedRoles: [ROLES.ADMIN]
+      }
+    ]
+  },
+  {
+    title: 'navigation.settings',
+    icon: 'tabler-settings',
+    allowedRoles: [ROLES.ADMIN],
+    children: [
+      {
+        title: 'navigation.system-settings',
+        href: '/admin/settings/system',
+        icon: 'tabler-tool',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.feature-flags',
+        href: '/admin/settings/feature-flags',
+        icon: 'tabler-flag',
         allowedRoles: [ROLES.ADMIN]
       }
     ]

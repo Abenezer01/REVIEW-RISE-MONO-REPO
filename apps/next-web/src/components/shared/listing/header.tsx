@@ -1,10 +1,12 @@
 import { Fragment, useState, useCallback, memo } from 'react';
+/* eslint-disable import/no-unresolved */
 
 import { Box, Button, IconButton, Typography } from '@mui/material';
 
+import CustomTextField from '@core/components/mui/TextField';
+
 import useTranslation from '@/hooks/useTranslation';
 
-import CustomTextField from '@core/components/mui/TextField';
 import ExportComponentOption from './export';
 import FilterList from './filter-list';
 
@@ -34,6 +36,7 @@ interface ListHeaderProps {
         subject: string;
       };
       component?: React.ComponentType<any>;
+      placeholder?: string;
     };
     export?: {
       enabled: boolean;
@@ -168,6 +171,7 @@ const ListHeader = memo((props: ListHeaderProps) => {
                 value={searchTerm}
                 sx={{ mr: 4 }}
                 onChange={handleSearchChange}
+                placeholder={search?.placeholder}
               />
             )
           )}
