@@ -5,7 +5,12 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "react-server": "./src/server-index.ts",
+      "default": "./src/index.ts"
+    },
+    "./client": "./src/index.ts",
+    "./server": "./src/server-index.ts"
   },
   "scripts": {
     "lint": "eslint . --ext .ts,.tsx",

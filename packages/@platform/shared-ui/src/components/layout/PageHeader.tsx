@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
 
 interface PageHeaderProps {
     title: string;
@@ -12,21 +11,26 @@ interface PageHeaderProps {
 
 const PageHeader = ({ title, subtitle, action }: PageHeaderProps) => {
     return (
-        <Box sx={{ mb: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        <Box sx={{ mb: 4 }}>
+            <Box sx={{ 
+                display: 'flex', 
+                flexDirection: { xs: 'column', sm: 'row' },
+                alignItems: { xs: 'flex-start', sm: 'center' },
+                justifyContent: 'space-between',
+                gap: 2
+            }}>
                 <Box>
-                    <Typography variant="h5" component="h1" fontWeight="bold">
+                    <Typography variant="h4" component="h1" sx={{ fontWeight: 600, letterSpacing: '-0.01em', mb: 0.5 }}>
                         {title}
                     </Typography>
                     {subtitle && (
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body1" color="text.secondary">
                             {subtitle}
                         </Typography>
                     )}
                 </Box>
                 {action && <Box>{action}</Box>}
             </Box>
-            <Divider />
         </Box>
     );
 };

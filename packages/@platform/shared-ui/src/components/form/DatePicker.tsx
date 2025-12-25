@@ -1,3 +1,4 @@
+ 'use client'
 import React from 'react';
 
 import { FormHelperText, InputAdornment } from '@mui/material';
