@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
 import {
     Box,
     Switch,
@@ -90,13 +91,16 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
 
                 // Extract targets
                 const userIds: string[] = []
+                
                 const emails: string[] = []
+                
                 if (rules.targets && Array.isArray(rules.targets)) {
                     rules.targets.forEach((target: any) => {
                         if (target.userIds) userIds.push(...target.userIds)
                         if (target.emails) emails.push(...target.emails)
                     })
                 }
+                
                 setTargets({ userIds, emails })
 
                 // Extract conditions
@@ -107,6 +111,7 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
                         operator: cond.operator || 'in',
                         values: cond.values || [],
                     }))
+                    
                     setConditions(parsedConditions)
                 }
             }
@@ -158,6 +163,7 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
         }
 
         setErrors(newErrors)
+        
         return !newErrors.name && !newErrors.description
     }
 
@@ -189,6 +195,7 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
         if (targets.userIds.length > 0) {
             rulesStructure.targets.push({ userIds: targets.userIds })
         }
+        
         if (targets.emails.length > 0) {
             rulesStructure.targets.push({ emails: targets.emails })
         }

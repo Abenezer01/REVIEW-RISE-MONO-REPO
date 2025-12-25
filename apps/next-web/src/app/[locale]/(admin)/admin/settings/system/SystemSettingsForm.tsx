@@ -2,6 +2,7 @@
 'use client'
 
 import { useState } from 'react'
+
 import toast from 'react-hot-toast'
 import {
     Box,
@@ -56,9 +57,11 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
         const file = event.target.files?.[0]
 
         if (file) {
+            
             // Validate file size (2MB max)
             if (file.size > 2 * 1024 * 1024) {
                 toast.error('Logo file size must be less than 2MB')
+            
                 return
             }
 
@@ -131,12 +134,14 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
         }
 
         setErrors(newErrors)
+        
         return !Object.values(newErrors).some(error => error !== '')
     }
 
     const handleSave = async () => {
         if (!validateForm()) {
             toast.error('Please fix the validation errors before saving')
+            
             return
         }
 
