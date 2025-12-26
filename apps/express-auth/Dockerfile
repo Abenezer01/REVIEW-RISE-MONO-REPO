@@ -76,6 +76,7 @@ RUN addgroup --system --gid 1001 expressjs && \
 
 # Copy only the pruned production dependencies and built code (includes dist now)
 COPY --from=builder --chown=expressjs:expressjs /app/pruned ./
+COPY --from=builder --chown=expressjs:expressjs /app/apps/express-auth/dist ./dist
 
 # Switch to non-root user
 USER expressjs
