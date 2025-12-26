@@ -23,7 +23,7 @@ import VisibilityTrendsChart from './VisibilityTrendsChart';
 import HeatmapGrid from '@/components/shared/charts/HeatmapGrid';
 import KeywordRankChart from './KeywordRankChart';
 
-const API_URL = 'http://localhost:3012/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_SEO_HEALTH_API_URL || 'http://localhost:3012/api/v1';
 
 const VisibilityDashboard = () => {
   const { user } = useAuth();
@@ -173,8 +173,8 @@ const VisibilityDashboard = () => {
 
   const sortedHistory = useMemo(() => {
     if (!historicalMetrics?.length) return [];
-    
-return [...historicalMetrics].sort((a, b) =>
+
+    return [...historicalMetrics].sort((a, b) =>
       new Date(a.periodStart).getTime() - new Date(b.periodStart).getTime()
     );
   }, [historicalMetrics]);

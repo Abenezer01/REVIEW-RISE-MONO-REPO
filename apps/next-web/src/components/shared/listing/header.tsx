@@ -206,7 +206,7 @@ const ListHeader = memo((props: ListHeaderProps) => {
                 ) : (
                   <CustomTextField
                     value={searchTerm}
-                    placeholder={search?.placeholder || t('common.search-placeholder') || 'Search...'}
+                    placeholder={search?.placeholder || t('form.search-placeholder') || 'Search...'}
                     onChange={handleSearchChange}
                     sx={{ flex: 1 }}
                     InputProps={{

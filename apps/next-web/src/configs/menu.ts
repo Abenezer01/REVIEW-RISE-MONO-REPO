@@ -45,23 +45,34 @@ const menuData: MenuItem[] = [
     allowedRoles: [ROLES.ADMIN],
     children: [
       {
-    title: 'navigation.ai-visibility',
-    href: '/admin/ai-visibility',
-    icon: 'tabler-eye',
-    allowedRoles: [ROLES.ADMIN]
-  },
-  {
+        title: 'navigation.ai-visibility',
+        href: '/admin/ai-visibility',
+        icon: 'tabler-eye',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
         title: 'navigation.seo-overview',
-        href: '/admin/seo-intelligence'
+        href: '/admin/seo-intelligence/overview',
+        icon: 'tabler-eye',
+        allowedRoles: [ROLES.ADMIN]
       },
       {
         title: 'navigation.seo-visibility',
-        href: '/admin/seo-intelligence/visibility'
-      }
-      ,
+        href: '/admin/seo-intelligence/visibility',
+        icon: 'tabler-eye',
+        allowedRoles: [ROLES.ADMIN]
+      },
       {
         title: 'navigation.seo-keywords',
-        href: '/admin/seo-intelligence/keywords'
+        href: '/admin/seo-intelligence/keywords',
+        icon: 'tabler-key',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.seo-competitors',
+        href: '/admin/seo-intelligence/competitors',
+        icon: 'tabler-badge',
+        allowedRoles: [ROLES.ADMIN]
       }
     ]
   },

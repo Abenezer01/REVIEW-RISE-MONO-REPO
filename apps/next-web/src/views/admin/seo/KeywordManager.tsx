@@ -1,10 +1,8 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import React, { useState } from 'react'
 
 import dynamic from 'next/dynamic'
-
-import axios from 'axios'
 
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
@@ -12,62 +10,77 @@ import Typography from '@mui/material/Typography'
 import type { KeywordDTO } from '@platform/contracts'
 
 import { useAuth } from '@/contexts/AuthContext'
+import { useApiGet } from '@/hooks/useApi'
+import { useSeoApiGet, useSeoApiDelete } from '@/hooks/useSeoApi'
 
 const KeywordListing = dynamic(() => import('@/components/admin/seo/KeywordListing'), { ssr: false })
 
-const API_URL = 'http://localhost:3012/api/v1'
+interface BusinessResponse {
+  data: Array<{ id: string; name: string }>;
+}
+
+interface KeywordsResponse {
+  data: KeywordDTO[];
+}
 
 export default function KeywordManager() {
   const { user } = useAuth()
 
   const [businessId, setBusinessId] = useState<string | null>(null)
-  const [keywords, setKeywords] = useState<KeywordDTO[]>([])
-  const [loading, setLoading] = useState(false)
-
   const [tagFilter, setTagFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'archived'>('all')
   const [search, setSearch] = useState('')
 
-  useEffect(() => {
-    if (!user?.id) return
-    axios.get(`/api/admin/users/${user.id}/businesses`).then(res => {
-      const items = res.data?.data || []
+  // Fetch user businesses
+  const { data: businessesData } = useApiGet<BusinessResponse>(
+    ['user-businesses', user?.id || ''],
+    `/admin/users/${user?.id}/businesses`,
+    undefined,
+    { enabled: !!user?.id }
+  )
 
-      if (items.length) {
-        setBusinessId(items[0].id)
-      }
-    })
-  }, [user?.id])
+  // Auto-select first business when data loads
+  React.useEffect(() => {
+    const businesses = businessesData?.data || []
+    if (businesses.length > 0 && !businessId) {
+      setBusinessId(businesses[0].id)
+    }
+  }, [businessesData, businessId])
 
   const locationId: string | undefined = undefined
 
-  const fetchKeywords = useCallback(async () => {
-    if (!businessId) return
-    setLoading(true)
+  // Fetch keywords
+  const {
+    data: keywordsData,
+    isLoading: loading,
+    refetch
+  } = useSeoApiGet<KeywordsResponse>(
+    ['keywords', businessId || '', statusFilter, tagFilter],
+    '/keywords',
+    {
+      businessId,
+      locationId,
+      limit: 200,
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+      tags: tagFilter || undefined
+    },
+    { enabled: !!businessId }
+  )
 
-    const res = await axios.get(`${API_URL}/keywords`, {
-      params: {
-        businessId,
-        locationId,
-        limit: 200,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-        tags: tagFilter || undefined
-      }
-    })
+  const keywords = keywordsData?.data || []
 
-    const items = (res.data?.data || []) as KeywordDTO[]
-
-    setKeywords(items)
-    setLoading(false)
-  }, [businessId, locationId, statusFilter, tagFilter])
-
-  useEffect(() => {
-    fetchKeywords()
-  }, [fetchKeywords])
+  const deleteKeywordMutation = useSeoApiDelete('/keywords/:id', {
+    onSuccess: () => {
+      refetch()
+    }
+  })
 
   const handleDeleteKeyword = async (id: string) => {
-    await axios.delete(`${API_URL}/keywords/${id}`)
-    await fetchKeywords()
+    await deleteKeywordMutation.mutateAsync(id)
+  }
+
+  const fetchKeywords = async () => {
+    await refetch()
   }
 
   const filteredRows = keywords.filter(k => {
@@ -79,7 +92,6 @@ export default function KeywordManager() {
 
     return byTag && bySearch
   })
-
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>

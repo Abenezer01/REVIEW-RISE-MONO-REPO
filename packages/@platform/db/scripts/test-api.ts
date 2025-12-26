@@ -7,7 +7,7 @@ dotenv.config({ path: envPath });
 
 async function testApi() {
   const { prisma } = await import('../src/client');
-  
+
   try {
     console.log('🔍 Fetching test business...');
     const business = await prisma.business.findFirst();
@@ -16,7 +16,7 @@ async function testApi() {
       console.error('❌ Test business not found. Listing all businesses:');
       const all = await prisma.business.findMany();
       all.forEach(b => console.log(` - ${b.name} (${b.id}) slug: ${b.slug}`));
-      
+
       if (all.length > 0) {
         console.log('Using first business found...');
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -30,12 +30,12 @@ async function testApi() {
 
     console.log(`✓ Found business: ${business.id}`);
 
-    const API_URL = 'http://localhost:3012/api/v1';
-    
+    const API_URL = process.env.NEXT_PUBLIC_SEO_HEALTH_API_URL || 'http://localhost:3012/api/v1'
+
     // Test 1: List Keywords
     console.log('\n🧪 Testing GET /keywords...');
     const keywordsRes = await fetch(`${API_URL}/keywords?businessId=${business.id}`);
-    
+
     if (keywordsRes.status === 200) {
       const data = await keywordsRes.json();
       console.log(`✓ Success! Found ${data.data.length} keywords`);
@@ -49,7 +49,7 @@ async function testApi() {
     // Test 2: Get Visibility Metrics
     console.log('\n🧪 Testing GET /visibility/metrics...');
     const metricsRes = await fetch(`${API_URL}/visibility/metrics?businessId=${business.id}&periodType=daily`);
-    
+
     if (metricsRes.status === 200) {
       const data = await metricsRes.json();
       console.log(`✓ Success! Found ${data.data.length} metric records`);
@@ -69,11 +69,11 @@ async function testApi() {
     const today = new Date();
     const ago = new Date();
     ago.setDate(ago.getDate() - 7);
-    
+
     const sovRes = await fetch(
       `${API_URL}/visibility/share-of-voice?businessId=${business.id}&startDate=${ago.toISOString()}&endDate=${today.toISOString()}`
     );
-    
+
     if (sovRes.status === 200) {
       const data = await sovRes.json();
       console.log(`✓ Success! Share of Voice: ${data.data.shareOfVoice.toFixed(2)}%`);

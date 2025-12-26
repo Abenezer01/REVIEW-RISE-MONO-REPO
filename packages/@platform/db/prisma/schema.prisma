@@ -83,6 +83,7 @@ model Business {
   aiVisibilityMetrics AIVisibilityMetric[]
   jobs          Job[]
   reviewSyncLogs ReviewSyncLog[]
+  competitors   Competitor[]
 
 
   @@index([name])
@@ -294,6 +295,7 @@ model Keyword {
   business        Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
   location        Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
   ranks           KeywordRank[]
+  competitorRanks CompetitorKeywordRank[]
   
   @@index([businessId])
   @@index([locationId])
@@ -496,4 +498,40 @@ model AIPlatformData {
 
   @@index([aIVisibilityMetricId])
   @@index([platform])
+}
+
+model Competitor {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId      String   @db.Uuid
+  domain          String
+  name            String?
+  avgRank         Float?
+  visibilityScore Float?
+  reviewCount     Int?
+  rating          Float?
+  gbpCompleteness Int?     // 0-100
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  business        Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  ranks           CompetitorKeywordRank[]
+
+  @@unique([businessId, domain])
+  @@index([businessId])
+}
+
+model CompetitorKeywordRank {
+  id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  competitorId    String     @db.Uuid
+  keywordId       String     @db.Uuid
+  rankPosition    Int?
+  rankingUrl      String?
+  capturedAt      DateTime   @default(now())
+  
+  competitor      Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+  keyword         Keyword    @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+
+  @@index([competitorId])
+  @@index([keywordId])
+  @@index([capturedAt])
 }

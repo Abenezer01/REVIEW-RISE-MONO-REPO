@@ -13,7 +13,7 @@ import CustomTextBox from '@/components/shared/form/custom-text-box'
 import CustomTagsInput from '@/components/shared/form/custom-tags-input'
 import CustomSelectBox from '@/components/shared/form/custom-select'
 
-const API_URL = 'http://localhost:3012/api/v1'
+const API_URL = process.env.NEXT_PUBLIC_SEO_HEALTH_API_URL || 'http://localhost:3012/api/v1'
 
 interface KeywordFormProps {
   businessId: string

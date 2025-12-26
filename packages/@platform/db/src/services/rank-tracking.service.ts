@@ -1,4 +1,4 @@
-import { keywordRepository, keywordRankRepository, locationRepository } from '../repositories'
+import { keywordRepository, keywordRankRepository, locationRepository, competitorRepository, competitorRankRepository } from '../repositories'
 import type { Prisma } from '@prisma/client'
 import { fetchMockRankData, type DeviceType } from './rank-provider.mock'
 
@@ -8,9 +8,11 @@ export class RankTrackingService {
     devices: DeviceType[] = ['desktop', 'mobile']
   ) {
     const keywords = await keywordRepository.getActiveKeywords(businessId)
-    if (keywords.length === 0) return { created: 0 }
+    if (keywords.length === 0) return { created: 0, competitorsDetected: 0 }
 
-    const inputs: Prisma.KeywordRankCreateManyInput[] = []
+    const keywordRankInputs: Prisma.KeywordRankCreateManyInput[] = []
+    const competitorRankInputs: { competitorId: string; keywordId: string; rankPosition: number; rankingUrl: string }[] = []
+    const competitorsDetected = new Set<string>()
 
     for (const kw of keywords) {
       const location = kw.locationId ? await locationRepository.findById(kw.locationId) : null
@@ -21,7 +23,8 @@ export class RankTrackingService {
         const capturedAt = new Date()
         capturedAt.setHours(0, 0, 0, 0)
 
-        inputs.push({
+        // Store the business's own rank
+        keywordRankInputs.push({
           keywordId: kw.id,
           rankPosition: result.rankPosition ?? null,
           mapPackPosition: result.mapPackPosition ?? null,
@@ -36,12 +39,66 @@ export class RankTrackingService {
           device,
           capturedAt
         })
+
+        // Extract and store competitors from SERP
+        if (result.serpEntries) {
+          for (const entry of result.serpEntries) {
+            // Skip the business's own domain
+            if (entry.domain === 'example.com') continue
+
+            // Upsert competitor
+            const competitor = await competitorRepository.upsertByDomain(
+              businessId,
+              entry.domain,
+              {
+                name: entry.title.split(' - ')[0] || entry.domain,
+              }
+            )
+
+            competitorsDetected.add(competitor.id)
+
+            // Store competitor rank
+            competitorRankInputs.push({
+              competitorId: competitor.id,
+              keywordId: kw.id,
+              rankPosition: entry.position,
+              rankingUrl: entry.url,
+            })
+          }
+        }
       }
     }
 
-    if (inputs.length === 0) return { created: 0 }
-    const payload = await keywordRankRepository.createBatch(inputs)
-    return { created: payload.count }
+    // Batch create keyword ranks
+    let createdCount = 0
+    if (keywordRankInputs.length > 0) {
+      const payload = await keywordRankRepository.createBatch(keywordRankInputs)
+      createdCount = payload.count
+    }
+
+    // Batch create competitor ranks
+    if (competitorRankInputs.length > 0) {
+      const capturedAt = new Date()
+      capturedAt.setHours(0, 0, 0, 0)
+
+      // We need to create them individually since we need the competitor ID
+      for (const input of competitorRankInputs) {
+        try {
+          await competitorRankRepository.create({
+            competitor: { connect: { id: input.competitorId } },
+            keyword: { connect: { id: input.keywordId } },
+            rankPosition: input.rankPosition,
+            rankingUrl: input.rankingUrl,
+            capturedAt,
+          })
+        } catch (error) {
+          // Skip duplicates or errors
+          console.error('Error creating competitor rank:', error)
+        }
+      }
+    }
+
+    return { created: createdCount, competitorsDetected: competitorsDetected.size }
   }
 
   async computeRankChange(

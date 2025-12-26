@@ -26,6 +26,8 @@ export { AuditLogRepository, auditLogRepository } from './audit-log.repository';
 export { SeoSnapshotRepository, seoSnapshotRepository } from './seo-snapshot.repository';
 export { KeywordRepository, keywordRepository } from './keyword.repository';
 export { KeywordRankRepository, keywordRankRepository } from './keyword-rank.repository';
+export { CompetitorRepository, competitorRepository } from './competitor.repository';
+export { CompetitorRankRepository, competitorRankRepository } from './competitor-rank.repository';
 export { VisibilityMetricRepository, visibilityMetricRepository } from './visibility-metric.repository';
 export { JobRepository, jobRepository } from './job.repository';
 export { ReviewSyncLogRepository, reviewSyncLogRepository } from './review-sync-log.repository';
@@ -44,6 +46,8 @@ import { auditLogRepository } from './audit-log.repository';
 import { seoSnapshotRepository } from './seo-snapshot.repository';
 import { keywordRepository } from './keyword.repository';
 import { keywordRankRepository } from './keyword-rank.repository';
+import { competitorRepository } from './competitor.repository';
+import { competitorRankRepository } from './competitor-rank.repository';
 import { visibilityMetricRepository } from './visibility-metric.repository';
 import { jobRepository } from './job.repository';
 import { reviewSyncLogRepository } from './review-sync-log.repository';
@@ -63,6 +67,8 @@ export const repositories = {
     seoSnapshot: seoSnapshotRepository,
     keyword: keywordRepository,
     keywordRank: keywordRankRepository,
+    competitor: competitorRepository,
+    competitorRank: competitorRankRepository,
     visibilityMetric: visibilityMetricRepository,
     job: jobRepository,
     reviewSyncLog: reviewSyncLogRepository,

@@ -14,6 +14,7 @@ export * from './responses';
 export * from './dtos/location.dto';
 export * from './dtos/business.dto';
 export * from './dtos/keyword.dto';
+export * from './dtos/competitor.dto';
 export * from './dtos/visibility.dto';
 
 // Re-export commonly used types from requests
