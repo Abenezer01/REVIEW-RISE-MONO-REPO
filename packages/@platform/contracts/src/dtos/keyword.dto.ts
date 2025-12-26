@@ -13,6 +13,10 @@ export interface KeywordDTO {
   status: string;
   createdAt: string;
   updatedAt: string;
+  language?: string;
+  city?: string;
+  country?: string;
+  deviceType?: 'desktop' | 'mobile';
   // Include latest rank data if available
   currentRank?: number;
   mapPackPosition?: number;
@@ -41,6 +45,10 @@ export interface UpdateKeywordDTO {
   difficulty?: number;
   tags?: string[];
   status?: string;
+  language?: string;
+  city?: string;
+  country?: string;
+  deviceType?: 'desktop' | 'mobile';
 }
 
 export interface KeywordRankDTO {
