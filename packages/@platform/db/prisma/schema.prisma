@@ -80,6 +80,7 @@ model Business {
   userBusinessRoles UserBusinessRole[]
   keywords      Keyword[]
   visibilityMetrics VisibilityMetric[]
+  aiVisibilityMetrics AIVisibilityMetric[]
   jobs          Job[]
   reviewSyncLogs ReviewSyncLog[]
 
@@ -104,6 +105,7 @@ model Location {
   business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
   keywords    Keyword[]
   visibilityMetrics VisibilityMetric[]
+  aiVisibilityMetrics AIVisibilityMetric[]
   jobs        Job[]
   reviewSyncLogs ReviewSyncLog[]
 
@@ -438,3 +440,60 @@ model SystemSetting {
   @@index([key])
 }
 
+// AI Visibility Metrics (Brand mentions, sentiment, etc.)
+model AIVisibilityMetric {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId        String    @db.Uuid
+  locationId        String?   @db.Uuid
+
+  // Metrics
+  visibilityScore   Float     @default(0) // 0-100
+  sentimentScore    Float     @default(0) // 0-100
+  shareOfVoice      Float     @default(0) // 0-100
+  citationAuthority Float     @default(0) // 0-100
+
+  // Time period
+  periodStart       DateTime
+  periodEnd         DateTime
+  periodType        String    // daily, weekly, monthly
+
+  // Metadata
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  business          Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location          Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  platformData      AIPlatformData[]
+
+  @@index([businessId])
+  @@index([locationId])
+  @@index([periodStart, periodEnd])
+}
+
+// Platform-specific AI data (ChatGPT, Gemini, etc.)
+model AIPlatformData {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  aIVisibilityMetricId String   @db.Uuid
+
+  // Platform Info
+  platform            String    // ChatGPT, Gemini, Claude, Perplexity, etc.
+  
+  // Metrics
+  rank                Int?      // Rank in AI results (null if not found)
+  sentiment           String    // Positive, Neutral, Negative
+  mentioned           Boolean   @default(false)
+  sourcesCount        Int       @default(0)
+  
+  // Raw response/evidence
+  responseSnippet     String?   @db.Text
+  
+  // Metadata
+  capturedAt          DateTime  @default(now())
+  
+  // Relations
+  aIVisibilityMetric  AIVisibilityMetric @relation(fields: [aIVisibilityMetricId], references: [id], onDelete: Cascade)
+
+  @@index([aIVisibilityMetricId])
+  @@index([platform])
+}
