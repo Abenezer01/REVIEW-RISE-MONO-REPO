@@ -61,28 +61,28 @@ RUN pnpm --filter @apps/express-auth deploy --prod /app/pruned
 RUN cp -r /app/apps/express-auth/dist /app/pruned/dist
 
 # Debug: Locate the .prisma folder
-RUN find /app -name .prisma -type d
-
-# Copy the generated Prisma client to the pruned directory
-# We dynamically locate the .prisma folder because pnpm structure can vary
-RUN PRISMA_PATH=$(find /app -name .prisma -type d | head -n 1) && \
-  if [ -z "$PRISMA_PATH" ]; then \
-  echo "Error: .prisma directory not found"; \
-  exit 1; \
-  fi &&    echo "Found .prisma at $PRISMA_PATH" && \
-  mkdir -p /app/pruned/node_modules/.prisma && \
-  cp -r $PRISMA_PATH/* /app/pruned/node_modules/.prisma/
-
-# Copy the @prisma/client package explicitly to ensure runtime files are present
-# pnpm deploy might prune or symlink this incorrectly for Docker
-RUN CLIENT_PATH=$(find /app -path "*/@prisma/client" -type d | head -n 1) && \
-  if [ -z "$CLIENT_PATH" ]; then \
-  echo "Error: @prisma/client directory not found"; \
+# Copy ALL Prisma-related packages to the pruned directory
+# This ensures the complete dependency tree is present (client, runtime-utils, adapter, etc.)
+RUN PRISMA_SCOPE=$(find /app/node_modules -type d -path "*/@prisma" | head -n 1) && \
+  if [ -z "$PRISMA_SCOPE" ]; then \
+  echo "Error: @prisma scope not found"; \
   exit 1; \
   fi && \
-  echo "Found @prisma/client at $CLIENT_PATH" && \
-  mkdir -p /app/pruned/node_modules/@prisma/client && \
-  cp -r $CLIENT_PATH/* /app/pruned/node_modules/@prisma/client/
+  echo "Found @prisma scope at $PRISMA_SCOPE" && \
+  mkdir -p /app/pruned/node_modules/@prisma && \
+  cp -r $PRISMA_SCOPE/* /app/pruned/node_modules/@prisma/ && \
+  echo "Copied all @prisma packages"
+
+# Copy the generated Prisma client (.prisma directory)
+RUN PRISMA_CLIENT=$(find /app -name .prisma -type d | head -n 1) && \
+  if [ -z "$PRISMA_CLIENT" ]; then \
+  echo "Error: .prisma directory not found"; \
+  exit 1; \
+  fi && \
+  echo "Found .prisma at $PRISMA_CLIENT" && \
+  mkdir -p /app/pruned/node_modules/.prisma && \
+  cp -r $PRISMA_CLIENT/* /app/pruned/node_modules/.prisma/ && \
+  echo "Copied generated Prisma client"
 
 # ============================================
 # Stage 3: Runner - Production image
