@@ -153,6 +153,9 @@ jobs:
             # Pull latest Docker images
             docker compose -f docker-compose.prod.yml pull
             
+            # Create/Update .env.production from secret
+            echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
+            
             # Run deployment script
             chmod +x ./scripts/deploy-staging.sh
             ./scripts/deploy-staging.sh
