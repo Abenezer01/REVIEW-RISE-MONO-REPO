@@ -60,14 +60,8 @@ RUN pnpm --filter @apps/express-auth deploy --prod /app/pruned
 # pnpm deploy doesn't copy build artifacts, only source and dependencies
 RUN cp -r /app/apps/express-auth/dist /app/pruned/dist
 
-# Copy platform/db source to pruned for Prisma generation
-# pnpm deploy only copies dependencies, not source files needed for generation
-RUN cp -r /app/packages/@platform/db /app/pruned/node_modules/@platform/
-
-# Generate Prisma Client in the pruned directory
-# The pruned directory has a cleaner node_modules structure than the build workspace
-# This ensures .prisma directory is created in a predictable location
-RUN cd /app/pruned && npx prisma generate --schema=./node_modules/@platform/db/prisma/schema.prisma
+# Prisma Client is generated with custom output to /app/node_modules/.prisma/client
+# This will be copied separately to the runner stage
 
 # ============================================
 # Stage 3: Runner - Production image
@@ -83,11 +77,13 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 expressjs && \
   adduser --system --uid 1001 expressjs
 
-# Copy the entire pruned directory which now includes:
-# - Production dependencies
-# - Built code (dist/)
-# - Generated Prisma client (.prisma/ and @prisma/)
+# Copy the pruned production dependencies
+# This includes @prisma/client runtime and all other production dependencies
 COPY --from=builder --chown=expressjs:expressjs /app/pruned ./
+
+# Copy the generated Prisma client from the builder stage
+# The custom output in schema.prisma generates to /app/node_modules/.prisma/client
+COPY --from=builder --chown=expressjs:expressjs /app/node_modules/.prisma ./node_modules/.prisma
 
 # Switch to non-root user
 USER expressjs
