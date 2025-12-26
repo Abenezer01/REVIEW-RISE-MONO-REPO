@@ -112,7 +112,12 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+          known_hosts: unnecessary
+          if_key_exists: replace
+          config: |
+            Host ${{ secrets.VPS_HOST }}
+              StrictHostKeyChecking no
+              UserKnownHostsFile /dev/null
 
       - name: Deploy to VPS
         env:
