@@ -45,6 +45,12 @@ const menuData: MenuItem[] = [
     allowedRoles: [ROLES.ADMIN],
     children: [
       {
+    title: 'navigation.ai-visibility',
+    href: '/admin/ai-visibility',
+    icon: 'tabler-eye',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
         title: 'navigation.seo-overview',
         href: '/admin/seo-intelligence'
       },
