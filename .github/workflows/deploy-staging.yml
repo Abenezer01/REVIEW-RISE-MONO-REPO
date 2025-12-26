@@ -146,7 +146,7 @@ jobs:
             # Update remote URL to ensure token is fresh (optional but good practice)
             git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/REVIEWRISE/REVIEW-RISE-MONO-REPO.git
             
-            # Fetch and Checkout
+            # Fetch and Checkout staging branch
             git fetch origin
             git checkout staging
             git pull origin staging
