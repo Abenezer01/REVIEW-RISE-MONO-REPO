@@ -82,6 +82,15 @@ log_info "Backup created at $BACKUP_DIR with timestamp $TIMESTAMP ✓"
 # ==============================================================================
 # Pull Latest Images
 # ==============================================================================
+log_info "Logging into GHCR..."
+
+if [ -n "${GITHUB_TOKEN:-}" ] && [ -n "${GITHUB_ACTOR:-}" ]; then
+    echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+    log_info "Authenticated with ghcr.io ✓"
+else
+    log_warn "GITHUB_TOKEN or GITHUB_ACTOR not set. Skipping docker login (pull may fail for private images)."
+fi
+
 log_info "Pulling latest Docker images..."
 
 docker compose -f "$COMPOSE_FILE" pull

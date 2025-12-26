@@ -125,7 +125,7 @@ jobs:
           VPS_USER: ${{ secrets.VPS_USER }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
-          ssh -A -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "export GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}'; bash -s" << 'EOF'
+          ssh -A -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "export GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}'; export GITHUB_ACTOR='${{ github.actor }}'; bash -s" << 'EOF'
             set -e
             
             # Ensure deploy directory exists
