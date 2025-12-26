@@ -67,7 +67,7 @@ RUN addgroup --system --gid 1001 expressjs && \
   adduser --system --uid 1001 expressjs
 
 # Copy the entire node_modules from builder
-# This preserves pnpm's symlink structure which is critical for Prisma Client runtime resolution
+# This preserves pnpm's symlink structure and includes Prisma client in default location
 COPY --from=builder --chown=expressjs:expressjs /app/node_modules ./node_modules
 
 # Copy the built application
