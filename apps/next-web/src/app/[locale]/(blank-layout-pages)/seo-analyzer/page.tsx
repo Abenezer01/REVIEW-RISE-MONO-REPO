@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+
 import { useTranslations } from 'next-intl'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'

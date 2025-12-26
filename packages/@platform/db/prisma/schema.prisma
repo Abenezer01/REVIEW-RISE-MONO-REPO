@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../../../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -46,6 +47,8 @@ model User {
   sessions      Session[]
   userRoles     UserRole[]
   userBusinessRoles UserBusinessRole[]
+  auditLogs     AuditLog[]
+  seoSnapshots  SeoSnapshot[]
 }
 
 model UserRole {
@@ -180,6 +183,22 @@ model PasswordResetToken {
   @@index([email])
 }
 
+model AuditLog {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @db.Uuid
+  action      String
+  entityType  String
+  entityId    String   @db.Uuid
+  details     Json?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([entityId])
+  @@index([createdAt])
+}
+
 model EmailVerificationToken {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email     String
@@ -188,5 +207,24 @@ model EmailVerificationToken {
   createdAt DateTime @default(now())
 
   @@index([email])
+}
+
+model SeoSnapshot {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  url             String
+  healthScore     Int
+  
+  // Store structured JSON data for flexibility
+  categoryScores  Json      
+  recommendations Json      
+  seoElements     Json      
+  
+  userId          String?   @db.Uuid
+  user            User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  createdAt       DateTime  @default(now())
+  
+  @@index([userId])
+  @@index([url])
 }
 

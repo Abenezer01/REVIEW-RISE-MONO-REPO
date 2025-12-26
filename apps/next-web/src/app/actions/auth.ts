@@ -134,6 +134,18 @@ export async function loginAction(prevState: LoginResponse | null, formData: For
         avatar: data.user.image,
         username: data.user.email
       }
+
+      try {
+        const cookieStore = await cookies()
+        
+        cookieStore.set('userInfo', JSON.stringify(user), {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 7,
+          path: '/'
+        })
+      } catch {}
     }
 
     return {

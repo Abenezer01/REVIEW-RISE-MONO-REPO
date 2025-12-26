@@ -12,6 +12,33 @@ export const getServerUser = async (): Promise<User | null> => {
     const cookieStore = await cookies()
     const accessToken = cookieStore.get('accessToken')
 
+    const decodeJwt = (t: string) => {
+      try {
+        const parts = t.split('.')
+
+        if (parts.length < 2) return null
+        const json = Buffer.from(parts[1], 'base64').toString('utf-8')
+
+        return JSON.parse(json)
+      } catch {
+        return null
+      }
+    }
+
+    const claims = accessToken?.value ? decodeJwt(accessToken.value) : null
+
+    const userInfoCookie = cookieStore.get('userInfo')
+
+    if (userInfoCookie?.value) {
+      try {
+        const parsed = JSON.parse(userInfoCookie.value)
+
+        if (parsed && parsed.id && parsed.email) {
+          return parsed as User
+        }
+      } catch {}
+    }
+
     if (!accessToken) {
       return null
     }
@@ -25,11 +52,42 @@ export const getServerUser = async (): Promise<User | null> => {
         const data = apiResponse?.data ?? apiResponse
         const u = data?.user
 
+        console.log("User", u);
+
+
         if (u) {
+          const name = typeof u.name === 'string' ? u.name : ''
+          const parts = name.trim().split(' ').filter(Boolean)
+
+          const firstName =
+            (u.firstName as string | undefined) ||
+            (parts[0] || undefined) ||
+            (claims?.given_name as string | undefined)
+
+            const lastName =
+            (u.lastName as string | undefined) ||
+            (parts.slice(1).join(' ') || undefined) ||
+            (claims?.family_name as string | undefined)
+
+            const avatar =
+            (u.avatar as string | undefined) ||
+            (u.image as string | undefined) ||
+            (claims?.picture as string | undefined) ||
+            undefined
+
+            const username =
+            (u.username as string | undefined) ||
+            (claims?.preferred_username as string | undefined) ||
+            u.email
+
           return {
             id: u.id,
             email: u.email,
-            role: u.role
+            role: u.role,
+            firstName,
+            lastName,
+            avatar,
+            username
           }
         }
 

@@ -18,6 +18,14 @@ export const routing = defineRouting({
         '/admin': {
             en: '/admin',
             ar: '/admin'
+        },
+        '/admin/accounts': {
+            en: '/admin/accounts',
+            ar: '/admin/accounts'
+        },
+        '/admin/accounts/[id]': {
+            en: '/admin/accounts/[id]',
+            ar: '/admin/accounts/[id]'
         }
     }
 })
