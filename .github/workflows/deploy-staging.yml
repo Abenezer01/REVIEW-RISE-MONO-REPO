@@ -125,7 +125,8 @@ jobs:
           VPS_USER: ${{ secrets.VPS_USER }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
-          ssh -A -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << 'EOF'
+        run: |
+          ssh -A -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "export GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}'; bash -s" << 'EOF'
             set -e
             
             # Ensure deploy directory exists
@@ -133,10 +134,8 @@ jobs:
               echo "Repository not found at ${{ secrets.DEPLOY_PATH }}. Cloning..."
               mkdir -p ${{ secrets.DEPLOY_PATH }}
               
-              # Use SSH Agent Forwarding to clone
-              # Disable strict host checking for github.com to avoid prompt
-              export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
-              git clone git@github.com:REVIEWRISE/REVIEW-RISE-MONO-REPO.git ${{ secrets.DEPLOY_PATH }}
+              # Use HTTPS with GITHUB_TOKEN for reliable cloning
+              git clone https://x-access-token:$GITHUB_TOKEN@github.com/REVIEWRISE/REVIEW-RISE-MONO-REPO.git ${{ secrets.DEPLOY_PATH }}
             
             else
               echo "Repository exists. Updating..."
@@ -144,8 +143,10 @@ jobs:
 
             cd ${{ secrets.DEPLOY_PATH }}
             
+            # Update remote URL to ensure token is fresh (optional but good practice)
+            git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/REVIEWRISE/REVIEW-RISE-MONO-REPO.git
+            
             # Fetch and Checkout
-            export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
             git fetch origin
             git checkout staging
             git pull origin staging
