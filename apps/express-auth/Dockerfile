@@ -60,9 +60,12 @@ RUN pnpm --filter @apps/express-auth deploy --prod /app/pruned
 # pnpm deploy doesn't copy build artifacts, only source and dependencies
 RUN cp -r /app/apps/express-auth/dist /app/pruned/dist
 
+# Debug: Locate the .prisma folder
+RUN find /app -name .prisma -type d
+
 # Copy the generated Prisma client to the pruned directory
-# The generated client is in node_modules/.prisma which pnpm deploy doesn't copy
-RUN cp -r /app/packages/@platform/db/node_modules/.prisma /app/pruned/node_modules/.prisma
+# We try to copy from the package specific node_modules first, but fallback or wildcard if needed
+RUN cp -r /app/packages/@platform/db/node_modules/.prisma /app/pruned/node_modules/.prisma || cp -r /app/node_modules/.prisma /app/pruned/node_modules/.prisma
 
 # ============================================
 # Stage 3: Runner - Production image
