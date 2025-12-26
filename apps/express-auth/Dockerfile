@@ -52,17 +52,6 @@ RUN pnpm --filter "@platform/*" run build
 # Build the express-auth application
 RUN pnpm --filter @apps/express-auth run build
 
-# Create a production-only deployment using pnpm deploy
-# This prunes the workspace to only include express-auth and its dependencies
-RUN pnpm --filter @apps/express-auth deploy --prod /app/pruned
-
-# CRITICAL: Copy the built dist folder to the pruned directory
-# pnpm deploy doesn't copy build artifacts, only source and dependencies
-RUN cp -r /app/apps/express-auth/dist /app/pruned/dist
-
-# Prisma Client is generated with custom output to /app/node_modules/.prisma/client
-# This will be copied separately to the runner stage
-
 # ============================================
 # Stage 3: Runner - Production image
 # ============================================
@@ -77,17 +66,16 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 expressjs && \
   adduser --system --uid 1001 expressjs
 
-# Copy the pruned production dependencies
-# This includes @prisma/client runtime and all other production dependencies
-COPY --from=builder --chown=expressjs:expressjs /app/pruned ./
+# Copy the entire node_modules from builder
+# This preserves pnpm's symlink structure which is critical for Prisma Client runtime resolution
+COPY --from=builder --chown=expressjs:expressjs /app/node_modules ./node_modules
 
-# Copy the generated Prisma client from the builder stage
-# The custom output in schema.prisma generates to /app/node_modules/.prisma/client
-COPY --from=builder --chown=expressjs:expressjs /app/node_modules/.prisma ./node_modules/.prisma
+# Copy the built application
+COPY --from=builder --chown=expressjs:expressjs /app/apps/express-auth/dist ./dist
 
-# CRITICAL: Explicitly copy @prisma/client-runtime-utils from pnpm store
-# pnpm deploy doesn't properly preserve this symlinked dependency, so we copy it manually
-COPY --from=builder --chown=expressjs:expressjs /app/node_modules/.pnpm/@prisma+client-runtime-utils@7.2.0 ./node_modules/.pnpm/@prisma+client-runtime-utils@7.2.0
+# Copy necessary workspace files for runtime
+COPY --from=builder --chown=expressjs:expressjs /app/package.json ./package.json
+COPY --from=builder --chown=expressjs:expressjs /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
 # Switch to non-root user
 USER expressjs
