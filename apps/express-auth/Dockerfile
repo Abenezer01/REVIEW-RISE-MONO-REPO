@@ -69,10 +69,20 @@ RUN PRISMA_PATH=$(find /app -name .prisma -type d | head -n 1) && \
   if [ -z "$PRISMA_PATH" ]; then \
   echo "Error: .prisma directory not found"; \
   exit 1; \
-  fi && \
-  echo "Found .prisma at $PRISMA_PATH" && \
+  fi &&    echo "Found .prisma at $PRISMA_PATH" && \
   mkdir -p /app/pruned/node_modules/.prisma && \
   cp -r $PRISMA_PATH/* /app/pruned/node_modules/.prisma/
+
+# Copy the @prisma/client package explicitly to ensure runtime files are present
+# pnpm deploy might prune or symlink this incorrectly for Docker
+RUN CLIENT_PATH=$(find /app -path "*/@prisma/client" -type d | head -n 1) && \
+  if [ -z "$CLIENT_PATH" ]; then \
+  echo "Error: @prisma/client directory not found"; \
+  exit 1; \
+  fi && \
+  echo "Found @prisma/client at $CLIENT_PATH" && \
+  mkdir -p /app/pruned/node_modules/@prisma/client && \
+  cp -r $CLIENT_PATH/* /app/pruned/node_modules/@prisma/client/
 
 # ============================================
 # Stage 3: Runner - Production image
