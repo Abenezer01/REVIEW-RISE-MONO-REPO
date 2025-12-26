@@ -60,13 +60,9 @@ RUN pnpm --filter @apps/express-auth deploy --prod /app/pruned
 # pnpm deploy doesn't copy build artifacts, only source and dependencies
 RUN cp -r /app/apps/express-auth/dist /app/pruned/dist
 
-# Generate Prisma Client in the pruned directory
-# pnpm deploy doesn't run postinstall hooks, so we must explicitly generate the client
-# Copy prisma CLI from builder (where it's already installed) to run generate
-RUN cp -r /app/node_modules/.pnpm/prisma@*/node_modules/prisma /app/pruned/node_modules/.temp-prisma && \
-  cd /app/pruned && \
-  node ./node_modules/.temp-prisma/build/index.js generate --schema=./node_modules/@platform/db/prisma/schema.prisma && \
-  rm -rf ./node_modules/.temp-prisma
+# Generate Prisma Client in the builder stage (where all dependencies exist)
+# This is the official Prisma Docker pattern - generate once, then copy artifacts
+RUN npx prisma generate --schema=./packages/@platform/db/prisma/schema.prisma
 
 # ============================================
 # Stage 3: Runner - Production image
@@ -85,6 +81,11 @@ RUN addgroup --system --gid 1001 expressjs && \
 # Copy only the pruned production dependencies and built code (includes dist now)
 COPY --from=builder --chown=expressjs:expressjs /app/pruned ./
 COPY --from=builder --chown=expressjs:expressjs /app/apps/express-auth/dist ./dist
+
+# Copy the generated Prisma client from builder stage
+# This includes both .prisma (generated client) and @prisma (runtime)
+COPY --from=builder --chown=expressjs:expressjs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=expressjs:expressjs /app/node_modules/@prisma ./node_modules/@prisma
 
 # Switch to non-root user
 USER expressjs
