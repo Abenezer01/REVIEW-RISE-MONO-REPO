@@ -39,6 +39,7 @@ RUN pnpm --filter "@platform/db" run db:generate
 RUN pnpm --filter "@platform/*" run build || true
 RUN pnpm --filter @apps/express-social run build
 RUN pnpm --filter @apps/express-social deploy --prod /app/pruned
+RUN cp -r /app/apps/express-social/dist /app/pruned/dist
 
 # ============================================
 # Stage 3: Runner - Production image

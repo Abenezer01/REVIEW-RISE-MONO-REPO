@@ -38,6 +38,7 @@ RUN pnpm --filter "@platform/db" run db:generate
 RUN pnpm --filter "@platform/*" run build || true
 RUN pnpm --filter @apps/worker-jobs run build
 RUN pnpm --filter @apps/worker-jobs deploy --prod /app/pruned
+RUN cp -r /app/apps/worker-jobs/dist /app/pruned/dist
 
 # ============================================
 # Stage 3: Runner - Production image

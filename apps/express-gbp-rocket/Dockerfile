@@ -38,6 +38,7 @@ RUN pnpm --filter "@platform/db" run db:generate
 RUN pnpm --filter "@platform/*" run build || true
 RUN pnpm --filter @apps/express-gbp-rocket run build
 RUN pnpm --filter @apps/express-gbp-rocket deploy --prod /app/pruned
+RUN cp -r /app/apps/express-gbp-rocket/dist /app/pruned/dist
 
 # ============================================
 # Stage 3: Runner - Production image

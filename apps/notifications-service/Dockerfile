@@ -38,6 +38,7 @@ RUN pnpm --filter "@platform/db" run db:generate
 RUN pnpm --filter "@platform/*" run build || true
 RUN pnpm --filter @apps/notifications-service run build
 RUN pnpm --filter @apps/notifications-service deploy --prod /app/pruned
+RUN cp -r /app/apps/notifications-service/dist /app/pruned/dist
 
 # ============================================
 # Stage 3: Runner - Production image

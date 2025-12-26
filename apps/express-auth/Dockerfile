@@ -56,6 +56,10 @@ RUN pnpm --filter @apps/express-auth run build
 # This prunes the workspace to only include express-auth and its dependencies
 RUN pnpm --filter @apps/express-auth deploy --prod /app/pruned
 
+# CRITICAL: Copy the built dist folder to the pruned directory
+# pnpm deploy doesn't copy build artifacts, only source and dependencies
+RUN cp -r /app/apps/express-auth/dist /app/pruned/dist
+
 # ============================================
 # Stage 3: Runner - Production image
 # ============================================
@@ -70,9 +74,8 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 expressjs && \
     adduser --system --uid 1001 expressjs
 
-# Copy only the pruned production dependencies and built code
+# Copy only the pruned production dependencies and built code (includes dist now)
 COPY --from=builder --chown=expressjs:expressjs /app/pruned ./
-COPY --from=builder --chown=expressjs:expressjs /app/apps/express-auth/dist ./dist
 
 # Switch to non-root user
 USER expressjs

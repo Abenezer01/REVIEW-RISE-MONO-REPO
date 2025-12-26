@@ -39,6 +39,7 @@ RUN pnpm --filter "@platform/db" run db:generate
 RUN pnpm --filter "@platform/*" run build || true
 RUN pnpm --filter @apps/express-seo-health run build
 RUN pnpm --filter @apps/express-seo-health deploy --prod /app/pruned
+RUN cp -r /app/apps/express-seo-health/dist /app/pruned/dist
 
 # ============================================
 # Stage 3: Runner - Production image
