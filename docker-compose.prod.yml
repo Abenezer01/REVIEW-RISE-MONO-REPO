@@ -96,6 +96,7 @@ services:
       - reviewrise-network
     environment:
       - NODE_ENV=production
+      - PORT=3010
       - DATABASE_URL=${DATABASE_URL}
       - DATABASE_ADMIN_URL=${DATABASE_ADMIN_URL}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
@@ -129,6 +130,7 @@ services:
       - reviewrise-network
     environment:
       - NODE_ENV=production
+      - PORT=3006
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
     depends_on:
@@ -159,6 +161,7 @@ services:
       - reviewrise-network
     environment:
       - NODE_ENV=production
+      - PORT=3002
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
       - LLM_PROVIDER_API_KEY=${LLM_PROVIDER_API_KEY}
@@ -190,6 +193,7 @@ services:
       - reviewrise-network
     environment:
       - NODE_ENV=production
+      - PORT=3003
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
     depends_on:
@@ -220,6 +224,7 @@ services:
       - reviewrise-network
     environment:
       - NODE_ENV=production
+      - PORT=3004
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
     depends_on:
@@ -250,6 +255,7 @@ services:
       - reviewrise-network
     environment:
       - NODE_ENV=production
+      - PORT=3005
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
     depends_on:
@@ -280,6 +286,7 @@ services:
       - reviewrise-network
     environment:
       - NODE_ENV=production
+      - PORT=3007
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
     depends_on:
@@ -310,6 +317,7 @@ services:
       - reviewrise-network
     environment:
       - NODE_ENV=production
+      - PORT=3011
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
     depends_on:
@@ -340,6 +348,7 @@ services:
       - reviewrise-network
     environment:
       - NODE_ENV=production
+      - PORT=3012
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
     depends_on:
@@ -370,6 +379,7 @@ services:
       - reviewrise-network
     environment:
       - NODE_ENV=production
+      - PORT=3008
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
     depends_on:
