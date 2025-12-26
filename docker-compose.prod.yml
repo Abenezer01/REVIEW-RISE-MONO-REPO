@@ -87,6 +87,7 @@ services:
   # ==================================================
   
   express-auth:
+    image: ghcr.io/reviewrise/reviewrise-express-auth:staging
     build:
       context: .
       dockerfile: apps/express-auth/Dockerfile
@@ -121,6 +122,7 @@ services:
           memory: 256M
 
   express-reviews:
+    image: ghcr.io/reviewrise/reviewrise-express-reviews:staging
     build:
       context: .
       dockerfile: apps/express-reviews/Dockerfile
@@ -152,6 +154,7 @@ services:
           memory: 256M
 
   express-ai:
+    image: ghcr.io/reviewrise/reviewrise-express-ai:staging
     build:
       context: .
       dockerfile: apps/express-ai/Dockerfile
@@ -184,6 +187,7 @@ services:
           memory: 384M
 
   express-social:
+    image: ghcr.io/reviewrise/reviewrise-express-social:staging
     build:
       context: .
       dockerfile: apps/express-social/Dockerfile
@@ -215,6 +219,7 @@ services:
           memory: 256M
 
   express-gbp-rocket:
+    image: ghcr.io/reviewrise/reviewrise-express-gbp-rocket:staging
     build:
       context: .
       dockerfile: apps/express-gbp-rocket/Dockerfile
@@ -246,6 +251,7 @@ services:
           memory: 256M
 
   express-ad-rise:
+    image: ghcr.io/reviewrise/reviewrise-express-ad-rise:staging
     build:
       context: .
       dockerfile: apps/express-ad-rise/Dockerfile
@@ -277,6 +283,7 @@ services:
           memory: 256M
 
   express-brand:
+    image: ghcr.io/reviewrise/reviewrise-express-brand:staging
     build:
       context: .
       dockerfile: apps/express-brand/Dockerfile
@@ -308,6 +315,7 @@ services:
           memory: 256M
 
   express-seo-health:
+    image: ghcr.io/reviewrise/reviewrise-express-seo-health:staging
     build:
       context: .
       dockerfile: apps/express-seo-health/Dockerfile
@@ -339,6 +347,7 @@ services:
           memory: 256M
 
   express-admin-portal:
+    image: ghcr.io/reviewrise/reviewrise-express-admin-portal:staging
     build:
       context: .
       dockerfile: apps/express-admin-portal/Dockerfile
@@ -370,6 +379,7 @@ services:
           memory: 256M
 
   notifications-service:
+    image: ghcr.io/reviewrise/reviewrise-notifications-service:staging
     build:
       context: .
       dockerfile: apps/notifications-service/Dockerfile
@@ -401,6 +411,7 @@ services:
           memory: 256M
 
   worker-jobs:
+    image: ghcr.io/reviewrise/reviewrise-worker-jobs:staging
     build:
       context: .
       dockerfile: apps/worker-jobs/Dockerfile
@@ -429,6 +440,7 @@ services:
   # ==================================================
   
   next-web:
+    image: ghcr.io/reviewrise/reviewrise-next-web:staging
     build:
       context: .
       dockerfile: apps/next-web/Dockerfile
@@ -460,6 +472,7 @@ services:
           memory: 512M
 
   next-seo-landing:
+    image: ghcr.io/reviewrise/reviewrise-next-seo-landing:staging
     build:
       context: .
       dockerfile: apps/next-seo-landing/Dockerfile
@@ -491,6 +504,7 @@ services:
   # ==================================================
   
   nginx:
+    image: ghcr.io/reviewrise/reviewrise-nginx:staging
     build:
       context: ./nginx
       dockerfile: Dockerfile
