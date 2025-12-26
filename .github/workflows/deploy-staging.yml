@@ -147,6 +147,7 @@ jobs:
             
             # Fetch and Checkout staging branch
             git fetch origin
+            git reset --hard origin/staging
             git checkout staging
             git pull origin staging
             
