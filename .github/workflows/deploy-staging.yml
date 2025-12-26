@@ -128,7 +128,7 @@ jobs:
           VPS_USER: ${{ secrets.VPS_USER }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
-          ssh -A -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "export GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}'; export GITHUB_ACTOR='${{ github.actor }}'; bash -s" << 'EOF'
+          ssh -A -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "export GITHUB_TOKEN='${{ secrets.GHCR_PAT }}'; export GITHUB_ACTOR='${{ github.actor }}'; bash -s" << 'EOF'
             set -e
             
             # Ensure deploy directory exists
@@ -158,15 +158,22 @@ jobs:
             # docker compose -f docker-compose.prod.yml pull <--- REMOVED: Script handles this after login
             
              # ==============================================================================
-             # INLINE DOCKER LOGIN (Failsafe)
+             # INLINE DOCKER LOGIN using GHCR_PAT
              # ==============================================================================
-            echo "Logging into GHCR (Inline)..."
+            echo "Logging into GHCR with PAT..."
             if [ -n "$GITHUB_TOKEN" ] && [ -n "$GITHUB_ACTOR" ]; then
                 # Ensure lowercase actor
                 LOWER_ACTOR=$(echo "$GITHUB_ACTOR" | tr '[:upper:]' '[:lower:]')
-                echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$LOWER_ACTOR" --password-stdin || echo "Inline login failed, hope script works"
+                echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$LOWER_ACTOR" --password-stdin || echo "Inline login failed"
+                if [ $? -eq 0 ]; then
+                    echo "✓ Successfully authenticated with GHCR"
+                else
+                    echo "✗ Failed to authenticate with GHCR"
+                    exit 1
+                fi
             else
                 echo "GITHUB_TOKEN or ACTOR missing for inline login"
+                exit 1
             fi
             # ==============================================================================
             
