@@ -3,6 +3,7 @@ import { keywordRepository, keywordRankRepository, locationRepository, rankTrack
 import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 import type {
   CreateKeywordDTO,
+  HarvestCompetitorDTO,
   UpdateKeywordDTO,
 } from '@platform/contracts';
 
