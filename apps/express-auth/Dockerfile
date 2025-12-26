@@ -62,8 +62,11 @@ RUN cp -r /app/apps/express-auth/dist /app/pruned/dist
 
 # Generate Prisma Client in the pruned directory
 # pnpm deploy doesn't run postinstall hooks, so we must explicitly generate the client
-# This creates .prisma/client with proper runtime links to @prisma/client
-RUN cd /app/pruned && pnpm exec prisma generate --schema=./node_modules/@platform/db/prisma/schema.prisma
+# Copy prisma CLI from builder (where it's already installed) to run generate
+RUN cp -r /app/node_modules/.pnpm/prisma@*/node_modules/prisma /app/pruned/node_modules/.temp-prisma && \
+  cd /app/pruned && \
+  node ./node_modules/.temp-prisma/build/index.js generate --schema=./node_modules/@platform/db/prisma/schema.prisma && \
+  rm -rf ./node_modules/.temp-prisma
 
 # ============================================
 # Stage 3: Runner - Production image
