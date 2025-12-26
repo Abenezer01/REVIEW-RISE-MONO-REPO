@@ -155,7 +155,20 @@ jobs:
             git pull origin staging
             
             # Pull latest Docker images
-            docker compose -f docker-compose.prod.yml pull
+            # docker compose -f docker-compose.prod.yml pull <--- REMOVED: Script handles this after login
+            
+             # ==============================================================================
+             # INLINE DOCKER LOGIN (Failsafe)
+             # ==============================================================================
+            echo "Logging into GHCR (Inline)..."
+            if [ -n "$GITHUB_TOKEN" ] && [ -n "$GITHUB_ACTOR" ]; then
+                # Ensure lowercase actor
+                LOWER_ACTOR=$(echo "$GITHUB_ACTOR" | tr '[:upper:]' '[:lower:]')
+                echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$LOWER_ACTOR" --password-stdin || echo "Inline login failed, hope script works"
+            else
+                echo "GITHUB_TOKEN or ACTOR missing for inline login"
+            fi
+            # ==============================================================================
             
             # --- STAGING RESET (For Initial Setup) ---
             # Remove this block after first successful deployment!
