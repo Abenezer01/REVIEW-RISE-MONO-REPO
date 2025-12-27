@@ -196,7 +196,7 @@ log_info "Verifying service health endpoints..."
 sleep 10
 
 # Test Nginx health
-if curl -f http://localhost/health > /dev/null 2>&1; then
+if curl -f http://127.0.0.1/health > /dev/null 2>&1; then
     log_info "Nginx health check passed ✓"
 else
     log_error "Nginx health check failed!"
