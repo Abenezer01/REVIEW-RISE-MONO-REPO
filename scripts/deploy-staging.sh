@@ -120,8 +120,9 @@ log_info "Running database migrations..."
 
 # Run migrations using the db package's migrate:deploy script
 # This uses db-admin.ts which properly handles DATABASE_ADMIN_URL
+# Use express-auth since next-web standalone doesn't have full workspace
 docker compose -f "$COMPOSE_FILE" run --rm \
-    next-web \
+    express-auth \
     sh -c "cd /app && pnpm --filter @platform/db run db:migrate:deploy" || {
     log_error "Database migration failed!"
     log_warn "You can rollback using: ./scripts/rollback-staging.sh $TIMESTAMP"
@@ -138,7 +139,7 @@ if [[ "$*" == *"--seed"* ]]; then
     log_info "Seeding database..."
     
     docker compose -f "$COMPOSE_FILE" run --rm \
-        next-web \
+        express-auth \
         sh -c "cd /app && pnpm --filter @platform/db run db:seed" || {
         log_warn "Database seeding failed (non-fatal)"
     }
