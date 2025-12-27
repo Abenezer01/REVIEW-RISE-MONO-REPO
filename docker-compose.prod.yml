@@ -501,10 +501,10 @@ services:
   # ==================================================
 
   nginx:
-    image: ghcr.io/reviewrise/reviewrise-nginx:staging
-    # build:
-    #   context: .
-    #   dockerfile: nginx/Dockerfile
+    # image: ghcr.io/reviewrise/reviewrise-nginx:staging
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
     container_name: reviewrise-nginx
     restart: unless-stopped
     networks:
