@@ -105,4 +105,4 @@ ENTRYPOINT ["dumb-init", "--"]
 WORKDIR /app/apps/express-gbp-rocket
 
 # Start the application using the built file in dist
-CMD ["node", "dist/apps/express-gbp-rocket/src/index.js"]
+CMD ["node", "dist/index.js"]

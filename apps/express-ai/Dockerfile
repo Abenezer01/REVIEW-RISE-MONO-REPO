@@ -105,4 +105,4 @@ ENTRYPOINT ["dumb-init", "--"]
 WORKDIR /app/apps/express-ai
 
 # Start the application using the built file in dist
-CMD ["node", "dist/apps/express-ai/src/index.js"]
+CMD ["node", "dist/index.js"]

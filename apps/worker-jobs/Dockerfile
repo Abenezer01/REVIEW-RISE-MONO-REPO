@@ -104,4 +104,4 @@ ENTRYPOINT ["dumb-init", "--"]
 WORKDIR /app/apps/worker-jobs
 
 # Start the application using the built file in dist
-CMD ["node", "dist/apps/worker-jobs/src/index.js"]
+CMD ["node", "dist/index.js"]

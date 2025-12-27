@@ -105,4 +105,4 @@ ENTRYPOINT ["dumb-init", "--"]
 WORKDIR /app/apps/express-ad-rise
 
 # Start the application using the built file in dist
-CMD ["node", "dist/apps/express-ad-rise/src/index.js"]
+CMD ["node", "dist/index.js"]
