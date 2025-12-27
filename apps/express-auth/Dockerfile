@@ -80,6 +80,9 @@ COPY --from=builder --chown=expressjs:expressjs /app/apps/express-auth ./apps/ex
 # Copy shared packages (including their node_modules and dist) to satisfy symlinks
 COPY --from=builder --chown=expressjs:expressjs /app/packages ./packages
 
+# Verify auth dist exists in Runner stage
+RUN ls -la packages/@platform/auth/dist && test -f packages/@platform/auth/dist/index.js || (echo "CRITICAL: Auth dist missing in RUNNER stage" && exit 1)
+
 # Copy workspace config
 COPY --from=builder --chown=expressjs:expressjs /app/package.json ./package.json
 COPY --from=builder --chown=expressjs:expressjs /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
