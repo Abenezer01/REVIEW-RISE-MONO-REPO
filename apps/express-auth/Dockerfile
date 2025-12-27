@@ -117,4 +117,4 @@ ENTRYPOINT ["dumb-init", "--"]
 WORKDIR /app/apps/express-auth
 
 # Start the application using the built file in dist
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/apps/express-auth/src/index.js"]
