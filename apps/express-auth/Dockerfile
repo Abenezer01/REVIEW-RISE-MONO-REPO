@@ -75,6 +75,7 @@ FROM node:20-alpine AS runner
 
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
+RUN corepack enable && corepack prepare pnpm@9 --activate
 
 WORKDIR /app
 

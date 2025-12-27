@@ -51,6 +51,7 @@ RUN pnpm --filter @apps/next-web run build
 FROM node:20-alpine AS runner
 
 RUN apk add --no-cache dumb-init libc6-compat
+RUN corepack enable && corepack prepare pnpm@9 --activate
 
 WORKDIR /app
 
@@ -58,7 +59,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+  adduser --system --uid 1001 nextjs
 
 # Copy public assets
 COPY --from=builder /app/apps/next-web/public ./public
