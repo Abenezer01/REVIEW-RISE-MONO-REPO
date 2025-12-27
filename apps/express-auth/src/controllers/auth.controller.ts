@@ -473,3 +473,26 @@ export const resendVerificationEmail = async (req: Request, res: Response) => {
         );
     }
 };
+
+export const logout = async (req: Request, res: Response) => {
+    try {
+        const { refreshToken } = req.body;
+
+        if (refreshToken) {
+            const session = await sessionRepository.findSession(refreshToken);
+            if (session) {
+                await sessionRepository.deleteSession(session.id);
+            }
+        }
+
+        res.status(200).json(
+            createSuccessResponse({}, 'Logged out successfully')
+        );
+    } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Logout error:', error);
+        res.status(500).json(
+            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
+        );
+    }
+};
