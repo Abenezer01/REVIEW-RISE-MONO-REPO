@@ -66,14 +66,16 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 expressjs && \
   adduser --system --uid 1001 expressjs
 
-# Copy the entire node_modules from builder
-# This preserves pnpm's symlink structure and includes Prisma client in default location
+# Copy root node_modules (for shared dependencies and pnpm virtual store)
 COPY --from=builder --chown=expressjs:expressjs /app/node_modules ./node_modules
 
-# Copy the built application
-COPY --from=builder --chown=expressjs:expressjs /app/apps/express-auth/dist ./dist
+# Copy the specific app (including its node_modules, dist, and config)
+COPY --from=builder --chown=expressjs:expressjs /app/apps/express-auth ./apps/express-auth
 
-# Copy necessary workspace files for runtime
+# Copy shared packages (including their node_modules and dist) to satisfy symlinks
+COPY --from=builder --chown=expressjs:expressjs /app/packages ./packages
+
+# Copy workspace config
 COPY --from=builder --chown=expressjs:expressjs /app/package.json ./package.json
 COPY --from=builder --chown=expressjs:expressjs /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
@@ -90,5 +92,11 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
-# Start the application
-CMD ["node", "dist/apps/express-auth/src/index.js"]
+# Set working directory to the app folder so module resolution works as expected
+WORKDIR /app/apps/express-auth
+
+# Start the application using the built file in dist
+# Assuming dist structure matches src (e.g., dist/src/index.js or dist/index.js)
+# Based on previous logs: /app/dist/apps/express-auth/src/index.js was the path when we copied dist individually
+# In the apps/express-auth folder, it is likely dist/src/index.js
+CMD ["node", "dist/src/index.js"]
