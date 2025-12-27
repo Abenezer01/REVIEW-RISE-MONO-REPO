@@ -312,10 +312,10 @@ services:
           memory: 256M
 
   express-seo-health:
-    image: ghcr.io/reviewrise/reviewrise-express-seo-health:staging
-    # build:
-    #   context: .
-    #   dockerfile: apps/express-seo-health/Dockerfile
+    # image: ghcr.io/reviewrise/reviewrise-express-seo-health:staging
+    build:
+      context: .
+      dockerfile: apps/express-seo-health/Dockerfile
     container_name: reviewrise-express-seo-health
     restart: unless-stopped
     networks:
@@ -344,10 +344,10 @@ services:
           memory: 256M
 
   express-admin-portal:
-    image: ghcr.io/reviewrise/reviewrise-express-admin-portal:staging
-    # build:
-    #   context: .
-    #   dockerfile: apps/express-admin-portal/Dockerfile
+    # image: ghcr.io/reviewrise/reviewrise-express-admin-portal:staging
+    build:
+      context: .
+      dockerfile: apps/express-admin-portal/Dockerfile
     container_name: reviewrise-express-admin-portal
     restart: unless-stopped
     networks:
@@ -376,10 +376,10 @@ services:
           memory: 256M
 
   notifications-service:
-    image: ghcr.io/reviewrise/reviewrise-notifications-service:staging
-    # build:
-    #   context: .
-    #   dockerfile: apps/notifications-service/Dockerfile
+    # image: ghcr.io/reviewrise/reviewrise-notifications-service:staging
+    build:
+      context: .
+      dockerfile: apps/notifications-service/Dockerfile
     container_name: reviewrise-notifications
     restart: unless-stopped
     networks:
@@ -408,10 +408,10 @@ services:
           memory: 256M
 
   worker-jobs:
-    image: ghcr.io/reviewrise/reviewrise-worker-jobs:staging
-    # build:
-    #   context: .
-    #   dockerfile: apps/worker-jobs/Dockerfile
+    # image: ghcr.io/reviewrise/reviewrise-worker-jobs:staging
+    build:
+      context: .
+      dockerfile: apps/worker-jobs/Dockerfile
     container_name: reviewrise-worker
     restart: unless-stopped
     networks:
