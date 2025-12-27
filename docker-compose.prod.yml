@@ -470,9 +470,9 @@ services:
 
   next-seo-landing:
     image: ghcr.io/reviewrise/reviewrise-next-seo-landing:staging
-    # build:
-    #   context: .
-    #   dockerfile: apps/next-seo-landing/Dockerfile
+    build:
+      context: .
+      dockerfile: apps/next-seo-landing/Dockerfile
     container_name: reviewrise-next-seo-landing
     restart: unless-stopped
     networks:
