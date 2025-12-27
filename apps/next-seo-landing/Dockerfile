@@ -54,7 +54,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs && \
   adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/apps/next-seo-landing/public ./public
+# Copy public assets to the correct location for standalone
+COPY --from=builder /app/apps/next-seo-landing/public ./apps/next-seo-landing/public
 
 COPY --from=builder --chown=nextjs:nodejs /app/apps/next-seo-landing/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/next-seo-landing/.next/static ./apps/next-seo-landing/.next/static

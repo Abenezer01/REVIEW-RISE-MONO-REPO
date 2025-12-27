@@ -61,8 +61,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs && \
   adduser --system --uid 1001 nextjs
 
-# Copy public assets
-COPY --from=builder /app/apps/next-web/public ./public
+# Copy public assets to the correct location for standalone
+COPY --from=builder /app/apps/next-web/public ./apps/next-web/public
 
 # Copy standalone output (this includes minimal node_modules)
 COPY --from=builder --chown=nextjs:nodejs /app/apps/next-web/.next/standalone ./
