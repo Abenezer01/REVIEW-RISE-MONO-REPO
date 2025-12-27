@@ -21,5 +21,10 @@ if [ -n "$DATABASE_APP_URL" ]; then
     export DATABASE_URL="$DATABASE_APP_URL"
 fi
 
-# Start the main application with dumb-init
-exec dumb-init -- node dist/index.js
+# If arguments are provided (e.g. running a script), execute them
+if [ $# -gt 0 ]; then
+    exec dumb-init -- "$@"
+else
+    # Otherwise start the main application
+    exec dumb-init -- node dist/index.js
+fi
