@@ -33,7 +33,24 @@ function getCTRForPosition(position: number): number {
 
 export class VisibilityComputationService {
   /**
-   * Compute Map Pack visibility percentage
+   * Compute Map Pack Visibility Percentage
+   * 
+   * Calculates what percentage of tracked keywords trigger a Google Map Pack (Local Pack)
+   * result where the business appears. The Map Pack is the box with a map and 3 business
+   * listings that appears for local searches.
+   * 
+   * Formula: (Keywords with Map Pack appearance / Total tracked keywords) × 100
+   * 
+   * @param businessId - The business to analyze
+   * @param locationId - Specific location filter (null = all locations)
+   * @param startDate - Start of analysis period
+   * @param endDate - End of analysis period
+   * @returns Object containing map pack appearances count, total keywords, and visibility percentage
+   * 
+   * @example
+   * // Business appears in Map Pack for 45 out of 100 tracked keywords
+   * const result = await computeMapPackVisibility('biz-123', null, startDate, endDate);
+   * // Returns: { mapPackAppearances: 45, totalTrackedKeywords: 100, mapPackVisibility: 45.0 }
    */
   async computeMapPackVisibility(
     businessId: string,
@@ -80,7 +97,26 @@ export class VisibilityComputationService {
   }
 
   /**
-   * Compute organic presence in top 3, 10, and 20
+   * Compute Organic Presence in Top Positions
+   * 
+   * Counts how many keywords rank in premium organic positions:
+   * - Top 3: Positions 1-3 (captures ~60% of all clicks)
+   * - Top 10: Positions 1-10 (first page, captures ~90% of clicks)
+   * - Top 20: Positions 1-20 (first two pages)
+   * 
+   * This provides a quick snapshot of overall ranking performance and helps
+   * identify opportunities to move keywords from page 2 to page 1, or from
+   * lower page 1 positions to top 3.
+   * 
+   * @param businessId - The business to analyze
+   * @param locationId - Specific location filter (null = all locations)
+   * @param startDate - Start of analysis period
+   * @param endDate - End of analysis period
+   * @returns Object with counts for top 3, top 10, and top 20 positions
+   * 
+   * @example
+   * const result = await computeOrganicPresence('biz-123', null, startDate, endDate);
+   * // Returns: { top3Count: 12, top10Count: 34, top20Count: 56 }
    */
   async computeOrganicPresence(
     businessId: string,
@@ -114,7 +150,45 @@ export class VisibilityComputationService {
   }
 
   /**
-   * Compute Share of Voice (weighted by search volume)
+   * Compute Share of Voice (SoV) - CTR-Weighted Visibility Metric
+   * 
+   * Calculates the percentage of total search visibility you own in your market.
+   * Unlike simple rank tracking, SoV accounts for:
+   * 1. Search Volume: High-volume keywords contribute more to your score
+   * 2. Click-Through Rate: Better positions get exponentially more clicks
+   * 3. Market Opportunity: Your visibility relative to total potential
+   * 
+   * Formula: Σ(Search Volume × CTR for Position) / Σ(Search Volume) × 100
+   * 
+   * Where CTR is based on industry-standard click-through rates:
+   * - Position 1: 31.4% CTR
+   * - Position 2: 15.6% CTR
+   * - Position 3: 10.0% CTR
+   * - Positions 4-10: Decreasing CTR
+   * - Beyond 10: Exponential decay
+   * 
+   * @param businessId - The business to analyze
+   * @param locationId - Specific location filter (null = all locations)
+   * @param startDate - Start of analysis period
+   * @param endDate - End of analysis period
+   * @returns Object with overall SoV percentage and per-keyword breakdown
+   * 
+   * @example
+   * // Business with 23.4% Share of Voice
+   * const result = await computeShareOfVoice('biz-123', null, startDate, endDate);
+   * // Returns: {
+   * //   shareOfVoice: 23.4,
+   * //   breakdown: [
+   * //     { keyword: 'emergency plumber', searchVolume: 5000, position: 2, contribution: 780 },
+   * //     { keyword: '24hr plumber', searchVolume: 2000, position: 1, contribution: 628 },
+   * //     ...
+   * //   ]
+   * // }
+   * 
+   * @remarks
+   * This is the most important visibility metric as it correlates directly with
+   * actual traffic and revenue. A 10% increase in SoV typically means 10% more
+   * organic traffic.
    */
   async computeShareOfVoice(
     businessId: string,
@@ -180,8 +254,8 @@ export class VisibilityComputationService {
     }
 
     // Share of Voice is the percentage of potential traffic we're capturing
-    const shareOfVoice = totalSearchVolume > 0 
-      ? (totalWeightedCTR / totalSearchVolume) * 100 
+    const shareOfVoice = totalSearchVolume > 0
+      ? (totalWeightedCTR / totalSearchVolume) * 100
       : 0;
 
     // Sort breakdown by contribution (highest first)
@@ -191,7 +265,30 @@ export class VisibilityComputationService {
   }
 
   /**
-   * Track SERP feature presence
+   * Track SERP Feature Presence
+   * 
+   * Counts how many keywords trigger special Google search features where your
+   * business appears. SERP features get premium placement and higher visibility:
+   * 
+   * - Featured Snippets: "Position 0" answer boxes at the top
+   * - Local Pack: Map with 3 business listings
+   * - People Also Ask: Expandable question boxes
+   * - Knowledge Panel: Information box on the right side
+   * - Image Pack: Grid of images
+   * - Video Carousel: Row of video results
+   * 
+   * These features often appear above traditional organic results and can
+   * significantly increase click-through rates.
+   * 
+   * @param businessId - The business to analyze
+   * @param locationId - Specific location filter (null = all locations)
+   * @param startDate - Start of analysis period
+   * @param endDate - End of analysis period
+   * @returns Object with counts for each SERP feature type
+   * 
+   * @example
+   * const result = await trackSerpFeatures('biz-123', null, startDate, endDate);
+   * // Returns: { featuredSnippetCount: 5, localPackCount: 23 }
    */
   async trackSerpFeatures(
     businessId: string,
@@ -226,7 +323,39 @@ export class VisibilityComputationService {
   }
 
   /**
-   * Compute all metrics and store in database
+   * Compute All Visibility Metrics and Store in Database
+   * 
+   * Orchestrates the complete visibility computation pipeline:
+   * 1. Computes Map Pack Visibility
+   * 2. Computes Organic Presence (Top 3/10/20)
+   * 3. Computes Share of Voice (CTR-weighted)
+   * 4. Tracks SERP Features
+   * 5. Stores all results in VisibilityMetric table
+   * 
+   * This method is called by scheduled background jobs (daily, weekly, monthly)
+   * to keep visibility metrics up-to-date. It uses parallel execution for
+   * performance and handles errors gracefully.
+   * 
+   * @param businessId - The business to analyze
+   * @param locationId - Specific location filter (null = business-wide metrics)
+   * @param periodType - Granularity: 'daily', 'weekly', or 'monthly'
+   * @param periodStart - Start of the period
+   * @param periodEnd - End of the period
+   * @throws Error if computation or database storage fails
+   * 
+   * @example
+   * // Compute daily metrics for December 28, 2025
+   * await computeAllMetrics(
+   *   'biz-123',
+   *   null,
+   *   'daily',
+   *   new Date('2025-12-28'),
+   *   new Date('2025-12-28')
+   * );
+   * 
+   * @remarks
+   * The method uses upsert logic, so running it multiple times for the same
+   * period will update existing records rather than creating duplicates.
    */
   async computeAllMetrics(
     businessId: string,
@@ -277,7 +406,34 @@ export class VisibilityComputationService {
   }
 
   /**
-   * Compute metrics for all active businesses
+   * Compute Metrics for All Active Businesses
+   * 
+   * Batch processes visibility metrics for all businesses in the system.
+   * This is typically called by a scheduled job to compute metrics for
+   * all customers at once (e.g., nightly batch job).
+   * 
+   * The implementation should:
+   * 1. Query all businesses with active keyword tracking
+   * 2. For each business, call computeAllMetrics()
+   * 3. Handle errors gracefully (log and continue with other businesses)
+   * 4. Provide progress reporting for monitoring
+   * 
+   * @param periodType - Granularity: 'daily', 'weekly', or 'monthly'
+   * @param periodStart - Start of the period
+   * @param periodEnd - End of the period
+   * 
+   * @example
+   * // Compute daily metrics for all businesses for yesterday
+   * const yesterday = new Date();
+   * yesterday.setDate(yesterday.getDate() - 1);
+   * await computeMetricsForAllBusinesses('daily', yesterday, yesterday);
+   * 
+   * @remarks
+   * This is a placeholder implementation. In production, it should:
+   * - Use pagination to avoid memory issues with large datasets
+   * - Implement retry logic for failed computations
+   * - Send alerts if computation fails for critical customers
+   * - Track execution time and performance metrics
    */
   async computeMetricsForAllBusinesses(
     periodType: 'daily' | 'weekly' | 'monthly',

@@ -10,9 +10,10 @@
     "test": "jest --passWithNoTests"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@platform/auth": "workspace:*",
-    "@platform/db": "workspace:*",
     "@platform/contracts": "workspace:*",
+    "@platform/db": "workspace:*",
     "@types/lodash": "^4.17.21",
     "axios": "^1.6.5",
     "cheerio": "^1.0.0-rc.12",
@@ -23,6 +24,7 @@
     "helmet": "^7.1.0",
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
+    "openai": "^6.15.0",
     "robots-parser": "^3.0.1",
     "zod": "^3.22.4"
   },

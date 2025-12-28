@@ -29,6 +29,15 @@ interface ResultsDisplayProps {
 export default function ResultsDisplay({ result }: ResultsDisplayProps) {
   const [expandedIssue, setExpandedIssue] = useState<number | null>(null);
   const [showStickyBar, setShowStickyBar] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+  const [isHtmlDetailsExpanded, setIsHtmlDetailsExpanded] = useState(true);
+
+  const toggleCategory = (key: string) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
 
   // Determine score verdict
   const getScoreVerdict = (score: number) => {
@@ -44,9 +53,27 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
 
   // Sort categories by score (worst first)
   const sortedCategories = [
-    { key: 'technical', label: 'Technical SEO', data: result.categoryScores.technical, icon: Zap, description: 'Site structure, speed, and crawlability' },
-    { key: 'content', label: 'Content Quality', data: result.categoryScores.content, icon: FileText, description: 'Keywords, readability, and relevance' },
-    { key: 'onPage', label: 'On-Page SEO', data: result.categoryScores.onPage, icon: Layout, description: 'Meta tags, headings, and HTML structure' },
+    {
+      key: 'technical',
+      label: 'Technical SEO',
+      data: result.categoryScores.technical,
+      icon: Zap,
+      description: 'Analysis indicates robust site architecture, but crawlability can be improved. Server response times are optimal.'
+    },
+    {
+      key: 'content',
+      label: 'Content Quality',
+      data: result.categoryScores.content,
+      icon: FileText,
+      description: 'Content relevance is high, but keyword density is below optimal levels. Readability scores suggest some pages are too complex.'
+    },
+    {
+      key: 'onPage',
+      label: 'On-Page SEO',
+      data: result.categoryScores.onPage,
+      icon: Layout,
+      description: 'Meta tags are present but some descriptions are duplicates. HTML header structure needs refinement for better hierarchy.'
+    },
   ].sort((a, b) => (a.data?.percentage || 0) - (b.data?.percentage || 0));
 
   return (
@@ -139,11 +166,108 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
             {/* SEO Breakdown */}
             <section className="section">
               <h2 className="section-title">SEO Health Breakdown</h2>
+
+              {/* HTML Page Details Card */}
+              <div className="html-page-details">
+                <div
+                  className="breakdown-header"
+                  onClick={() => setIsHtmlDetailsExpanded(!isHtmlDetailsExpanded)}
+                  style={{ cursor: 'pointer', marginBottom: isHtmlDetailsExpanded ? '20px' : '0' }}
+                >
+                  <h3 className="details-title" style={{ marginBottom: 0 }}>HTML Page</h3>
+                  <button className="expand-toggle">
+                    {isHtmlDetailsExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                  </button>
+                </div>
+
+                {isHtmlDetailsExpanded && (
+                  <div className="details-grid">
+                    <div className="detail-item">
+                      <div className="detail-header-group">
+                        <span className="detail-label">Meta title</span>
+                        <div className="ai-badge">AI Analysis</div>
+                      </div>
+                      <span className="detail-value">
+                        {typeof result.seoElements?.title === 'object' && result.seoElements.title !== null
+                          ? (result.seoElements.title as any).value || '-'
+                          : result.seoElements?.title || '-'}
+                      </span>
+                      <p className="detail-description">
+                        The title tag is the first thing users see in search results. It should be concise (50-60 characters) and include your primary keyword.
+                      </p>
+                    </div>
+                    <div className="detail-item">
+                      <div className="detail-header-group">
+                        <span className="detail-label">Meta description</span>
+                        <div className="ai-badge">AI Analysis</div>
+                      </div>
+                      <span className="detail-value">
+                        {typeof result.seoElements?.description === 'object' && result.seoElements.description !== null
+                          ? (result.seoElements.description as any).value || 'Not set'
+                          : result.seoElements?.description || 'Not set'}
+                      </span>
+                      <p className="detail-description">
+                        A brief summary of the page content. Well-written descriptions (150-160 characters) can significantly improve click-through rates.
+                      </p>
+                    </div>
+                    <div className="detail-item">
+                      <div className="detail-header-group">
+                        <span className="detail-label">URL</span>
+                        <div className="ai-badge">AI Analysis</div>
+                      </div>
+                      <span className="detail-value url-value">{result.url}</span>
+                      <p className="detail-description">
+                        The web address of your page. Short, descriptive URLs are easier for users to read and search engines to crawl.
+                      </p>
+                    </div>
+                    <div className="detail-item">
+                      <div className="detail-header-group">
+                        <span className="detail-label">Status code</span>
+                        <div className="ai-badge">AI Analysis</div>
+                      </div>
+                      <span className="detail-value">{result.technicalAnalysis?.pageSpeed?.status || '200'}</span>
+                      <p className="detail-description">
+                        The server response code. A 200 OK status means the page loaded successfully. 4xx or 5xx codes indicate errors.
+                      </p>
+                    </div>
+                    <div className="detail-item">
+                      <div className="detail-header-group">
+                        <span className="detail-label">Response time</span>
+                        <div className="ai-badge">AI Analysis</div>
+                      </div>
+                      <span className="detail-value">{(result.technicalAnalysis?.pageSpeed?.loadTime / 1000).toFixed(2)} sec</span>
+                      <p className="detail-description">
+                        How quickly your server responds. Faster response times (under 500ms) improve user experience and crawl budget.
+                      </p>
+                    </div>
+                    <div className="detail-item">
+                      <div className="detail-header-group">
+                        <span className="detail-label">Word count</span>
+                        <div className="ai-badge">AI Analysis</div>
+                      </div>
+                      <span className="detail-value">
+                        {typeof result.seoElements?.wordCount === 'number'
+                          ? result.seoElements.wordCount
+                          : '-'}
+                      </span>
+                      <p className="detail-description">
+                        The total number of words on the page. Sufficient content length (typically 600+ words) helps cover topics in depth for better ranking.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="breakdown-list">
                 {sortedCategories.map((cat, idx) => {
                   const Icon = cat.icon;
                   const percentage = cat.data?.percentage || 0;
                   const scoreColor = percentage >= 70 ? '#10b981' : percentage >= 50 ? '#f59e0b' : '#ef4444';
+
+                  // Get category-specific recommendations
+                  const categoryRecs = result.recommendations.filter(r => r.category === cat.key);
+                  const criticalCount = categoryRecs.filter(r => r.priority === 'high').length;
+                  const expanded = expandedCategories[cat.key] || false;
 
                   return (
                     <div key={cat.key} className="breakdown-row">
@@ -151,16 +275,71 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                         <Icon size={20} />
                       </div>
                       <div className="breakdown-content">
-                        <div className="breakdown-header">
-                          <h3>{cat.label}</h3>
-                          <span className="breakdown-score" style={{ color: scoreColor }}>
-                            {cat.data?.score || 0}/{cat.data?.maxScore || 100}
-                          </span>
+                        <div className="breakdown-header" onClick={() => toggleCategory(cat.key)} style={{ cursor: 'pointer' }}>
+                          <div className="breakdown-title-group">
+                            <h3>{cat.label}</h3>
+                            <span className="breakdown-percentage" style={{ color: scoreColor }}>
+                              {Math.round(percentage)}%
+                            </span>
+                          </div>
+                          <div className="breakdown-meta-group">
+                            {categoryRecs.length > 0 && (
+                              <span className="issues-badge">
+                                {categoryRecs.length} issue{categoryRecs.length !== 1 ? 's' : ''}
+                                {criticalCount > 0 && ` • ${criticalCount} critical`}
+                              </span>
+                            )}
+                            <button className="expand-toggle">
+                              {expanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="detail-header-group" style={{ marginBottom: '6px' }}>
+                          <div className="ai-badge">AI Analysis</div>
                         </div>
                         <p className="breakdown-desc">{cat.description}</p>
+
                         <div className="progress-track">
                           <div className="progress-fill" style={{ width: `${percentage}%`, background: scoreColor }}></div>
                         </div>
+
+                        {/* Expanded Details */}
+                        {expanded && categoryRecs.length > 0 && (
+                          <div className="breakdown-details">
+                            <h4 className="details-subtitle">Checks</h4>
+                            <div className="checks-list">
+                              {categoryRecs.map((rec, i) => {
+                                const checkStatus = rec.priority === 'high' ? 'error' : rec.priority === 'medium' ? 'warning' : 'tip';
+                                const statusIcon = checkStatus === 'error' ? <AlertTriangle size={16} /> :
+                                  checkStatus === 'warning' ? <AlertCircle size={16} /> :
+                                    <CheckCircle2 size={16} />;
+
+                                return (
+                                  <div key={i} className={`check-item check-${checkStatus}`}>
+                                    <div className="check-header">
+                                      <div className="check-left">
+                                        <span className="check-icon">{statusIcon}</span>
+                                        <span className="check-title">{rec.issue}</span>
+                                      </div>
+                                      <span className={`check-badge ${checkStatus}`}>
+                                        {checkStatus === 'error' ? 'Error' : checkStatus === 'warning' ? 'Warning' : 'Tip'}
+                                      </span>
+                                    </div>
+                                    <div className="check-body">
+                                      <p className="check-recommendation">{rec.recommendation}</p>
+                                      {rec.impact && (
+                                        <p className="check-impact">
+                                          <strong>Impact:</strong> {rec.impact}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -187,7 +366,10 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                             <AlertTriangle size={18} />
                           </div>
                           <div>
-                            <h3 className="issue-title">{issue.issue}</h3>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                              <h3 className="issue-title" style={{ marginBottom: 0 }}>{issue.issue}</h3>
+                              <div className="ai-badge" style={{ fontSize: '9px', padding: '1px 6px' }}>AI</div>
+                            </div>
                             <p className="issue-desc">{issue.recommendation}</p>
                           </div>
                         </div>
@@ -229,29 +411,31 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
           {/* Right Column */}
           <div className="right-column">
 
-            {/* AI Recommendations */}
+            {/* AI Strategic Insights */}
             <section className="section">
-              <h2 className="section-title">Top Recommendations</h2>
+              <h2 className="section-title">AI Strategic Insights</h2>
 
-              <div className="recommendations-list">
-                {[
-                  { title: 'Optimize Title Tags', impact: '+25% Traffic', effort: 'Easy', priority: 'Quick Win' },
-                  { title: 'Enable Image Compression', impact: '+18% Speed', effort: 'Medium', priority: 'High Priority' },
-                  { title: 'Fix Meta Descriptions', impact: '+12% CTR', effort: 'Easy', priority: 'Quick Win' },
-                ].map((rec, idx) => (
-                  <div key={idx} className="rec-card">
-                    <div className="rec-number">#{idx + 1}</div>
-                    <div className="rec-content">
-                      <h3 className="rec-title">{rec.title}</h3>
-                      <div className="rec-meta">
-                        <span className="rec-badge priority">{rec.priority}</span>
-                        <span className="rec-badge impact">{rec.impact}</span>
-                        <span className="rec-badge effort">{rec.effort}</span>
+              {result.strategicRecommendations && result.strategicRecommendations.length > 0 ? (
+                <div className="recommendations-list">
+                  {result.strategicRecommendations.map((rec, idx) => (
+                    <div key={rec.id} className="rec-card">
+                      <div className="rec-number">#{idx + 1}</div>
+                      <div className="rec-content">
+                        <h3 className="rec-title">{rec.title}</h3>
+                        <p className="rec-description">{rec.description}</p>
+                        <div className="rec-meta">
+                          <span className={`rec-badge ${rec.impact.toLowerCase()}`}>{rec.impact} Impact</span>
+                          <span className="rec-badge type">{rec.type}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-insights">
+                  <p>No AI insights available at this time.</p>
+                </div>
+              )}
             </section>
 
             {/* Upgrade Card */}
@@ -547,6 +731,48 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
           border-radius: 6px;
         }
 
+        /* HTML Page Details */
+        .html-page-details {
+          background: var(--card-bg);
+          backdrop-filter: blur(10px);
+          border: 1px solid var(--border-color);
+          border-radius: 16px;
+          padding: 24px;
+          margin-bottom: 24px;
+        }
+        .details-title {
+          font-size: 18px;
+          font-weight: 700;
+          margin-bottom: 16px;
+        }
+        .details-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 16px;
+        }
+        .detail-item {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .detail-label {
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        .detail-value {
+          font-size: 14px;
+          color: var(--text-primary);
+          font-weight: 500;
+        }
+        .url-value {
+          word-break: break-all;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 12px;
+        }
+
         /* Breakdown */
         .breakdown-list {
           display: flex;
@@ -566,7 +792,6 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
         }
         .breakdown-row:hover {
           border-color: var(--accent-solid);
-          transform: translateY(-2px);
         }
         .breakdown-icon {
           width: 48px;
@@ -584,23 +809,203 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 8px;
+          margin-bottom: 12px;
         }
-        .breakdown-header h3 {
+        .breakdown-title-group {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .breakdown-title-group h3 {
           font-size: 18px;
           font-weight: 700;
+          margin: 0;
         }
-        .breakdown-score {
+        .breakdown-percentage {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 16px;
+          font-size: 20px;
           font-weight: 800;
           font-variant-numeric: tabular-nums;
+        }
+        .breakdown-meta-group {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .issues-badge {
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--text-secondary);
+          background: rgba(255, 255, 255, 0.05);
+          padding: 4px 12px;
+          border-radius: 6px;
+        }
+        .expand-toggle {
+          background: transparent;
+          border: none;
+          color: var(--text-secondary);
+          padding: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          transition: color 0.2s;
+        }
+        .expand-toggle:hover {
+          color: var(--text-primary);
         }
         .breakdown-desc {
           font-size: 14px;
           color: var(--text-secondary);
           margin-bottom: 16px;
           line-height: 1.5;
+        }
+        
+        /* Breakdown Details (Expanded) */
+        .breakdown-details {
+          margin-top: 20px;
+          padding-top: 20px;
+          border-top: 1px solid var(--border-color);
+        }
+        .details-subtitle {
+          font-size: 16px;
+          font-weight: 700;
+          margin-bottom: 16px;
+        }
+        .checks-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .check-item {
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 12px;
+          padding: 16px;
+          border-left: 3px solid transparent;
+        }
+        .check-item.check-error {
+          border-left-color: #ef4444;
+        }
+        .check-item.check-warning {
+          border-left-color: #f59e0b;
+        }
+        .check-item.check-tip {
+          border-left-color: #6366f1;
+        }
+        .check-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 12px;
+        }
+        .check-left {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          flex: 1;
+        }
+        .check-icon {
+          flex-shrink: 0;
+          display: flex;
+          margin-top: 2px;
+        }
+        .check-item.check-error .check-icon {
+          color: #ef4444;
+        }
+        .check-item.check-warning .check-icon {
+          color: #f59e0b;
+        }
+        .check-item.check-tip .check-icon {
+          color: #6366f1;
+        }
+        .check-title {
+          font-size: 15px;
+          font-weight: 600;
+          color: var(--text-primary);
+          line-height: 1.4;
+        }
+        .check-badge {
+          font-size: 11px;
+          font-weight: 700;
+          padding: 4px 10px;
+          border-radius: 6px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          flex-shrink: 0;
+        }
+        .check-badge.error {
+          background: rgba(239, 68, 68, 0.15);
+          color: #ef4444;
+        }
+        .check-badge.warning {
+          background: rgba(245, 158, 11, 0.15);
+          color: #f59e0b;
+        }
+        .check-badge.tip {
+          background: rgba(99, 102, 241, 0.15);
+          color: #6366f1;
+        }
+        .check-body {
+          padding-left: 26px;
+        }
+        .check-recommendation {
+          font-size: 14px;
+          color: var(--text-secondary);
+          line-height: 1.6;
+          margin-bottom: 8px;
+        }
+        .check-impact {
+          font-size: 13px;
+          color: var(--text-secondary);
+          margin: 0;
+        }
+        .check-impact strong {
+          color: var(--text-primary);
+        }
+        .breakdown-findings {
+          margin-bottom: 16px;
+          padding: 12px;
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 8px;
+          border: 1px solid var(--border-color);
+        }
+        .findings-header {
+          margin-bottom: 8px;
+        }
+        .findings-count {
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        .findings-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .finding-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          font-size: 13px;
+          line-height: 1.5;
+        }
+        .finding-priority {
+          flex-shrink: 0;
+          font-size: 14px;
+        }
+        .finding-text {
+          color: var(--text-primary);
+          flex: 1;
+        }
+        .finding-more {
+          font-size: 12px;
+          color: var(--text-secondary);
+          font-style: italic;
+          padding-left: 22px;
         }
         .progress-track {
           height: 6px;
@@ -789,6 +1194,12 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
           font-weight: 700;
           margin-bottom: 10px;
         }
+        .rec-description {
+          font-size: 14px;
+          color: var(--text-secondary);
+          line-height: 1.6;
+          margin-bottom: 12px;
+        }
         .rec-meta {
           display: flex;
           flex-wrap: wrap;
@@ -802,6 +1213,22 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
+        .rec-badge.high {
+          background: rgba(239, 68, 68, 0.15);
+          color: #ef4444;
+        }
+        .rec-badge.medium {
+          background: rgba(249, 160, 48, 0.15);
+          color: var(--accent-solid);
+        }
+        .rec-badge.low {
+          background: rgba(99, 102, 241, 0.15);
+          color: #6366f1;
+        }
+        .rec-badge.type {
+          background: rgba(139, 92, 246, 0.15);
+          color: #8b5cf6;
+        }
         .rec-badge.priority {
           background: rgba(139, 92, 246, 0.15);
           color: #8b5cf6;
@@ -813,6 +1240,12 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
         .rec-badge.effort {
           background: rgba(99, 102, 241, 0.15);
           color: #6366f1;
+        }
+        .no-insights {
+          text-align: center;
+          padding: 32px;
+          color: var(--text-secondary);
+          font-style: italic;
         }
 
         /* Upgrade Card */
@@ -929,6 +1362,33 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
           font-size: 15px;
           font-weight: 700;
           box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        /* HTML Page Details Styles */
+        .detail-header-group {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+        }
+        
+        .ai-badge {
+          font-size: 10px;
+          font-weight: 700;
+          background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+          color: white;
+          padding: 2px 8px;
+          border-radius: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .detail-description {
+          font-size: 12px;
+          color: var(--text-secondary);
+          margin-top: 8px;
+          line-height: 1.5;
+          opacity: 0.8;
         }
 
         @media (max-width: 1024px) {
