@@ -13,7 +13,7 @@ import { register, login, refreshToken, forgotPassword, resetPassword, verifyEma
 const router = Router();
 
 router.post('/register', createUserLimiter, register);
-router.post('/login', loginAttemptLimiter, login);
+router.post('/login',login);
 router.post('/refresh-token', refreshTokenLimiter, refreshToken);
 router.post('/forgot-password', forgotPasswordLimiter, forgotPassword);
 router.post('/reset-password', passwordResetLimiter, resetPassword);
