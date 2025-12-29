@@ -23,13 +23,6 @@ const HeartIcon = () => (
   </svg>
 )
 
-const MegaphoneIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m3 11 18-5v12L3 14v-3z" />
-    <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
-  </svg>
-)
-
 const AwardIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="8" r="7" />
@@ -40,7 +33,6 @@ const AwardIcon = () => (
 export interface BrandVisibilityMetrics {
   visibilityScore: number // 0-100
   sentimentScore: number // -100 to 100
-  shareOfVoice: number // %
   citationAuthority: number // 0-100
 }
 
@@ -54,7 +46,7 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
   const getSentimentLabel = (score: number) => {
     if (score >= 30) return 'Positive'
     if (score <= -30) return 'Negative'
-    
+
     return 'Neutral'
   }
 
@@ -105,27 +97,7 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
         />
       </Grid>
 
-      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <MetricCard
-          title="Share of Voice"
-          value={`${metrics.shareOfVoice}%`}
-          icon={<MegaphoneIcon />}
-          color="info"
-          footer={
-             <Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={metrics.shareOfVoice}
-                  color="info"
-                  sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
-                />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
-                  Vs. potential competitors
-                </p>
-             </Box>
-          }
-        />
-      </Grid>
+
 
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <MetricCard
