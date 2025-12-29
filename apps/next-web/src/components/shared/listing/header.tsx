@@ -1,6 +1,7 @@
 import { Fragment, useState, useCallback, memo } from 'react';
 
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Chip, Divider, IconButton, Typography } from '@mui/material';
+import { Formik } from 'formik';
 
 import CustomTextField from '@core/components/mui/TextField';
 
@@ -25,6 +26,7 @@ interface ListHeaderProps {
         subject: string;
       };
       component?: React.ComponentType<any>;
+      position?: 'sidebar' | 'top' | 'inline';
     };
     search?: {
       enabled: boolean;
@@ -52,13 +54,19 @@ interface ListHeaderProps {
   FilterComponentItems?: React.ComponentType<any>;
   searchKeys: string[];
   title: string;
+  subtitle?: string;
+  icon?: React.ReactNode;
+  totalCount?: number;
 }
 
 const ListHeader = memo((props: ListHeaderProps) => {
-  const { title, features } = props;
+  const { title, subtitle, icon, totalCount, features, FilterComponentItems } = props;
   const t = useTranslation('common');
 
   const { filter, export: exportFeature, search } = features
+  const filterPosition = filter?.position || 'top';
+  const FilterComponent = filter?.component || FilterComponentItems;
+  const SearchComponent = search?.component;
 
   // ** Props
   const [filterOpen, setFilterOpen] = useState<boolean>(false);
@@ -117,12 +125,12 @@ const ListHeader = memo((props: ListHeaderProps) => {
 
   return (
     <Fragment>
-      {filter?.enabled && filter.component && (
+      {filter?.enabled && FilterComponent && filterPosition === 'sidebar' && (
         <FilterList
           open={filterOpen}
           toggle={toggleFilter}
           handleFilter={handleFilterSubmit}
-          FilterComponentItems={filter.component}
+          FilterComponentItems={FilterComponent}
           initialValues={{
             is_child: false,
           }}
@@ -137,85 +145,141 @@ const ListHeader = memo((props: ListHeaderProps) => {
           availableFormats={["excel", "pdf"]}
         />
       )}
-      <Box
-        sx={{
-          py: 4,
-          px: 6,
-          rowGap: 2,
-          columnGap: 4,
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}
-      >
-        <Box>
-          <Typography variant="h5">{title}</Typography>
-        </Box>
-        <Box
-          sx={{
-            rowGap: 2,
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center'
-          }}
-        >
-          {search?.enabled && (
-            search.component ? (
-              <Box sx={{ mr: 4 }}>
-                <search.component onSearch={(term: string) => search.onSearch(term, features?.search?.searchKeys || [])} />
+
+      <Card sx={{ mb: 4 }}>
+        <CardContent>
+          {/* Header Row: Icon, Title/Subtitle, Badge */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              {icon && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    p: 2,
+                    borderRadius: 1,
+                    bgcolor: 'action.hover',
+                    color: 'error.main' // Assuming warning/error icon style from image, or make configurable
+                  }}
+                >
+                  {icon}
+                </Box>
+              )}
+              <Box>
+                <Typography variant="h5">{title}</Typography>
+                {subtitle && (
+                  <Typography variant="body2" color="text.secondary">
+                    {subtitle}
+                  </Typography>
+                )}
               </Box>
-            ) : (
-              <CustomTextField
-                value={searchTerm}
-                sx={{ mr: 4 }}
-                onChange={handleSearchChange}
-                placeholder={search?.placeholder}
+            </Box>
+            {totalCount !== undefined && (
+              <Chip
+                label={`${totalCount} ${t('common.found') || 'Found'}`} // Adjust translation key as needed
+                color="primary"
+                variant="tonal"
+                size="small"
               />
-            )
-          )}
-          <Box
-            sx={{
-              rowGap: 2,
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center'
-            }}
-          >
-            {props.createActionConfig.show &&
-              (props.createActionConfig.onlyIcon ? (
-                <IconButton color="primary" onClick={props.createActionConfig.onClick}>
-                  <i className="tabler:plus text-2xl" />
-                </IconButton>
-              ) : (
-                <Button onClick={props.createActionConfig.onClick} variant="contained" sx={{ '& svg': { mr: 2 } }}>
-                  <i className="tabler:plus text-2xl" />
-                  {t('common.create')}
-                </Button>
-              ))}
-            {filter?.enabled && (
-              <Button
-                onClick={toggleFilter}
-                variant="contained"
-                sx={{ "& svg": { mr: 2 }, ml: 2 }}
-              >
-                <i className="tabler:adjustments text-2xl" />
-                {t('common.filter')}
-              </Button>
-            )}
-            {exportFeature?.enabled && exportFeature.onExport && (
-              <Button
-                onClick={toggleExport}
-                variant="contained"
-                sx={{ "& svg": { mr: 2 }, ml: 2 }}
-              >
-                <i className="tabler:file-export text-2xl" />
-                {t('common.export')}
-              </Button>
             )}
           </Box>
-        </Box>
-      </Box>
+
+          <Divider sx={{ my: 3 }} />
+
+          {/* Controls Row: Search, Filter (Inline), Buttons */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: 2,
+              justifyContent: 'space-between'
+            }}
+          >
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flex: 1, minWidth: 300 }}>
+              {search?.enabled && (
+                SearchComponent ? (
+                  <Box sx={{ flex: 1 }}>
+                    <SearchComponent onSearch={(term: string) => search.onSearch(term, features?.search?.searchKeys || [])} />
+                  </Box>
+                ) : (
+                  <CustomTextField
+                    value={searchTerm}
+                    placeholder={search?.placeholder || t('common.search-placeholder') || 'Search...'}
+                    onChange={handleSearchChange}
+                    sx={{ flex: 1 }}
+                    InputProps={{
+                      startAdornment: <i className="tabler-search text-xl mr-2" />
+                    }}
+                  />
+                )
+              )}
+
+              {/* Inline Filter */}
+              {filter?.enabled && FilterComponent && (filterPosition === 'inline' || filterPosition === 'top') && (
+                <Box sx={{ flex: 1 }}>
+                  {/* Wrap inline filter in Formik since most filter components expect it */}
+                  <Formik
+                    initialValues={{}}
+                    onSubmit={(values) => handleFilterSubmit(values)}
+                  >
+                    {(formik) => (
+                      <form onSubmit={formik.handleSubmit} style={{ width: '100%' }}>
+                        <FilterComponent formik={formik} />
+                        {/* Note: Inline filters usually need to trigger submit on change or have their own logic.
+                            If the component expects to be in a form, this wrapper provides it.
+                        */}
+                      </form>
+                    )}
+                  </Formik>
+                </Box>
+              )}
+            </Box>
+
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              {/* Show separate filter button only if sidebar or collapsible top (which we replaced with inline for 'top' but let's keep logic flexible)
+                   Actually, if position is 'top' or 'inline', we render it inline above.
+                   If position is 'sidebar', we show the button.
+               */}
+              {filter?.enabled && filterPosition === 'sidebar' && (
+                <Button
+                  onClick={toggleFilter}
+                  variant="outlined"
+                  sx={{ gap: 2 }}
+                >
+                  <i className="tabler-adjustments" />
+                  {t('common.filter')}
+                </Button>
+              )}
+
+              {exportFeature?.enabled && exportFeature.onExport && (
+                <Button
+                  onClick={toggleExport}
+                  variant="tonal"
+                  color="secondary"
+                  sx={{ gap: 2 }}
+                >
+                  <i className="tabler-upload" />
+                  {t('common.export')}
+                </Button>
+              )}
+
+              {props.createActionConfig.show &&
+                (props.createActionConfig.onlyIcon ? (
+                  <IconButton color="primary" onClick={props.createActionConfig.onClick}>
+                    <i className="tabler-plus" />
+                  </IconButton>
+                ) : (
+                  <Button onClick={props.createActionConfig.onClick} variant="contained" sx={{ gap: 2 }}>
+                    <i className="tabler-plus" />
+                    {t('common.create')}
+                  </Button>
+                ))}
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
     </Fragment>
   );
 });

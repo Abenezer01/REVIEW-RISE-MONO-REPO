@@ -86,6 +86,7 @@ const ItemsListing = <T extends object>({
         subject: string;
       };
       component?: React.ComponentType<any>;
+      position?: 'sidebar' | 'top';
     };
     search?: {
       enabled: boolean;

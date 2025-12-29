@@ -1,8 +1,8 @@
 /* eslint-disable import/no-unresolved */
-import AccountList from '@/views/admin/accounts/AccountList'
+import AccountDetail from '@/views/admin/accounts/AccountDetail'
 
 const AccountsPage = () => {
-  return <AccountList />
+  return <AccountDetail />
 }
 
 export default AccountsPage

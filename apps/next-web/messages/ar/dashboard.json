@@ -4,7 +4,6 @@
     "reviews": "المراجعات",
     "social-rise": "سوشل رايز",
     "seo-intelligence": "تحليلات السيو",
-    "locations": "الفروع",
     "accounts": "الحسابات",
     "jobs": "المهام",
     "logs": "السجلات",
@@ -15,10 +14,12 @@
     "about": "عن الموقع",
     "seo-overview": "نظرة عامة",
     "seo-visibility": "ظهور في نتائج البحث",
+    "seo-keywords": "الكلمات المفتاحية",
     "smart-reviews": "سمارت ريفيوز",
     "gbp-rocket": "جي بي بي روكيت",
     "ad-rise": "أد رايز",
-    "brand-rise": "براند رايز"
+    "brand-rise": "براند رايز",
+    "ai-visibility": "رؤية الذكاء الاصطناعي"
   },
   "overview": {
     "title": "نظرة عامة على لوحة التحكم",
@@ -48,5 +49,24 @@
     "generateResponse": "إنشاء رد بالذكاء الاصطناعي",
     "viewDetails": "عرض التفاصيل",
     "markAsRead": "وضع علامة كمقروء"
+  },
+  "locations": {
+    "title": "إدارة الفروع",
+    "listTitle": "الفروع",
+    "createTitle": "إضافة فرع",
+    "editTitle": "تعديل الفرع",
+    "form": {
+      "name": "اسم الفرع",
+      "businessId": "الحساب",
+      "address": "العنوان",
+      "timezone": "المنطقة الزمنية",
+      "status": "الحالة",
+      "active": "نشط",
+      "archived": "مؤرشف",
+      "platformConnections": "ربط المنصات",
+      "googlePlaceId": "معرف مكان جوجل",
+      "facebookPageId": "معرف صفحة فيسبوك",
+      "deleteConfirm": "هل أنت متأكد من رغبتك في حذف هذا الفرع؟"
+    }
   }
 }

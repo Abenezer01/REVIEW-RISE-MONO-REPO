@@ -45,6 +45,12 @@ const menuData: MenuItem[] = [
     allowedRoles: [ROLES.ADMIN],
     children: [
       {
+    title: 'navigation.ai-visibility',
+    href: '/admin/ai-visibility',
+    icon: 'tabler-eye',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
         title: 'navigation.seo-overview',
         href: '/admin/seo-intelligence'
       },
@@ -52,13 +58,12 @@ const menuData: MenuItem[] = [
         title: 'navigation.seo-visibility',
         href: '/admin/seo-intelligence/visibility'
       }
+      ,
+      {
+        title: 'navigation.seo-keywords',
+        href: '/admin/seo-intelligence/keywords'
+      }
     ]
-  },
-  {
-    title: 'navigation.locations',
-    href: '/admin/locations',
-    icon: 'tabler-map-pin',
-    allowedRoles: [ROLES.ADMIN]
   },
   {
     title: 'navigation.smart-reviews',
