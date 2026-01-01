@@ -5,5 +5,6 @@ const router = express.Router();
 const controller = new AIVisibilityController();
 
 router.post('/analyze', controller.analyze.bind(controller));
+router.post('/validate', controller.validate.bind(controller));
 
 export default router;

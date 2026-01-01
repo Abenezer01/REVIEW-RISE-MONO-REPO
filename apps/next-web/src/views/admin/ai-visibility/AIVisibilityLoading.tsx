@@ -7,10 +7,28 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Skeleton from '@mui/material/Skeleton'
 import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
-const AIVisibilityLoading = () => {
+interface AIVisibilityLoadingProps {
+  message?: string | null;
+}
+
+const AIVisibilityLoading = ({ message }: AIVisibilityLoadingProps) => {
   return (
     <Grid container spacing={6}>
+      <Grid size={{ xs: 12 }}>
+        <Card>
+          <CardContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', py: 6 }}>
+            <Skeleton variant="circular" width={80} height={80} sx={{ mb: 2 }} />
+            {message && (
+              <Typography variant="h6" color="text.secondary">
+                {message}
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
+      </Grid>
+
       {/* Overview Metrics Skeletons */}
       {Array.from(new Array(4)).map((_, index) => (
         <Grid key={index} size={{ xs: 12, sm: 6, md: 3 }}>
