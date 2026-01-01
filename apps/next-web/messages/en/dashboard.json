@@ -72,5 +72,41 @@
       "facebookPageId": "Facebook Page ID",
       "deleteConfirm": "Are you sure you want to delete this location?"
     }
+  },
+  "brandRise": {
+    "subtitle": "Brand performance and visibility insights",
+    "tabs": {
+      "overview": "Overview",
+      "visibility": "Visibility",
+      "dna": "Brand DNA",
+      "competitors": "Competitors",
+      "content": "Content & Messaging",
+      "reviews": "Reviews & Reputation",
+      "reports": "Reports"
+    },
+    "reports": {
+      "title": "Brand Reports",
+      "generate": "Generate Report"
+    },
+    "reviews": {
+      "recent": "Recent Reviews",
+      "velocity": "Review Velocity",
+      "sentiment": "Sentiment Distribution"
+    },
+    "content": {
+      "calendar": "Content Calendar",
+      "add": "Add Content",
+      "ideas": "Content Ideas"
+    },
+    "dna": {
+      "summary": "Brand Identity Summary",
+      "voice": "Brand Voice",
+      "audience": "Target Audience",
+      "messages": "Key Messages",
+      "viewFull": "View Full Brand DNA"
+    },
+    "competitors": {
+      "tracking": "Competitor Tracking"
+    }
   }
 }
