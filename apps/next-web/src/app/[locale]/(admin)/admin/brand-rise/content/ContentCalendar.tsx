@@ -1,23 +1,21 @@
 
 'use client';
 
-import AppFullCalendar from '@/libs/styles/AppFullCalendar';
-import { ContentIdea } from '@/services/brand.service';
-import { EventClickArg } from '@fullcalendar/core';
+import type { EventClickArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import { useTheme } from '@mui/material';
+
+import type { ContentIdea } from '@/services/brand.service';
+import AppFullCalendar from '@/libs/styles/AppFullCalendar';
 
 interface ContentCalendarProps {
   ideas: ContentIdea[];
 }
 
 const ContentCalendar = ({ ideas }: ContentCalendarProps) => {
-  const theme = useTheme();
-
   // Transform ideas into FullCalendar events
   const events = ideas.map(idea => {
     let color = '';

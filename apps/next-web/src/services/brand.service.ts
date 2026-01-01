@@ -32,12 +32,16 @@ export const BrandService = {
   // Competitors
   listCompetitors: async (businessId: string) => {
     const response = await apiClient.get<{ data: Competitor[] }>(`/brands/${businessId}/competitors`);
-    return response.data.data || [];
+
+    
+return response.data.data || [];
   },
 
   addCompetitor: async (businessId: string, data: { name: string; website?: string }) => {
     const response = await apiClient.post<{ data: Competitor }>(`/brands/${businessId}/competitors`, data);
-    return response.data.data;
+
+    
+return response.data.data;
   },
 
   removeCompetitor: async (businessId: string, competitorId: string) => {
@@ -47,47 +51,63 @@ export const BrandService = {
   // Dashboard
   getOverview: async (businessId: string) => {
     const response = await apiClient.get<{ data: DashboardOverview }>(`/brands/${businessId}/dashboards/overview`);
-    return response.data.data;
+
+    
+return response.data.data;
   },
 
   getVisibilityMetrics: async (businessId: string, range: '7d' | '30d' | '90d' = '30d') => {
     const response = await apiClient.get<{ data: VisibilityMetric[] }>(`/brands/${businessId}/dashboards/visibility`, {
       params: { range }
     });
-    return response.data.data || [];
+
+    
+return response.data.data || [];
   },
 
   // Reports
   listReports: async (businessId: string) => {
     const response = await apiClient.get<{ data: Report[] }>(`/brands/${businessId}/reports`);
-    return response.data.data;
+
+    
+return response.data.data;
   },
   
   getReport: async (businessId: string, reportId: string) => {
       const response = await apiClient.get<{ data: Report & { htmlContent: string } }>(`/brands/${businessId}/reports/${reportId}`);
-      return response.data.data;
+
+      
+return response.data.data;
   },
 
   // DNA
   getDNA: async (businessId: string) => {
       const response = await apiClient.get<{ data: BrandDNA }>(`/brands/${businessId}/dna`);
-      return response.data.data;
+
+      
+return response.data.data;
   },
 
   updateDNA: async (businessId: string, data: Partial<BrandDNA>) => {
       const response = await apiClient.post<{ data: BrandDNA }>(`/brands/${businessId}/dna`, data);
-      return response.data.data;
+
+      
+return response.data.data;
   },
 
   // Content
   listContent: async (businessId: string) => {
       const response = await apiClient.get<{ data: ContentIdea[] }>(`/brands/${businessId}/content`);
-      return response.data.data || [];
+
+      
+return response.data.data || [];
   },
 
   createContent: async (businessId: string, data: Partial<ContentIdea>) => {
       const response = await apiClient.post<{ data: ContentIdea }>(`/brands/${businessId}/content`, data);
-      return response.data.data;
+
+      
+return response.data.data;
   },
 
   deleteContent: async (businessId: string, contentId: string) => {
@@ -99,17 +119,23 @@ export const BrandService = {
       const response = await apiClient.get<{ data: { reviews: Review[], total: number, page: number, totalPages: number } }>(`/brands/${businessId}/reviews`, {
           params: { page, limit, platform }
       });
-      return response.data.data || { reviews: [], total: 0, page: 1, totalPages: 1 };
+
+      
+return response.data.data || { reviews: [], total: 0, page: 1, totalPages: 1 };
   },
 
   getReviewStats: async (businessId: string) => {
       const response = await apiClient.get<{ data: { totalReviews: number, averageRating: number } }>(`/brands/${businessId}/reviews/stats`);
-      return response.data.data;
+
+      
+return response.data.data;
   },
 
   replyReview: async (businessId: string, reviewId: string, responseContent: string) => {
       const response = await apiClient.post<{ data: Review }>(`/brands/${businessId}/reviews/${reviewId}/reply`, { response: responseContent });
-      return response.data.data;
+
+      
+return response.data.data;
   }
 };
 

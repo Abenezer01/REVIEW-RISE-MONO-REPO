@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 
 const SERVICE_URL = 'http://localhost:3004/api/v1/brands';
 
@@ -10,11 +11,14 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ path: str
 
   try {
     const headers = new Headers();
+
     // Copy necessary headers
     const contentType = req.headers.get('content-type');
+
     if (contentType) headers.set('content-type', contentType);
     
     const auth = req.headers.get('authorization');
+
     if (auth) headers.set('authorization', auth);
 
     const body = req.method !== 'GET' && req.method !== 'HEAD' ? await req.text() : undefined;
@@ -28,6 +32,7 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ path: str
     // Handle 204 No Content or empty responses
     const text = await response.text();
     let data;
+
     try {
         data = text ? JSON.parse(text) : {};
     } catch {
@@ -37,7 +42,8 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ path: str
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error('Proxy error:', error);
-    return NextResponse.json({ error: 'Proxy error', details: String(error) }, { status: 500 });
+    
+return NextResponse.json({ error: 'Proxy error', details: String(error) }, { status: 500 });
   }
 }
 

@@ -79,11 +79,13 @@ const ReviewsPage = () => {
 
   const refreshData = async () => {
     if (!businessId) return;
+
     try {
         const [reviewsData, statsData] = await Promise.all([
             BrandService.listReviews(businessId, 1, 50),
             BrandService.getReviewStats(businessId)
         ]);
+
         setReviews(reviewsData.reviews);
         setStats(statsData);
     } catch (error) {

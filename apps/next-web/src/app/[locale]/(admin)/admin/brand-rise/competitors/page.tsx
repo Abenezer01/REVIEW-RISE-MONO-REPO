@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -71,13 +71,7 @@ const CompetitorsPage = () => {
   // RBAC: Manager or Admin can edit
   const canEdit = user?.role === 'ADMIN' || user?.role === 'MANAGER';
 
-  useEffect(() => {
-    if (businessId) {
-      fetchCompetitors();
-    }
-  }, [businessId]);
-
-  const fetchCompetitors = async () => {
+  const fetchCompetitors = useCallback(async () => {
     if (!businessId) return;
     setLoading(true);
 
@@ -90,7 +84,13 @@ const CompetitorsPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [businessId]);
+
+  useEffect(() => {
+    if (businessId) {
+      fetchCompetitors();
+    }
+  }, [businessId, fetchCompetitors]);
 
   const handleAddCompetitor = async () => {
     if (!businessId) return;

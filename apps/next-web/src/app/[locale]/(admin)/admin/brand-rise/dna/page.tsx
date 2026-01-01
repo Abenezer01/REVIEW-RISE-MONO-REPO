@@ -15,7 +15,6 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { useTranslations } from 'next-intl';
 
-import { useAuth } from '@/contexts/AuthContext';
 import { useBusinessId } from '@/hooks/useBusinessId';
 import type { BrandDNA } from '@/services/brand.service';
 import { BrandService } from '@/services/brand.service';
@@ -27,30 +26,29 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
 const BrandDnaPage = () => {
   const t = useTranslations('dashboard');
   const { businessId } = useBusinessId();
-  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [dna, setDna] = useState<BrandDNA | null>(null);
 
   useEffect(() => {
+    const fetchDNA = async () => {
+        if (!businessId) return;
+        setLoading(true);
+    
+        try {
+            const data = await BrandService.getDNA(businessId);
+    
+            setDna(data);
+        } catch (error) {
+            console.error('Failed to fetch DNA', error);
+        } finally {
+            setLoading(false);
+        }
+      };
+
     if (businessId) {
         fetchDNA();
     }
   }, [businessId]);
-
-  const fetchDNA = async () => {
-    if (!businessId) return;
-    setLoading(true);
-
-    try {
-        const data = await BrandService.getDNA(businessId);
-
-        setDna(data);
-    } catch (error) {
-        console.error('Failed to fetch DNA', error);
-    } finally {
-        setLoading(false);
-    }
-  };
 
   const toneKeywords = dna?.values || [
     'Confident', 'Approachable', 'Clear',
@@ -78,7 +76,7 @@ const BrandDnaPage = () => {
     <Box>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h5" fontWeight="bold">{t('brandRise.dna.summary')}</Typography>
-        <Typography variant="body1" color="text.secondary">Your brand's core identity, voice, and messaging guidelines at a glance</Typography>
+        <Typography variant="body1" color="text.secondary">Your brand&apos;s core identity, voice, and messaging guidelines at a glance</Typography>
       </Box>
 
       <Grid container spacing={4}>
@@ -94,7 +92,7 @@ const BrandDnaPage = () => {
                 {dna?.voice || 'Professional yet approachable. We communicate with clarity and confidence, making complex technology accessible to everyone. Our tone is friendly, knowledgeable, and empowering.'}
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                We avoid jargon and speak directly to our customers' needs, always maintaining authenticity and transparency in our communications.
+                We avoid jargon and speak directly to our customers&apos; needs, always maintaining authenticity and transparency in our communications.
               </Typography>
             </CardContent>
           </Card>
