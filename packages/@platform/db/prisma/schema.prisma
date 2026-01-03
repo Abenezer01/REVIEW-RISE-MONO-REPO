@@ -1,27 +1,26 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
-  provider   = "postgresql"
+  provider = "postgresql"
 }
 
 model Account {
-  id                 String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId             String  @db.Uuid
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String? @db.Text
-  access_token       String? @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String? @db.Text
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String  @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -35,28 +34,28 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-  userRoles     UserRole[]
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String?
+  email             String?            @unique
+  emailVerified     DateTime?
+  image             String?
+  password          String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  accounts          Account[]
+  auditLogs         AuditLog[]
+  seoSnapshots      SeoSnapshot[]
+  sessions          Session[]
   userBusinessRoles UserBusinessRole[]
-  auditLogs     AuditLog[]
-  seoSnapshots  SeoSnapshot[]
+  userRoles         UserRole[]
 }
 
 model UserRole {
-  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId  String @db.Uuid
-  roleId  String @db.Uuid
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role    Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId String @db.Uuid
+  roleId String @db.Uuid
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, roleId])
   @@index([userId])
@@ -64,26 +63,27 @@ model UserRole {
 }
 
 model Business {
-  id            String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String
-  slug          String             @unique
-  description   String?
-  phone         String?
-  email         String?
-  website       String?
-  status        String             @default("active")
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  deletedAt     DateTime?
-  locations     Location[]
-  subscriptions Subscription[]
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String
+  slug              String             @unique
+  description       String?
+  phone             String?
+  email             String?
+  website           String?
+  status            String             @default("active")
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  deletedAt         DateTime?
+  jobs              Job[]
+  keywords          Keyword[]
+  locations         Location[]
+  reviewSyncLogs    ReviewSyncLog[]
+  subscriptions     Subscription[]
   userBusinessRoles UserBusinessRole[]
-  keywords      Keyword[]
   visibilityMetrics VisibilityMetric[]
   aiVisibilityMetrics AIVisibilityMetric[]
-  jobs          Job[]
-  reviewSyncLogs ReviewSyncLog[]
-
+  brandProfiles     BrandProfile[]
+  
   // BrandingRise Relations
   competitors   Competitor[]
   visibilitySnapshots VisibilitySnapshot[]
@@ -93,44 +93,43 @@ model Business {
   contentIdeas  ContentIdea[]
   reviews       Review[]
 
-
   @@index([name])
   @@index([status])
 }
 
 model Location {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String
-  address     String?
-  timezone    String?
-  platformIds Json?
-  tags        String[]
-  lastSync    DateTime?
-  status      String    @default("active")
-  businessId  String    @db.Uuid
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  keywords    Keyword[]
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String
+  address           String?
+  timezone          String?
+  platformIds       Json?
+  tags              String[]
+  lastSync          DateTime?
+  status            String             @default("active")
+  businessId        String             @db.Uuid
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  deletedAt         DateTime?
+  jobs              Job[]
+  keywords          Keyword[]
+  business          Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  reviewSyncLogs    ReviewSyncLog[]
   visibilityMetrics VisibilityMetric[]
   aiVisibilityMetrics AIVisibilityMetric[]
-  jobs        Job[]
-  reviewSyncLogs ReviewSyncLog[]
-  reviews     Review[]
+  reviews           Review[]
 
   @@index([businessId])
 }
 
 model Role {
-  id          String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String             @unique
-  description String?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  permissions RolePermission[]
-  userRoles   UserRole[]
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String             @unique
+  description       String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  permissions       RolePermission[]
   userBusinessRoles UserBusinessRole[]
+  userRoles         UserRole[]
 }
 
 model Permission {
@@ -197,20 +196,19 @@ model PasswordResetToken {
   token     String   @unique
   expires   DateTime
   createdAt DateTime @default(now())
-  
+
   @@index([email])
 }
 
 model AuditLog {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId      String   @db.Uuid
-  action      String
-  entityType  String
-  entityId    String   @db.Uuid
-  details     Json?
-  createdAt   DateTime @default(now())
-
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String   @db.Uuid
+  action     String
+  entityType String
+  entityId   String   @db.Uuid
+  details    Json?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([entityId])
@@ -218,38 +216,24 @@ model AuditLog {
 }
 
 model ReviewSyncLog {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  
-  // Context
-  businessId  String    @db.Uuid
-  locationId  String    @db.Uuid
-  platform    String    // google, facebook, etc.
-  
-  // Status
-  status      String    // success, failed
-  errorMessage String?
-  errorStack  String?
-  
-  // Metrics
-  reviewsSynced Int     @default(0)
-  durationMs  Int?
-  
-  // Raw Data (for debugging)
-  requestData Json?
-  responseData Json?
-  
-  // Relation to the Job that created this log
-  jobId       String?   @db.Uuid
-  
-  // Timestamps
-  startedAt   DateTime
-  completedAt DateTime?
-  createdAt   DateTime  @default(now())
-
-  // Relations
-  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  location    Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  job         Job?      @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId    String    @db.Uuid
+  locationId    String    @db.Uuid
+  platform      String
+  status        String
+  errorMessage  String?
+  errorStack    String?
+  reviewsSynced Int       @default(0)
+  durationMs    Int?
+  requestData   Json?
+  responseData  Json?
+  jobId         String?   @db.Uuid
+  startedAt     DateTime
+  completedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  business      Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  job           Job?      @relation(fields: [jobId], references: [id])
+  location      Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
   @@index([locationId])
@@ -269,154 +253,199 @@ model EmailVerificationToken {
 }
 
 model SeoSnapshot {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   url             String
   healthScore     Int
-  
-  // Store structured JSON data for flexibility
-  categoryScores  Json      
-  recommendations Json      
-  seoElements     Json      
-  
-  userId          String?   @db.Uuid
-  user            User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  createdAt       DateTime  @default(now())
-  
+  categoryScores  Json
+  recommendations Json
+  seoElements     Json
+  userId          String?  @db.Uuid
+  createdAt       DateTime @default(now())
+  user            User?    @relation(fields: [userId], references: [id])
+
   @@index([userId])
   @@index([url])
 }
 
-// Keyword tracking for SERP visibility
 model Keyword {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId      String    @db.Uuid
-  locationId      String?   @db.Uuid
-  keyword         String
-  searchVolume    Int?      // Monthly search volume
-  difficulty      Float?    // Keyword difficulty score (0-100)
-  tags            String[]  // Categories/grouping
-  status          String    @default("active") // active, paused, archived
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  deletedAt       DateTime?
-  
-  business        Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  location        Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
-  ranks           KeywordRank[]
-  
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId   String        @db.Uuid
+  locationId   String?       @db.Uuid
+  keyword      String
+  searchVolume Int?
+  difficulty   Float?
+  tags         String[]
+  status       String        @default("active")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+  business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location     Location?     @relation(fields: [locationId], references: [id])
+  ranks        KeywordRank[]
+
   @@index([businessId])
   @@index([locationId])
   @@index([status])
 }
 
-// Historical rank data snapshots
 model KeywordRank {
-  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  keywordId             String    @db.Uuid
-  rankPosition          Int?      // Organic rank position (null if not ranked in top 100)
-  mapPackPosition       Int?      // Position in Map Pack (1-3, null if not present)
-  
-  // SERP features presence
-  hasFeaturedSnippet    Boolean   @default(false)
-  hasPeopleAlsoAsk      Boolean   @default(false)
-  hasLocalPack          Boolean   @default(false)
-  hasKnowledgePanel     Boolean   @default(false)
-  hasImagePack          Boolean   @default(false)
-  hasVideoCarousel      Boolean   @default(false)
-  
-  // URL that ranked
-  rankingUrl            String?
-  
-  // Location/device context
-  searchLocation        String?   // City, Country, or coordinate
-  device                String    @default("desktop") // desktop, mobile, tablet
-  
-  // Metadata
-  capturedAt            DateTime  @default(now())
-  createdAt             DateTime  @default(now())
-  
-  keyword               Keyword   @relation(fields: [keywordId], references: [id], onDelete: Cascade)
-  
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  keywordId          String   @db.Uuid
+  rankPosition       Int?
+  mapPackPosition    Int?
+  hasFeaturedSnippet Boolean  @default(false)
+  hasPeopleAlsoAsk   Boolean  @default(false)
+  hasLocalPack       Boolean  @default(false)
+  hasKnowledgePanel  Boolean  @default(false)
+  hasImagePack       Boolean  @default(false)
+  hasVideoCarousel   Boolean  @default(false)
+  rankingUrl         String?
+  searchLocation     String?
+  device             String   @default("desktop")
+  capturedAt         DateTime @default(now())
+  createdAt          DateTime @default(now())
+  keyword            Keyword  @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+
   @@index([keywordId])
   @@index([capturedAt])
 }
 
-// Aggregated visibility metrics (computed)
 model VisibilityMetric {
-  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId            String    @db.Uuid
-  locationId            String?   @db.Uuid
-  
-  // Time period this metric covers
-  periodStart           DateTime
-  periodEnd             DateTime
-  periodType            String    // daily, weekly, monthly
-  
-  // Map Pack visibility
-  mapPackAppearances    Int       @default(0)
-  totalTrackedKeywords  Int       @default(0)
-  mapPackVisibility     Float     @default(0) // Percentage (0-100)
-  
-  // Organic rankings
-  top3Count             Int       @default(0)
-  top10Count            Int       @default(0)
-  top20Count            Int       @default(0)
-  
-  // Share of Voice (weighted by search volume)
-  shareOfVoice          Float     @default(0) // Percentage (0-100)
-  
-  // SERP feature counts
-  featuredSnippetCount  Int       @default(0)
-  localPackCount        Int       @default(0)
-  
-  // Metadata
-  computedAt            DateTime  @default(now())
-  createdAt             DateTime  @default(now())
-  
-  business              Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  location              Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
-  
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId           String    @db.Uuid
+  locationId           String?   @db.Uuid
+  periodStart          DateTime
+  periodEnd            DateTime
+  periodType           String
+  mapPackAppearances   Int       @default(0)
+  totalTrackedKeywords Int       @default(0)
+  mapPackVisibility    Float     @default(0)
+  top3Count            Int       @default(0)
+  top10Count           Int       @default(0)
+  top20Count           Int       @default(0)
+  shareOfVoice         Float     @default(0)
+  featuredSnippetCount Int       @default(0)
+  localPackCount       Int       @default(0)
+  computedAt           DateTime  @default(now())
+  createdAt            DateTime  @default(now())
+  business             Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location             Location? @relation(fields: [locationId], references: [id])
+
   @@unique([businessId, locationId, periodStart, periodEnd, periodType])
   @@index([businessId])
   @@index([locationId])
   @@index([periodStart, periodEnd])
 }
 
-
 model Job {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  type        String    // reviews, social_posts, seo_crawls, ai_tasks
-  status      String    // pending, processing, completed, failed, resolved, ignored
-  
-  // Relations
-  businessId  String?   @db.Uuid
-  locationId  String?   @db.Uuid
-  business    Business? @relation(fields: [businessId], references: [id], onDelete: SetNull)
-  location    Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type           String
+  status         String
+  businessId     String?         @db.Uuid
+  locationId     String?         @db.Uuid
+  payload        Json?
+  result         Json?
+  error          Json?
+  retryCount     Int             @default(0)
+  maxRetries     Int             @default(3)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  startedAt      DateTime?
+  completedAt    DateTime?
+  failedAt       DateTime?
+  business       Business?       @relation(fields: [businessId], references: [id])
+  location       Location?       @relation(fields: [locationId], references: [id])
   reviewSyncLogs ReviewSyncLog[]
-
-  // Data
-  payload     Json?     // Snapshot of input data
-  result      Json?     // Output or metadata
-  error       Json?     // Detailed error info (message, stack, code)
-
-  // Retry logic
-  retryCount  Int       @default(0)
-  maxRetries  Int       @default(3)
-
-  // Timestamps
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  startedAt   DateTime?
-  completedAt DateTime?
-  failedAt    DateTime?
 
   @@index([type])
   @@index([status])
   @@index([businessId])
   @@index([locationId])
   @@index([createdAt])
+}
+
+model BrandProfile {
+  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId           String                 @db.Uuid
+  websiteUrl           String
+  status               String                 @default("pending") // 'pending' | 'extracting' | 'completed' | 'failed' | 'pending_confirmation'
+  currentExtractedData Json?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+
+  business             Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  assets                BrandAsset[]
+  colors                BrandColor[]
+  fonts                 BrandFont[]
+  pages                 BrandPage[]
+  socialLinks           BrandSocialLink[]
+
+  @@index([businessId])
+  @@index([status])
+}
+
+model BrandAsset {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  brandProfileId String       @db.Uuid
+  type           String       // 'logo', 'favicon', 'og_image', 'header_image'
+  url            String
+  altText        String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  brandProfile   BrandProfile @relation(fields: [brandProfileId], references: [id], onDelete: Cascade)
+
+  @@index([brandProfileId])
+}
+
+model BrandColor {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  brandProfileId String       @db.Uuid
+  hexCode        String
+  type           String       // 'primary', 'secondary', 'accent', 'background'
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  brandProfile   BrandProfile @relation(fields: [brandProfileId], references: [id], onDelete: Cascade)
+
+  @@index([brandProfileId])
+}
+
+model BrandFont {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  brandProfileId String       @db.Uuid
+  family         String
+  usage          String       // 'title', 'body', 'ui'
+  url            String?      // URL to font file or CSS
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  brandProfile   BrandProfile @relation(fields: [brandProfileId], references: [id], onDelete: Cascade)
+
+  @@index([brandProfileId])
+}
+
+model BrandPage {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  brandProfileId String       @db.Uuid
+  type           String       // 'home', 'about', 'services', 'contact'
+  url            String
+  summary        String?
+  content        String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  brandProfile   BrandProfile @relation(fields: [brandProfileId], references: [id], onDelete: Cascade)
+
+  @@index([brandProfileId])
+}
+
+model BrandSocialLink {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  brandProfileId String       @db.Uuid
+  platform       String       // 'facebook', 'twitter', 'linkedin', 'instagram'
+  url            String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  brandProfile   BrandProfile @relation(fields: [brandProfileId], references: [id], onDelete: Cascade)
+
+  @@index([brandProfileId])
 }
 
 model FeatureFlag {

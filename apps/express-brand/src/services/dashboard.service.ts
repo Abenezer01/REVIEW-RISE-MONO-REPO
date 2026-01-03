@@ -45,7 +45,7 @@ export const getVisibilityMetrics = async (businessId: string, range: '7d' | '30
         orderBy: { capturedAt: 'asc' },
     });
 
-    return snapshots.map(s => ({
+    return snapshots.map((s: any) => ({
         date: s.capturedAt,
         score: s.score,
         breakdown: s.breakdown,

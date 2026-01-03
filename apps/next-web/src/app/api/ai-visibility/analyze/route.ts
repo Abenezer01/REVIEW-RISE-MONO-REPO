@@ -3,6 +3,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { backendClient } from '@/utils/backendClient'
+import { getServerAuthHeaders } from '@/utils/getServerAuthHeaders'
 
 export async function POST(request: NextRequest) {
   // Default to localhost:3012/api if not defined
@@ -10,12 +11,14 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
+    const authHeaders = await getServerAuthHeaders()
 
     // Proxy to SEO service
     const data = await backendClient('/v1/ai-visibility/analyze', {
       method: 'POST',
       data: body,
-      baseUrl: SEO_SERVICE_URL
+      baseUrl: SEO_SERVICE_URL,
+      headers: authHeaders
     })
 
     return NextResponse.json(data)

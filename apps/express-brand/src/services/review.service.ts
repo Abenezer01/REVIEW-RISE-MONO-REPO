@@ -4,7 +4,7 @@ export const listReviews = async (businessId: string, params: { page?: number; l
     const page = params.page || 1;
     const limit = params.limit || 10;
     const skip = (page - 1) * limit;
-    
+
     const where: any = { businessId };
     if (params.platform && params.platform !== 'all') {
         where.platform = params.platform;
@@ -30,8 +30,8 @@ export const getReviewStats = async (businessId: string) => {
     });
 
     const total = reviews.length;
-    const average = total > 0 ? reviews.reduce((acc, r) => acc + r.rating, 0) / total : 0;
-    
+    const average = total > 0 ? reviews.reduce((acc: number, r: { rating: number }) => acc + r.rating, 0) / total : 0;
+
     return {
         totalReviews: total,
         averageRating: parseFloat(average.toFixed(1)),

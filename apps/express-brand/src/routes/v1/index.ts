@@ -5,6 +5,7 @@ import reportRoutes from './report.routes';
 import dnaRoutes from './dna.routes';
 import contentRoutes from './content.routes';
 import reviewRoutes from './review.routes';
+import brandProfileRoutes from './brand-profile.routes';
 
 import opportunitiesReportRoutes from './opportunities-report.routes';
 
@@ -17,6 +18,7 @@ router.use('/brands/:id/reports', reportRoutes); // standard reports
 router.use('/brands/:id/dna', dnaRoutes);
 router.use('/brands/:id/content', contentRoutes);
 router.use('/brands/:id/reviews', reviewRoutes);
+router.use('/brand-profiles', brandProfileRoutes);
 
 export default router;
 
