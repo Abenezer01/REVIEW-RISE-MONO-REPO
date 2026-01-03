@@ -228,9 +228,9 @@ export class AIVisibilityController {
       if (fetchResult && fetchResult.html) {
         try {
           const seoData = await extractSEOData(url, fetchResult.html, fetchResult);
-          properHtml = seoData.html.sizeKb > 0; // If we got HTML, assume proper enough for this check
-          semanticTags = seoData.headings.h1 > 0; // Simple check: presence of H1
-          sitemapXml = seoData.sitemap.detected;
+          properHtml = seoData.page.htmlSizeKb > 0; // If we got HTML, assume proper enough for this check
+          semanticTags = seoData.headings.h1Count > 0; // Simple check: presence of H1
+          sitemapXml = seoData.advanced.sitemapExists;
           // Clean URLs is complex, for now, assume true if URL is valid and accessible
         } catch (err: any) {
           seoPracticesMessage = `Failed to parse HTML for SEO practices: ${err.message}`;

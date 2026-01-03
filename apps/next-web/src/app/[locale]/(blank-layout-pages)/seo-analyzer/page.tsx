@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import axios from 'axios'
 import { useTranslations } from 'next-intl'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
@@ -13,42 +14,94 @@ import CardContent from '@mui/material/CardContent'
 import Grid from '@mui/material/Grid'
 import Chip from '@mui/material/Chip'
 import InputAdornment from '@mui/material/InputAdornment'
+import LinearProgress from '@mui/material/LinearProgress'
+import CircularProgress from '@mui/material/CircularProgress'
+import Alert from '@mui/material/Alert'
+import Accordion from '@mui/material/Accordion'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import Divider from '@mui/material/Divider'
 
-// Tabler Icons
+// Icons
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import WarningIcon from '@mui/icons-material/Warning'
+import ErrorIcon from '@mui/icons-material/Error'
+
+// Tabler Icons (Simple SVG Wrappers)
 const IconWorld = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <line x1="2" y1="12" x2="22" y2="12" />
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
 )
 
-const IconTarget = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <circle cx="12" cy="12" r="6" />
-        <circle cx="12" cy="12" r="2" />
-    </svg>
+const IconSparkles = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /></svg>
 )
 
-const IconSearch = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="11" cy="11" r="8" />
-        <path d="m21 21-4.35-4.35" />
-    </svg>
-)
-
-const IconBulb = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
-        <path d="M9 18h6" />
-        <path d="M10 22h4" />
-    </svg>
-)
+interface SeoResult {
+    url: string
+    healthScore: number
+    strategicRecommendations: Array<{
+        id: string
+        title: string
+        description: string
+        impact: 'High' | 'Medium' | 'Low'
+        type: string
+    }>
+    recommendations: Array<{
+        priority: 'high' | 'medium' | 'low'
+        category: string
+        issue: string
+        recommendation: string
+        impact: string
+    }>
+    categoryScores: Record<string, { score: number; percentage: number }>
+    meta: {
+        title: string
+        description: string
+        server: string
+    }
+}
 
 export default function SeoAnalyzerPage() {
     const t = useTranslations('common.seoAnalyzer')
     const [url, setUrl] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    const [result, setResult] = useState<SeoResult | null>(null)
+
+    const handleAnalyze = async () => {
+        if (!url) return
+        setError(null)
+        setLoading(true)
+        setResult(null)
+
+        try {
+            // Ensure protocol
+            const targetUrl = url.startsWith('http') ? url : `https://${url}`
+
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3012/api'}/v1/seo/analyze`, {
+                url: targetUrl
+            })
+
+            if (response.data && response.data.data) {
+                setResult(response.data.data)
+            } else {
+                throw new Error('Invalid response format')
+            }
+        } catch (err: any) {
+            console.error(err)
+            setError(err.response?.data?.message || err.message || 'Analysis failed. Please try again.')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const getScoreColor = (score: number) => {
+        if (score >= 90) return '#4caf50' // Green
+        if (score >= 70) return '#ff9800' // Orange
+        
+return '#f44336' // Red
+    }
 
     return (
         <Box
@@ -56,508 +109,181 @@ export default function SeoAnalyzerPage() {
                 minHeight: '100vh',
                 background: 'linear-gradient(180deg, #1a1f3a 0%, #0f1729 100%)',
                 color: 'white',
-                overflow: 'hidden'
+                pb: 10
             }}
         >
-            {/* Hero Section */}
+            {/* Header / Input Section */}
             <Container maxWidth="lg">
-                <Box sx={{ pt: { xs: 8, md: 12 }, pb: { xs: 6, md: 10 }, textAlign: 'center' }}>
-                    {/* Badge */}
+                <Box sx={{ pt: { xs: 8, md: 12 }, pb: { xs: 4, md: 6 }, textAlign: 'center' }}>
                     <Chip
-                        label={t('hero.badge')}
+                        label={t('hero.badge') || "AI-Powered SEO Tool"}
                         sx={{
                             mb: 3,
                             bgcolor: 'rgba(255, 152, 0, 0.1)',
                             color: 'warning.main',
                             fontWeight: 600,
-                            fontSize: '0.75rem',
-                            letterSpacing: '0.5px',
                             border: '1px solid rgba(255, 152, 0, 0.3)',
-                            '& .MuiChip-label': { px: 2, py: 0.5 }
                         }}
                     />
-
-                    {/* Main Title */}
                     <Typography
                         variant="h1"
                         sx={{
-                            fontSize: { xs: '2rem', sm: '2.5rem', md: '3.5rem' },
+                            fontSize: { xs: '2rem', md: '3.5rem' },
                             fontWeight: 700,
                             mb: 2,
-                            lineHeight: 1.2,
                             background: 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text'
                         }}
                     >
-                        {t('hero.title')}
+                        {t('hero.title') || "Instant SEO Health Check"}
                     </Typography>
 
-                    {/* Subtitle */}
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            mb: 4,
-                            color: 'rgba(255, 255, 255, 0.7)',
-                            fontSize: { xs: '1rem', md: '1.25rem' },
-                            fontWeight: 400,
-                            maxWidth: '600px',
-                            mx: 'auto'
-                        }}
-                    >
-                        {t('hero.subtitle')}
+                    <Typography sx={{ mb: 4, color: 'rgba(255, 255, 255, 0.7)', maxWidth: '600px', mx: 'auto' }}>
+                        {t('hero.subtitle') || "Enter your URL to get a comprehensive standard audit plus AI-generated strategic insights."}
                     </Typography>
 
-                    {/* URL Input */}
-                    <Box
-                        sx={{
-                            maxWidth: '700px',
-                            mx: 'auto',
-                            mb: 3,
-                            display: 'flex',
-                            flexDirection: { xs: 'column', sm: 'row' },
-                            gap: 2
-                        }}
-                    >
+                    <Box sx={{ maxWidth: '700px', mx: 'auto', display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
                         <TextField
                             fullWidth
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
-                            placeholder={t('hero.inputPlaceholder')}
-                            variant="outlined"
+                            placeholder={t('hero.inputPlaceholder') || "example.com"}
+                            disabled={loading}
                             InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <IconWorld />
-                                    </InputAdornment>
-                                ),
-                                sx: {
-                                    bgcolor: 'rgba(255, 255, 255, 0.08)',
-                                    backdropFilter: 'blur(10px)',
-                                    borderRadius: 2,
-                                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                                    '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
-                                    '&.Mui-focused fieldset': { borderColor: 'warning.main' },
-                                    '& input': { color: 'white' }
-                                }
+                                startAdornment: <InputAdornment position="start"><IconWorld /></InputAdornment>,
+                                sx: { bgcolor: 'rgba(255, 255, 255, 0.08)', borderRadius: 2, color: 'white' }
                             }}
                         />
                         <Button
                             variant="contained"
                             size="large"
+                            onClick={handleAnalyze}
+                            disabled={loading || !url}
                             sx={{
                                 px: 5,
-                                py: 1.5,
                                 bgcolor: 'warning.main',
                                 color: 'grey.900',
                                 fontWeight: 700,
-                                fontSize: '1rem',
-                                borderRadius: 2,
-                                minWidth: { xs: '100%', sm: '160px' },
-                                boxShadow: '0 8px 24px rgba(255, 152, 0, 0.4)',
-                                '&:hover': {
-                                    bgcolor: 'warning.dark',
-                                    boxShadow: '0 12px 32px rgba(255, 152, 0, 0.5)',
-                                    transform: 'translateY(-2px)'
-                                },
-                                transition: 'all 0.3s ease'
+                                '&:hover': { bgcolor: 'warning.dark' },
+                                opacity: loading ? 0.7 : 1
                             }}
                         >
-                            {t('hero.ctaButton')}
+                            {loading ? <CircularProgress size={24} color="inherit" /> : (t('hero.ctaButton') || "Analyze")}
                         </Button>
                     </Box>
 
-                    {/* Free Results Text */}
-                    <Typography
-                        variant="body2"
-                        sx={{
-                            color: 'rgba(255, 255, 255, 0.6)',
-                            fontSize: '0.875rem'
-                        }}
-                    >
-                        {t('hero.freeResults')}
-                    </Typography>
+                    {error && (
+                        <Alert severity="error" sx={{ mt: 3, maxWidth: '700px', mx: 'auto', bgcolor: 'rgba(244, 67, 54, 0.1)', color: '#ffcdd2' }}>
+                            {error}
+                        </Alert>
+                    )}
                 </Box>
             </Container>
 
-            {/* Stats Section */}
-            <Container maxWidth="lg">
-                <Grid container spacing={3} sx={{ mb: { xs: 8, md: 12 } }}>
-                    {[
-                        { value: t('stats.sitesAnalyzed'), label: t('stats.sitesAnalyzedLabel') },
-                        { value: t('stats.accuracy'), label: t('stats.accuracyLabel') },
-                        { value: t('stats.rating'), label: t('stats.ratingLabel') },
-                        { value: t('stats.availability'), label: t('stats.availabilityLabel') }
-                    ].map((stat, index) => (
-                        <Grid size={{ xs: 6, md: 3 }} key={index}>
-                            <Card
-                                sx={{
-                                    textAlign: 'center',
-                                    bgcolor: 'rgba(255, 255, 255, 0.05)',
-                                    backdropFilter: 'blur(10px)',
-                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    borderRadius: 3,
-                                    transition: 'all 0.3s ease',
-                                    '&:hover': {
-                                        bgcolor: 'rgba(255, 255, 255, 0.08)',
-                                        transform: 'translateY(-4px)',
-                                        boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)'
-                                    }
-                                }}
-                            >
-                                <CardContent sx={{ py: 3 }}>
-                                    <Typography
-                                        variant="h3"
-                                        sx={{
-                                            fontWeight: 800,
-                                            mb: 1,
-                                            color: 'warning.main',
-                                            fontSize: { xs: '1.75rem', md: '2.5rem' }
-                                        }}
-                                    >
-                                        {stat.value}
-                                    </Typography>
-                                    <Typography
-                                        variant="body2"
-                                        sx={{
-                                            color: 'rgba(255, 255, 255, 0.7)',
-                                            fontSize: '0.875rem',
-                                            fontWeight: 500
-                                        }}
-                                    >
-                                        {stat.label}
+            {loading && (
+                <Container maxWidth="md">
+                    <Box sx={{ textAlign: 'center', py: 8 }}>
+                        <Typography variant="h5" sx={{ mb: 2 }}>Analyzing {url}...</Typography>
+                        <LinearProgress color="warning" sx={{ height: 8, borderRadius: 4, bgcolor: 'rgba(255,255,255,0.1)' }} />
+                        <Typography variant="body2" sx={{ mt: 2, color: 'gray' }}>Checking meta tags, performance, security, and content quality...</Typography>
+                    </Box>
+                </Container>
+            )}
+
+            {/* Results Section */}
+            {!loading && result && (
+                <Container maxWidth="lg">
+                    {/* 1. Score & High Level */}
+                    <Grid container spacing={4} sx={{ mb: 6 }}>
+                        <Grid size={{ xs: 12, md: 4 }}>
+                            <Card sx={{ height: '100%', bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 3, border: `1px solid ${getScoreColor(result.healthScore)}` }}>
+                                <CardContent sx={{ textAlign: 'center', py: 4 }}>
+                                    <Box sx={{ position: 'relative', display: 'inline-flex', mb: 2 }}>
+                                        <CircularProgress
+                                            variant="determinate"
+                                            value={100}
+                                            size={120}
+                                            sx={{ color: 'rgba(255,255,255,0.1)' }}
+                                        />
+                                        <CircularProgress
+                                            variant="determinate"
+                                            value={result.healthScore}
+                                            size={120}
+                                            sx={{ color: getScoreColor(result.healthScore), position: 'absolute', left: 0 }}
+                                        />
+                                        <Box sx={{ top: 0, left: 0, bottom: 0, right: 0, position: 'absolute', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <Typography variant="h3" fontWeight="bold">{result.healthScore}</Typography>
+                                        </Box>
+                                    </Box>
+                                    <Typography variant="h5">Overall Health Score</Typography>
+                                    <Typography variant="body2" sx={{ color: 'gray', mt: 1 }}>
+                                        {result.meta.title ? `"${result.meta.title}"` : 'No Title Detected'}
                                     </Typography>
                                 </CardContent>
                             </Card>
                         </Grid>
-                    ))}
-                </Grid>
-            </Container>
-
-            {/* Features Section - What You'll Discover */}
-            <Container maxWidth="lg">
-                <Box sx={{ mb: { xs: 8, md: 12 } }}>
-                    <Typography
-                        variant="h2"
-                        sx={{
-                            fontSize: { xs: '2rem', md: '2.5rem' },
-                            fontWeight: 700,
-                            textAlign: 'center',
-                            mb: 2
-                        }}
-                    >
-                        {t('features.title')}
-                    </Typography>
-                    <Typography
-                        variant="body1"
-                        sx={{
-                            textAlign: 'center',
-                            color: 'rgba(255, 255, 255, 0.7)',
-                            mb: 6,
-                            maxWidth: '600px',
-                            mx: 'auto'
-                        }}
-                    >
-                        {t('features.subtitle')}
-                    </Typography>
-
-                    <Grid container spacing={4}>
-                        {[
-                            {
-                                icon: <IconTarget />,
-                                title: t('features.seoHealth.title'),
-                                description: t('features.seoHealth.description'),
-                                features: [
-                                    t('features.seoHealth.feature1'),
-                                    t('features.seoHealth.feature2'),
-                                    t('features.seoHealth.feature3')
-                                ]
-                            },
-                            {
-                                icon: <IconSearch />,
-                                title: t('features.technicalAnalysis.title'),
-                                description: t('features.technicalAnalysis.description'),
-                                features: [
-                                    t('features.technicalAnalysis.feature1'),
-                                    t('features.technicalAnalysis.feature2'),
-                                    t('features.technicalAnalysis.feature3')
-                                ]
-                            },
-                            {
-                                icon: <IconBulb />,
-                                title: t('features.smartRecommendations.title'),
-                                description: t('features.smartRecommendations.description'),
-                                features: [
-                                    t('features.smartRecommendations.feature1'),
-                                    t('features.smartRecommendations.feature2'),
-                                    t('features.smartRecommendations.feature3')
-                                ]
-                            }
-                        ].map((feature, index) => (
-                            <Grid size={{ xs: 12, md: 4 }} key={index}>
-                                <Card
-                                    sx={{
-                                        height: '100%',
-                                        bgcolor: 'rgba(255, 255, 255, 0.05)',
-                                        backdropFilter: 'blur(10px)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        borderRadius: 3,
-                                        p: 3,
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': {
-                                            bgcolor: 'rgba(255, 255, 255, 0.08)',
-                                            transform: 'translateY(-8px)',
-                                            boxShadow: '0 16px 32px rgba(255, 152, 0, 0.2)',
-                                            borderColor: 'rgba(255, 152, 0, 0.3)'
-                                        }
-                                    }}
-                                >
-                                    <CardContent>
-                                        {/* Icon */}
-                                        <Box
-                                            sx={{
-                                                width: 64,
-                                                height: 64,
-                                                borderRadius: 2,
-                                                bgcolor: 'rgba(255, 152, 0, 0.1)',
-                                                border: '1px solid rgba(255, 152, 0, 0.3)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                mb: 3,
-                                                color: 'warning.main'
-                                            }}
-                                        >
-                                            {feature.icon}
-                                        </Box>
-
-                                        {/* Title */}
-                                        <Typography
-                                            variant="h5"
-                                            sx={{
-                                                fontWeight: 700,
-                                                mb: 2,
-                                                fontSize: '1.25rem'
-                                            }}
-                                        >
-                                            {feature.title}
-                                        </Typography>
-
-                                        {/* Description */}
-                                        <Typography
-                                            variant="body2"
-                                            sx={{
-                                                color: 'rgba(255, 255, 255, 0.7)',
-                                                mb: 3,
-                                                lineHeight: 1.6
-                                            }}
-                                        >
-                                            {feature.description}
-                                        </Typography>
-
-                                        {/* Features List */}
-                                        <Box component="ul" sx={{ pl: 0, listStyle: 'none', m: 0 }}>
-                                            {feature.features.map((item, idx) => (
-                                                <Box
-                                                    component="li"
-                                                    key={idx}
-                                                    sx={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        mb: 1.5,
-                                                        color: 'rgba(255, 255, 255, 0.8)',
-                                                        fontSize: '0.875rem'
-                                                    }}
-                                                >
-                                                    <Box
-                                                        sx={{
-                                                            width: 6,
-                                                            height: 6,
-                                                            borderRadius: '50%',
-                                                            bgcolor: 'success.main',
-                                                            mr: 2,
-                                                            flexShrink: 0
-                                                        }}
-                                                    />
-                                                    {item}
-                                                </Box>
-                                            ))}
-                                        </Box>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
-                </Box>
-            </Container>
-
-            {/* How It Works Section */}
-            <Container maxWidth="lg">
-                <Box sx={{ mb: { xs: 8, md: 12 } }}>
-                    <Typography
-                        variant="h2"
-                        sx={{
-                            fontSize: { xs: '2rem', md: '2.5rem' },
-                            fontWeight: 700,
-                            textAlign: 'center',
-                            mb: 2
-                        }}
-                    >
-                        {t('howItWorks.title')}
-                    </Typography>
-                    <Typography
-                        variant="body1"
-                        sx={{
-                            textAlign: 'center',
-                            color: 'rgba(255, 255, 255, 0.7)',
-                            mb: 6,
-                            maxWidth: '600px',
-                            mx: 'auto'
-                        }}
-                    >
-                        {t('howItWorks.subtitle')}
-                    </Typography>
-
-                    <Grid container spacing={4} alignItems="center">
-                        {[
-                            {
-                                step: '1',
-                                title: t('howItWorks.step1.title'),
-                                description: t('howItWorks.step1.description')
-                            },
-                            {
-                                step: '2',
-                                title: t('howItWorks.step2.title'),
-                                description: t('howItWorks.step2.description')
-                            },
-                            {
-                                step: '3',
-                                title: t('howItWorks.step3.title'),
-                                description: t('howItWorks.step3.description')
-                            }
-                        ].map((step, index) => (
-                            <Grid size={{ xs: 12, md: 4 }} key={index}>
-                                <Box sx={{ textAlign: 'center', position: 'relative' }}>
-                                    {/* Step Number */}
-                                    <Box
-                                        sx={{
-                                            width: 80,
-                                            height: 80,
-                                            borderRadius: '50%',
-                                            bgcolor: 'rgba(255, 152, 0, 0.1)',
-                                            border: '2px solid',
-                                            borderColor: 'warning.main',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            mx: 'auto',
-                                            mb: 3,
-                                            fontSize: '2rem',
-                                            fontWeight: 800,
-                                            color: 'warning.main',
-                                            boxShadow: '0 8px 16px rgba(255, 152, 0, 0.2)'
-                                        }}
-                                    >
-                                        {step.step}
+                        <Grid size={{ xs: 12, md: 8 }}>
+                            {/* AI Insights - NEW FEATURE */}
+                            <Card sx={{ height: '100%', bgcolor: 'rgba(103, 58, 183, 0.15)', borderRadius: 3, border: '1px solid rgba(103, 58, 183, 0.4)' }}>
+                                <CardContent>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 1 }}>
+                                        <IconSparkles />
+                                        <Typography variant="h5" sx={{ fontWeight: 700, color: '#d1c4e9' }}>AI Strategic Insights</Typography>
                                     </Box>
+                                    <Divider sx={{ bgcolor: 'rgba(255,255,255,0.1)', mb: 2 }} />
 
-                                    {/* Title */}
-                                    <Typography
-                                        variant="h5"
-                                        sx={{
-                                            fontWeight: 700,
-                                            mb: 2,
-                                            fontSize: '1.25rem'
-                                        }}
-                                    >
-                                        {step.title}
-                                    </Typography>
-
-                                    {/* Description */}
-                                    <Typography
-                                        variant="body2"
-                                        sx={{
-                                            color: 'rgba(255, 255, 255, 0.7)',
-                                            lineHeight: 1.6,
-                                            maxWidth: '300px',
-                                            mx: 'auto'
-                                        }}
-                                    >
-                                        {step.description}
-                                    </Typography>
-                                </Box>
-                            </Grid>
-                        ))}
+                                    {result.strategicRecommendations?.map((rec) => (
+                                        <Box key={rec.id} sx={{ mb: 2 }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                                                <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'white' }}>{rec.title}</Typography>
+                                                <Chip label={rec.impact} size="small" color={rec.impact === 'High' ? 'error' : 'secondary'} variant="outlined" />
+                                            </Box>
+                                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                                                {rec.description}
+                                            </Typography>
+                                        </Box>
+                                    ))}
+                                    {(!result.strategicRecommendations || result.strategicRecommendations.length === 0) && (
+                                        <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'gray' }}>No strategic insights available at this time.</Typography>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </Grid>
                     </Grid>
-                </Box>
-            </Container>
 
-            {/* Final CTA Section */}
-            <Container maxWidth="md">
-                <Box
-                    sx={{
-                        textAlign: 'center',
-                        pb: { xs: 8, md: 12 },
-                        pt: { xs: 4, md: 6 }
-                    }}
-                >
-                    <Typography
-                        variant="h2"
-                        sx={{
-                            fontSize: { xs: '2rem', md: '2.75rem' },
-                            fontWeight: 700,
-                            mb: 4
-                        }}
-                    >
-                        {t('cta.title')}
-                    </Typography>
+                    {/* 2. Detailed Recommendations */}
+                    <Typography variant="h4" sx={{ mb: 3, fontWeight: 700 }}>Audit Details</Typography>
 
-                    <Button
-                        variant="contained"
-                        size="large"
-                        sx={{
-                            px: 6,
-                            py: 2,
-                            bgcolor: 'warning.main',
-                            color: 'grey.900',
-                            fontWeight: 700,
-                            fontSize: '1.125rem',
-                            borderRadius: 2,
-                            boxShadow: '0 8px 24px rgba(255, 152, 0, 0.4)',
-                            '&:hover': {
-                                bgcolor: 'warning.dark',
-                                boxShadow: '0 12px 32px rgba(255, 152, 0, 0.5)',
-                                transform: 'translateY(-2px)'
-                            },
-                            transition: 'all 0.3s ease'
-                        }}
-                    >
-                        {t('cta.button')}
-                    </Button>
-                </Box>
-            </Container>
+                    {result.recommendations.length === 0 ? (
+                        <Alert severity="success" sx={{ mb: 4, bgcolor: 'rgba(76, 175, 80, 0.1)', color: '#a5d6a7' }}>
+                            Great job! No critical issues found.
+                        </Alert>
+                    ) : (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {result.recommendations.map((rec, index) => (
+                                <Accordion key={index} sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: 'white' }}>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', pr: 2 }}>
+                                            {rec.priority === 'high' && <ErrorIcon color="error" sx={{ mr: 2 }} />}
+                                            {rec.priority === 'medium' && <WarningIcon color="warning" sx={{ mr: 2 }} />}
+                                            {rec.priority === 'low' && <CheckCircleIcon color="success" sx={{ mr: 2 }} />}
 
-            {/* Footer Branding */}
-            <Box
-                sx={{
-                    borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-                    py: 4,
-                    textAlign: 'center'
-                }}
-            >
-                <Container>
-                    <Typography
-                        variant="body2"
-                        sx={{
-                            color: 'rgba(255, 255, 255, 0.5)',
-                            fontSize: '0.875rem'
-                        }}
-                    >
-                        © 2025 Adlites SEO. All rights reserved.
-                    </Typography>
+                                            <Typography sx={{ flex: 1, fontWeight: 600 }}>{rec.issue}</Typography>
+                                            <Chip label={rec.category.replace('_', ' ')} size="small" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)', textTransform: 'capitalize' }} />
+                                        </Box>
+                                    </AccordionSummary>
+                                    <AccordionDetails sx={{ bgcolor: 'rgba(0,0,0,0.2)' }}>
+                                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', mb: 1 }}>
+                                            <strong>Recommendation:</strong> {rec.recommendation}
+                                        </Typography>
+                                    </AccordionDetails>
+                                </Accordion>
+                            ))}
+                        </Box>
+                    )}
                 </Container>
-            </Box>
+            )}
         </Box>
     )
 }

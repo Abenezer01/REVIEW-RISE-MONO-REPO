@@ -1,0 +1,31 @@
+Starting verification with provider: gemini
+SEO Snapshot persisted for https://example.com (ID: aba1f2a8-4cf4-4a1c-a8bd-82ff9882a599, User: Anonymous)
+Health Score: 48
+Strategic Recommendations (AI):
+✅ Strategic Recommendations found: 3
+[
+  {
+    "id": 1,
+    "title": "Implement Organization and SameAs Schema Markup",
+    "description": "Deploy advanced JSON-LD Schema on the homepage, specifically using the 'Organization' type and 'sameAs' properties to link all verified social profiles and brand entities. This will help search engines definitively connect the brand's digital footprint, addressing the low Citation Authority (38/100) and low Visibility Score (48/100) by strengthening the Knowledge Graph presence.",
+    "impact": "High",
+    "type": "technical"
+  },
+  {
+    "id": 2,
+    "title": "Perform a Technical NAP Audit and Data Cleansing",
+    "description": "Execute a full audit of Name, Address, and Phone (NAP) consistency across all indexed directories. While 'Missing From' is none, the low Citation Authority indicates high levels of data fragmentation or conflicting information. Consolidating these via API-driven tools will prevent authority dilution and improve local/organic search signals.",
+    "impact": "High",
+    "type": "authority"
+  },
+  {
+    "id": 3,
+    "title": "Deploy Review Aggregation Schema for SERP Real Estate",
+    "description": "Integrate 'AggregateRating' schema on key service or product pages to pull star ratings into the Search Engine Results Pages (SERPs). This leverages the positive Sentiment Score (75/100) to increase Click-Through Rates (CTR), which indirectly signals higher relevance to search engines and boosts the overall Visibility Score.",
+    "impact": "Medium",
+    "type": "technical"
+  }
+]
+Standard Recommendations:
+✅ Standard Recommendations found: 10
+✅ Summary field present

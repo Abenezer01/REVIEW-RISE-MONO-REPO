@@ -12,13 +12,13 @@ export function evaluateRules(data: any) {
 
     seoRules.categories.forEach(category => {
         let categoryPoints = 0;
-        
+
         // Calculate points per rule assuming equal weight distribution within category maxPoints
         // OR we can assign points based on pass/fail validation count
         // The user provided config has `maxPoints` for category.
         // We will distribute these points among the rules based on their severity or just equally?
         // User didn't specify per-rule points. Let's assume weighted by severity.
-        
+
         const rules = category.rules;
         const totalWeight = rules.reduce((acc, rule) => {
             const severity = rule.severity as 'HIGH' | 'MEDIUM' | 'LOW';
@@ -33,12 +33,34 @@ export function evaluateRules(data: any) {
             let status = 'PASS';
             let scoreMultiplier = 1.0;
 
+            // Handle subRules (e.g., Core Web Vitals)
+            if ((rule as any).subRules) {
+                const subRules = (rule as any).subRules;
+                let passedCount = 0;
+                const totalSubRules = subRules.length;
+
+                subRules.forEach((subRule: any) => {
+                    const metricValue = getValue(data, `metrics.${subRule.metric.toLowerCase()}`);
+                    if (metricValue !== undefined && metricValue <= subRule.pass) {
+                        passedCount++;
+                    }
+                });
+
+                const passRatio = passedCount / totalSubRules;
+                if (passRatio >= 0.75) {
+                    status = 'PASS';
+                } else if (passRatio >= 0.5) {
+                    status = 'WARNING';
+                } else {
+                    status = 'FAIL';
+                }
+            }
             // Check thresholds first if available (they are more specific)
-            if (rule.thresholds) {
+            else if (rule.thresholds) {
                 const passField = rule.thresholds.pass.field;
                 const passVal = getValue(data, passField);
                 const passConfig = rule.thresholds.pass;
-                
+
                 if (checkCondition(passVal, passConfig.operator, passConfig.value)) {
                     status = 'PASS';
                 } else {
@@ -88,7 +110,7 @@ export function evaluateRules(data: any) {
             percentage: Math.round((categoryPoints / category.maxPoints) * 100),
             label: category.name
         };
-        
+
         totalScore += categoryPoints;
         totalMaxPoints += category.maxPoints;
     });
