@@ -274,7 +274,7 @@ export const confirmExtraction = async (brandProfileId: string) => {
   const data = brandProfile.currentExtractedData as unknown as ExtractedBrandData
 
   // Transactionally update brand profile and create assets
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: any) => {
     // Clear existing configuration
     await tx.brandAsset.deleteMany({ where: { brandProfileId } })
     await tx.brandColor.deleteMany({ where: { brandProfileId } })
