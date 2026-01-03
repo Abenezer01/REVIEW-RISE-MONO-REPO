@@ -23,6 +23,7 @@ const extractBrandData = async (websiteUrl: string): Promise<ExtractedBrandData>
       },
       timeout: 10000 // 10s timeout
     })
+    // eslint-disable-next-line no-console
     console.log(`Scraping ${websiteUrl} - Status: ${response.status}, Data Length: ${response.data?.length}`)
     const $ = cheerio.load(response.data)
 
@@ -35,14 +36,14 @@ const extractBrandData = async (websiteUrl: string): Promise<ExtractedBrandData>
     if (favicon) {
       try {
         assets.push({ type: 'favicon', url: new URL(favicon, websiteUrl).toString(), altText: 'Favicon' })
-      } catch (e) { /* ignore invalid URL */ }
+      } catch { /* ignore invalid URL */ }
     }
     // OG Image
     const ogImage = $('meta[property="og:image"]').attr('content')
     if (ogImage) {
       try {
         assets.push({ type: 'og_image', url: new URL(ogImage, websiteUrl).toString(), altText: 'OG Image' })
-      } catch (e) { /* ignore invalid URL */ }
+      } catch { /* ignore invalid URL */ }
     }
 
     const socialLinks: ExtractedBrandData['socialLinks'] = []
@@ -58,7 +59,7 @@ const extractBrandData = async (websiteUrl: string): Promise<ExtractedBrandData>
               socialLinks.push({ platform: platform.split('.')[0], url: fullUrl })
             }
           }
-        } catch (e) { /* ignore */ }
+        } catch { /* ignore */ }
       }
     })
 
@@ -81,7 +82,7 @@ const extractBrandData = async (websiteUrl: string): Promise<ExtractedBrandData>
               }
             })
           }
-        } catch (e) { /* ignore invalid URL */ }
+        } catch { /* ignore invalid URL */ }
       }
     })
 
@@ -250,7 +251,7 @@ export const reExtractBrandProfile = async (id: string) => {
             updatedAt: new Date(),
           },
         })
-      } catch (e) {
+      } catch {
         await prisma.brandProfile.update({
           where: { id },
           data: { status: 'failed' } // Or revert to previous status
