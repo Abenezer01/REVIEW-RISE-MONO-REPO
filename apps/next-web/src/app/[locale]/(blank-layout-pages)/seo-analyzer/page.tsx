@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+
 import axios from 'axios'
 import { useTranslations } from 'next-intl'
 import Box from '@mui/material/Box'
@@ -26,7 +27,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import WarningIcon from '@mui/icons-material/Warning'
 import ErrorIcon from '@mui/icons-material/Error'
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 
 // Tabler Icons (Simple SVG Wrappers)
 const IconWorld = () => (
@@ -99,7 +99,8 @@ export default function SeoAnalyzerPage() {
     const getScoreColor = (score: number) => {
         if (score >= 90) return '#4caf50' // Green
         if (score >= 70) return '#ff9800' // Orange
-        return '#f44336' // Red
+        
+return '#f44336' // Red
     }
 
     return (
@@ -226,8 +227,8 @@ export default function SeoAnalyzerPage() {
                             {/* AI Insights - NEW FEATURE */}
                             <Card sx={{ height: '100%', bgcolor: 'rgba(103, 58, 183, 0.15)', borderRadius: 3, border: '1px solid rgba(103, 58, 183, 0.4)' }}>
                                 <CardContent>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                        <AutoAwesomeIcon sx={{ color: '#b39ddb', mr: 1 }} />
+                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 1 }}>
+                                        <IconSparkles />
                                         <Typography variant="h5" sx={{ fontWeight: 700, color: '#d1c4e9' }}>AI Strategic Insights</Typography>
                                     </Box>
                                     <Divider sx={{ bgcolor: 'rgba(255,255,255,0.1)', mb: 2 }} />

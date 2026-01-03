@@ -37,7 +37,7 @@ export function evaluateRules(data: any) {
             if ((rule as any).subRules) {
                 const subRules = (rule as any).subRules;
                 let passedCount = 0;
-                let totalSubRules = subRules.length;
+                const totalSubRules = subRules.length;
 
                 subRules.forEach((subRule: any) => {
                     const metricValue = getValue(data, `metrics.${subRule.metric.toLowerCase()}`);

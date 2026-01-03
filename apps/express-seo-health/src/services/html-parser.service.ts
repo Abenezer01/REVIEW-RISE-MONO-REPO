@@ -51,6 +51,7 @@ export interface ExtractedData {
     };
     performance: {
         renderBlockingCount: number;
+        hasRenderBlockingResources: boolean;
     };
     metrics: {
         ttfb: number;
@@ -253,7 +254,10 @@ export async function extractSEOData(url: string, html: string, fetchResult: any
         page: { htmlSizeKb: htmlSizeKb, domNodes: domNodes },
         html: { lang: htmlLang.length },
         network: { requestCount: reqCount },
-        performance: { renderBlockingCount: blockingScripts + blockingStyles },
+        performance: {
+            renderBlockingCount: blockingScripts + blockingStyles,
+            hasRenderBlockingResources: renderBlocking
+        },
         metrics: { ttfb: ttfb, fcp: fcp, lcp: lcp, cls: 0.05 },
         security: {
             isHttps: sslValid,
