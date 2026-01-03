@@ -54,7 +54,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
   const { user } = useAuth()
-  const t = useTranslations('dashboard')
+  const tDashboard = useTranslations('dashboard')
+  const tCommon = useTranslations('common')
   const locale = useLocale() as string
 
   // Vars
@@ -78,7 +79,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         return (
           <SubMenu
             key={index}
-            label={t(item.title as any)}
+            label={item.title.startsWith('navigation.brand-profiles') ? tCommon(item.title as any) : tDashboard(item.title as any)}
             icon={item.icon ? <i className={item.icon} /> : undefined}
           >
             {renderMenuItems(item.children)}
@@ -94,11 +95,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           key={index}
           href={localizedHref as any}
           component={<Link href={(item.href as any) || '/'} />}
-          exactMatch={item.href === '/admin'}
+          exactMatch={true}
           activeUrl={item.href as any}
           icon={item.icon ? <i className={item.icon} /> : undefined}
         >
-          {t(item.title as any)}
+          {item.title.startsWith('navigation.brand-profiles') ? tCommon(item.title as any) : tDashboard(item.title as any)}
         </MenuItem>
       )
     })

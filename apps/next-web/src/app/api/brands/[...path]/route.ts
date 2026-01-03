@@ -1,7 +1,7 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 
-const SERVICE_URL = 'http://localhost:3004/api/v1/brands';
+const SERVICE_URL = 'http://localhost:3004/api/v1/brand-profiles';
 
 async function proxy(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params;
@@ -16,13 +16,13 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ path: str
     const contentType = req.headers.get('content-type');
 
     if (contentType) headers.set('content-type', contentType);
-    
+
     const auth = req.headers.get('authorization');
 
     if (auth) headers.set('authorization', auth);
 
     const body = req.method !== 'GET' && req.method !== 'HEAD' ? await req.text() : undefined;
-    
+
     const response = await fetch(url, {
       method: req.method,
       headers,
@@ -38,11 +38,11 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ path: str
     } catch {
         data = { message: text };
     }
-    
+
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error('Proxy error:', error);
-    
+
 return NextResponse.json({ error: 'Proxy error', details: String(error) }, { status: 500 });
   }
 }

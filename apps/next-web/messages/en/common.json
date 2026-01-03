@@ -8,7 +8,9 @@
     "dashboard": "Dashboard",
     "reviews": "Reviews",
     "settings": "Settings",
-    "logout": "Logout"
+    "logout": "Logout",
+    "brand-profiles": "Brand Profiles",
+    "profiles": "Profiles"
   },
   "common": {
     "apply": "Apply",

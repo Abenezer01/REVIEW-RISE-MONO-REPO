@@ -1,31 +1,15 @@
-import { headers, cookies } from 'next/headers'
-
 import axios, { type AxiosRequestConfig, isAxiosError } from 'axios'
 
 interface BackendClientOptions extends AxiosRequestConfig {
   baseUrl?: string
+  authorization?: string // Add authorization to options
 }
 
 export async function backendClient<T = any>(
   path: string,
   options: BackendClientOptions = {}
 ): Promise<T> {
-  const { baseUrl, headers: customHeaders, ...rest } = options
-
-  // Get headers from the incoming request (e.g. Authorization)
-  const headersList = await headers()
-  let authorization = headersList.get('authorization')
-
-  // If no Authorization header, check for accessToken cookie
-  if (!authorization) {
-    const cookieStore = await cookies()
-
-    const accessToken = cookieStore.get('accessToken')
-
-    if (accessToken) {
-      authorization = `Bearer ${accessToken.value}`
-    }
-  }
+  const { baseUrl, headers: customHeaders, authorization, ...rest } = options
 
   const mergedHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
