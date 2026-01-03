@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useParams } from 'next/navigation';
+import React from 'react';
+import { useParams, useRouter, usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { BrandService } from '@/services/brand.service';
@@ -15,104 +15,50 @@ import {
   Button, 
   Stack, 
   Chip, 
-  Paper, 
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   useTheme, 
-  alpha, 
-  Tabs, 
-  Tab 
+  alpha,
+  Grid
 } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
-import AutoGraphIcon from '@mui/icons-material/AutoGraph';
-import VerifiedIcon from '@mui/icons-material/Verified';
-import PriceCheckIcon from '@mui/icons-material/PriceCheck';
-import AdsClickIcon from '@mui/icons-material/AdsClick';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import StarIcon from '@mui/icons-material/Star';
+import GroupsIcon from '@mui/icons-material/Groups';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import DescriptionIcon from '@mui/icons-material/Description';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import CodeIcon from '@mui/icons-material/Code';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
-// Helper: Ensure Array
 const ensureArray = (data: any): string[] => {
     if (Array.isArray(data)) return data;
     if (typeof data === 'string') return [data];
     return [];
 };
 
-// Helper Components
-const SectionPaper = ({ title, children, color, icon }: { title: string, children: React.ReactNode, color?: string, icon?: React.ReactNode }) => (
-    <Paper sx={{ p: 3, borderRadius: 2, height: '100%', ...(color && { borderTop: `4px solid ${color}` }) }}>
-        <Stack direction="row" alignItems="center" spacing={1.5} mb={2}>
-            {icon && <Box sx={{ display: 'flex' }}>{icon}</Box>}
-            <Typography variant="h6" fontWeight="bold" sx={{ color: color || 'text.primary' }}>{title}</Typography>
-        </Stack>
-        {children}
-    </Paper>
-);
-
-const ListItems = ({ items, icon }: { items?: string[], icon: React.ReactNode }) => {
-    if (!items || items.length === 0) return <Typography variant="body2" color="text.secondary">None identified.</Typography>;
-    return (
-        <Stack spacing={1.5}>
-            {items.map((item, i) => (
-                <Stack key={i} direction="row" spacing={1.5} alignItems="start">
-                    <Box sx={{ mt: 0.3 }}>{icon}</Box>
-                    <Typography variant="body2" sx={{ lineHeight: 1.6 }}>{item}</Typography>
-                </Stack>
-            ))}
-        </Stack>
-    );
-};
-
-const LinkTypography = ({ domain }: { domain?: string | null }) => {
-    if (!domain) return null;
-    return (
-        <Typography 
-            component="a" 
-            href={domain.startsWith('http') ? domain : `https://${domain}`} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            variant="body2" 
-            color="primary" 
-            sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
-        >
-            {domain}
-        </Typography>
-    );
-};
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-const TabPanel = (props: TabPanelProps) => {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`competitor-tabpanel-${index}`}
-      aria-labelledby={`competitor-tab-${index}`}
-      {...other}
-      style={{ minHeight: 300 }}
-    >
-      {value === index && (
-        <Box sx={{ py: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-};
-
 export default function CompetitorDetailPage() {
   const t = useTranslations('dashboard');
   const theme = useTheme();
+  const router = useRouter();
   const params = useParams();
+  const pathname = usePathname();
   const competitorId = params.competitorId as string;
   const { businessId } = useBusinessId();
-  const [tabValue, setTabValue] = useState(0);
+
+  // Get base path for back navigation (remove competitorId from pathname)
+  const basePath = pathname.replace(`/${competitorId}`, '');
 
   const { data: competitor, isLoading, error } = useQuery({
     queryKey: ['competitor', businessId, competitorId],
@@ -123,174 +69,384 @@ export default function CompetitorDetailPage() {
     enabled: !!businessId && !!competitorId
   });
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
-
   if (isLoading) return <Box p={4} display="flex" justifyContent="center"><CircularProgress /></Box>;
   if (error || !competitor) return <Box p={4}><Alert severity="error">Competitor not found or failed to load.</Alert></Box>;
 
   const snapshot = competitor.snapshots?.[0] || {};
 
+  // Extract data from snapshot
+  const strengths = ensureArray(snapshot.differentiators?.strengths);
+  const weaknesses = ensureArray(snapshot.differentiators?.weaknesses);
+  const whatToLearn = ensureArray(snapshot.whatToLearn);
+  const whatToAvoid = ensureArray(snapshot.whatToAvoid);
+  const uniqueDifferentiators = ensureArray(snapshot.differentiators?.unique);
+  const services = ensureArray(snapshot.serviceList);
+  const pricingCues = ensureArray(snapshot.pricingCues);
+
+  // Trust Metrics from AI analysis or parsed from trustSignals
+  const trustMetrics = snapshot.metrics?.trustMetrics || {};
+  const rating = trustMetrics.rating || snapshot.trustSignals?.avgRating || null;
+  const clientCount = trustMetrics.clientCount || snapshot.trustSignals?.reviewCount || null;
+  const awardCount = trustMetrics.awardCount || null;
+
+  const techStack = [
+      { name: 'WordPress', icon: <CodeIcon fontSize="small" /> },
+      { name: 'Google Analytics', icon: <AnalyticsIcon fontSize="small" /> }
+  ];
+
+  const comparisonData = [
+      { feature: 'Free Audit Offer', competitor: true, growthHub: false },
+      { feature: 'Transparent Pricing', competitor: true, growthHub: true },
+      { feature: 'Client Portal', competitor: true, growthHub: false },
+      { feature: 'Performance Guarantee', competitor: true, growthHub: false },
+  ];
+
+  const cardStyle = {
+      borderRadius: 3,
+      bgcolor: theme.palette.background.paper,
+      border: `1px solid ${theme.palette.divider}`,
+      boxShadow: 'none',
+      overflow: 'hidden'
+  };
+
+  // Style for text that may overflow
+  const textOverflowStyle = {
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      display: '-webkit-box',
+      WebkitLineClamp: 3,
+      WebkitBoxOrient: 'vertical' as const
+  };
+
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      {/* Header */}
-      <Box mb={4}>
-           <Button 
-                onClick={() => window.history.back()} 
-                startIcon={<ArrowBackIcon />}
-                sx={{ mb: 2, color: 'text.secondary' }}
-           >
-                {t('brandRise.competitors.listTitle')}
-           </Button>
-           
-           <Box display="flex" justifyContent="space-between" alignItems="center" pb={3} borderBottom={`1px solid ${theme.palette.divider}`}>
-                <Stack direction="row" spacing={3} alignItems="center">
-                    {competitor.logo ? (
-                        <Box component="img" src={competitor.logo} sx={{ width: 64, height: 64, borderRadius: 2, objectFit: 'contain', bgcolor: 'background.paper', boxShadow: 1 }} />
-                    ) : (
-                        <Box sx={{ width: 64, height: 64, borderRadius: 2, bgcolor: 'primary.main', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '1.5rem', boxShadow: 1 }}>
-                            {competitor.name?.substring(0, 1) || competitor.domain?.substring(0, 1)}
-                        </Box>
-                    )}
-                    <Box>
-                        <Stack direction="row" alignItems="center" spacing={2} mb={0.5}>
-                             <Typography variant="h4" fontWeight="bold">{competitor.name || competitor.domain}</Typography>
-                             <Chip 
-                                label={competitor.type.replace('_', ' ')} 
-                                size="small" 
-                                color={competitor.type === 'DIRECT_LOCAL' ? 'success' : 'default'} 
-                                sx={{ fontWeight: 600, textTransform: 'capitalize' }}
-                            />
+    <Box sx={{ bgcolor: theme.palette.background.default, minHeight: '100vh', py: 4 }}>
+      <Container maxWidth="xl">
+        {/* Back Button */}
+        <Button 
+            onClick={() => router.push(basePath)} 
+            startIcon={<ArrowBackIcon />}
+            sx={{ mb: 3, color: theme.palette.text.secondary, textTransform: 'none' }}
+        >
+            Back to Competitors
+        </Button>
+
+        {/* Header */}
+        <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'start', md: 'center' }} mb={4} spacing={2}>
+          <Box>
+              <Typography variant="h4" fontWeight="bold" color="text.primary">Competitor Analysis</Typography>
+              <Typography variant="body2" color="text.secondary" mt={0.5}>Deep insights from {competitor.name}</Typography>
+          </Box>
+          <Stack direction="row" spacing={2}>
+              <Button variant="outlined" startIcon={<CompareArrowsIcon />} sx={{ borderColor: theme.palette.divider, color: theme.palette.text.secondary, textTransform: 'none' }}>Compare</Button>
+              <Button variant="contained" sx={{ bgcolor: theme.palette.warning.main, color: 'white', textTransform: 'none', '&:hover': { bgcolor: theme.palette.warning.dark } }} startIcon={<DescriptionIcon />}>Generate Report</Button>
+          </Stack>
+        </Stack>
+
+        {/* Main Content Row */}
+        <Grid container spacing={3} sx={{ mb: 4 }} alignItems="flex-start">
+          {/* LEFT: Main Info */}
+          <Grid size={{ xs: 12, lg: 8 }}>
+              <Card sx={cardStyle}>
+                  <CardContent sx={{ p: 4 }}>
+                      {/* Company Header */}
+                      <Stack direction="row" justifyContent="space-between" alignItems="start" mb={4}>
+                          <Box>
+                              <Typography variant="h5" fontWeight="bold" color="text.primary">{competitor.name}</Typography>
+                              <Typography 
+                                  component="a" 
+                                  href={competitor.domain?.startsWith('http') ? competitor.domain : `https://${competitor.domain}`} 
+                                  target="_blank"
+                                  variant="body2" 
+                                  sx={{ color: theme.palette.info.main, textDecoration: 'none' }}
+                              >
+                                  {competitor.domain}
+                              </Typography>
+                          </Box>
+                          {competitor.type === 'DIRECT_LOCAL' && (
+                               <Chip label="DIRECT LOCAL" size="small" sx={{ borderRadius: 1, fontWeight: 'bold', bgcolor: theme.palette.success.main, color: 'white', fontSize: '0.7rem' }} />
+                          )}
+                      </Stack>
+
+                      {/* UVP */}
+                      <Box mb={4}>
+                          <Typography variant="caption" color="text.secondary" fontWeight="bold" sx={{ letterSpacing: 1, display: 'block', mb: 1.5 }}>UNIQUE VALUE PROPOSITION</Typography>
+                          <Typography variant="body1" color="text.primary" sx={{ lineHeight: 1.7, ...textOverflowStyle, WebkitLineClamp: 4 }}>
+                              {snapshot.uvp || "No UVP extracted yet."}
+                          </Typography>
+                      </Box>
+
+                      {/* Services */}
+                      <Box mb={4}>
+                          <Typography variant="caption" color="text.secondary" fontWeight="bold" sx={{ letterSpacing: 1, display: 'block', mb: 2 }}>TOP SERVICES</Typography>
+                          <Stack spacing={1.5}>
+                              {services.length > 0 ? services.slice(0, 4).map((service, i) => (
+                                  <Stack key={i} direction="row" spacing={1.5} alignItems="center">
+                                      <CheckCircleIcon sx={{ color: theme.palette.success.main, fontSize: 20 }} />
+                                      <Typography variant="body2" color="text.primary">{service}</Typography>
+                                  </Stack>
+                              )) : (
+                                  <Typography variant="body2" color="text.secondary">No services extracted yet.</Typography>
+                              )}
+                          </Stack>
+                      </Box>
+
+                      {/* Pricing */}
+                      <Box mb={4}>
+                          <Typography variant="caption" color="text.secondary" fontWeight="bold" sx={{ letterSpacing: 1, display: 'block', mb: 2 }}>PRICING STRUCTURE</Typography>
+                          <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
+                              {pricingCues.length > 0 ? pricingCues.map((price, i) => (
+                                  <Chip 
+                                      key={i} 
+                                      label={price} 
+                                      size="small"
+                                      sx={{ 
+                                          bgcolor: 'transparent', 
+                                          border: `1px solid ${theme.palette.warning.main}`,
+                                          color: theme.palette.warning.main,
+                                          fontWeight: 600,
+                                          borderRadius: 1,
+                                          fontSize: '0.75rem'
+                                      }} 
+                                  />
+                              )) : (
+                                  <Typography variant="body2" color="text.secondary">No pricing info extracted.</Typography>
+                              )}
+                          </Stack>
+                      </Box>
+
+                      {/* Trust Signals */}
+                      <Box mb={4}>
+                          <Typography variant="caption" color="text.secondary" fontWeight="bold" sx={{ letterSpacing: 1, display: 'block', mb: 2 }}>TRUST SIGNALS</Typography>
+                          <Stack direction="row" spacing={6} mt={1}>
+                              <Box textAlign="center">
+                                  <StarIcon sx={{ fontSize: 28, mb: 0.5, color: theme.palette.warning.main }} />
+                                  <Typography variant="h6" fontWeight="bold" color="text.primary">{rating ? `${rating}/5` : 'N/A'}</Typography>
+                                  <Typography variant="caption" color="text.secondary">RATING</Typography>
+                              </Box>
+                              <Box textAlign="center">
+                                  <GroupsIcon sx={{ fontSize: 28, mb: 0.5, color: theme.palette.info.main }} />
+                                  <Typography variant="h6" fontWeight="bold" color="text.primary">{clientCount || 'N/A'}</Typography>
+                                  <Typography variant="caption" color="text.secondary">CLIENTS</Typography>
+                              </Box>
+                              <Box textAlign="center">
+                                  <EmojiEventsIcon sx={{ fontSize: 28, mb: 0.5, color: theme.palette.success.main }} />
+                                  <Typography variant="h6" fontWeight="bold" color="text.primary">{awardCount || 'N/A'}</Typography>
+                                  <Typography variant="caption" color="text.secondary">AWARDS</Typography>
+                              </Box>
+                          </Stack>
+                      </Box>
+
+                      {/* CTA */}
+                      <Box>
+                          <Typography variant="caption" color="text.secondary" fontWeight="bold" sx={{ letterSpacing: 1, display: 'block', mb: 2 }}>CALL TO ACTION STYLE</Typography>
+                          <Button 
+                              fullWidth 
+                              variant="contained" 
+                              size="large"
+                              sx={{ 
+                                  background: `linear-gradient(90deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
+                                  '&:hover': { background: `linear-gradient(90deg, ${theme.palette.secondary.light} 0%, ${theme.palette.secondary.main} 100%)` },
+                                  textTransform: 'none',
+                                  fontWeight: 'bold',
+                                  py: 1.5,
+                                  borderRadius: 2
+                              }}
+                          >
+                              Get Your Free Marketing Audit
+                          </Button>
+                      </Box>
+                  </CardContent>
+              </Card>
+          </Grid>
+
+          {/* RIGHT: Insights */}
+          <Grid size={{ xs: 12, lg: 4 }}>
+              <Stack spacing={3}>
+                  {/* What to Learn */}
+                  <Card sx={{ ...cardStyle, background: `linear-gradient(180deg, ${alpha(theme.palette.secondary.main, 0.1)} 0%, ${theme.palette.background.paper} 100%)` }}>
+                      <CardContent sx={{ p: 3 }}>
+                          <Stack direction="row" spacing={1.5} alignItems="center" mb={3}>
+                              <LightbulbIcon sx={{ color: theme.palette.secondary.main }} />
+                              <Typography variant="h6" fontWeight="bold" color="text.primary">What to Learn</Typography>
+                          </Stack>
+                          <Stack spacing={2.5}>
+                              {whatToLearn.length > 0 ? whatToLearn.slice(0, 3).map((item, i) => (
+                                  <Box key={i}>
+                                      <Typography variant="caption" sx={{ color: theme.palette.secondary.main, fontWeight: 'bold', letterSpacing: 1 }}>INSIGHT {i + 1}</Typography>
+                                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.6, ...textOverflowStyle, WebkitLineClamp: 3 }}>{item}</Typography>
+                                  </Box>
+                              )) : (
+                                  <Typography variant="body2" color="text.secondary">No insights available yet.</Typography>
+                              )}
+                          </Stack>
+                      </CardContent>
+                  </Card>
+
+                  {/* What to Avoid */}
+                  <Card sx={{ ...cardStyle, background: `linear-gradient(180deg, ${alpha(theme.palette.error.main, 0.08)} 0%, ${theme.palette.background.paper} 100%)` }}>
+                      <CardContent sx={{ p: 3 }}>
+                          <Stack direction="row" spacing={1.5} alignItems="center" mb={3}>
+                              <ReportProblemIcon sx={{ color: theme.palette.error.main }} />
+                              <Typography variant="h6" fontWeight="bold" color="text.primary">What to Avoid</Typography>
+                          </Stack>
+                          <Stack spacing={2.5}>
+                              {whatToAvoid.length > 0 ? whatToAvoid.slice(0, 3).map((item, i) => (
+                                  <Box key={i}>
+                                      <Typography variant="caption" sx={{ color: theme.palette.error.main, fontWeight: 'bold', letterSpacing: 1 }}>CAUTION {i + 1}</Typography>
+                                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.6, ...textOverflowStyle, WebkitLineClamp: 3 }}>{item}</Typography>
+                                  </Box>
+                              )) : (
+                                  <Typography variant="body2" color="text.secondary">No warnings available yet.</Typography>
+                              )}
+                          </Stack>
+                      </CardContent>
+                  </Card>
+
+                  {/* Tech Stack */}
+                  <Card sx={cardStyle}>
+                      <CardContent sx={{ p: 3 }}>
+                          <Typography variant="h6" fontWeight="bold" mb={2} color="text.primary">Tech Stack</Typography>
+                          <Stack direction="row" flexWrap="wrap" gap={1.5}>
+                              {techStack.map((tech, i) => (
+                                  <Chip 
+                                      key={i} 
+                                      icon={tech.icon} 
+                                      label={tech.name} 
+                                      variant="outlined" 
+                                      size="small"
+                                      sx={{ 
+                                          borderColor: theme.palette.divider,
+                                          color: theme.palette.text.primary,
+                                          '& .MuiChip-icon': { color: theme.palette.text.secondary }
+                                      }} 
+                                  />
+                              ))}
+                          </Stack>
+                      </CardContent>
+                  </Card>
+              </Stack>
+          </Grid>
+        </Grid>
+
+        {/* Strengths & Weaknesses Row */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+            {/* Strengths */}
+            <Grid size={{ xs: 12, md: 6 }}>
+                <Card sx={{ ...cardStyle, background: `linear-gradient(180deg, ${alpha(theme.palette.success.main, 0.06)} 0%, ${theme.palette.background.paper} 100%)` }}>
+                    <CardContent sx={{ p: 4 }}>
+                        <Stack direction="row" spacing={1.5} alignItems="center" mb={3}>
+                            <ThumbUpIcon sx={{ color: theme.palette.success.main }} />
+                            <Typography variant="h6" fontWeight="bold" color="text.primary">Strengths</Typography>
                         </Stack>
-                        <LinkTypography domain={competitor.domain} />
-                    </Box>
-                </Stack>
-                {/* Actions could go here */}
-           </Box>
-      </Box>
+                        <Stack spacing={2}>
+                            {strengths.length > 0 ? strengths.map((item, i) => (
+                                <Stack key={i} direction="row" spacing={1.5} alignItems="start">
+                                    <CheckCircleIcon sx={{ color: theme.palette.success.main, fontSize: 20, mt: 0.3 }} />
+                                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, ...textOverflowStyle, WebkitLineClamp: 2 }}>{item}</Typography>
+                                </Stack>
+                            )) : (
+                                <Typography variant="body2" color="text.secondary">No strengths identified yet.</Typography>
+                            )}
+                        </Stack>
+                    </CardContent>
+                </Card>
+            </Grid>
 
-      {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="competitor details tabs">
-          <Tab label="Overview" sx={{ fontWeight: 600 }} />
-          <Tab label="Strategic Analysis" sx={{ fontWeight: 600 }} />
-          <Tab label="Signals & Cues" sx={{ fontWeight: 600 }} />
-        </Tabs>
-      </Box>
+            {/* Weaknesses */}
+            <Grid size={{ xs: 12, md: 6 }}>
+                <Card sx={{ ...cardStyle, background: `linear-gradient(180deg, ${alpha(theme.palette.error.main, 0.06)} 0%, ${theme.palette.background.paper} 100%)` }}>
+                    <CardContent sx={{ p: 4 }}>
+                        <Stack direction="row" spacing={1.5} alignItems="center" mb={3}>
+                            <ThumbDownIcon sx={{ color: theme.palette.error.main }} />
+                            <Typography variant="h6" fontWeight="bold" color="text.primary">Weaknesses</Typography>
+                        </Stack>
+                        <Stack spacing={2}>
+                            {weaknesses.length > 0 ? weaknesses.map((item, i) => (
+                                <Stack key={i} direction="row" spacing={1.5} alignItems="start">
+                                    <CancelIcon sx={{ color: theme.palette.error.main, fontSize: 20, mt: 0.3 }} />
+                                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, ...textOverflowStyle, WebkitLineClamp: 2 }}>{item}</Typography>
+                                </Stack>
+                            )) : (
+                                <Typography variant="body2" color="text.secondary">No weaknesses identified yet.</Typography>
+                            )}
+                        </Stack>
+                    </CardContent>
+                </Card>
+            </Grid>
+        </Grid>
 
-      {/* Content */}
-      <Box sx={{ mt: 2 }}>
-        
-        {/* TAB 1: OVERVIEW */}
-        <TabPanel value={tabValue} index={0}>
-            <Stack spacing={4}>
-                {/* UVP Hero Section */}
-                <Paper sx={{ p: 4, borderRadius: 2, background: `linear-gradient(45deg, ${alpha(theme.palette.primary.main, 0.05)}, ${alpha(theme.palette.background.paper, 1)})`, borderLeft: `6px solid ${theme.palette.primary.main}` }}>
-                    <Typography variant="overline" color="primary" fontWeight="bold" sx={{ letterSpacing: 1.5 }}>Unique Value Proposition</Typography>
-                    <Typography variant="h5" fontWeight="500" sx={{ mt: 2, fontStyle: 'italic', color: 'text.primary', lineHeight: 1.5 }}>
-                        "{snapshot.uvp || "No UVP extracted yet."}"
-                    </Typography>
-                </Paper>
-
-                <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>
-                    {/* Services */}
-                    <Box sx={{ flex: 1 }}>
-                        <SectionPaper title="Service Offerings" icon={<VerifiedIcon color="info" />}>
-                            <Stack direction="row" flexWrap="wrap" gap={1}>
-                                {snapshot.serviceList?.map((service: string, i: number) => (
-                                    <Chip key={i} label={service} size="medium" variant="outlined" sx={{ borderRadius: 1 }} />
-                                )) || <Typography variant="body2" color="text.secondary">No services listed.</Typography>}
+        {/* Differentiators Row */}
+        <Box sx={{ mb: 4 }}>
+            <Card sx={{ ...cardStyle, background: `linear-gradient(180deg, ${alpha(theme.palette.warning.main, 0.06)} 0%, ${theme.palette.background.paper} 100%)` }}>
+                <CardContent sx={{ p: 4 }}>
+                    <Typography variant="h6" fontWeight="bold" mb={3} color="text.primary">Top 3 Differentiators</Typography>
+                    <Stack spacing={3}>
+                        {uniqueDifferentiators.length > 0 ? uniqueDifferentiators.slice(0, 3).map((diff, i) => (
+                            <Stack key={i} direction="row" spacing={2.5} alignItems="start">
+                                <Box sx={{ 
+                                    minWidth: 36, 
+                                    height: 36, 
+                                    borderRadius: 1.5, 
+                                    bgcolor: theme.palette.warning.main, 
+                                    color: 'white', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center', 
+                                    fontWeight: 'bold',
+                                    fontSize: '1rem'
+                                }}>
+                                    {i + 1}
+                                </Box>
+                                <Box>
+                                    <Typography variant="subtitle1" fontWeight="bold" color="text.primary" sx={{ mb: 0.5 }}>Differentiator {i + 1}</Typography>
+                                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, ...textOverflowStyle, WebkitLineClamp: 3 }}>{diff}</Typography>
+                                </Box>
                             </Stack>
-                        </SectionPaper>
-                    </Box>
+                        )) : (
+                            <Typography variant="body2" color="text.secondary">No differentiators identified yet.</Typography>
+                        )}
+                    </Stack>
+                </CardContent>
+            </Card>
+        </Box>
 
-                    {/* Differentiators */}
-                    <Box sx={{ flex: 1 }}>
-                        <SectionPaper title="Unique Differentiators" icon={<AutoGraphIcon color="secondary" />}>
-                             <Stack spacing={2}>
-                                {ensureArray(snapshot.differentiators?.unique).map((item, i) => (
-                                    <Box key={i} sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                                        <Box sx={{ minWidth: 24, height: 24, borderRadius: '50%', bgcolor: theme.palette.secondary.main, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 'bold', mt: 0.3 }}>
-                                            {i + 1}
-                                        </Box>
-                                        <Typography variant="body1">{item}</Typography>
-                                    </Box>
+        {/* Feature Comparison Matrix Row */}
+        <Box>
+             <Card sx={cardStyle}>
+                <CardContent sx={{ p: 4 }}>
+                    <Typography variant="h6" fontWeight="bold" mb={3} color="text.primary">Feature Comparison Matrix</Typography>
+                    <TableContainer>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 'bold', borderBottom: 'none', color: theme.palette.text.secondary, fontSize: '0.7rem', letterSpacing: 1, pb: 2 }}>FEATURE</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: 'bold', borderBottom: 'none', color: theme.palette.text.primary, pb: 2 }}>{competitor.name?.split(' ')[0] || 'Competitor'}</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: 'bold', borderBottom: 'none', color: theme.palette.text.primary, pb: 2 }}>Growth Hub</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: 'bold', borderBottom: 'none', color: theme.palette.text.primary, pb: 2 }}>Your Brand</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {comparisonData.map((row, i) => (
+                                    <TableRow key={i} sx={{ '& td': { borderBottom: `1px solid ${theme.palette.divider}`, py: 2.5 } }}>
+                                        <TableCell sx={{ color: theme.palette.text.primary }}>{row.feature}</TableCell>
+                                        <TableCell align="center">
+                                            {row.competitor ? <CheckCircleIcon sx={{ color: theme.palette.success.main }} /> : <CancelIcon sx={{ color: theme.palette.error.main }} />}
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            {row.growthHub ? <CheckCircleIcon sx={{ color: theme.palette.success.main }} /> : <CancelIcon sx={{ color: theme.palette.error.main }} />}
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <Typography variant="body2" color="text.secondary">—</Typography>
+                                        </TableCell>
+                                    </TableRow>
                                 ))}
-                                {ensureArray(snapshot.differentiators?.unique).length === 0 && <Typography variant="body2" color="text.secondary">None found.</Typography>}
-                             </Stack>
-                        </SectionPaper>
-                    </Box>
-                </Stack>
-            </Stack>
-        </TabPanel>
-
-        {/* TAB 2: STRATEGIC ANALYSIS */}
-        <TabPanel value={tabValue} index={1}>
-            <Stack direction="row" flexWrap="wrap" spacing={3} useFlexGap>
-                {/* Strengths */}
-                <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
-                    <SectionPaper title="Strengths" color={theme.palette.success.main} icon={<CheckCircleIcon color="success" />}>
-                        <ListItems items={ensureArray(snapshot.differentiators?.strengths)} icon={<CheckCircleIcon color="success" fontSize="small" />} />
-                    </SectionPaper>
-                </Box>
-                {/* Weaknesses */}
-                <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
-                    <SectionPaper title="Weaknesses" color={theme.palette.error.main} icon={<CancelIcon color="error" />}>
-                        <ListItems items={ensureArray(snapshot.differentiators?.weaknesses)} icon={<CancelIcon color="error" fontSize="small" />} />
-                    </SectionPaper>
-                </Box>
-                {/* What to Learn */}
-                <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
-                    <SectionPaper title="What to Learn" color={theme.palette.warning.main} icon={<LightbulbIcon color="warning" />}>
-                        <ListItems items={ensureArray(snapshot.whatToLearn)} icon={<CheckCircleIcon color="warning" fontSize="small" />} />
-                    </SectionPaper>
-                </Box>
-                {/* What to Avoid */}
-                <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
-                    <SectionPaper title="What to Avoid" color={theme.palette.error.dark} icon={<CancelIcon sx={{ color: theme.palette.error.dark }} />}>
-                         <ListItems items={ensureArray(snapshot.whatToAvoid)} icon={<CancelIcon sx={{ color: theme.palette.error.dark }} fontSize="small" />} />
-                    </SectionPaper>
-                </Box>
-            </Stack>
-        </TabPanel>
-
-        {/* TAB 3: SIGNALS */}
-        <TabPanel value={tabValue} index={2}>
-            <Stack direction="row" flexWrap="wrap" spacing={3} useFlexGap>
-                <Box sx={{ width: { xs: '100%', md: 'calc(33.33% - 16px)' } }}>
-                    <SectionPaper title="Trust Signals" color={theme.palette.info.main} icon={<VerifiedIcon color="info" />}>
-                        <Stack flexWrap="wrap" gap={1} direction="row">
-                            {ensureArray((snapshot as any).trustSignals).map((s: string, i: number) => (
-                                <Chip key={i} label={s} size="small" sx={{ bgcolor: alpha(theme.palette.info.main, 0.1), color: theme.palette.info.dark, fontWeight: 500 }} />
-                            ))}
-                            {ensureArray((snapshot as any).trustSignals).length === 0 && <Typography variant="caption" color="text.secondary">None</Typography>}
-                        </Stack>
-                    </SectionPaper>
-                </Box>
-                <Box sx={{ width: { xs: '100%', md: 'calc(33.33% - 16px)' } }}>
-                    <SectionPaper title="Pricing Cues" color={theme.palette.success.main} icon={<PriceCheckIcon color="success" />}>
-                         <Stack flexWrap="wrap" gap={1} direction="row">
-                            {ensureArray((snapshot as any).pricingCues).map((s: string, i: number) => (
-                                <Chip key={i} label={s} size="small" sx={{ bgcolor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.dark, fontWeight: 500 }} />
-                            ))}
-                            {ensureArray((snapshot as any).pricingCues).length === 0 && <Typography variant="caption" color="text.secondary">None</Typography>}
-                        </Stack>
-                    </SectionPaper>
-                </Box>
-                <Box sx={{ width: { xs: '100%', md: 'calc(33.33% - 16px)' } }}>
-                    <SectionPaper title="CTA Styles" color={theme.palette.primary.main} icon={<AdsClickIcon color="primary" />}>
-                         <Stack flexWrap="wrap" gap={1} direction="row">
-                            {ensureArray((snapshot as any).ctaStyles).map((s: string, i: number) => (
-                                <Chip key={i} label={s} size="small" variant="outlined" color="primary" sx={{ fontWeight: 500 }} />
-                            ))}
-                            {ensureArray((snapshot as any).ctaStyles).length === 0 && <Typography variant="caption" color="text.secondary">None</Typography>}
-                        </Stack>
-                    </SectionPaper>
-                </Box>
-            </Stack>
-        </TabPanel>
-      </Box>
-    </Container>
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </CardContent>
+             </Card>
+        </Box>
+      </Container>
+    </Box>
   );
 }

@@ -95,14 +95,17 @@ export class CompetitorClassifierService {
             1. Differentiators (Strengths, Weaknesses, Unique Selling Points)
             2. "What to Learn" (Strategies to adopt)
             3. "What to Avoid" (Mistakes or gaps)
+            4. Trust Metrics (estimated rating out of 5, approximate client count, award count if visible)
 
             Return ONLY a JSON object with this structure:
             {
                 "differentiators": { "strengths": [], "weaknesses": [], "unique": [] },
                 "whatToLearn": [],
-                "whatToAvoid": []
+                "whatToAvoid": [],
+                "trustMetrics": { "rating": 4.5, "clientCount": "100+", "awardCount": 5 }
             }
             Keep strings concise (under 10 words). Limit arrays to 3-5 items each.
+            For trustMetrics, use your best estimate based on the data. If unknown, use null.
             `;
 
             const content = await this.callAI(prompt);
@@ -139,7 +142,12 @@ export class CompetitorClassifierService {
                     "Vague or unclear pricing",
                     "Missing customer testimonials",
                     "Outdated content or design"
-                ]
+                ],
+                trustMetrics: {
+                    rating: 4.5,
+                    clientCount: "50+",
+                    awardCount: 3
+                }
             };
         }
     }

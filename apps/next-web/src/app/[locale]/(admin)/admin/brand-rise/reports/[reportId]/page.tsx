@@ -169,7 +169,7 @@ export default function ReportDetailPage() {
 
       <Grid container spacing={4}>
         {/* Market Positioning - FULL WIDTH */}
-        <Grid xs={12}>
+        <Grid size={{ xs: 12 }}>
             <Card sx={{ border: 'none', boxShadow: '0 4px 18px -4px rgba(76, 78, 100, 0.1)', borderRadius: 3, overflow: 'visible' }}>
                 <CardContent sx={{ p: 4 }}>
                     <Box display="flex" alignItems="center" gap={2} mb={3}>
@@ -183,10 +183,10 @@ export default function ReportDetailPage() {
                     </Box>
                     
                     <Grid container spacing={4}>
-                        <Grid xs={12} md={8}>
+                        <Grid size={{ xs: 12, md: 8 }}>
                              <PositioningMapChart data={mapData} />
                         </Grid>
-                        <Grid xs={12} md={4} display="flex" alignItems="center">
+                        <Grid size={{ xs: 12, md: 4 }} display="flex" alignItems="center">
                             <Box p={3} bgcolor="#F8F7FA" borderRadius={2} border="1px dashed #DBDADE" width="100%">
                                 <Typography variant="subtitle2" fontWeight="bold" gutterBottom color="primary">
                                     Strategic Insight
@@ -202,7 +202,7 @@ export default function ReportDetailPage() {
         </Grid>
 
         {/* Strategies & Gaps Row */}
-        <Grid xs={12} md={7}>
+        <Grid size={{ xs: 12, md: 7 }}>
              <Card sx={{ height: '100%', border: 'none', boxShadow: '0 4px 18px -4px rgba(76, 78, 100, 0.1)', borderRadius: 3 }}>
                 <CardContent sx={{ p: 3 }}>
                     <Box display="flex" alignItems="center" gap={2} mb={3}>
@@ -243,7 +243,7 @@ export default function ReportDetailPage() {
             </Card>
         </Grid>
 
-        <Grid xs={12} md={5}>
+        <Grid size={{ xs: 12, md: 5 }}>
             <Card sx={{ height: '100%', border: 'none', boxShadow: '0 4px 18px -4px rgba(76, 78, 100, 0.1)', borderRadius: 3 }}>
                 <CardContent sx={{ p: 3 }}>
                      <Box display="flex" alignItems="center" gap={2} mb={3}>
@@ -290,11 +290,11 @@ export default function ReportDetailPage() {
         </Grid>
 
         {/* Content Ideas */}
-         <Grid xs={12}>
+         <Grid size={{ xs: 12 }}>
              <Typography variant="h5" fontWeight="bold" sx={{ mb: 3, mt: 2 }}>{t('brandRise.reports.detail.roadmap')}</Typography>
              <Grid container spacing={3}>
                   {contentIdeas.slice(0, 6).map((idea: any, i: number) => (
-                       <Grid xs={12} sm={6} md={4} key={i}>
+                       <Grid size={{ xs: 12, sm: 6, md: 4 }} key={i}>
                            <Card sx={{ height: '100%', border: '1px solid #F0F0F0', boxShadow: 'none', borderRadius: 2, transition: '0.3s', '&:hover': { boxShadow: '0 4px 20px 0 rgba(0,0,0,0.08)', transform: 'translateY(-2px)' } }}>
                                <CardContent>
                                    <Chip label={idea.format || 'Blog Post'} size="small" sx={{ mb: 2, bgcolor: '#E3F2FD', color: '#1976D2', fontWeight: 600, borderRadius: 1 }} />

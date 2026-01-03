@@ -18,11 +18,12 @@ interface CompetitorListProps {
   analyzingIds: string[];
 }
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 export const CompetitorList = ({ competitors, onAdd, onRemove, onAnalyze, analyzingIds }: CompetitorListProps) => {
   const t = useTranslations('dashboard');
   const router = useRouter();
+  const pathname = usePathname();
   const [filter, setFilter] = useState<'ALL' | 'DIRECT_LOCAL' | 'CONTENT' | 'AGGREGATOR'>('ALL');
 
   const counts = {
@@ -72,7 +73,7 @@ export const CompetitorList = ({ competitors, onAdd, onRemove, onAnalyze, analyz
               onAnalyze={onAnalyze}
               onRemove={onRemove}
               isAnalyzing={analyzingIds.includes(competitor.id)}
-              onViewReport={() => router.push(`competitors/${competitor.id}`)}
+              onViewReport={() => router.push(`${pathname}/${competitor.id}`)}
               rank={index + 1}
             />
         ))}

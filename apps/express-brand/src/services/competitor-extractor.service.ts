@@ -123,7 +123,8 @@ export const createSnapshot = async (competitorId: string) => {
         let aiAnalysis = {
             differentiators: {},
             whatToLearn: [],
-            whatToAvoid: []
+            whatToAvoid: [],
+            trustMetrics: { rating: null, clientCount: null, awardCount: null }
         };
 
         try {
@@ -157,7 +158,9 @@ export const createSnapshot = async (competitorId: string) => {
                 differentiators: aiAnalysis.differentiators,
                 whatToLearn: aiAnalysis.whatToLearn,
                 whatToAvoid: aiAnalysis.whatToAvoid,
-                metrics: {} // legacy
+                metrics: {
+                    trustMetrics: aiAnalysis.trustMetrics
+                }
             }
         });
     } catch (e) {

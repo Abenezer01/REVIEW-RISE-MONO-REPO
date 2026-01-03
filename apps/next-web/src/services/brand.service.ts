@@ -3,6 +3,9 @@ import apiClient from '@/lib/apiClient';
 export interface Competitor {
   id: string;
   name: string;
+  domain?: string;
+  logo?: string;
+  type?: string;
   website?: string;
   snapshots?: any[];
 }
