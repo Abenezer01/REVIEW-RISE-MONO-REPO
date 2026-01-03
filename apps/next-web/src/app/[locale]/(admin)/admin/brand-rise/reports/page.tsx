@@ -34,7 +34,7 @@ const ReportsPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const canGenerate = user?.role === 'ADMIN' || user?.role === 'MANAGER';
+  const canGenerate = user?.role === 'Admin' || user?.role === 'MANAGER';
 
   // Fetch Reports
   const { data: reports = [], isLoading } = useQuery({

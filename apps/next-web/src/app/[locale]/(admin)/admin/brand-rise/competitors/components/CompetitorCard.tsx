@@ -9,7 +9,8 @@ import {
   Chip, 
   Button,
   Stack,
-  alpha
+  alpha,
+  CircularProgress
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import InsightsIcon from '@mui/icons-material/Insights';
@@ -36,6 +37,7 @@ export interface Competitor {
   isUserAdded: boolean;
   ranking?: number; // Added ranking
   snapshots?: CompetitorSnapshot[];
+  logo?: string;
 }
 
 interface CompetitorCardProps {
@@ -125,22 +127,44 @@ export const CompetitorCard = ({ competitor, onAnalyze, onRemove, isAnalyzing, o
                 <DeleteIcon fontSize="small" />
             </IconButton>
 
+            {/* Refresh / Re-Analyze (only if snapshots exist) */}
+            {competitor.snapshots && competitor.snapshots.length > 0 && (
+                <IconButton 
+                    onClick={() => onAnalyze(competitor.id)} 
+                    disabled={isAnalyzing}
+                    size="small" 
+                    sx={{ color: '#7367F0', bgcolor: alpha('#7367F0', 0.1), mr: 1 }}
+                >
+                    {isAnalyzing ? <CircularProgress size={16} /> : <InsightsIcon fontSize="small" sx={{ transform: 'rotate(180deg)' }} />} 
+                </IconButton>
+            )}
+
             <Button 
                 variant="contained" 
                 size="small" 
-                startIcon={<InsightsIcon fontSize="small" />}
-                onClick={onViewReport || (() => onAnalyze(competitor.id))}
+                startIcon={isAnalyzing ? <CircularProgress size={16} color="inherit" /> : <InsightsIcon fontSize="small" />}
+                onClick={() => {
+                     const hasSnapshots = competitor.snapshots && competitor.snapshots.length > 0;
+                     if (hasSnapshots && onViewReport) {
+                         onViewReport();
+                     } else {
+                         onAnalyze(competitor.id);
+                     }
+                }}
+                disabled={isAnalyzing}
                 sx={{ 
-                    bgcolor: '#9E69FD',
+                    bgcolor: (competitor.snapshots && competitor.snapshots.length > 0) ? '#28C76F' : '#9E69FD', // Green for View, Purple for Analyze
                     color: 'white',
                     textTransform: 'none',
                     fontWeight: 600,
                     borderRadius: 1.5,
                     px: 2,
-                    '&:hover': { bgcolor: '#804BDF' }
+                    '&:hover': { 
+                        bgcolor: (competitor.snapshots && competitor.snapshots.length > 0) ? '#1f9d57' : '#804BDF' 
+                    }
                 }}
             >
-                Analyze
+                {isAnalyzing ? 'Analyzing...' : (competitor.snapshots && competitor.snapshots.length > 0 ? 'Insights' : 'Analyze')}
             </Button>
         </Box>
       </CardContent>

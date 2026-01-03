@@ -72,3 +72,17 @@ export const getLatestOpportunities = async (req: Request, res: Response) => {
         res.status(500).json(createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
     }
 };
+
+export const downloadPdf = async (req: Request, res: Response) => {
+    const requestId = (req as any).id || crypto.randomUUID();
+    const reportId = req.params.reportId;
+    try {
+        const pdfBuffer = await OpportunitiesReportService.generatePdf(reportId);
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=report-${reportId}.pdf`);
+        res.send(pdfBuffer);
+    } catch (e: any) {
+        console.error('PDF Generation Error:', e);
+        res.status(500).json(createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
+    }
+};

@@ -11,5 +11,6 @@ router.post('/:competitorId/extract', CompetitorController.extract);
 router.post('/:competitorId/hide', CompetitorController.hide);
 router.post('/:competitorId/unhide', CompetitorController.unhide);
 router.delete('/:competitorId', CompetitorController.remove);
+router.get('/:competitorId', CompetitorController.get);
 
 export default router;

@@ -25,6 +25,23 @@ export const list = async (req: Request, res: Response) => {
     }
 };
 
+export const get = async (req: Request, res: Response) => {
+    const requestId = (req as any).id || crypto.randomUUID();
+    try {
+        const businessId = req.params.id;
+        const competitorId = req.params.competitorId;
+        const competitor = await CompetitorService.getCompetitor(competitorId, businessId);
+        
+        if (!competitor) {
+            return res.status(404).json(createErrorResponse('Competitor not found', ErrorCode.NOT_FOUND, 404, undefined, requestId));
+        }
+
+        res.json(createSuccessResponse(competitor, 'Competitor fetched', 200, { requestId }));
+    } catch (e: any) {
+        res.status(500).json(createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
+    }
+};
+
 export const discover = async (req: Request, res: Response) => {
     const requestId = (req as any).id || crypto.randomUUID();
     try {

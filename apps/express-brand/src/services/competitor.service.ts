@@ -63,3 +63,15 @@ export const removeCompetitor = async (id: string, businessId: string) => {
         where: { id, businessId } // Ensure ownership
     });
 };
+
+export const getCompetitor = async (id: string, businessId: string) => {
+    return prisma.competitor.findUnique({
+        where: { id, businessId },
+        include: {
+            snapshots: {
+                orderBy: { capturedAt: 'desc' },
+                take: 1
+            }
+        }
+    });
+};

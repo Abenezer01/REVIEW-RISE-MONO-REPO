@@ -44,35 +44,177 @@ async function seedBrandRiseData() {
 
   // 2. Competitors
   console.log('⚔️ Seeding Competitors...');
-  const competitors = [
-      { name: 'Starbucks', website: 'https://starbucks.com' },
-      { name: 'Peets Coffee', website: 'https://peets.com' },
-      { name: 'Blue Bottle', website: 'https://bluebottlecoffee.com' }
+  const competitorsData = [
+      { 
+          name: 'Starbucks', 
+          domain: 'starbucks.com',
+          website: 'https://starbucks.com',
+          type: 'DIRECT_LOCAL',
+          source: 'manual',
+          relevanceScore: 95,
+          ranking: 1,
+          snapshot: {
+              headline: 'Starbucks Coffee - Handcrafted beverages and great-tasting food',
+              uvp: 'Premium coffee experience with consistent quality and worldwide presence',
+              serviceList: ['Coffee & Espresso', 'Tea', 'Bakery Items', 'Breakfast & Lunch', 'Mobile Ordering', 'Rewards Program'],
+              pricingCues: ['Starting at $3.95', 'Rewards members save', 'Mobile order & pay'],
+              trustSignals: { badges: ['#1 Coffee Chain'], certifications: ['Fair Trade Certified'], reviewCount: 50000, avgRating: 4.2 },
+              ctaStyles: ['Order Now', 'Join Rewards', 'Find a Store'],
+              contentCategories: ['Menu', 'Locations', 'Rewards', 'About Us'],
+              differentiators: {
+                  strengths: ['Global brand recognition', 'Extensive store network', 'Mobile app integration'],
+                  weaknesses: ['Premium pricing', 'Corporate atmosphere', 'Inconsistent quality across locations'],
+                  unique: ['Starbucks Rewards program', 'Seasonal specialty drinks', 'Third place experience']
+              },
+              whatToLearn: ['Customer loyalty program design', 'Mobile ordering system', 'Seasonal product launches'],
+              whatToAvoid: ['Over-expansion losing local feel', 'Pricing out budget customers', 'Losing artisanal quality']
+          }
+      },
+      { 
+          name: 'Peets Coffee', 
+          domain: 'peets.com',
+          website: 'https://peets.com',
+          type: 'DIRECT_LOCAL',
+          source: 'manual',
+          relevanceScore: 82,
+          ranking: 2,
+          snapshot: {
+              headline: "Peet's Coffee - Fresher, Bolder, Better",
+              uvp: 'Small-batch artisanal coffee with deep roasting expertise since 1966',
+              serviceList: ['Specialty Coffee', 'Espresso Bar', 'Tea Selection', 'Pastries', 'Coffee Beans', 'Subscription Service'],
+              pricingCues: ['Premium beans from $14.95/lb', 'Free shipping over $39', 'Subscribe & save 10%'],
+              trustSignals: { badges: ['Founded 1966', 'Small Batch'], certifications: ['Organic Options', 'Rainforest Alliance'], reviewCount: 15000, avgRating: 4.5 },
+              ctaStyles: ['Shop Now', 'Subscribe', 'Find Stores', 'Learn More'],
+              contentCategories: ['Coffee Origins', 'Roasting Process', 'Brewing Guide', 'Locations'],
+              differentiators: {
+                  strengths: ['Artisanal roasting expertise', 'Heritage brand since 1966', 'Quality over quantity approach'],
+                  weaknesses: ['Limited store locations', 'Higher price point', 'Less known outside West Coast'],
+                  unique: ['Deep roast signature', 'Focus on coffee craftsmanship', 'Smaller footprint than competitors']
+              },
+              whatToLearn: ['Premium positioning strategy', 'Heritage storytelling', 'Subscription model implementation'],
+              whatToAvoid: ['Limited accessibility', 'Regional focus limiting growth', 'Intimidating to casual coffee drinkers']
+          }
+      },
+      { 
+          name: 'Blue Bottle', 
+          domain: 'bluebottlecoffee.com',
+          website: 'https://bluebottlecoffee.com',
+          type: 'DIRECT_LOCAL',
+          source: 'discovery',
+          relevanceScore: 88,
+          ranking: 3,
+          snapshot: {
+              headline: 'Blue Bottle Coffee - Delicious coffee. Freshly roasted.',
+              uvp: 'Freshly roasted, perfectly brewed coffee delivered within 48 hours of roasting',
+              serviceList: ['Single-Origin Coffee', 'Espresso', 'Cold Brew', 'Pour Over', 'Coffee Subscriptions', 'Brewing Equipment'],
+              pricingCues: ['Subscriptions from $11/week', 'Free shipping', '48-hour freshness guarantee'],
+              trustSignals: { badges: ['Freshness Guarantee', 'Third Wave Coffee'], certifications: ['Organic', 'Direct Trade'], reviewCount: 8500, avgRating: 4.7 },
+              ctaStyles: ['Start Subscription', 'Shop Coffee', 'Visit Cafe', 'Learn to Brew'],
+              contentCategories: ['Our Coffee', 'Brew Guides', 'Stories', 'Cafes', 'Gear'],
+              differentiators: {
+                  strengths: ['48-hour freshness commitment', 'Minimalist aesthetic', 'Tech-savvy target audience'],
+                  weaknesses: ['Premium pricing tier', 'Limited physical locations', 'May seem pretentious'],
+                  unique: ['Freshness as core value proposition', 'Japanese-inspired design', 'Subscription-first model']
+              },
+              whatToLearn: ['Freshness commitment as differentiator', 'Minimalist brand aesthetic', 'Subscription engagement tactics'],
+              whatToAvoid: ['Elitist positioning', 'Complexity over accessibility', 'Losing independent spirit after acquisition']
+          }
+      },
+      {
+          name: 'Yelp',
+          domain: 'yelp.com',
+          website: 'https://yelp.com',
+          type: 'AGGREGATOR',
+          source: 'discovery',
+          relevanceScore: 70,
+          ranking: 4,
+          snapshot: {
+              headline: 'Find Local Businesses & Reviews on Yelp',
+              uvp: 'Connect with great local businesses through millions of reviews',
+              serviceList: ['Business Listings', 'User Reviews', 'Business Photos', 'Reservation Booking', 'Food Delivery'],
+              pricingCues: ['Free for users', 'Business advertising available'],
+              trustSignals: { badges: ['Over 200M reviews'], certifications: [], reviewCount: 200000000, avgRating: null },
+              ctaStyles: ['Write a Review', 'Find Businesses', 'Sign Up', 'For Business Owners'],
+              contentCategories: ['Restaurants', 'Shopping', 'Services', 'Reviews'],
+              differentiators: {
+                  strengths: ['Massive review database', 'Strong local focus', 'User-generated content'],
+                  weaknesses: ['Controversial business practices', 'Review filtering concerns', 'Declining relevance vs Google'],
+                  unique: ['Community-driven reviews', 'Comprehensive business categories', 'Photo-rich profiles']
+              },
+              whatToLearn: ['User review systems', 'Photo integration', 'Local SEO strategies'],
+              whatToAvoid: ['Aggressive monetization', 'Questionable review filtering', 'Alienating business owners']
+          }
+      }
   ];
 
-  for (const comp of competitors) {
-      const competitor = await prisma.competitor.upsert({
-          where: { businessId_name: { businessId, name: comp.name } },
-          update: {},
-          create: {
+  for (const comp of competitorsData) {
+      // Robustly find existing competitor by domain OR name to avoid unique constraint violations
+      const existingCompetitor = await prisma.competitor.findFirst({
+          where: {
               businessId,
-              name: comp.name,
-              website: comp.website
-          }
+              OR: [
+                  { domain: comp.domain },
+                  { name: comp.name }
+              ]
+          } as any
       });
 
-      // Create a snapshot for each competitor
+      let competitor;
+      if (existingCompetitor) {
+          competitor = await prisma.competitor.update({
+              where: { id: existingCompetitor.id },
+              data: {
+                  name: comp.name, // Ensure name aligns with seed data
+                  domain: comp.domain,
+                  relevanceScore: comp.relevanceScore,
+                  ranking: comp.ranking,
+                  source: comp.source,
+                  type: comp.type as any,
+              } as any
+          });
+      } else {
+          competitor = await prisma.competitor.create({
+              data: {
+                  businessId,
+                  name: comp.name,
+                  domain: comp.domain,
+                  website: comp.website,
+                  type: comp.type as any,
+                  source: comp.source,
+                  relevanceScore: comp.relevanceScore,
+                  ranking: comp.ranking,
+                  isUserAdded: comp.source === 'manual'
+              } as any
+          });
+      }
+
+      // Clear existing snapshots for this competitor to avoid duplicates
+      await prisma.competitorSnapshot.deleteMany({
+          where: { competitorId: competitor.id }
+      });
+
+      // Create a comprehensive snapshot for each competitor
       await prisma.competitorSnapshot.create({
           data: {
               competitorId: competitor.id,
+              headline: comp.snapshot.headline,
+              uvp: comp.snapshot.uvp,
+              serviceList: comp.snapshot.serviceList,
+              pricingCues: comp.snapshot.pricingCues,
+              trustSignals: comp.snapshot.trustSignals as any,
+              ctaStyles: comp.snapshot.ctaStyles,
+              contentCategories: comp.snapshot.contentCategories,
+              differentiators: comp.snapshot.differentiators as any,
+              whatToLearn: comp.snapshot.whatToLearn,
+              whatToAvoid: comp.snapshot.whatToAvoid,
               metrics: {
                   visibilityScore: Math.floor(Math.random() * 30) + 60,
                   socialFollowers: Math.floor(Math.random() * 10000) + 5000,
-                  reviewCount: Math.floor(Math.random() * 500) + 100,
-                  averageRating: (Math.random() * 1.5 + 3.5).toFixed(1)
+                  reviewCount: comp.snapshot.trustSignals.reviewCount || Math.floor(Math.random() * 500) + 100,
+                  averageRating: comp.snapshot.trustSignals.avgRating || (Math.random() * 1.5 + 3.5).toFixed(1)
               },
               capturedAt: new Date()
-          }
+          } as any
       });
   }
 

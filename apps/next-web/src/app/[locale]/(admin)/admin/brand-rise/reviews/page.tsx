@@ -22,6 +22,7 @@ import { useTranslations } from 'next-intl';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusinessId } from '@/hooks/useBusinessId';
+import { useLocationFilter } from '@/hooks/useLocationFilter';
 import type { Review } from '@/services/brand.service';
 import { BrandService } from '@/services/brand.service';
 
@@ -38,6 +39,7 @@ const ReviewsPage = () => {
   const theme = useTheme();
   const t = useTranslations('dashboard');
   const { businessId } = useBusinessId();
+  const { locationId } = useLocationFilter();
   const { user } = useAuth();
   
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -59,8 +61,8 @@ const ReviewsPage = () => {
   
         try {
             const [reviewsData, statsData] = await Promise.all([
-                BrandService.listReviews(businessId, 1, 50), // Get first 50 for now
-                BrandService.getReviewStats(businessId)
+                BrandService.listReviews(businessId, 1, 50, undefined, locationId), // Get first 50 for now
+                BrandService.getReviewStats(businessId, locationId)
             ]);
   
             setReviews(reviewsData.reviews);
@@ -75,15 +77,15 @@ const ReviewsPage = () => {
     if (businessId) {
         fetchData();
     }
-  }, [businessId]);
+  }, [businessId, locationId]);
 
   const refreshData = async () => {
     if (!businessId) return;
 
     try {
         const [reviewsData, statsData] = await Promise.all([
-            BrandService.listReviews(businessId, 1, 50),
-            BrandService.getReviewStats(businessId)
+            BrandService.listReviews(businessId, 1, 50, undefined, locationId),
+            BrandService.getReviewStats(businessId, locationId)
         ]);
 
         setReviews(reviewsData.reviews);

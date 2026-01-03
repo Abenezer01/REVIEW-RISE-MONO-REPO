@@ -2,15 +2,8 @@ import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { z } from 'zod';
 
-// Initialize AI providers
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
-
-const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-
 // AI Provider selection from environment
-const AI_PROVIDER = process.env.AI_PROVIDER || 'openai'; // 'openai' or 'gemini'
+const AI_PROVIDER = process.env.AI_PROVIDER || 'gemini'; // 'openai' or 'gemini'
 
 const ClassificationSchema = z.object({
     type: z.enum(['DIRECT_LOCAL', 'CONTENT', 'AGGREGATOR', 'UNKNOWN']),
@@ -22,6 +15,7 @@ export class CompetitorClassifierService {
     private async callAI(prompt: string, useJsonFormat: boolean = true): Promise<string | null> {
         try {
             if (AI_PROVIDER === 'gemini') {
+                const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
                 const model = gemini.getGenerativeModel({ 
                     model: 'gemini-1.5-flash',
                     generationConfig: {
@@ -33,6 +27,9 @@ export class CompetitorClassifierService {
                 return result.response.text();
             } else {
                 // OpenAI
+                const openai = new OpenAI({
+                    apiKey: process.env.OPENAI_API_KEY,
+                });
                 const completion = await openai.chat.completions.create({
                     messages: [{ role: "user", content: prompt }],
                     model: "gpt-3.5-turbo-0125",

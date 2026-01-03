@@ -3,25 +3,29 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import { useBusinessId } from '@/hooks/useBusinessId';
+import { useLocationFilter } from '@/hooks/useLocationFilter';
 import apiClient from '@/lib/apiClient';
+import { BrandService } from '@/services/brand.service';
 import { Competitor } from '../components/CompetitorCard';
 
 export const useCompetitors = () => {
   const t = useTranslations('dashboard');
   const { businessId } = useBusinessId();
+  const { locationId } = useLocationFilter();
   const queryClient = useQueryClient();
   const [analyzingIds, setAnalyzingIds] = useState<string[]>([]);
   const [discoveryStatus, setDiscoveryStatus] = useState<'idle' | 'discovering'>('idle');
 
   // Fetch Competitors
   const { data: competitors = [], isLoading: isListLoading } = useQuery({
-    queryKey: ['competitors', businessId],
+    queryKey: ['competitors', businessId, locationId],
     queryFn: async () => {
       if (!businessId) return [];
-      const res = await apiClient.get(`/brands/${businessId}/competitors`);
-      // Ensure we return the array, mapping to our interface if needed
-      // Assuming API returns { data: Competitor[] }
-      return (res.data.data || []).map((c: any) => ({
+      
+      // Use BrandService which we just updated to handle locationId
+      const data = await BrandService.listCompetitors(businessId, locationId);
+      
+      return data.map((c: any) => ({
           ...c,
           // Ensure type is valid for our UI
           type: c.type || 'DIRECT_LOCAL'
@@ -37,7 +41,8 @@ export const useCompetitors = () => {
       setDiscoveryStatus('discovering');
       const res = await apiClient.post(`/brands/${businessId}/competitors/discover`, {
         businessId,
-        keywords
+        keywords,
+        locationId // Pass locationId if discovery should be location aware? Assuming yes or backend ignores it.
       });
       return res.data;
     },

@@ -46,7 +46,11 @@ const DashboardLineChart = ({ title, subtitle, series, categories }: DashboardLi
       categories: categories || [],
       axisBorder: { show: false },
       axisTicks: { show: false },
+      tickAmount: 10, // Limit the number of ticks displayed
       labels: {
+        rotate: -45,
+        rotateAlways: false,
+        hideOverlappingLabels: true, // Hide labels that overlap
         style: { colors: textSecondary, fontSize: '13px' }
       }
     },

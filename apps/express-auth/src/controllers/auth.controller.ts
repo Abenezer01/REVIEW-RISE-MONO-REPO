@@ -99,9 +99,17 @@ export const login = async (req: Request, res: Response) => {
             );
         }
 
+        // Extract Default Location ID
+        const defaultLocationId = user.userBusinessRoles?.[0]?.business?.locations?.[0]?.id;
+
         // Generate Access Token (JWT)
         const accessToken = jwt.sign(
-            { userId: user.id, email: user.email, roles: user.userRoles.map(ur => ur.role.name) },
+            { 
+                userId: user.id, 
+                email: user.email, 
+                roles: user.userRoles.map(ur => ur.role.name),
+                locationId: defaultLocationId // Attach locationId to token
+            },
             JWT_SECRET,
             { expiresIn: '15m' }
         );
@@ -122,7 +130,8 @@ export const login = async (req: Request, res: Response) => {
             email: user.email,
             name: user.name,
             image: user.image,
-            role: user.userRoles?.[0]?.role?.name || 'user'
+            role: user.userRoles?.[0]?.role?.name || 'user',
+            locationId: defaultLocationId // Attach to user object response
         };
 
         res.status(200).json(
@@ -221,7 +230,8 @@ export const me = async (req: Request, res: Response) => {
         const user = {
             id: payload.userId,
             email: payload.email,
-            role: roles[0] || 'user'
+            role: roles[0] || 'user',
+            locationId: payload.locationId // Return from token payload
         };
         res.status(200).json(
             createSuccessResponse({ user }, 'User fetched successfully', 200)

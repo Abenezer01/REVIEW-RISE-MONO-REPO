@@ -90,6 +90,8 @@
       "generate": "Generate AI Report",
       "generating": "Generating...",
       "viewInsights": "View Insights",
+      "share": "Share",
+      "exportPdf": "Export PDF",
       "noReports": "No reports generated yet. Click \"Generate AI Report\" to start.",
       "columns": {
         "date": "Report Date",

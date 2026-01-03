@@ -8,7 +8,6 @@ import {
   alpha
 } from '@mui/material';
 import { CompetitorCard, Competitor } from './CompetitorCard';
-import { CompetitorDetailsDialog } from './CompetitorDetailsDialog';
 import { CompetitorStatsFooter } from './CompetitorStatsFooter';
 
 interface CompetitorListProps {
@@ -19,9 +18,11 @@ interface CompetitorListProps {
   analyzingIds: string[];
 }
 
+import { useRouter } from 'next/navigation';
+
 export const CompetitorList = ({ competitors, onAdd, onRemove, onAnalyze, analyzingIds }: CompetitorListProps) => {
   const t = useTranslations('dashboard');
-  const [selectedCompetitor, setSelectedCompetitor] = useState<Competitor | null>(null);
+  const router = useRouter();
   const [filter, setFilter] = useState<'ALL' | 'DIRECT_LOCAL' | 'CONTENT' | 'AGGREGATOR'>('ALL');
 
   const counts = {
@@ -58,7 +59,6 @@ export const CompetitorList = ({ competitors, onAdd, onRemove, onAnalyze, analyz
       <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
         <FilterChip label={`${counts.total} All`} active={filter === 'ALL'} onClick={() => setFilter('ALL')} color="#FF9F43" />
         <Box flex={1} />
-        {/* Placeholder colored boxes from screenshot - purely visual or additional filters */}
         <Box sx={{ width: 40, height: 40, bgcolor: alpha('#28C76F', 0.2), borderRadius: 1 }} />
         <Box sx={{ width: 40, height: 40, bgcolor: alpha('#00CFE8', 0.2), borderRadius: 1 }} />
         <Box sx={{ width: 40, height: 40, bgcolor: alpha('#A8AAAE', 0.2), borderRadius: 1 }} />
@@ -72,17 +72,11 @@ export const CompetitorList = ({ competitors, onAdd, onRemove, onAnalyze, analyz
               onAnalyze={onAnalyze}
               onRemove={onRemove}
               isAnalyzing={analyzingIds.includes(competitor.id)}
-              onViewReport={() => setSelectedCompetitor(competitor)}
+              onViewReport={() => router.push(`competitors/${competitor.id}`)}
               rank={index + 1}
             />
         ))}
       </Stack>
-
-      <CompetitorDetailsDialog 
-        open={!!selectedCompetitor} 
-        onClose={() => setSelectedCompetitor(null)} 
-        competitor={selectedCompetitor} 
-      />
     </>
   );
 };

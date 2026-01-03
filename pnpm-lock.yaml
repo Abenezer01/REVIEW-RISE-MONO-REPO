@@ -421,7 +421,7 @@ importers:
         version: 1.10.1
       openai:
         specifier: ^6.15.0
-        version: 6.15.0(zod@3.25.76)
+        version: 6.15.0(ws@8.18.3)(zod@3.25.76)
       robots-parser:
         specifier: ^3.0.1
         version: 3.0.1
@@ -10878,6 +10878,11 @@ snapshots:
   onetime@5.1.2:
     dependencies:
       mimic-fn: 2.1.0
+
+  openai@6.15.0(ws@8.18.3)(zod@3.25.76):
+    optionalDependencies:
+      ws: 8.18.3
+      zod: 3.25.76
 
   openai@6.15.0(ws@8.18.3)(zod@4.3.4):
     optionalDependencies:
