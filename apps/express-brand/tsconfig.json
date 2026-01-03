@@ -1,10 +1,17 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./src",
     "outDir": "./dist",
-    "types": ["@lukeed/uuid"]
+    "types": [
+      "@lukeed/uuid"
+    ]
   },
-  "include": ["src/**/*"],
-  "references": [{ "path": "../../packages/@platform/db" }]
+  "include": [
+    "src/**/*"
+  ],
+  "references": [
+    {
+      "path": "../../packages/@platform/db"
+    }
+  ]
 }
