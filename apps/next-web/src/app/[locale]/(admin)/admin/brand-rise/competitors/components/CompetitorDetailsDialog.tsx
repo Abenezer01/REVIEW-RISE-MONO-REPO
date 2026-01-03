@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { useTranslations } from 'next-intl';
+
+
 import { 
   Dialog, 
   DialogTitle, 
   DialogContent, 
   IconButton, 
-  Grid, 
+ 
   Paper, 
   Typography, 
   Box,
@@ -24,12 +25,14 @@ import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import PriceCheckIcon from '@mui/icons-material/PriceCheck';
 import AdsClickIcon from '@mui/icons-material/AdsClick';
-import { Competitor } from './CompetitorCard';
+
+import type { Competitor } from './CompetitorCard';
 
 const ensureArray = (data: any): string[] => {
     if (Array.isArray(data)) return data;
     if (typeof data === 'string') return [data];
-    return [];
+    
+return [];
 };
 
 interface CompetitorDetailsDialogProps {
@@ -66,7 +69,6 @@ const TabPanel = (props: TabPanelProps) => {
 };
 
 export const CompetitorDetailsDialog = ({ open, onClose, competitor }: CompetitorDetailsDialogProps) => {
-  const t = useTranslations('dashboard');
   const theme = useTheme();
   const [tabValue, setTabValue] = useState(0);
 
@@ -130,7 +132,7 @@ export const CompetitorDetailsDialog = ({ open, onClose, competitor }: Competito
                 <Paper sx={{ p: 3, borderRadius: 2, background: `linear-gradient(45deg, ${alpha(theme.palette.primary.main, 0.05)}, ${alpha(theme.palette.background.paper, 1)})`, borderLeft: `6px solid ${theme.palette.primary.main}` }}>
                     <Typography variant="overline" color="primary" fontWeight="bold">Unique Value Proposition</Typography>
                     <Typography variant="h6" fontWeight="500" sx={{ mt: 1, fontStyle: 'italic', color: 'text.primary' }}>
-                        "{snapshot.uvp || "No UVP extracted yet."}"
+                        &quot;{snapshot.uvp || "No UVP extracted yet."}&quot;
                     </Typography>
                 </Paper>
 
@@ -250,7 +252,8 @@ const SectionPaper = ({ title, children, color, icon }: { title: string, childre
 
 const ListItems = ({ items, icon }: { items?: string[], icon: React.ReactNode }) => {
     if (!items || items.length === 0) return <Typography variant="body2" color="text.secondary">None identified.</Typography>;
-    return (
+    
+return (
         <Stack spacing={1.5}>
             {items.map((item, i) => (
                 <Stack key={i} direction="row" spacing={1.5} alignItems="start">
@@ -264,7 +267,8 @@ const ListItems = ({ items, icon }: { items?: string[], icon: React.ReactNode })
 
 const LinkTypography = ({ domain }: { domain?: string | null }) => {
     if (!domain) return null;
-    return (
+    
+return (
         <Typography 
             component="a" 
             href={domain.startsWith('http') ? domain : `https://${domain}`} 

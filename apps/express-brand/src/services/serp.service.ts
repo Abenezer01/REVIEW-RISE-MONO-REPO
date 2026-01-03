@@ -16,7 +16,7 @@ export interface SerpProvider {
 
 // Mock Provider for Development/Testing
 class MockSerpProvider implements SerpProvider {
-    async fetchResults(keyword: string, location?: string): Promise<SerpResult> {
+    async fetchResults(keyword: string, _location?: string): Promise<SerpResult> {
         // Return realistic mock data
         return {
             keyword,
@@ -63,7 +63,7 @@ class MockSerpProvider implements SerpProvider {
 
 // DataForSEO Provider (Skeleton)
 class DataForSeoProvider implements SerpProvider {
-    async fetchResults(keyword: string, location?: string): Promise<SerpResult> {
+    async fetchResults(_keyword: string, _location?: string): Promise<SerpResult> {
         // TODO: Implement actual API call
         // const response = await axios.post(...)
         throw new Error('DataForSEO provider not yet configured');

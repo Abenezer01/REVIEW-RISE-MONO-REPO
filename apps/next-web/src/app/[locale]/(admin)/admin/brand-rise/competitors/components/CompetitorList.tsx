@@ -1,5 +1,13 @@
 import { useState } from 'react';
+
+import { useRouter, usePathname } from 'next/navigation';
+
 import { useTranslations } from 'next-intl';
+
+
+
+
+
 import { 
   Box,
   Typography,
@@ -7,7 +15,9 @@ import {
   Chip,
   alpha
 } from '@mui/material';
-import { CompetitorCard, Competitor } from './CompetitorCard';
+
+import type { Competitor } from './CompetitorCard';
+import { CompetitorCard } from './CompetitorCard';
 import { CompetitorStatsFooter } from './CompetitorStatsFooter';
 
 interface CompetitorListProps {
@@ -18,9 +28,9 @@ interface CompetitorListProps {
   analyzingIds: string[];
 }
 
-import { useRouter, usePathname } from 'next/navigation';
 
-export const CompetitorList = ({ competitors, onAdd, onRemove, onAnalyze, analyzingIds }: CompetitorListProps) => {
+
+export const CompetitorList = ({ competitors, onRemove, onAnalyze, analyzingIds }: CompetitorListProps) => {
   const t = useTranslations('dashboard');
   const router = useRouter();
   const pathname = usePathname();
@@ -35,7 +45,8 @@ export const CompetitorList = ({ competitors, onAdd, onRemove, onAnalyze, analyz
 
   const filteredCompetitors = competitors.filter(c => {
       if (filter === 'ALL') return true;
-      return c.type === filter;
+      
+return c.type === filter;
   });
 
   if (competitors.length === 0) {

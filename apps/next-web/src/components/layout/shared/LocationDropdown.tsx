@@ -34,6 +34,7 @@ interface Location {
 const LocationDropdown = () => {
   // States
   const [open, setOpen] = useState(false)
+
   // Removed local selectedLocation state in favor of URL param lookup
   // const [selectedLocation, setSelectedLocation] = useState<Location | null>(null) 
   const [locations, setLocations] = useState<Location[]>([])
@@ -52,6 +53,7 @@ const LocationDropdown = () => {
 
   // Set default location from user profile if not set in URL
   const { user } = useAuth()
+
   useEffect(() => {
     // console.log('LocationDropdown Debug:', { locationId, userLocationId: user?.locationId, user })
     if (!locationId) {
@@ -81,6 +83,7 @@ const LocationDropdown = () => {
 
       if (response.data && response.data.data) {
         const fetchedLocations = response.data.data
+
         setLocations(fetchedLocations)
 
         // If no location is selected in URL, and we have locations, select the first one by default?

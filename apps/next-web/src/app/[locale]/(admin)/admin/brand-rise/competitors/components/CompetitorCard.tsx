@@ -8,7 +8,7 @@ import {
   IconButton, 
   Chip, 
   Button,
-  Stack,
+
   alpha,
   CircularProgress
 } from '@mui/material';
@@ -145,6 +145,7 @@ export const CompetitorCard = ({ competitor, onAnalyze, onRemove, isAnalyzing, o
                 startIcon={isAnalyzing ? <CircularProgress size={16} color="inherit" /> : <InsightsIcon fontSize="small" />}
                 onClick={() => {
                      const hasSnapshots = competitor.snapshots && competitor.snapshots.length > 0;
+
                      if (hasSnapshots && onViewReport) {
                          onViewReport();
                      } else {

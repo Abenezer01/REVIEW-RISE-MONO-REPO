@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+
+
 import { useRouter } from 'next/navigation';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
-import IconButton from '@mui/material/IconButton';
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -18,10 +20,11 @@ import Typography from '@mui/material/Typography';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusinessId } from '@/hooks/useBusinessId';
 import { BrandService } from '@/services/brand.service';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [key: string]: any }) => {
   return <i className={icon} style={{ fontSize }} {...rest} />
@@ -42,7 +45,9 @@ const ReportsPage = () => {
       queryFn: async () => {
           if (!businessId) return [];
           const res = await BrandService.listOpportunitiesReports(businessId);
-          return res; // Assuming service returns array
+
+          
+return res; // Assuming service returns array
       },
       enabled: !!businessId
   });
@@ -51,10 +56,12 @@ const ReportsPage = () => {
   const generateMutation = useMutation({
       mutationFn: async () => {
           if (!businessId) throw new Error('No business ID');
-          return BrandService.generateOpportunitiesReport(businessId);
+          
+return BrandService.generateOpportunitiesReport(businessId);
       },
       onSuccess: () => {
           toast.success('Report generation started...');
+
           // In real implementation, this might be async job. 
           // If sync, we invalidate queries.
           setTimeout(() => {

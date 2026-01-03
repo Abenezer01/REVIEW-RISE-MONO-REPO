@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+
 import { useTranslations } from 'next-intl';
 import { 
-  Box, 
+ 
   Card,
   TextField,
   Button,
@@ -26,6 +27,7 @@ export const DiscoveryInput = ({ onDiscover, isLoading }: DiscoveryInputProps) =
   const t = useTranslations('dashboard');
   const theme = useTheme();
   const [inputValue, setInputValue] = useState('');
+
   const [keywords, setKeywords] = useState<string[]>([
     'digital marketing agency',
     'local SEO services',

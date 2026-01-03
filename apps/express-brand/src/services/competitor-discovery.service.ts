@@ -149,7 +149,7 @@ export const classifyCompetitor = async (domain: string): Promise<CompetitorType
             businessContext: 'Local business'
         });
         return response.data.type as CompetitorType;
-    } catch (e) {
+    } catch {
         return CompetitorType.UNKNOWN;
     }
 };

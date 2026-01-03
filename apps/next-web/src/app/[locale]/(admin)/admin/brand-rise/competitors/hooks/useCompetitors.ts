@@ -1,12 +1,14 @@
 import { useState } from 'react';
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
+
 import { useBusinessId } from '@/hooks/useBusinessId';
 import { useLocationFilter } from '@/hooks/useLocationFilter';
 import apiClient from '@/lib/apiClient';
 import { BrandService } from '@/services/brand.service';
-import { Competitor } from '../components/CompetitorCard';
+import type { Competitor } from '../components/CompetitorCard';
 
 export const useCompetitors = () => {
   const t = useTranslations('dashboard');
@@ -27,6 +29,7 @@ export const useCompetitors = () => {
       
       return data.map((c: any) => ({
           ...c,
+
           // Ensure type is valid for our UI
           type: c.type || 'DIRECT_LOCAL'
       })) as Competitor[]; 
@@ -39,12 +42,15 @@ export const useCompetitors = () => {
     mutationFn: async (keywords: string[]) => {
       if (!businessId) throw new Error('No business ID');
       setDiscoveryStatus('discovering');
+
       const res = await apiClient.post(`/brands/${businessId}/competitors/discover`, {
         businessId,
         keywords,
         locationId // Pass locationId if discovery should be location aware? Assuming yes or backend ignores it.
       });
-      return res.data;
+
+      
+return res.data;
     },
     onSuccess: () => {
       toast.success(t('brandRise.competitors.toast.discoverySuccess') || 'Discovery started!');
@@ -61,7 +67,8 @@ export const useCompetitors = () => {
   const addMutation = useMutation({
     mutationFn: async (competitor: any) => {
         if (!businessId) throw new Error('No business ID');
-        return apiClient.patch(`/brands/${businessId}/competitors/${competitor.id}`, {
+        
+return apiClient.patch(`/brands/${businessId}/competitors/${competitor.id}`, {
             isUserAdded: true,
             isHidden: false
         });
@@ -76,7 +83,8 @@ export const useCompetitors = () => {
   const removeMutation = useMutation({
     mutationFn: async (id: string) => {
         if (!businessId) throw new Error('No business ID');
-        return apiClient.delete(`/brands/${businessId}/competitors/${id}`);
+        
+return apiClient.delete(`/brands/${businessId}/competitors/${id}`);
     },
     onSuccess: () => {
         toast.success(t('brandRise.competitors.toast.removedSuccess') || 'Competitor removed');
@@ -89,7 +97,9 @@ export const useCompetitors = () => {
     mutationFn: async (id: string) => {
        setAnalyzingIds(prev => [...prev, id]);
        const res = await apiClient.post(`/brands/${businessId}/competitors/${id}/extract`);
-       return res.data;
+
+       
+return res.data;
     },
     onSuccess: (data, id) => {
        toast.success(t('brandRise.competitors.toast.analysisStarted') || 'Analysis started');

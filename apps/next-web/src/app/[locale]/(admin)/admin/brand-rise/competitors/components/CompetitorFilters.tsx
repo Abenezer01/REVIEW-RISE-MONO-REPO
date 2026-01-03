@@ -3,11 +3,9 @@
 import { Box, Button, Stack } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 
-interface CompetitorFiltersProps {
-  onFilterChange?: (filter: string) => void;
-}
 
-export const CompetitorFilters = ({ onFilterChange }: CompetitorFiltersProps) => {
+
+export const CompetitorFilters = () => {
   const theme = useTheme();
 
   return (

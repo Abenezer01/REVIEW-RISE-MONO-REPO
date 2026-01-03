@@ -1,55 +1,57 @@
 'use client';
 
-import React from 'react';
-import { useParams, useRouter, usePathname } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+
+import { useParams, usePathname, useRouter } from 'next/navigation';
+
 import { useQuery } from '@tanstack/react-query';
-import { BrandService } from '@/services/brand.service';
-import { useBusinessId } from '@/hooks/useBusinessId';
-import { 
-  Box, 
-  Container, 
-  Typography, 
-  CircularProgress, 
-  Alert, 
-  Button, 
-  Stack, 
-  Chip, 
-  Card,
-  CardContent,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  useTheme, 
-  alpha,
-  Grid
-} from '@mui/material';
+
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
-import LightbulbIcon from '@mui/icons-material/Lightbulb';
-import StarIcon from '@mui/icons-material/Star';
-import GroupsIcon from '@mui/icons-material/Groups';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CodeIcon from '@mui/icons-material/Code';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import DescriptionIcon from '@mui/icons-material/Description';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import GroupsIcon from '@mui/icons-material/Groups';
+import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
-import CodeIcon from '@mui/icons-material/Code';
-import AnalyticsIcon from '@mui/icons-material/Analytics';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import StarIcon from '@mui/icons-material/Star';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import {
+    Alert,
+    alpha,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Chip,
+    CircularProgress,
+    Container,
+    Grid,
+    Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
+    useTheme
+} from '@mui/material';
+
+import { useBusinessId } from '@/hooks/useBusinessId';
+import { BrandService } from '@/services/brand.service';
 
 const ensureArray = (data: any): string[] => {
     if (Array.isArray(data)) return data;
     if (typeof data === 'string') return [data];
-    return [];
+    
+return [];
 };
 
 export default function CompetitorDetailPage() {
-  const t = useTranslations('dashboard');
   const theme = useTheme();
   const router = useRouter();
   const params = useParams();
@@ -64,7 +66,8 @@ export default function CompetitorDetailPage() {
     queryKey: ['competitor', businessId, competitorId],
     queryFn: async () => {
         if (!businessId || !competitorId) return null;
-        return BrandService.getCompetitor(businessId, competitorId);
+        
+return BrandService.getCompetitor(businessId, competitorId);
     },
     enabled: !!businessId && !!competitorId
   });

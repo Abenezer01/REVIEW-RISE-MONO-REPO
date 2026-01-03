@@ -2,15 +2,16 @@
 
 import { 
   Box, 
-  Container, 
-  Typography,
+
+  Container,
   CircularProgress,
   Button
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
+
 import { DiscoveryInput } from './components/DiscoveryInput';
 import { CompetitorList } from './components/CompetitorList';
-import { DiscoveryProgress } from './components/DiscoveryProgress';
+
 import { useCompetitors } from './hooks/useCompetitors';
 
 export default function CompetitorsPage() {
@@ -21,7 +22,7 @@ export default function CompetitorsPage() {
     removeMutation, 
     extractMutation,
     analyzingIds,
-    discoveryStatus
+
   } = useCompetitors();
 
   return (

@@ -4,10 +4,11 @@ import {
     LinearProgress,
     Stack,
     Paper,
-    alpha
+    alpha,
+    CircularProgress // Added missing import
 } from '@mui/material';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+
 
 export const DiscoveryProgress = () => {
     return (

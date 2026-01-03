@@ -1,7 +1,8 @@
 'use client'
 
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useCallback } from 'react'
+
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 
 export const useLocationFilter = () => {
   const searchParams = useSearchParams()
