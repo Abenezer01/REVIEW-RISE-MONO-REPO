@@ -88,6 +88,7 @@ model Business {
   competitors   Competitor[]
   visibilitySnapshots VisibilitySnapshot[]
   reports       Report[]
+  opportunitiesReports OpportunitiesReport[]
   dna           BrandDNA?
   contentIdeas  ContentIdea[]
   reviews       Review[]
@@ -536,34 +537,71 @@ model AIPlatformData {
   @@index([platform])
 }
 
+// Competitor Type Enum
+enum CompetitorType {
+  DIRECT_LOCAL  // Direct local competitor
+  CONTENT       // Content competitor (blogs, guides)
+  AGGREGATOR    // Directories, aggregators (Yelp, etc.)
+  UNKNOWN       // Not yet classified
+}
+
 // BrandingRise: Competitor Analysis
 model Competitor {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId  String    @db.Uuid
-  name        String
-  website     String?
+  id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId      String         @db.Uuid
+  name            String
+  website         String?
+  
+  // Discovery & Classification
+  domain          String?                    // Normalized domain (e.g., example.com)
+  type            CompetitorType @default(UNKNOWN)
+  source          String?                    // "discovery" or "manual"
+  relevanceScore  Float?                     // 0-100 ranking from SERP
+  ranking         Int?                       // Position in competitor list
+  isUserAdded     Boolean        @default(false)
+  isHidden        Boolean        @default(false)
   
   // Metadata
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
   
-  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  snapshots   CompetitorSnapshot[]
+  business        Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  snapshots       CompetitorSnapshot[]
 
   @@unique([businessId, name])
+  @@unique([businessId, domain])
   @@index([businessId])
+  @@index([type])
 }
 
 model CompetitorSnapshot {
-  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  competitorId String     @db.Uuid
+  id                String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  competitorId      String     @db.Uuid
   
-  // Metrics (flexible JSON to store various comparisons)
-  metrics      Json       // e.g. { "visibilityScore": 85, "rankingKeywords": 120, "socialFollowers": 5000 }
+  // Extracted Brand Elements
+  headline          String?    @db.Text      // Main UVP/headline
+  uvp               String?    @db.Text      // Full value proposition
+  serviceList       String[]                 // List of services offered
+  pricingCues       String[]                 // Pricing indicators found
+  trustSignals      Json?                    // { badges: [], certifications: [], reviewCount: 0, avgRating: 0 }
+  ctaStyles         String[]                 // CTA button texts/styles
+  contentCategories String[]                 // Blog/content categories
   
-  capturedAt   DateTime   @default(now())
+  // Differentiators Analysis (AI-generated)
+  differentiators   Json?                    // { strengths: [], weaknesses: [], unique: [] }
+  whatToLearn       String[]                 // Insights to adopt
+  whatToAvoid       String[]                 // Patterns to avoid
   
-  competitor   Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+  // Optional Enrichments
+  techStack         Json?                    // Wappalyzer data
+  trafficMetrics    Json?                    // SimilarWeb data
+  
+  // Legacy field for backwards compatibility
+  metrics           Json?
+  
+  capturedAt        DateTime   @default(now())
+  
+  competitor        Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
   
   @@index([competitorId])
   @@index([capturedAt])
@@ -608,6 +646,30 @@ model Report {
   
   @@index([businessId])
   @@index([generatedAt])
+}
+
+// BrandingRise: Opportunities Report
+model OpportunitiesReport {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId         String    @db.Uuid
+  
+  // Report Content
+  positioningMap     Json                    // { competitors: [...], axes: { x: 'price', y: 'quality' } }
+  gaps               Json                    // [{ title: '', description: '', priority: 1-10 }]
+  strategies         Json                    // [{ title: '', description: '', pros: [], cons: [] }]
+  suggestedTaglines  String[]
+  contentIdeas       Json                    // [{ topic: '', rationale: '', competitorGap: '' }]
+  
+  // Metadata
+  generatedAt        DateTime  @default(now())
+  expiresAt          DateTime?
+  shareToken         String?   @unique       // For shareable link
+  pdfUrl             String?
+  
+  business           Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@index([businessId])
+  @@index([shareToken])
 }
 
 model BrandDNA {

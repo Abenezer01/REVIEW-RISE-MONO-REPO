@@ -15,6 +15,7 @@ import Typography from '@mui/material/Typography';
 import type { ApexOptions } from 'apexcharts';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
+import { useLocationFilter } from '@/hooks/useLocationFilter';
 import type { VisibilityMetric } from '@/services/brand.service';
 import { BrandService } from '@/services/brand.service';
 
@@ -123,6 +124,7 @@ const ChannelCard = ({ title, score, icon, iconColor, metrics, chartType }: Chan
 const VisibilityPage = () => {
   const [activeTab, setActiveTab] = useState('Search');
   const { businessId } = useBusinessId();
+  const { locationId } = useLocationFilter();
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState<VisibilityMetric[]>([]);
   const [latestMetric, setLatestMetric] = useState<VisibilityMetric | null>(null);
@@ -133,7 +135,7 @@ const VisibilityPage = () => {
       setLoading(true);
   
       try {
-          const data = await BrandService.getVisibilityMetrics(businessId, '30d');
+          const data = await BrandService.getVisibilityMetrics(businessId, '30d', locationId);
   
           setMetrics(data);
   
@@ -150,7 +152,7 @@ const VisibilityPage = () => {
     if (businessId) {
         fetchMetrics();
     }
-  }, [businessId]);
+  }, [businessId, locationId]);
 
   const getBreakdownValue = (key: string, subKey: string, defaultValue: string = '0') => {
       if (!latestMetric?.breakdown) return defaultValue;

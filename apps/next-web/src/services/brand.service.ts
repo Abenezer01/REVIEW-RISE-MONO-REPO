@@ -3,6 +3,9 @@ import apiClient from '@/lib/apiClient';
 export interface Competitor {
   id: string;
   name: string;
+  domain?: string;
+  logo?: string;
+  type?: string;
   website?: string;
   snapshots?: any[];
 }
@@ -30,11 +33,22 @@ export interface Report {
 
 export const BrandService = {
   // Competitors
-  listCompetitors: async (businessId: string) => {
-    const response = await apiClient.get<{ data: Competitor[] }>(`/brands/${businessId}/competitors`);
+  listCompetitors: async (businessId: string, locationId?: string | number | null) => {
+    const params: any = {};
+
+    if (locationId) params.locationId = locationId;
+
+    const response = await apiClient.get<{ data: Competitor[] }>(`/brands/${businessId}/competitors`, { params });
 
     
 return response.data.data || [];
+  },
+
+  getCompetitor: async (businessId: string, competitorId: string) => {
+      const response = await apiClient.get<{ data: Competitor }>(`/brands/${businessId}/competitors/${competitorId}`);
+
+      
+return response.data.data;
   },
 
   addCompetitor: async (businessId: string, data: { name: string; website?: string }) => {
@@ -49,16 +63,24 @@ return response.data.data;
   },
 
   // Dashboard
-  getOverview: async (businessId: string) => {
-    const response = await apiClient.get<{ data: DashboardOverview }>(`/brands/${businessId}/dashboards/overview`);
+  getOverview: async (businessId: string, locationId?: string | number | null) => {
+    const params: any = {};
+
+    if (locationId) params.locationId = locationId;
+
+    const response = await apiClient.get<{ data: DashboardOverview }>(`/brands/${businessId}/dashboards/overview`, { params });
 
     
 return response.data.data;
   },
 
-  getVisibilityMetrics: async (businessId: string, range: '7d' | '30d' | '90d' = '30d') => {
+  getVisibilityMetrics: async (businessId: string, range: '7d' | '30d' | '90d' = '30d', locationId?: string | number | null) => {
+    const params: any = { range };
+
+    if (locationId) params.locationId = locationId;
+
     const response = await apiClient.get<{ data: VisibilityMetric[] }>(`/brands/${businessId}/dashboards/visibility`, {
-      params: { range }
+      params
     });
 
     
@@ -75,6 +97,20 @@ return response.data.data;
   
   getReport: async (businessId: string, reportId: string) => {
       const response = await apiClient.get<{ data: Report & { htmlContent: string } }>(`/brands/${businessId}/reports/${reportId}`);
+
+      
+return response.data.data;
+  },
+
+  listOpportunitiesReports: async (businessId: string) => {
+      const response = await apiClient.get<{ data: any[] }>(`/brands/${businessId}/reports/opportunities`);
+
+      
+return response.data.data || [];
+  },
+
+  generateOpportunitiesReport: async (businessId: string) => {
+      const response = await apiClient.post<{ data: any }>(`/brands/${businessId}/reports/opportunities`);
 
       
 return response.data.data;
@@ -115,17 +151,26 @@ return response.data.data;
   },
 
   // Reviews
-  listReviews: async (businessId: string, page: number = 1, limit: number = 10, platform?: string) => {
+  // Reviews
+  listReviews: async (businessId: string, page: number = 1, limit: number = 10, platform?: string, locationId?: string | number | null) => {
+      const params: any = { page, limit, platform };
+
+      if (locationId) params.locationId = locationId;
+
       const response = await apiClient.get<{ data: { reviews: Review[], total: number, page: number, totalPages: number } }>(`/brands/${businessId}/reviews`, {
-          params: { page, limit, platform }
+          params
       });
 
       
 return response.data.data || { reviews: [], total: 0, page: 1, totalPages: 1 };
   },
 
-  getReviewStats: async (businessId: string) => {
-      const response = await apiClient.get<{ data: { totalReviews: number, averageRating: number } }>(`/brands/${businessId}/reviews/stats`);
+  getReviewStats: async (businessId: string, locationId?: string | number | null) => {
+      const params: any = {};
+
+      if (locationId) params.locationId = locationId;
+
+      const response = await apiClient.get<{ data: { totalReviews: number, averageRating: number } }>(`/brands/${businessId}/reviews/stats`, { params });
 
       
 return response.data.data;

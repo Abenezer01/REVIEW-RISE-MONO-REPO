@@ -12,6 +12,9 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
+import aiRoutes from './routes/ai.routes';
+app.use('/api/v1/ai', aiRoutes);
+
 app.get('/', (req, res) => {
     res.json({ message: 'Express AI Service is running' });
 });

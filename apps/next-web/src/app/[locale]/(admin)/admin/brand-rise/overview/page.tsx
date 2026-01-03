@@ -15,6 +15,7 @@ import InsightsCard from '@/components/shared/dashboard/InsightsCard';
 import MetricCard from '@/components/shared/dashboard/MetricCard';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
+import { useLocationFilter } from '@/hooks/useLocationFilter';
 import { BrandService, type DashboardOverview, type VisibilityMetric } from '@/services/brand.service';
 
 const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [key: string]: any }) => {
@@ -23,6 +24,7 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
 
 const OverviewPage = () => {
   const { businessId } = useBusinessId();
+  const { locationId } = useLocationFilter();
   const [loading, setLoading] = useState(true);
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [visibilityMetrics, setVisibilityMetrics] = useState<VisibilityMetric[]>([]);
@@ -34,8 +36,8 @@ const OverviewPage = () => {
   
       try {
         const [overviewData, metricsData] = await Promise.all([
-          BrandService.getOverview(businessId),
-          BrandService.getVisibilityMetrics(businessId, '30d')
+          BrandService.getOverview(businessId, locationId),
+          BrandService.getVisibilityMetrics(businessId, '30d', locationId)
         ]);
   
         setOverview(overviewData);
@@ -50,7 +52,7 @@ const OverviewPage = () => {
     if (businessId) {
       fetchData();
     }
-  }, [businessId]);
+  }, [businessId, locationId]);
 
   if (loading) {
     return (

@@ -85,8 +85,30 @@
       "reports": "Reports"
     },
     "reports": {
-      "title": "Brand Reports",
-      "generate": "Generate Report"
+      "title": "Brand Opportunities Reports",
+      "subtitle": "AI-driven analysis of gaps, strategies, and positioning.",
+      "generate": "Generate AI Report",
+      "generating": "Generating...",
+      "viewInsights": "View Insights",
+      "share": "Share",
+      "exportPdf": "Export PDF",
+      "noReports": "No reports generated yet. Click \"Generate AI Report\" to start.",
+      "columns": {
+        "date": "Report Date",
+        "status": "Status",
+        "id": "ID",
+        "actions": "Actions"
+      },
+      "detail": {
+        "title": "Strategy Report",
+        "subtitle": "AI-Generated Opportunities & Insights",
+        "positioning": "Market Positioning",
+        "positioningDesc": "Your brand vs competitors on key dimensions.",
+        "strategies": "Differentiation Strategies",
+        "gaps": "Market Gaps",
+        "taglines": "Suggested Taglines",
+        "roadmap": "Content Roadmap"
+      }
     },
     "reviews": {
       "recent": "Recent Reviews",
@@ -106,7 +128,30 @@
       "viewFull": "View Full Brand DNA"
     },
     "competitors": {
-      "tracking": "Competitor Tracking"
+      "tracking": "Competitor Tracking",
+      "discoveryTitle": "Competitor Discovery",
+      "discoverySubtitle": "Analyze competitor websites to identify gaps, strategies, and opportunities.",
+      "inputLabel": "Add keywords (e.g. 'plumber cityname')",
+      "discoverBtn": "Discover Competitors",
+      "discovering": "Discovering...",
+      "analyzeWebsite": "Analyze Website",
+      "analyzing": "Analyzing...",
+      "noAnalysis": "No detailed analysis available yet.",
+      "noCompetitors": "No competitors tracked yet. Add one above.",
+      "uvp": "UVP",
+      "services": "Services",
+      "analysis": "Analysis",
+      "listTitle": "Tracked Competitors",
+      "toast": {
+        "discoverySuccess": "Competitors discovered successfully",
+        "discoveryError": "Failed to discover competitors",
+        "addedSuccess": "Competitor tracked successfully",
+        "removedSuccess": "Competitor removed",
+        "analysisStarted": "Analysis started",
+        "analysisFailed": "Analysis failed"
+      },
+      "strategy": "Strategy: {value}",
+      "learn": "Learn: {value}"
     }
   }
 }
