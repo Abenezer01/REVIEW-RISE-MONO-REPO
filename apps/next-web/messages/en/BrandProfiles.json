@@ -1,0 +1,29 @@
+{
+  "wizard": {
+    "title": "Website Connect Wizard",
+    "step1": {
+      "title": "Enter Website URL",
+      "urlInputLabel": "Website URL",
+      "invalidUrlError": "Please enter a valid URL.",
+      "nextButton": "Next",
+      "businessSelectLabel": "Select Business"
+    },
+    "step2": {
+      "title": "Extracting Brand Profile...",
+      "description": "This may take a few moments.",
+      "errorTitle": "Extraction Failed",
+      "tryAgainButton": "Try Again"
+    },
+    "step3": {
+      "title": "Review Extracted Data",
+      "description": "No brand profile data available for review.",
+      "confirmButton": "Confirm Extraction"
+    },
+    "step4": {
+      "title": "Extraction Confirmed!",
+      "description": "Your brand profile has been successfully extracted and confirmed.",
+      "tryAgainButton": "Start New Extraction",
+      "newExtractionButton": "Start New Extraction"
+    }
+  }
+}
