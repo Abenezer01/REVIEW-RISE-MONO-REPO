@@ -1,8 +1,20 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { URL } from 'url';
+import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export class AIVisibilityService {
+  private openai: OpenAI | null = null;
+
+  constructor() {
+    if (process.env.LLM_PROVIDER_API_KEY) {
+      this.openai = new OpenAI({
+        apiKey: process.env.LLM_PROVIDER_API_KEY,
+      });
+    }
+  }
+
   /**
    * Extract brand name and domain from a URL
    */
@@ -119,11 +131,11 @@ export class AIVisibilityService {
    */
   async mockLLMQuery(platform: string, prompt: string, brandName: string): Promise<string> {
     // Simulate latency
-    await new Promise(r => setTimeout(r, 500)); 
+    await new Promise(r => setTimeout(r, 500));
 
     const rand = Math.random();
     const promptLower = prompt.toLowerCase();
-    
+
     // Platform-specific flavor text
     let intro = '';
     if (platform === 'ChatGPT') intro = "As an AI language model, I can tell you that ";
@@ -137,26 +149,26 @@ export class AIVisibilityService {
 
     // Scenario 1: "Alternatives" or "Competitors"
     if (promptLower.includes('alternative') || promptLower.includes('competitor') || promptLower.includes('best')) {
-        if (rand > 0.4) {
-            responseBody = `Top options in this market include ${brandName}, CompetitorX, and CompetitorY. ${brandName} is particularly known for its robust features and user-friendly interface.`;
-        } else if (rand > 0.2) {
-            responseBody = `Users often compare CompetitorA and CompetitorB. While ${brandName} is a player in this field, some users prefer CompetitorA for enterprise needs.`;
-        } else {
-            responseBody = `The leading tools are currently MarketLeader, BigCorp, and FastStartup. They offer comprehensive suites for professionals.`;
-        }
-    } 
+      if (rand > 0.4) {
+        responseBody = `Top options in this market include ${brandName}, CompetitorX, and CompetitorY. ${brandName} is particularly known for its robust features and user-friendly interface.`;
+      } else if (rand > 0.2) {
+        responseBody = `Users often compare CompetitorA and CompetitorB. While ${brandName} is a player in this field, some users prefer CompetitorA for enterprise needs.`;
+      } else {
+        responseBody = `The leading tools are currently MarketLeader, BigCorp, and FastStartup. They offer comprehensive suites for professionals.`;
+      }
+    }
     // Scenario 2: "Legitimate" or "Review" or "What is"
     else {
-        if (rand > 0.3) {
-            // Positive/Neutral Mention
-            responseBody = `${brandName} is a legitimate and well-regarded provider. Reviews generally praise their customer support and reliability. You can visit them at ${brandName.toLowerCase()}.com.`;
-        } else if (rand > 0.1) {
-             // Mixed/Negative
-             responseBody = `${brandName} operates in this sector but has received mixed feedback regarding pricing and stability. It is worth comparing with other established brands.`;
-        } else {
-             // No Mention (Hallucination or Irrelevance)
-             responseBody = `I don't have enough specific information to provide a detailed review of that specific brand. However, when looking for services in this industry, you should consider reputation and uptime.`;
-        }
+      if (rand > 0.3) {
+        // Positive/Neutral Mention
+        responseBody = `${brandName} is a legitimate and well-regarded provider. Reviews generally praise their customer support and reliability. You can visit them at ${brandName.toLowerCase()}.com.`;
+      } else if (rand > 0.1) {
+        // Mixed/Negative
+        responseBody = `${brandName} operates in this sector but has received mixed feedback regarding pricing and stability. It is worth comparing with other established brands.`;
+      } else {
+        // No Mention (Hallucination or Irrelevance)
+        responseBody = `I don't have enough specific information to provide a detailed review of that specific brand. However, when looking for services in this industry, you should consider reputation and uptime.`;
+      }
     }
 
     return `${intro}${responseBody}`;
@@ -164,16 +176,85 @@ export class AIVisibilityService {
 
   /**
    * Generate strategic recommendations based on analysis data
-   * Simulates an AI consultant analyzing the specific metrics
+   * Uses OpenAI if available, otherwise falls back to static logic
    */
   async generateStrategicRecommendations(
     metrics: { visibilityScore: number; citationAuthority: number; sentimentScore: number },
     platformData: any[],
     brandName: string
   ): Promise<any[]> {
+
+    // 1. Try Real AI
+    const provider = process.env.LLM_PROVIDER || 'openai';
+
+    if (provider === 'gemini' && process.env.LLM_PROVIDER_API_KEY) {
+      try {
+        const genAI = new GoogleGenerativeAI(process.env.LLM_PROVIDER_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+
+        const prompt = `You are an expert SEO and Brand Reputation Consultant. Analyze the provided metrics and return 3 prioritized, actionable, technical recommendations in JSON format.
+            
+            Analyze the following brand visibility data for "${brandName}":
+            - Visibility Score: ${metrics.visibilityScore}/100
+            - Citation Authority: ${metrics.citationAuthority}/100
+            - Sentiment Score: ${metrics.sentimentScore}/100
+            - Missing from: ${platformData.filter(p => !p.mentioned).map(p => p.platform).join(', ') || 'None'}
+            
+            Return a JSON array of objects with keys: id, title, description, impact (High/Medium/Low), type (technical/authority/content). Strictly output valid JSON only.`;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        // Cleanup markdown code blocks if present
+        const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+        if (cleanText) {
+          const parsed = JSON.parse(cleanText);
+          return parsed.recommendations || parsed;
+        }
+      } catch (error: any) {
+        const errorMessage = error.message || 'Unknown error';
+        if (errorMessage.includes('API_KEY_INVALID') || errorMessage.includes('400 Bad Request')) {
+          console.error('❌ Gemini Configuration Error: Invalid API Key. Please check LLM_PROVIDER_API_KEY in your .env file.');
+        } else {
+          console.error('Gemini generation failed, falling back to mock:', error);
+        }
+      }
+    } else if (this.openai && provider === 'openai') {
+      try {
+        const completion = await this.openai.chat.completions.create({
+          messages: [{
+            role: "system",
+            content: "You are an expert SEO and Brand Reputation Consultant. Analyze the provided metrics and return 3 prioritized, actionable, technical recommendations in JSON format."
+          }, {
+            role: "user",
+            content: `Analyze the following brand visibility data for "${brandName}":
+                    - Visibility Score: ${metrics.visibilityScore}/100
+                    - Citation Authority: ${metrics.citationAuthority}/100
+                    - Sentiment Score: ${metrics.sentimentScore}/100
+                    - Missing from: ${platformData.filter(p => !p.mentioned).map(p => p.platform).join(', ') || 'None'}
+                    
+                    Return a JSON array of objects with keys: id, title, description, impact (High/Medium/Low), type (technical/authority/content). strictly JSON.`
+          }],
+          model: "gpt-3.5-turbo",
+          response_format: { type: "json_object" }
+        });
+
+        const content = completion.choices[0].message.content;
+        if (content) {
+          const parsed = JSON.parse(content);
+          return parsed.recommendations || parsed; // Handle { recommendations: [...] } or [...]
+        }
+      } catch (error) {
+        console.error('OpenAI generation failed, falling back to mock:', error);
+      }
+    }
+
+    // 2. Fallback to Static Logic
     const recommendations: any[] = [];
 
-    // 1. Analyze Visibility Gaps
+    // Analyze Visibility Gaps
     const lowVisibilityPlatforms = platformData
       .filter(p => !p.mentioned)
       .map(p => p.platform);
@@ -188,7 +269,7 @@ export class AIVisibilityService {
       });
     }
 
-    // 2. Analyze Citation Authority
+    // Analyze Citation Authority
     if (metrics.citationAuthority < 50) {
       recommendations.push({
         id: 'rec_authority_1',
@@ -199,7 +280,7 @@ export class AIVisibilityService {
       });
     }
 
-    // 3. Analyze Content/Sentiment
+    // Analyze Content/Sentiment
     if (metrics.sentimentScore < 70) {
       recommendations.push({
         id: 'rec_sentiment_1',

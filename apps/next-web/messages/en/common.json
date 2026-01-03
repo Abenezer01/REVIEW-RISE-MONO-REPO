@@ -42,6 +42,8 @@
     "exportFormat": "Export Format",
     "exportCurrentPageOnly": "Export only current page's records",
     "selectFields": "Select Fields",
+    "search-placeholder": "Search...",
+    "found": "Found",
     "confirmDelete": "Are you sure you want to delete this item?"
   },
   "form": {
