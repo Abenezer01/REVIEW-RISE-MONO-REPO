@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
+import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -16,10 +16,12 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { useTranslations } from 'next-intl';
+import toast from 'react-hot-toast';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusinessId } from '@/hooks/useBusinessId';
-import { BrandService, type Report } from '@/services/brand.service';
+import { BrandService } from '@/services/brand.service';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [key: string]: any }) => {
   return <i className={icon} style={{ fontSize }} {...rest} />
@@ -27,58 +29,47 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
 
 const ReportsPage = () => {
   const t = useTranslations('dashboard');
+  const router = useRouter();
   const { businessId } = useBusinessId();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  const [reports, setReports] = useState<Report[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  // RBAC: Manager or Admin can generate
   const canGenerate = user?.role === 'ADMIN' || user?.role === 'MANAGER';
 
-  useEffect(() => {
-    const fetchReports = async () => {
-      if (!businessId) return;
-      setLoading(true);
-  
-      try {
-        const data = await BrandService.listReports(businessId);
-  
-        setReports(data);
-      } catch (error) {
-        console.error('Failed to fetch reports', error);
-      } finally {
-        setLoading(false);
+  // Fetch Reports
+  const { data: reports = [], isLoading } = useQuery({
+      queryKey: ['opportunities-reports', businessId],
+      queryFn: async () => {
+          if (!businessId) return [];
+          const res = await BrandService.listOpportunitiesReports(businessId);
+          return res; // Assuming service returns array
+      },
+      enabled: !!businessId
+  });
+
+  // Generate Mutation
+  const generateMutation = useMutation({
+      mutationFn: async () => {
+          if (!businessId) throw new Error('No business ID');
+          return BrandService.generateOpportunitiesReport(businessId);
+      },
+      onSuccess: () => {
+          toast.success('Report generation started...');
+          // In real implementation, this might be async job. 
+          // If sync, we invalidate queries.
+          setTimeout(() => {
+              queryClient.invalidateQueries({ queryKey: ['opportunities-reports', businessId] });
+          }, 2000); 
+      },
+      onError: (err) => {
+          toast.error('Failed to generate report');
+          console.error(err);
       }
-    };
+  });
 
-    if (businessId) {
-      fetchReports();
-    }
-  }, [businessId]);
-
-  const handleViewReport = async (reportId: string) => {
-    if (!businessId) return;
-
-    try {
-        const report = await BrandService.getReport(businessId, reportId);
-
-        // Open report content in new window for now
-        const win = window.open('', '_blank');
-
-        if (win) {
-            win.document.write(report.htmlContent);
-            win.document.close();
-        }
-    } catch (error) {
-        console.error('Failed to load report content', error);
-        alert('Failed to load report content');
-    }
-  };
-
-  const handleGenerateReport = () => {
-      // Future implementation: Open generation dialog
-      alert('Report generation feature coming soon!');
+  const handleViewReport = (reportId: string) => {
+      if(!businessId) return;
+      router.push(`/en/admin/brand-rise/reports/${reportId}`); // TODO: Handle locale dynamically if needed
   };
 
   return (
@@ -86,33 +77,34 @@ const ReportsPage = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
             <Typography variant="h6" fontWeight="bold">{t('brandRise.reports.title')}</Typography>
-            <Typography variant="body1" color="text.secondary">Access and view comprehensive brand performance reports</Typography>
+            <Typography variant="body1" color="text.secondary">{t('brandRise.reports.subtitle')}</Typography>
         </Box>
         {canGenerate && (
           <Button 
               variant="contained" 
-              startIcon={<Icon icon="tabler-file-plus" />}
+              startIcon={generateMutation.isPending ? <CircularProgress size={20} color="inherit"/> : <Icon icon="tabler-wand" />}
               sx={{ bgcolor: '#7367F0', '&:hover': { bgcolor: '#665BE0' }, textTransform: 'none' }}
-              onClick={handleGenerateReport}
+              onClick={() => generateMutation.mutate()}
+              disabled={generateMutation.isPending}
           >
-              {t('brandRise.reports.generate')}
+              {generateMutation.isPending ? t('brandRise.reports.generating') : t('brandRise.reports.generate')}
           </Button>
         )}
       </Box>
 
       <Card>
         <TableContainer>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <Table sx={{ minWidth: 650 }} aria-label="reports table">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ color: 'text.secondary', fontWeight: 600 }}>Report Title</TableCell>
-                <TableCell sx={{ color: 'text.secondary', fontWeight: 600 }}>Version</TableCell>
-                <TableCell sx={{ color: 'text.secondary', fontWeight: 600 }}>Created Date</TableCell>
-                <TableCell sx={{ color: 'text.secondary', fontWeight: 600 }}>Actions</TableCell>
+                <TableCell sx={{ color: 'text.secondary', fontWeight: 600 }}>{t('brandRise.reports.columns.date')}</TableCell>
+                <TableCell sx={{ color: 'text.secondary', fontWeight: 600 }}>{t('brandRise.reports.columns.status')}</TableCell>
+                <TableCell sx={{ color: 'text.secondary', fontWeight: 600 }}>{t('brandRise.reports.columns.id')}</TableCell>
+                <TableCell sx={{ color: 'text.secondary', fontWeight: 600 }}>{t('brandRise.reports.columns.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {loading ? (
+              {isLoading ? (
                  <TableRow>
                    <TableCell colSpan={4} align="center">
                      <CircularProgress />
@@ -121,17 +113,17 @@ const ReportsPage = () => {
               ) : reports.length === 0 ? (
                  <TableRow>
                    <TableCell colSpan={4} align="center">
-                     <Typography color="text.secondary">No reports generated yet.</Typography>
+                     <Typography color="text.secondary" py={3}>{t('brandRise.reports.noReports')}</Typography>
                    </TableCell>
                  </TableRow>
               ) : (
-                (reports || []).map((row) => (
+                reports.map((row: any) => (
                   <TableRow
                     key={row.id}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                          <Box sx={{ 
                              width: 38, 
                              height: 38, 
@@ -142,49 +134,36 @@ const ReportsPage = () => {
                              color: '#7367F0',
                              borderRadius: 1
                          }}>
-                             <Icon icon="tabler-file-text" fontSize={20} />
+                             <Icon icon="tabler-file-analytics" fontSize={20} />
                          </Box>
-                         <Typography variant="body1" fontWeight={500}>{row.title}</Typography>
+                         <Typography variant="body1" fontWeight={500}>
+                            {new Date(row.generatedAt).toLocaleDateString()} {new Date(row.generatedAt).toLocaleTimeString()}
+                         </Typography>
                       </Box>
                     </TableCell>
                     <TableCell>
                       <Chip 
-                          label={`v${row.version}`} 
+                          label="Ready" 
                           size="small" 
-                          sx={{ 
-                              bgcolor: '#E8F8F0', 
-                              color: '#28C76F',
-                              fontWeight: 600,
-                              borderRadius: 1,
-                              height: 24
-                          }} 
+                          color="success"
+                          variant="outlined"
                       />
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" color="text.secondary">
-                          {new Date(row.generatedAt).toLocaleDateString()}
+                      <Typography variant="caption" color="text.secondary">
+                          {row.id.substring(0, 8)}...
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                           <Button 
-                              variant="contained" 
+                              variant="outlined" 
                               size="small" 
                               startIcon={<Icon icon="tabler-eye" fontSize={16} />}
-                              sx={{ 
-                                  bgcolor: '#7367F0', 
-                                  '&:hover': { bgcolor: '#665BE0' },
-                                  textTransform: 'none',
-                                  borderRadius: 1,
-                                  px: 2
-                              }}
                               onClick={() => handleViewReport(row.id)}
                           >
-                              View
+                              {t('brandRise.reports.viewInsights')}
                           </Button>
-                          <IconButton size="small" sx={{ color: 'text.secondary' }}>
-                              <Icon icon="tabler-download" fontSize={20} />
-                          </IconButton>
                       </Box>
                     </TableCell>
                   </TableRow>
@@ -199,4 +178,3 @@ const ReportsPage = () => {
 };
 
 export default ReportsPage;
-

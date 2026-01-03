@@ -6,11 +6,14 @@ import dnaRoutes from './dna.routes';
 import contentRoutes from './content.routes';
 import reviewRoutes from './review.routes';
 
+import opportunitiesReportRoutes from './opportunities-report.routes';
+
 const router = Router();
 
 router.use('/brands', dashboardRoutes); // has /:id/dashboards/overview
 router.use('/brands/:id/competitors', competitorRoutes);
-router.use('/brands/:id/reports', reportRoutes);
+router.use('/brands/:id/reports', reportRoutes); // standard reports
+router.use('/brands/:id/reports/opportunities', opportunitiesReportRoutes); // sub-resource
 router.use('/brands/:id/dna', dnaRoutes);
 router.use('/brands/:id/content', contentRoutes);
 router.use('/brands/:id/reviews', reviewRoutes);

@@ -80,6 +80,16 @@ return response.data.data;
 return response.data.data;
   },
 
+  listOpportunitiesReports: async (businessId: string) => {
+      const response = await apiClient.get<{ data: any[] }>(`/brands/${businessId}/reports/opportunities`);
+      return response.data.data || [];
+  },
+
+  generateOpportunitiesReport: async (businessId: string) => {
+      const response = await apiClient.post<{ data: any }>(`/brands/${businessId}/reports/opportunities`);
+      return response.data.data;
+  },
+
   // DNA
   getDNA: async (businessId: string) => {
       const response = await apiClient.get<{ data: BrandDNA }>(`/brands/${businessId}/dna`);
