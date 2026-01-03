@@ -84,6 +84,14 @@ model Business {
   jobs          Job[]
   reviewSyncLogs ReviewSyncLog[]
 
+  // BrandingRise Relations
+  competitors   Competitor[]
+  visibilitySnapshots VisibilitySnapshot[]
+  reports       Report[]
+  dna           BrandDNA?
+  contentIdeas  ContentIdea[]
+  reviews       Review[]
+
 
   @@index([name])
   @@index([status])
@@ -108,6 +116,7 @@ model Location {
   aiVisibilityMetrics AIVisibilityMetric[]
   jobs        Job[]
   reviewSyncLogs ReviewSyncLog[]
+  reviews     Review[]
 
   @@index([businessId])
 }
@@ -496,4 +505,126 @@ model AIPlatformData {
 
   @@index([aIVisibilityMetricId])
   @@index([platform])
+}
+
+// BrandingRise: Competitor Analysis
+model Competitor {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String    @db.Uuid
+  name        String
+  website     String?
+  
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  snapshots   CompetitorSnapshot[]
+
+  @@unique([businessId, name])
+  @@index([businessId])
+}
+
+model CompetitorSnapshot {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  competitorId String     @db.Uuid
+  
+  // Metrics (flexible JSON to store various comparisons)
+  metrics      Json       // e.g. { "visibilityScore": 85, "rankingKeywords": 120, "socialFollowers": 5000 }
+  
+  capturedAt   DateTime   @default(now())
+  
+  competitor   Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+  
+  @@index([competitorId])
+  @@index([capturedAt])
+}
+
+// BrandingRise: Visibility Snapshots (for unified dashboard history)
+model VisibilitySnapshot {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String    @db.Uuid
+  
+  range       String    // 7d, 30d, 90d (snapshot covers this range ending at capturedAt)
+  score       Float     // Overall visibility score (0-100)
+  
+  // Detailed breakdown
+  breakdown   Json      // { "organic": 40, "maps": 30, "social": 15, "reviews": 15 }
+  
+  capturedAt  DateTime  @default(now())
+  
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@index([businessId])
+  @@index([capturedAt])
+}
+
+// BrandingRise: Reports
+model Report {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String    @db.Uuid
+  
+  title       String
+  version     String    // v1.0, v1.1 etc.
+  
+  // Content
+  htmlContent String    @db.Text
+  pdfUrl      String?   // Optional link if we generate PDF later
+  
+  // Metadata
+  generatedBy String?   @db.Uuid // specific user who generated it
+  generatedAt DateTime  @default(now())
+  
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@index([businessId])
+  @@index([generatedAt])
+}
+
+model BrandDNA {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @unique @db.Uuid
+  values      String[]
+  voice       String?
+  audience    String?
+  mission     String?
+  
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+model ContentIdea {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @db.Uuid
+  title       String
+  description String?
+  platform    String
+  status      String   @default("draft")
+  createdAt   DateTime @default(now())
+  
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@index([businessId])
+}
+
+model Review {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @db.Uuid
+  locationId  String?  @db.Uuid
+  platform    String
+  externalId  String
+  author      String
+  rating      Int
+  content     String?  @db.Text
+  publishedAt DateTime
+  
+  response    String?  @db.Text
+  respondedAt DateTime?
+  
+  createdAt   DateTime @default(now())
+  
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location    Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  
+  @@unique([platform, externalId])
+  @@index([businessId])
 }

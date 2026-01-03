@@ -65,7 +65,7 @@ const LocaleLayout = async (props: Props) => {
 
     return (
         <html id='__next' lang={locale} dir={direction} suppressHydrationWarning>
-            <body className={`flex is-full min-bs-full flex-auto flex-col ${publicSans.className}`}>
+            <body className={`flex is-full min-bs-full flex-auto flex-col ${publicSans.className}`} suppressHydrationWarning>
                 <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
                 <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
             </body>
