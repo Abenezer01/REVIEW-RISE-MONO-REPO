@@ -1,29 +1,19 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
 import { 
   Box, 
   Card, 
   CardContent, 
   Typography, 
   IconButton, 
-  Chip,
+  Chip, 
   Button,
-  Divider,
   Stack,
-  CircularProgress,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText
+  alpha
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import InsightsIcon from '@mui/icons-material/Insights';
-import LanguageIcon from '@mui/icons-material/Language';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import LightbulbIcon from '@mui/icons-material/Lightbulb';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 
 export interface CompetitorSnapshot {
   uvp?: string;
@@ -44,6 +34,7 @@ export interface Competitor {
   type: string;
   relevanceScore?: number;
   isUserAdded: boolean;
+  ranking?: number; // Added ranking
   snapshots?: CompetitorSnapshot[];
 }
 
@@ -52,91 +43,106 @@ interface CompetitorCardProps {
   onAnalyze: (id: string) => void;
   onRemove: (id: string) => void;
   isAnalyzing: boolean;
+  onViewReport?: () => void;
+  rank: number;
 }
 
-export const CompetitorCard = ({ competitor, onAnalyze, onRemove, isAnalyzing }: CompetitorCardProps) => {
-  const t = useTranslations('dashboard');
-  const snapshot = competitor.snapshots?.[0]; // Get latest snapshot
+export const CompetitorCard = ({ competitor, onAnalyze, onRemove, isAnalyzing, onViewReport, rank }: CompetitorCardProps) => {
+  const getTypeColor = (type: string) => {
+      switch(type) {
+          case 'DIRECT_LOCAL': return { bg: alpha('#28C76F', 0.15), color: '#28C76F' };
+          case 'CONTENT': return { bg: alpha('#00CFE8', 0.15), color: '#00CFE8' };
+          case 'AGGREGATOR': return { bg: alpha('#A8AAAE', 0.15), color: '#A8AAAE' }; // Gray/Purple
+          default: return { bg: alpha('#A8AAAE', 0.15), color: '#A8AAAE' };
+      }
+  };
+
+  const typeStyle = getTypeColor(competitor.type);
 
   return (
-    <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Box>
-            <Typography variant="h6" noWrap>{competitor.name}</Typography>
-            <Stack direction="row" alignItems="center" spacing={0.5}>
-                <LanguageIcon fontSize="small" color="disabled" />
-                <Typography variant="caption" color="text.secondary">{competitor.domain}</Typography>
-            </Stack>
-          </Box>
-          <Box>
-            <Chip 
-              label={competitor.type} 
-              size="small" 
-              color={competitor.type === 'DIRECT_LOCAL' ? 'primary' : 'default'} 
-              sx={{ mr: 1 }}
-            />
-            <IconButton onClick={() => onRemove(competitor.id)} color="default" size="small">
-              <DeleteIcon />
-            </IconButton>
-          </Box>
+    <Card 
+        variant="outlined" 
+        sx={{ 
+            borderRadius: 3,
+            border: '1px solid',
+            borderColor: 'divider',
+            mb: 2,
+            boxShadow: 'none',
+            '&:hover': {
+                borderColor: 'primary.main',
+                boxShadow: 1
+            }
+        }}
+    >
+      <CardContent sx={{ p: '16px !important', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            {/* Rank Box */}
+            <Box 
+                sx={{ 
+                    width: 48, 
+                    height: 48, 
+                    borderRadius: 2, 
+                    bgcolor: '#D38E18', 
+                    color: 'white', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    fontWeight: 700,
+                    fontSize: '1.25rem'
+                }}
+            >
+                {rank}
+            </Box>
+
+            {/* Domain Name */}
+            <Typography variant="body1" sx={{ color: 'primary.main', fontWeight: 500 }}>
+                {competitor.domain}
+            </Typography>
         </Box>
 
-        <Divider sx={{ my: 1.5 }} />
-
-        {/* Snapshot Content or Empty State */}
-        {snapshot ? (
-          <Box>
-            {snapshot.uvp && (
-                <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle2" color="primary.main">{t('brandRise.competitors.uvp')}</Typography>
-                    <Typography variant="body2">{snapshot.uvp}</Typography>
-                </Box>
-            )}
-
-            {snapshot.serviceList && snapshot.serviceList.length > 0 && (
-                <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('brandRise.competitors.services')}</Typography>
-                    <Stack direction="row" flexWrap="wrap" gap={0.5}>
-                        {snapshot.serviceList.slice(0, 5).map((s, i) => (
-                            <Chip key={i} label={s} size="small" variant="outlined" />
-                        ))}
-                    </Stack>
-                </Box>
-            )}
-
-            {snapshot.differentiators && (
-                <Box>
-                     <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('brandRise.competitors.analysis')}</Typography>
-                     <Stack spacing={1}>
-                        <Box display="flex" alignItems="center" gap={1}>
-                            <ThumbUpIcon color="success" fontSize="small" />
-                            <Typography variant="caption">{t('brandRise.competitors.strategy', { value: snapshot.differentiators.unique?.[0] || 'N/A' })}</Typography>
-                        </Box>
-                         <Box display="flex" alignItems="center" gap={1}>
-                            <LightbulbIcon color="warning" fontSize="small" />
-                            <Typography variant="caption">{t('brandRise.competitors.learn', { value: snapshot.whatToLearn?.[0] || 'N/A' })}</Typography>
-                        </Box>
-                     </Stack>
-                </Box>
-            )}
-          </Box>
-        ) : (
-          <Box textAlign="center" py={2}>
-            <Typography variant="body2" color="text.secondary" paragraph>
-              {t('brandRise.competitors.noAnalysis')}
-            </Typography>
-            <Button 
-                variant="outlined" 
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {/* Type Badge */}
+            <Chip 
+                label={competitor.type.replace('_', ' ')} 
                 size="small" 
-                startIcon={isAnalyzing ? <CircularProgress size={16} /> : <InsightsIcon />}
-                onClick={() => onAnalyze(competitor.id)}
-                disabled={isAnalyzing}
+                sx={{ 
+                    bgcolor: typeStyle.bg, 
+                    color: typeStyle.color, 
+                    fontWeight: 700, 
+                    borderRadius: 1,
+                    textTransform: 'uppercase',
+                    fontSize: '0.7rem',
+                    height: 24
+                }}
+            />
+
+            {/* Actions */}
+            <IconButton size="small" sx={{ color: '#FF9F43' }}>
+                <BookmarkBorderIcon />
+            </IconButton>
+
+            <IconButton onClick={() => onRemove(competitor.id)} size="small" sx={{ color: '#EA5455', bgcolor: alpha('#EA5455', 0.1) }}>
+                <DeleteIcon fontSize="small" />
+            </IconButton>
+
+            <Button 
+                variant="contained" 
+                size="small" 
+                startIcon={<InsightsIcon fontSize="small" />}
+                onClick={onViewReport || (() => onAnalyze(competitor.id))}
+                sx={{ 
+                    bgcolor: '#9E69FD',
+                    color: 'white',
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    borderRadius: 1.5,
+                    px: 2,
+                    '&:hover': { bgcolor: '#804BDF' }
+                }}
             >
-                {isAnalyzing ? t('brandRise.competitors.analyzing') : t('brandRise.competitors.analyzeWebsite')}
+                Analyze
             </Button>
-          </Box>
-        )}
+        </Box>
       </CardContent>
     </Card>
   );

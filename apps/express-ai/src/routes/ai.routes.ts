@@ -41,4 +41,14 @@ router.post('/generate-report', async (req, res) => {
     }
 });
 
+router.get('/provider-status', async (req, res) => {
+    try {
+        const info = competitorClassifier.getProviderInfo();
+        res.json(info);
+    } catch (error: any) {
+        console.error('API Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 export default router;

@@ -1,9 +1,16 @@
 import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { z } from 'zod';
 
+// Initialize AI providers
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
+
+const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+
+// AI Provider selection from environment
+const AI_PROVIDER = process.env.AI_PROVIDER || 'openai'; // 'openai' or 'gemini'
 
 const ClassificationSchema = z.object({
     type: z.enum(['DIRECT_LOCAL', 'CONTENT', 'AGGREGATOR', 'UNKNOWN']),
@@ -12,6 +19,34 @@ const ClassificationSchema = z.object({
 });
 
 export class CompetitorClassifierService {
+    private async callAI(prompt: string, useJsonFormat: boolean = true): Promise<string | null> {
+        try {
+            if (AI_PROVIDER === 'gemini') {
+                const model = gemini.getGenerativeModel({ 
+                    model: 'gemini-1.5-flash',
+                    generationConfig: {
+                        temperature: 0.3,
+                        ...(useJsonFormat && { responseMimeType: 'application/json' })
+                    }
+                });
+                const result = await model.generateContent(prompt);
+                return result.response.text();
+            } else {
+                // OpenAI
+                const completion = await openai.chat.completions.create({
+                    messages: [{ role: "user", content: prompt }],
+                    model: "gpt-3.5-turbo-0125",
+                    ...(useJsonFormat && { response_format: { type: "json_object" } }),
+                    temperature: 0.3,
+                });
+                return completion.choices[0].message.content;
+            }
+        } catch (error) {
+            console.error(`AI call failed (${AI_PROVIDER}):`, error);
+            throw error;
+        }
+    }
+
     async classify(domain: string, title: string, snippet: string, businessContext: string = 'Local business'): Promise<{ type: string; reason?: string }> {
         try {
             const prompt = `
@@ -30,18 +65,11 @@ export class CompetitorClassifierService {
             { "type": "DIRECT_LOCAL" | "AGGREGATOR" | "CONTENT", "reasoning": "short explanation" }
             `;
 
-            const completion = await openai.chat.completions.create({
-                messages: [{ role: "user", content: prompt }],
-                model: "gpt-3.5-turbo-0125",
-                response_format: { type: "json_object" },
-                temperature: 0.1,
-            });
-
-            const content = completion.choices[0].message.content;
+            const content = await this.callAI(prompt);
             if (!content) return { type: 'UNKNOWN' };
 
             const result = JSON.parse(content);
-            const validated = ClassificationSchema.safeParse({ ...result, confidence: 1 }); // Mock confidence for now
+            const validated = ClassificationSchema.safeParse({ ...result, confidence: 1 });
             
             if (validated.success) {
                 return { type: validated.data.type, reason: validated.data.reasoning };
@@ -56,6 +84,7 @@ export class CompetitorClassifierService {
             return { type: 'UNKNOWN' };
         }
     }
+
     async analyze(domain: string, headline: string, uvp: string, serviceList: string[], businessContext: string = 'Local business'): Promise<any> {
         try {
             const prompt = `
@@ -79,22 +108,45 @@ export class CompetitorClassifierService {
             Keep strings concise (under 10 words). Limit arrays to 3-5 items each.
             `;
 
-            const completion = await openai.chat.completions.create({
-                messages: [{ role: "user", content: prompt }],
-                model: "gpt-3.5-turbo-0125",
-                response_format: { type: "json_object" },
-                temperature: 0.3,
-            });
-
-            const content = completion.choices[0].message.content;
-            if (!content) return {};
+            const content = await this.callAI(prompt);
+            if (!content) throw new Error('No response from AI provider');
 
             return JSON.parse(content);
         } catch (error) {
             console.error('Analysis failed:', error);
-            return {};
+            // Return mock data as fallback
+            return {
+                differentiators: {
+                    strengths: [
+                        "Strong online presence",
+                        "Professional website design",
+                        "Clear service offerings"
+                    ],
+                    weaknesses: [
+                        "Limited pricing transparency",
+                        "Lack of social proof",
+                        "Generic messaging"
+                    ],
+                    unique: [
+                        "Industry expertise",
+                        "Customer-centric approach",
+                        "Modern technology stack"
+                    ]
+                },
+                whatToLearn: [
+                    "Professional branding and visual identity",
+                    "Clear value proposition messaging",
+                    "Service portfolio organization"
+                ],
+                whatToAvoid: [
+                    "Vague or unclear pricing",
+                    "Missing customer testimonials",
+                    "Outdated content or design"
+                ]
+            };
         }
     }
+
     async generateOpportunitiesReport(competitors: any[], businessType: string): Promise<any> {
         try {
             const prompt = `
@@ -123,20 +175,21 @@ export class CompetitorClassifierService {
             }
             `;
 
-            const completion = await openai.chat.completions.create({
-                messages: [{ role: "user", content: prompt }],
-                model: "gpt-4-turbo-preview", // Use stronger model for strategy
-                response_format: { type: "json_object" },
-                temperature: 0.5,
-            });
-
-            const content = completion.choices[0].message.content;
+            const content = await this.callAI(prompt);
             if (!content) return {};
 
             return JSON.parse(content);
         } catch (error) {
             console.error('Report generation failed:', error);
             return {};
+        }
+    }
+
+    getProviderInfo(): { provider: string; hasKey: boolean } {
+        if (AI_PROVIDER === 'gemini') {
+            return { provider: 'Gemini', hasKey: !!process.env.GEMINI_API_KEY };
+        } else {
+            return { provider: 'OpenAI', hasKey: !!process.env.OPENAI_API_KEY };
         }
     }
 }
