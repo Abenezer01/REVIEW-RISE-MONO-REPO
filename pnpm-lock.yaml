@@ -11,6 +11,9 @@ importers:
       '@types/lodash':
         specifier: ^4.17.21
         version: 4.17.21
+      '@types/uuid':
+        specifier: ^10.0.0
+        version: 10.0.0
       baseline-browser-mapping:
         specifier: ^2.9.11
         version: 2.9.11
@@ -133,6 +136,9 @@ importers:
 
   apps/express-ai:
     dependencies:
+      '@google/generative-ai':
+        specifier: ^0.24.1
+        version: 0.24.1
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -261,6 +267,21 @@ importers:
 
   apps/express-brand:
     dependencies:
+      '@lukeed/uuid':
+        specifier: ^2.0.1
+        version: 2.0.1
+      '@platform/contracts':
+        specifier: workspace:*
+        version: link:../../packages/@platform/contracts
+      '@platform/db':
+        specifier: workspace:*
+        version: link:../../packages/@platform/db
+      axios:
+        specifier: ^1.13.2
+        version: 1.13.2
+      cheerio:
+        specifier: ^1.0.0
+        version: 1.0.0
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -277,6 +298,9 @@ importers:
         specifier: ^1.10.0
         version: 1.10.1
     devDependencies:
+      '@prisma/client':
+        specifier: ^7.1.0
+        version: 7.2.0(prisma@7.2.0(@types/react@19.2.6)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3))(typescript@5.9.3)
       '@types/cors':
         specifier: ^2.8.17
         version: 2.8.19
@@ -408,6 +432,9 @@ importers:
 
   apps/express-seo-health:
     dependencies:
+      '@google/generative-ai':
+        specifier: ^0.24.1
+        version: 0.24.1
       '@platform/auth':
         specifier: workspace:*
         version: link:../../packages/@platform/auth
@@ -424,8 +451,8 @@ importers:
         specifier: ^1.6.5
         version: 1.13.2
       cheerio:
-        specifier: ^1.0.0-rc.12
-        version: 1.0.0
+        specifier: ^1.1.2
+        version: 1.1.2
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -651,6 +678,9 @@ importers:
       formik:
         specifier: ^2.4.9
         version: 2.4.9(@types/react@19.2.6)(react@19.2.0)
+      js-cookie:
+        specifier: ^3.0.5
+        version: 3.0.5
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3

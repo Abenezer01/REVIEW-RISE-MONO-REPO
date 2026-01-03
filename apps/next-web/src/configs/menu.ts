@@ -85,9 +85,20 @@ const menuData: MenuItem[] = [
   },
   {
     title: 'navigation.brand-rise',
-    href: '/admin/brand-rise',
     icon: 'tabler-palette',
-    allowedRoles: [ROLES.ADMIN]
+    allowedRoles: [ROLES.ADMIN],
+    children: [
+      {
+        title: 'navigation.brand-rise',
+        href: '/admin/brand-rise',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.brand-profiles',
+        href: '/admin/profiles',
+        allowedRoles: [ROLES.ADMIN]
+      }
+    ]
   },
   {
     title: 'navigation.failed-jobs',

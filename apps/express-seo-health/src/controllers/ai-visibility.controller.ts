@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { createSuccessResponse, createErrorResponse } from '@platform/contracts';
 import { prisma } from '@platform/db';
 import { aiVisibilityService } from '../services/ai-visibility.service';
+import { fetchWebsite } from '../services/website-fetcher.service';
+import { extractSEOData } from '../services/html-parser.service';
 
 interface AIVisibilityMetrics {
   visibilityScore: number;
@@ -170,6 +172,99 @@ export class AIVisibilityController {
     } catch (error) {
       console.error('Analysis failed:', error);
       res.status(500).json(createErrorResponse('Failed to analyze AI visibility', 'INTERNAL_SERVER_ERROR', 500));
+    }
+  }
+
+  /**
+   * POST /api/v1/ai-visibility/validate
+   * Validate a URL for AI visibility checks
+   */
+  async validate(req: Request, res: Response): Promise<void> {
+    try {
+      const { url } = req.body;
+
+      if (!url) {
+        res.status(400).json(createErrorResponse('URL is required', 'BAD_REQUEST', 400));
+        return;
+      }
+
+      // 1. URL Accessibility Check
+      let isPubliclyAccessible = false;
+      let urlAccessibilityMessage = 'URL could not be accessed.';
+      let fetchResult;
+
+      try {
+        fetchResult = await fetchWebsite(url);
+        if (fetchResult.statusCode >= 200 && fetchResult.statusCode < 300) {
+          isPubliclyAccessible = true;
+          urlAccessibilityMessage = 'URL is publicly accessible.';
+        } else {
+          urlAccessibilityMessage = `URL returned status code ${fetchResult.statusCode}.`;
+        }
+      } catch (err: any) {
+        urlAccessibilityMessage = `Failed to fetch URL: ${err.message}`;
+      }
+
+      // 2. robots.txt Check (fetchWebsite handles this internally, if it throws, it's disallowed)
+      let allowsAIBots = true;
+      let robotsTxtMessage = 'robots.txt allows AI bots.';
+
+      if (fetchResult && fetchResult.error && fetchResult.error.includes('robots.txt')) {
+        allowsAIBots = false;
+        robotsTxtMessage = 'Access denied by robots.txt.';
+      } else if (!fetchResult) {
+        // If fetch itself failed, we can't confirm robots.txt
+        allowsAIBots = false;
+        robotsTxtMessage = 'Could not verify robots.txt due to URL access issues.';
+      }
+
+      // 3. Basic SEO Practices
+      let properHtml = false;
+      let semanticTags = false;
+      let sitemapXml = false;
+      const cleanUrls = true; // Assuming clean if accessible, more complex check needed for true validation
+      let seoPracticesMessage = 'Basic SEO practices check completed.';
+
+      if (fetchResult && fetchResult.html) {
+        try {
+          const seoData = await extractSEOData(url, fetchResult.html, fetchResult);
+          properHtml = seoData.page.htmlSizeKb > 0; // If we got HTML, assume proper enough for this check
+          semanticTags = seoData.headings.h1Count > 0; // Simple check: presence of H1
+          sitemapXml = seoData.advanced.sitemapExists;
+          // Clean URLs is complex, for now, assume true if URL is valid and accessible
+        } catch (err: any) {
+          seoPracticesMessage = `Failed to parse HTML for SEO practices: ${err.message}`;
+        }
+      } else {
+        seoPracticesMessage = 'Could not check SEO practices due to URL access issues or no HTML content.';
+      }
+
+      const validationResults = {
+        urlAccessibility: {
+          isPubliclyAccessible,
+          noLoginWall: isPubliclyAccessible, // Simplified for now
+          noIpRestriction: isPubliclyAccessible, // Simplified for now
+          noAggressiveBotBlocking: isPubliclyAccessible, // Simplified for now
+          message: urlAccessibilityMessage
+        },
+        robotsTxt: {
+          allowsAIBots,
+          message: robotsTxtMessage
+        },
+        seoPractices: {
+          properHtml,
+          semanticTags,
+          sitemapXml,
+          cleanUrls,
+          message: seoPracticesMessage
+        }
+      };
+
+      res.json(createSuccessResponse(validationResults));
+
+    } catch (error) {
+      console.error('Validation failed:', error);
+      res.status(500).json(createErrorResponse('Failed to validate URL', 'INTERNAL_SERVER_ERROR', 500));
     }
   }
 }

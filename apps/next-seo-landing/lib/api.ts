@@ -22,14 +22,14 @@ export interface SEOAnalysisResult {
   healthScore: number;
   timestamp: string;
   snapshotId?: string;
-  
+
   categoryScores: {
     onPage: CategoryScore;
     technical: CategoryScore;
     content: CategoryScore;
     local: CategoryScore;
   };
-  
+
   technicalAnalysis: {
     pageSpeed: {
       score: number;
@@ -45,11 +45,19 @@ export interface SEOAnalysisResult {
       status: string;
     };
   };
-  
+
   recommendations: Recommendation[];
-  
+
+  strategicRecommendations?: Array<{
+    id: string | number;
+    title: string;
+    description: string;
+    impact: 'High' | 'Medium' | 'Low';
+    type: string;
+  }>;
+
   seoElements: any;
-  
+
   summary: {
     sitesAnalyzed: number;
     accuracyRate: number;
@@ -61,12 +69,12 @@ export interface SEOAnalysisResult {
 export async function analyzeSEO(url: string): Promise<SEOAnalysisResult> {
   try {
     const response = await axios.post(`${API_URL}/seo/analyze`, { url });
-    
+
     // Handle standardized ApiResponse format
     if (response.data.success && response.data.data) {
       return response.data.data;
     }
-    
+
     // Fallback error handling
     throw new Error(response.data.message || 'Failed to analyze SEO');
   } catch (error: any) {
@@ -77,10 +85,10 @@ export async function analyzeSEO(url: string): Promise<SEOAnalysisResult> {
       responseStatus: error.response?.status,
       responseData: error.response?.data
     });
-    
+
     // Handle standardized error response
-    const errorMessage = error.response?.data?.error?.message 
-      || error.response?.data?.message 
+    const errorMessage = error.response?.data?.error?.message
+      || error.response?.data?.message
       || error.message
       || 'Failed to analyze SEO';
     throw new Error(errorMessage);

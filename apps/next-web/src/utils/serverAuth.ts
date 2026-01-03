@@ -2,6 +2,7 @@
 import { cookies } from 'next/headers'
 
 import { backendClient } from '@/utils/backendClient'
+import { getServerAuthHeaders } from '@/utils/getServerAuthHeaders'
 
 import type { User } from '@/contexts/AuthContext'
 
@@ -45,8 +46,11 @@ export const getServerUser = async (): Promise<User | null> => {
 
     if (AUTH_SERVICE_URL) {
       try {
+        const authHeaders = await getServerAuthHeaders()
+
         const apiResponse = await backendClient<any>('/v1/auth/me', {
-          baseUrl: AUTH_SERVICE_URL
+          baseUrl: AUTH_SERVICE_URL,
+          headers: authHeaders
         })
 
         const data = apiResponse?.data ?? apiResponse
