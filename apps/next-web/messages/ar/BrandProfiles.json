@@ -1,0 +1,71 @@
+{
+  "title": "ملفات تعريف العلامة التجارية",
+  "description": "إدارة واستخراج الهويات المرئية من مواقع العلامات التجارية.",
+  "tabs": {
+    "allProfiles": "كل الملفات",
+    "addNew": "إضافة جديد"
+  },
+  "list": {
+    "searchLabel": "البحث حسب العنوان",
+    "businessFilterLabel": "تصفية حسب العمل",
+    "statusFilterLabel": "تصفية حسب الحالة",
+    "allBusinesses": "كل الأعمال",
+    "allStatuses": "كل الحالات",
+    "noProfiles": "لم يتم العثور على ملفات تعريف",
+    "deleteConfirmTitle": "تأكيد الحذف",
+    "deleteConfirm": "هل أنت متأكد أنك تريد حذف ملف تعريف العلامة التجارية هذا؟ لا يمكن التراجع عن هذا الإجراء.",
+    "columns": {
+      "title": "عنوان العلامة التجارية",
+      "business": "العمل",
+      "websiteUrl": "عنوان الموقع",
+      "status": "الحالة",
+      "createdAt": "تاريخ الإنشاء",
+      "actions": "الإجراءات"
+    },
+    "actions": {
+      "view": "عرض التفاصيل",
+      "reExtract": "إعادة الاستخراج",
+      "delete": "حذف"
+    }
+  },
+  "status": {
+    "pending": "قيد الانتظار",
+    "extracting": "جاري الاستخراج",
+    "pending_confirmation": "في انتظار التأكيد",
+    "completed": "مكتمل",
+    "failed": "فشل"
+  },
+  "wizard": {
+    "title": "معالج ربط الموقع",
+    "steps": {
+      "input": "ربط الموقع",
+      "extracting": "استخراج العلامة",
+      "review": "مراجعة الهوية",
+      "done": "نجاح"
+    },
+    "step1": {
+      "title": "أدخل عنوان الموقع",
+      "urlInputLabel": "عنوان الموقع",
+      "invalidUrlError": "يرجى إدخال عنوان موقع صالح.",
+      "nextButton": "التالي",
+      "businessSelectLabel": "اختر العمل"
+    },
+    "step2": {
+      "title": "جاري استخراج ملف تعريف العلامة...",
+      "description": "قد يستغرق هذا بضع لحظات.",
+      "errorTitle": "فشل الاستخراج",
+      "tryAgainButton": "حاول مرة أخرى"
+    },
+    "step3": {
+      "title": "مراجعة البيانات المستخرجة",
+      "description": "لا توجد بيانات متاحة للمراجعة.",
+      "confirmButton": "تأكيد الاستخراج"
+    },
+    "step4": {
+      "title": "تم تأكيد الاستخراج!",
+      "description": "تم استخراج ملف تعريف العلامة التجارية وتأكيده بنجاح.",
+      "tryAgainButton": "بدء استخراج جديد",
+      "newExtractionButton": "بدء استخراج جديد"
+    }
+  }
+}

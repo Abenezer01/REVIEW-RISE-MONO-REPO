@@ -1,4 +1,4 @@
-import { useState, useMemo, memo } from 'react';
+import { useState, useMemo, memo, useEffect } from 'react';
 
 import { Box, Card } from '@mui/material';
 import type { GridColDef, GridPaginationModel, GridRowParams } from '@mui/x-data-grid';
@@ -9,7 +9,7 @@ import type { Pagination } from '@platform/contracts';
 interface TableListingProps<T> {
   columns: GridColDef[];
   items: T[]; // Use T[] for items
-  pagination: Pagination;
+  pagination?: Pagination | null;
   isLoading: boolean;
   onPagination?: (pageSize: number, page: number) => void;
   getRowClassName?: (params: any) => string;
@@ -19,9 +19,19 @@ interface TableListingProps<T> {
 const TableListing = memo(<T,>({ columns, items, pagination, onPagination, isLoading, getRowClassName, onRowClick }: TableListingProps<T>) => {
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
-    page: pagination?.page - 1,
-    pageSize: pagination?.pageSize
+    page: (pagination?.page || 1) - 1,
+    pageSize: pagination?.pageSize || 10
   });
+
+  // Sync paginationModel when pagination prop changes (important for server-side)
+  useEffect(() => {
+    if (pagination) {
+      setPaginationModel({
+        page: (pagination.page || 1) - 1,
+        pageSize: pagination.pageSize || 10
+      });
+    }
+  }, [pagination?.page, pagination?.pageSize]);
 
   const handlePaginationModelChange = (newPaginationModel: GridPaginationModel) => {
     setPaginationModel(newPaginationModel); // Update model unconditionally
@@ -38,13 +48,17 @@ const TableListing = memo(<T,>({ columns, items, pagination, onPagination, isLoa
       // Calculate global index based on pagination
       const currentRowIndex = items.findIndex((item: any) => item.id === params.row.id);
 
+      const currentPage = pagination?.page || 1;
+      const currentPageSize = pagination?.pageSize || 10;
       
-return (pagination?.page - 1) * pagination?.pageSize + currentRowIndex + 1;
+      return (currentPage - 1) * currentPageSize + currentRowIndex + 1;
     }
   }), [items, pagination]);
 
   // Memoize all columns to prevent recreation
   const allColumns = useMemo(() => [indexColumn, ...columns], [indexColumn, columns]);
+
+  const isServerSide = !!pagination;
 
   return (
     <Box sx={{ width: '100%', mb: 6 }}>
@@ -55,9 +69,9 @@ return (pagination?.page - 1) * pagination?.pageSize + currentRowIndex + 1;
           autoHeight
           pagination
           rowHeight={64}
-          rowCount={pagination?.total}
+          {...(isServerSide ? { rowCount: pagination?.total } : {})}
           columns={allColumns}
-          paginationMode="server"
+          paginationMode={isServerSide ? "server" : "client"}
           disableRowSelectionOnClick
           paginationModel={paginationModel}
           onPaginationModelChange={handlePaginationModelChange}
