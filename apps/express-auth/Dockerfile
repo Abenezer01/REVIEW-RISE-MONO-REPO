@@ -46,9 +46,10 @@ COPY apps/express-auth ./apps/express-auth
 RUN pnpm install --frozen-lockfile --offline
 
 # Build shared packages first (if they need building)
-# Build shared packages first (if they need building)
+# Generate Prisma client and build DB package (TypeScript project reference for auth)
 RUN pnpm --filter "@platform/db" run db:generate
-# Build auth explicitly to ensure it runs
+RUN pnpm --filter "@platform/db" run build
+# Build auth explicitly (now that DB is built)
 RUN pnpm --filter "@platform/auth" run build
 # Verify auth build succeeded
 # Verify auth build succeeded and fix structure if nested
