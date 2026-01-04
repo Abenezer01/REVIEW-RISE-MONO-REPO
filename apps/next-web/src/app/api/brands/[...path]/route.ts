@@ -1,7 +1,7 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 
-const SERVICE_URL = 'http://localhost:3004/api/v1/brand-profiles';
+const SERVICE_URL = 'http://localhost:3004/api/v1/brands';
 
 async function proxy(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params;

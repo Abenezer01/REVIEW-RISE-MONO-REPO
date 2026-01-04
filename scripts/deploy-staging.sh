@@ -129,7 +129,7 @@ if [[ "$*" == *"--seed"* ]]; then
     
     docker compose -f "$COMPOSE_FILE" run --rm \
         express-auth \
-        sh -c "cd /app && pnpm --filter @platform/db run db:seed" || {
+        sh -c "cd /app && pnpm --filter @platform/db run db:seed:all" || {
         log_warn "Database seeding failed (non-fatal)"
     }
     
