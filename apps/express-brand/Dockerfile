@@ -61,6 +61,13 @@ RUN pnpm --filter "@platform/*" run build
 # Build the application
 RUN pnpm --filter @apps/express-brand run build
 
+# Verify build output and fix structure if nested
+RUN if [ -f apps/express-brand/dist/apps/express-brand/src/index.js ]; then \
+  echo "Detected nested build structure. Flattening..."; \
+  cp -r apps/express-brand/dist/apps/express-brand/src/* apps/express-brand/dist/ && \
+  rm -rf apps/express-brand/dist/apps; \
+  fi
+
 # ============================================
 # Stage 3: Runner - Production image
 # ============================================
