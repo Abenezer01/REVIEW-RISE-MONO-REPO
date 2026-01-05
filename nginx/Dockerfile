@@ -17,7 +17,7 @@ RUN chown -R nginx:nginx /var/cache/nginx && \
     touch /var/run/nginx.pid && \
     chown -R nginx:nginx /var/run/nginx.pid
 
-USER nginx
+# USER nginx (Removed to allow binding to port 80 as root)
 
 EXPOSE 80 443
 
