@@ -11,11 +11,12 @@ COPY nginx/proxy_params.conf /etc/nginx/proxy_params.conf
 RUN mkdir -p /etc/nginx/ssl
 
 # Create non-root user for Nginx
-RUN chown -R nginx:nginx /var/cache/nginx && \
-    chown -R nginx:nginx /var/log/nginx && \
-    chown -R nginx:nginx /etc/nginx/conf.d && \
-    touch /var/run/nginx.pid && \
-    chown -R nginx:nginx /var/run/nginx.pid
+# Permissions are handled by base image (logs to stdout/stderr)
+# RUN chown -R nginx:nginx /var/cache/nginx && \
+#     chown -R nginx:nginx /var/log/nginx && \
+#     chown -R nginx:nginx /etc/nginx/conf.d && \
+#     touch /var/run/nginx.pid && \
+#     chown -R nginx:nginx /var/run/nginx.pid
 
 # USER nginx (Removed to allow binding to port 80 as root)
 

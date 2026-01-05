@@ -186,11 +186,17 @@ log_info "Verifying service health endpoints..."
 sleep 10
 
 # Test Nginx health
+# Test Nginx health
 if curl -f http://127.0.0.1/health > /dev/null 2>&1; then
-    log_info "Nginx health check passed ✓"
+    log_info "Nginx health check passed (IP) ✓"
+elif curl -f http://localhost/health > /dev/null 2>&1; then
+    log_info "Nginx health check passed (localhost) ✓"
 else
     log_error "Nginx health check failed!"
-     curl -v http://127.0.0.1/health
+    echo "--- CURL OUTPUT ---"
+    curl -v http://127.0.0.1/health || true
+    echo "--- NGINX LOGS ---"
+    docker logs reviewrise-nginx --tail 50 || true
     exit 1
 fi
 
