@@ -9,10 +9,10 @@ import {
     createErrorResponse
 } from '@platform/contracts';
 
+import { businessRepository } from '@platform/db';
+
 export async function GET(request: Request) {
     try {
-        const { businessRepository } = await import('@platform/db');
-
         const { searchParams } = new URL(request.url);
 
         const page = parseInt(searchParams.get('page') || '1');

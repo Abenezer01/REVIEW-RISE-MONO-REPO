@@ -1,5 +1,6 @@
 // Export enhanced Prisma clients
 export { prisma, prismaAdmin, disconnectDatabase } from './client';
+export * from '@prisma/client';
 
 // Export all repositories
 export * from './repositories';

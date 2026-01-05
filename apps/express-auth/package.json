@@ -7,7 +7,9 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts",
-    "test": "echo \"No tests specified for express-auth\" && exit 0"
+    "test": "echo \"No tests specified for express-auth\" && exit 0",
+    "db:seed": "cd ../../packages/@platform/db && npm run db:seed",
+    "db:migrate": "cd ../../packages/@platform/db && npm run db:migrate:deploy"
   },
   "dependencies": {
     "@platform/auth": "workspace:*",

@@ -8,7 +8,9 @@
     "dashboard": "Dashboard",
     "reviews": "Reviews",
     "settings": "Settings",
-    "logout": "Logout"
+    "logout": "Logout",
+    "brand-profiles": "Brand Profiles",
+    "profiles": "Profiles"
   },
   "common": {
     "apply": "Apply",
@@ -42,6 +44,8 @@
     "exportFormat": "Export Format",
     "exportCurrentPageOnly": "Export only current page's records",
     "selectFields": "Select Fields",
+    "search-placeholder": "Search...",
+    "found": "Found",
     "confirmDelete": "Are you sure you want to delete this item?"
   },
   "form": {

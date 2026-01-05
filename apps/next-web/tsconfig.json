@@ -51,16 +51,16 @@
         "./src/views/*"
       ],
       "@platform/utils": [
-        "../../packages/@platform/utils/dist/index.d.ts"
+        "../../packages/@platform/utils/src/index.ts"
       ],
       "@platform/contracts": [
-        "../../packages/@platform/contracts/dist/index.d.ts"
+        "../../packages/@platform/contracts/src/index.ts"
       ],
       "@platform/i18n": [
         "../../packages/@platform/i18n/src/index.ts"
       ],
       "@platform/db": [
-        "../../packages/@platform/db/dist/index.d.ts"
+        "../../packages/@platform/db/src/index.ts"
       ],
       "@platform/shared-ui/*": [
         "../../packages/@platform/shared-ui/src/*"

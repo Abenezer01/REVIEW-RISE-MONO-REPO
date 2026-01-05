@@ -20,6 +20,8 @@ import CircularProgress from '@mui/material/CircularProgress'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
+import { useAuth } from '@/contexts/AuthContext'
+import { useLocationFilter } from '@/hooks/useLocationFilter'
 
 import apiClient from '@/lib/apiClient'
 
@@ -32,7 +34,9 @@ interface Location {
 const LocationDropdown = () => {
   // States
   const [open, setOpen] = useState(false)
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null)
+
+  // Removed local selectedLocation state in favor of URL param lookup
+  // const [selectedLocation, setSelectedLocation] = useState<Location | null>(null) 
   const [locations, setLocations] = useState<Location[]>([])
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -42,6 +46,28 @@ const LocationDropdown = () => {
 
   // Hooks
   const { settings } = useSettings()
+  const { locationId, setLocationId } = useLocationFilter()
+
+  // Derived state for display
+  const selectedLocation = locations.find(l => String(l.id) === locationId) || null
+
+  // Set default location from user profile if not set in URL
+  const { user } = useAuth()
+
+  useEffect(() => {
+    // console.log('LocationDropdown Debug:', { locationId, userLocationId: user?.locationId, user })
+    if (!locationId) {
+        if (user?.locationId) {
+             // Case 1: Use cached location from session
+            // console.log('Setting default location from User Session:', user.locationId)
+            setLocationId(user.locationId)
+        } else if (locations.length > 0) {
+            // Case 2: User has no locationId in session, but we have fetched locations. Select the first one.
+            // console.log('Setting default location from First Available:', locations[0].id)
+            setLocationId(locations[0].id)
+        }
+    }
+  }, [locationId, user?.locationId, setLocationId, locations])
 
   const fetchLocations = useCallback(async (search = '') => {
     try {
@@ -56,20 +82,26 @@ const LocationDropdown = () => {
       })
 
       if (response.data && response.data.data) {
-        setLocations(response.data.data)
+        const fetchedLocations = response.data.data
 
-        // Set default selected location if none selected and we have results
-        if (!selectedLocation && response.data.data.length > 0) {
-          // Removed default selection to show "Select Location"
-          // setSelectedLocation(response.data.data[0])
-        }
+        setLocations(fetchedLocations)
+
+        // If no location is selected in URL, and we have locations, select the first one by default?
+        // OR just leave it empty. The original code had commented out default selection.
+        // Let's respect the "global" nature: if URL has ID, we use it. 
+        // If not, we could arguably default to the first one, but let's stick to explicit selection for now unless requested.
+        
+        // However, we need to ensure the selected location from URL is actually in the list 
+        // if we want to display its name correctly. 
+        // If the list is paginated/searched, we might not have the selected location in the initial list.
+        // For now, assuming the initial list contains the selected one or we just show "Select Location".
       }
     } catch (error) {
       console.error('Failed to fetch locations', error)
     } finally {
       setLoading(false)
     }
-  }, [selectedLocation])
+  }, []) // Removed dependency on selectedLocation to avoid loops
 
   // Fetch initial locations
   useEffect(() => {
@@ -100,7 +132,7 @@ const LocationDropdown = () => {
   }
 
   const handleLocationSelect = (location: Location) => {
-    setSelectedLocation(location)
+    setLocationId(location.id)
     setOpen(false)
   }
 
@@ -186,7 +218,7 @@ const LocationDropdown = () => {
                       <MenuItem
                         key={location.id}
                         onClick={() => handleLocationSelect(location)}
-                        selected={selectedLocation?.id === location.id}
+                        selected={String(selectedLocation?.id) === String(location.id)}
                       >
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                           <Typography>{location.name}</Typography>

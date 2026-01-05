@@ -46,7 +46,8 @@ RUN pnpm install --frozen-lockfile --offline
 
 # Build shared packages first (if they need building)
 RUN pnpm --filter "@platform/db" run db:generate
-# Build auth explicitly to ensure it runs
+RUN pnpm --filter "@platform/db" run build
+# Build auth explicitly to ensure it runs (after db build)
 RUN pnpm --filter "@platform/auth" run build
 # Verify auth build succeeded and fix structure if nested
 RUN if [ -f packages/@platform/auth/dist/auth/src/index.js ]; then \

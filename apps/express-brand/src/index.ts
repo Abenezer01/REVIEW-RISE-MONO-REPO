@@ -6,11 +6,14 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3004;
+const PORT = process.env.PORT || 3007;
 
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
+
+import v1Routes from './routes/v1';
+app.use('/api/v1', v1Routes);
 
 app.get('/', (req, res) => {
     res.json({ message: 'Express Brand Service is running' });
@@ -21,5 +24,6 @@ app.get('/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
+    // eslint-disable-next-line no-console
     console.log(`Server is running on port ${PORT}`);
 });

@@ -52,6 +52,7 @@ export interface ListingContextValue<T = any> {
             onFilter: (values: Record<string, any>) => void;
             permission: { action: string; subject: string };
             component?: React.ComponentType<any>;
+            position?: 'sidebar' | 'top';
         };
         search?: {
             enabled: boolean;

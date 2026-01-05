@@ -4,8 +4,8 @@
     "reviews": "المراجعات",
     "social-rise": "سوشل رايز",
     "seo-intelligence": "تحليلات السيو",
-    "locations": "الفروع",
     "accounts": "الحسابات",
+    "subscription-issues": "مشكلات الاشتراك",
     "jobs": "المهام",
     "logs": "السجلات",
     "failed-jobs": "المهام الفاشلة",
@@ -15,10 +15,15 @@
     "about": "عن الموقع",
     "seo-overview": "نظرة عامة",
     "seo-visibility": "ظهور في نتائج البحث",
+    "seo-keywords": "الكلمات المفتاحية",
     "smart-reviews": "سمارت ريفيوز",
     "gbp-rocket": "جي بي بي روكيت",
     "ad-rise": "أد رايز",
-    "brand-rise": "براند رايز"
+    "brand-rise": "براند رايز",
+    "settings": "الإعدادات",
+    "system-settings": "إعدادات النظام",
+    "feature-flags": "أعلام الميزات",
+    "ai-visibility": "رؤية الذكاء الاصطناعي"
   },
   "overview": {
     "title": "نظرة عامة على لوحة التحكم",
@@ -48,5 +53,60 @@
     "generateResponse": "إنشاء رد بالذكاء الاصطناعي",
     "viewDetails": "عرض التفاصيل",
     "markAsRead": "وضع علامة كمقروء"
+  },
+  "locations": {
+    "title": "إدارة الفروع",
+    "listTitle": "الفروع",
+    "createTitle": "إضافة فرع",
+    "editTitle": "تعديل الفرع",
+    "form": {
+      "name": "اسم الفرع",
+      "businessId": "الحساب",
+      "address": "العنوان",
+      "timezone": "المنطقة الزمنية",
+      "status": "الحالة",
+      "active": "نشط",
+      "archived": "مؤرشف",
+      "platformConnections": "ربط المنصات",
+      "googlePlaceId": "معرف مكان جوجل",
+      "facebookPageId": "معرف صفحة فيسبوك",
+      "deleteConfirm": "هل أنت متأكد من رغبتك في حذف هذا الفرع؟"
+    }
+  },
+  "brandRise": {
+    "subtitle": "رؤى أداء العلامة وظهورها",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "visibility": "الظهور",
+      "dna": "هوية العلامة",
+      "competitors": "المنافسون",
+      "content": "المحتوى والرسائل",
+      "reviews": "المراجعات والسمعة",
+      "reports": "التقارير"
+    },
+    "reports": {
+      "title": "تقارير العلامة",
+      "generate": "إنشاء تقرير"
+    },
+    "reviews": {
+      "recent": "المراجعات الأخيرة",
+      "velocity": "وتيرة المراجعات",
+      "sentiment": "توزيع المشاعر"
+    },
+    "content": {
+      "calendar": "تقويم المحتوى",
+      "add": "إضافة محتوى",
+      "ideas": "أفكار المحتوى"
+    },
+    "dna": {
+      "summary": "ملخص هوية العلامة",
+      "voice": "صوت العلامة",
+      "audience": "الجمهور المستهدف",
+      "messages": "الرسائل الأساسية",
+      "viewFull": "عرض دليل الهوية الكامل"
+    },
+    "competitors": {
+      "tracking": "تتبع المنافسين"
+    }
   }
 }

@@ -132,6 +132,20 @@ export class UserRepository extends BaseRepository<
                         role: true,
                     },
                 },
+                userBusinessRoles: {
+                    take: 1, // Start with just one business for now
+                    include: {
+                        business: {
+                            include: {
+                                locations: {
+                                    where: { status: 'active' },
+                                    take: 1, // Only need one to use as default
+                                    select: { id: true }
+                                }
+                            }
+                        }
+                    }
+                }
             },
         });
     }

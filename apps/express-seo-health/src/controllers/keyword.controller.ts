@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
-import { keywordRepository, keywordRankRepository, rankTrackingService } from '@platform/db';
+import { keywordRepository, keywordRankRepository, locationRepository, rankTrackingService } from '@platform/db';
 import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
-import type { CreateKeywordDTO, UpdateKeywordDTO } from '@platform/contracts';
+import type {
+  CreateKeywordDTO,
+  HarvestCompetitorDTO,
+  UpdateKeywordDTO,
+} from '@platform/contracts';
 
 export class KeywordController {
   /**
@@ -9,21 +13,30 @@ export class KeywordController {
    */
   async listKeywords(req: Request, res: Response): Promise<void> {
     try {
-      const { businessId, locationId, status, tags, limit = 50, offset = 0 } = req.query;
+      const { businessId } = req.query;
+      const locationId = typeof req.query.locationId === 'string' ? req.query.locationId : undefined;
+      const status = typeof req.query.status === 'string' ? req.query.status : undefined;
+      const tagsParam = req.query.tags;
+      const limitParam = req.query.limit;
+      const offsetParam = req.query.offset;
 
-      if (!businessId) {
-        res.status(400).json(createErrorResponse('businessId is required', 'BAD_REQUEST', 400));
+      if (!businessId || typeof businessId !== 'string') {
+        res.status(400).json(createErrorResponse('businessId is required', ErrorCode.BAD_REQUEST, 400));
         return;
       }
 
       const keywords = await keywordRepository.findByBusiness(
-        businessId as string,
+        businessId,
         {
-          locationId: locationId as string | undefined,
-          status: status as string | undefined,
-          tags: tags ? (tags as string).split(',') : undefined,
-          limit: parseInt(limit as string),
-          offset: parseInt(offset as string),
+          locationId,
+          status,
+          tags: Array.isArray(tagsParam)
+            ? tagsParam.filter((t): t is string => typeof t === 'string')
+            : typeof tagsParam === 'string'
+              ? tagsParam.split(',').map((t) => t.trim()).filter(Boolean)
+              : undefined,
+          limit: Number.isFinite(Number(limitParam)) ? Number(limitParam) : 50,
+          offset: Number.isFinite(Number(offsetParam)) ? Number(offsetParam) : 0,
         }
       );
 
@@ -73,13 +86,23 @@ export class KeywordController {
         return;
       }
 
+      const computedTags = Array.from(
+        new Set([
+          ...(data.tags || []),
+          ...(data.language ? [`lang:${data.language}`] : []),
+          ...(data.city ? [`city:${data.city}`] : []),
+          ...(data.country ? [`country:${data.country}`] : []),
+          ...(data.deviceType ? [`device:${data.deviceType}`] : [])
+        ])
+      );
+
       const keyword = await keywordRepository.create({
         business: { connect: { id: data.businessId } },
         ...(data.locationId && { location: { connect: { id: data.locationId } } }),
         keyword: data.keyword,
         searchVolume: data.searchVolume,
         difficulty: data.difficulty,
-        tags: data.tags || [],
+        tags: computedTags,
       });
 
       res.status(201).json(createSuccessResponse(keyword));
@@ -128,14 +151,20 @@ export class KeywordController {
   async getKeywordRanks(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { startDate, endDate, device, limit = 100, offset = 0 } = req.query;
+      const startDateParam = req.query.startDate;
+      const endDateParam = req.query.endDate;
+      const device = typeof req.query.device === 'string' ? req.query.device : undefined;
+      const limitParam = req.query.limit;
+      const offsetParam = req.query.offset;
 
       const ranks = await keywordRankRepository.findByKeyword(id, {
-        startDate: startDate ? new Date(startDate as string) : undefined,
-        endDate: endDate ? new Date(endDate as string) : undefined,
-        device: device as string | undefined,
-        limit: parseInt(limit as string),
-        offset: parseInt(offset as string),
+        startDate:
+          typeof startDateParam === 'string' ? new Date(startDateParam) : undefined,
+        endDate:
+          typeof endDateParam === 'string' ? new Date(endDateParam) : undefined,
+        device,
+        limit: Number.isFinite(Number(limitParam)) ? Number(limitParam) : 100,
+        offset: Number.isFinite(Number(offsetParam)) ? Number(offsetParam) : 0,
       });
 
       res.json(
@@ -183,7 +212,15 @@ export class KeywordController {
           keyword: k.keyword,
           searchVolume: k.searchVolume,
           difficulty: k.difficulty,
-          tags: k.tags || [],
+          tags: Array.from(
+            new Set([
+              ...(k.tags || []),
+              ...(k.language ? [`lang:${k.language}`] : []),
+              ...(k.city ? [`city:${k.city}`] : []),
+              ...(k.country ? [`country:${k.country}`] : []),
+              ...(k.deviceType ? [`device:${k.deviceType}`] : [])
+            ])
+          ),
         }))
       );
 
@@ -196,6 +233,78 @@ export class KeywordController {
     } catch (error) {
       console.error('Error bulk creating keywords:', error);
       res.status(500).json(createErrorResponse('Failed to bulk create keywords', ErrorCode.INTERNAL_SERVER_ERROR, 500));
+    }
+  }
+
+  /**
+   * GET /api/keywords/suggest - Auto-suggest local keywords (mocked)
+   */
+  async suggestKeywords(req: Request, res: Response): Promise<void> {
+    try {
+      const businessId = req.query.businessId;
+      const locationId = typeof req.query.locationId === 'string' ? req.query.locationId : undefined;
+      const category = typeof req.query.category === 'string' ? req.query.category : undefined;
+      const seedTermsParam = req.query.seedTerms;
+      const limitParam = req.query.limit;
+      if (!businessId || typeof businessId !== 'string') {
+        res.status(400).json(createErrorResponse('businessId is required', ErrorCode.BAD_REQUEST, 400));
+        return;
+      }
+      const locName =
+        locationId ? (await locationRepository.findById(locationId))?.name || 'Local' : 'Local';
+      const baseCategory = category || 'services';
+      const seeds = Array.isArray(seedTermsParam)
+        ? seedTermsParam
+        : typeof seedTermsParam === 'string'
+          ? seedTermsParam.split(',').map((s) => s.trim()).filter(Boolean)
+          : ['near me', 'best', 'top'];
+
+      const variants = ['cheap', 'best', 'top rated', 'open now', 'near me', '24/7'];
+      const suggestions: { keyword: string; tags: string[] }[] = [];
+      for (const v of variants) {
+        suggestions.push({
+          keyword: `${baseCategory} ${v} ${locName}`.toLowerCase(),
+          tags: [`city:${locName}`, 'device:mobile', 'intent:local']
+        });
+      }
+      for (const s of seeds.slice(0, 5)) {
+        suggestions.push({
+          keyword: `${baseCategory} ${s} ${locName}`.toLowerCase(),
+          tags: [`city:${locName}`, 'device:mobile', 'intent:seed']
+        });
+      }
+      const limit = Number.isFinite(Number(limitParam)) ? Number(limitParam) : 20;
+      res.json(createSuccessResponse({ suggestions: suggestions.slice(0, limit) }));
+    } catch (error) {
+      console.error('Error suggesting keywords:', error);
+      res.status(500).json(createErrorResponse('Failed to suggest keywords', ErrorCode.INTERNAL_SERVER_ERROR, 500));
+    }
+  }
+
+  /**
+   * POST /api/keywords/harvest - Harvest competitor keywords (mocked)
+   */
+  async harvestCompetitor(req: Request, res: Response): Promise<void> {
+    try {
+      const data: HarvestCompetitorDTO = req.body;
+      if (!data.businessId || (!data.competitorDomain && !data.competitorGbpId)) {
+        res.status(400).json(createErrorResponse('businessId and competitorDomain or competitorGbpId are required', ErrorCode.BAD_REQUEST, 400));
+        return;
+      }
+      const brand =
+        data.competitorDomain?.split('.').slice(0, 1)[0].replace(/[^a-z0-9]/gi, ' ') ||
+        data.competitorGbpId ||
+        'competitor';
+      const services = ['repair', 'installation', 'consultation', 'pricing', 'reviews'];
+      const cityTag = 'city:Local';
+      const harvested = services.map(s => ({
+        keyword: `${brand} ${s}`.toLowerCase(),
+        tags: [cityTag, 'branded', 'intent:competitor']
+      }));
+      res.json(createSuccessResponse({ keywords: harvested.slice(0, data.limit || 20) }));
+    } catch (error) {
+      console.error('Error harvesting competitor keywords:', error);
+      res.status(500).json(createErrorResponse('Failed to harvest competitor keywords', ErrorCode.INTERNAL_SERVER_ERROR, 500));
     }
   }
 }

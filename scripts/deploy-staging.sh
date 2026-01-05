@@ -129,7 +129,7 @@ if [[ "$*" == *"--seed"* ]]; then
     
     docker compose -f "$COMPOSE_FILE" run --rm \
         express-auth \
-        sh -c "cd /app && pnpm --filter @platform/db run db:seed" || {
+        sh -c "cd /app && pnpm --filter @platform/db run db:seed:all" || {
         log_warn "Database seeding failed (non-fatal)"
     }
     
@@ -186,11 +186,17 @@ log_info "Verifying service health endpoints..."
 sleep 10
 
 # Test Nginx health
+# Test Nginx health
 if curl -f http://127.0.0.1/health > /dev/null 2>&1; then
-    log_info "Nginx health check passed ✓"
+    log_info "Nginx health check passed (IP) ✓"
+elif curl -f http://localhost/health > /dev/null 2>&1; then
+    log_info "Nginx health check passed (localhost) ✓"
 else
     log_error "Nginx health check failed!"
-     curl -v http://127.0.0.1/health
+    echo "--- CURL OUTPUT ---"
+    curl -v http://127.0.0.1/health || true
+    echo "--- NGINX LOGS ---"
+    docker logs reviewrise-nginx --tail 50 || true
     exit 1
 fi
 
