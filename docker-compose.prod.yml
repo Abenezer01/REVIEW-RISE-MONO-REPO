@@ -84,10 +84,10 @@ services:
   # ==================================================
 
   express-auth:
-    # image: ghcr.io/reviewrise/reviewrise-express-auth:staging
-    build:
-      context: .
-      dockerfile: apps/express-auth/Dockerfile
+    image: ghcr.io/reviewrise/reviewrise-express-auth:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-auth/Dockerfile
     container_name: reviewrise-express-auth
     restart: unless-stopped
     networks:
@@ -119,10 +119,10 @@ services:
           memory: 256M
 
   express-reviews:
-    # image: ghcr.io/reviewrise/reviewrise-express-reviews:staging
-    build:
-      context: .
-      dockerfile: apps/express-reviews/Dockerfile
+    image: ghcr.io/reviewrise/reviewrise-express-reviews:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-reviews/Dockerfile
     container_name: reviewrise-express-reviews
     restart: unless-stopped
     networks:
@@ -151,10 +151,10 @@ services:
           memory: 256M
 
   express-ai:
-    # image: ghcr.io/reviewrise/reviewrise-express-ai:staging
-    build:
-      context: .
-      dockerfile: apps/express-ai/Dockerfile
+    image: ghcr.io/reviewrise/reviewrise-express-ai:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-ai/Dockerfile
     container_name: reviewrise-express-ai
     restart: unless-stopped
     networks:
@@ -184,10 +184,10 @@ services:
           memory: 384M
 
   express-social:
-    # image: ghcr.io/reviewrise/reviewrise-express-social:staging
-    build:
-      context: .
-      dockerfile: apps/express-social/Dockerfile
+    image: ghcr.io/reviewrise/reviewrise-express-social:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-social/Dockerfile
     container_name: reviewrise-express-social
     restart: unless-stopped
     networks:
@@ -216,10 +216,10 @@ services:
           memory: 256M
 
   express-gbp-rocket:
-    # image: ghcr.io/reviewrise/reviewrise-express-gbp-rocket:staging
-    build:
-      context: .
-      dockerfile: apps/express-gbp-rocket/Dockerfile
+    image: ghcr.io/reviewrise/reviewrise-express-gbp-rocket:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-gbp-rocket/Dockerfile
     container_name: reviewrise-express-gbp-rocket
     restart: unless-stopped
     networks:
@@ -248,10 +248,10 @@ services:
           memory: 256M
 
   express-ad-rise:
-    # image: ghcr.io/reviewrise/reviewrise-express-ad-rise:staging
-    build:
-      context: .
-      dockerfile: apps/express-ad-rise/Dockerfile
+    image: ghcr.io/reviewrise/reviewrise-express-ad-rise:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-ad-rise/Dockerfile
     container_name: reviewrise-express-ad-rise
     restart: unless-stopped
     networks:
@@ -280,10 +280,10 @@ services:
           memory: 256M
 
   express-brand:
-    # image: ghcr.io/reviewrise/reviewrise-express-brand:staging
-    build:
-      context: .
-      dockerfile: apps/express-brand/Dockerfile
+    image: ghcr.io/reviewrise/reviewrise-express-brand:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-brand/Dockerfile
     container_name: reviewrise-express-brand
     restart: unless-stopped
     networks:
@@ -312,10 +312,10 @@ services:
           memory: 256M
 
   express-seo-health:
-    # image: ghcr.io/reviewrise/reviewrise-express-seo-health:staging
-    build:
-      context: .
-      dockerfile: apps/express-seo-health/Dockerfile
+    image: ghcr.io/reviewrise/reviewrise-express-seo-health:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-seo-health/Dockerfile
     container_name: reviewrise-express-seo-health
     restart: unless-stopped
     networks:
@@ -344,10 +344,10 @@ services:
           memory: 256M
 
   express-admin-portal:
-    # image: ghcr.io/reviewrise/reviewrise-express-admin-portal:staging
-    build:
-      context: .
-      dockerfile: apps/express-admin-portal/Dockerfile
+    image: ghcr.io/reviewrise/reviewrise-express-admin-portal:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-admin-portal/Dockerfile
     container_name: reviewrise-express-admin-portal
     restart: unless-stopped
     networks:
@@ -376,10 +376,10 @@ services:
           memory: 256M
 
   notifications-service:
-    # image: ghcr.io/reviewrise/reviewrise-notifications-service:staging
-    build:
-      context: .
-      dockerfile: apps/notifications-service/Dockerfile
+    image: ghcr.io/reviewrise/reviewrise-notifications-service:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/notifications-service/Dockerfile
     container_name: reviewrise-notifications
     restart: unless-stopped
     networks:
@@ -408,10 +408,10 @@ services:
           memory: 256M
 
   worker-jobs:
-    # image: ghcr.io/reviewrise/reviewrise-worker-jobs:staging
-    build:
-      context: .
-      dockerfile: apps/worker-jobs/Dockerfile
+    image: ghcr.io/reviewrise/reviewrise-worker-jobs:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/worker-jobs/Dockerfile
     container_name: reviewrise-worker
     restart: unless-stopped
     networks:
@@ -437,10 +437,10 @@ services:
   # ==================================================
 
   next-web:
-    # image: ghcr.io/reviewrise/reviewrise-next-web:staging
-    build:
-      context: .
-      dockerfile: apps/next-web/Dockerfile
+    image: ghcr.io/reviewrise/reviewrise-next-web:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/next-web/Dockerfile
     container_name: reviewrise-next-web
     restart: unless-stopped
     networks:
@@ -470,9 +470,9 @@ services:
 
   next-seo-landing:
     image: ghcr.io/reviewrise/reviewrise-next-seo-landing:staging
-    build:
-      context: .
-      dockerfile: apps/next-seo-landing/Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: apps/next-seo-landing/Dockerfile
     container_name: reviewrise-next-seo-landing
     restart: unless-stopped
     networks:
@@ -501,10 +501,10 @@ services:
   # ==================================================
 
   nginx:
-    # image: ghcr.io/reviewrise/reviewrise-nginx:staging
-    build:
-      context: .
-      dockerfile: nginx/Dockerfile
+    image: ghcr.io/reviewrise/reviewrise-nginx:staging
+    # build:
+    #   context: .
+    #   dockerfile: nginx/Dockerfile
     container_name: reviewrise-nginx
     restart: unless-stopped
     networks:
