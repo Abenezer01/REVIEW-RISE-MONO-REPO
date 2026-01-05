@@ -479,6 +479,7 @@ services:
       - reviewrise-network
     environment:
       - NODE_ENV=production
+      - PORT=3001
       - DATABASE_URL=${DATABASE_URL}
     depends_on:
       postgres:

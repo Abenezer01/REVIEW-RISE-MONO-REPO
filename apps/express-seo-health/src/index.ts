@@ -8,7 +8,7 @@ import v1Routes from './routes/v1';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3012;
+const PORT = process.env.PORT || 3011;
 
 app.use(cors());
 app.use(helmet());
