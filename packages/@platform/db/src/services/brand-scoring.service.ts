@@ -1,4 +1,5 @@
 import { repositories } from '../repositories';
+import { Prisma } from '@prisma/client';
 
 /**
  * Brand Scoring Service
@@ -56,14 +57,14 @@ export class BrandScoringService {
                     take: 1,
                 },
             },
-        } as any); // Type assertion needed due to complex include
+        } as any); // Type assertion needed due to complex include in custom repository
 
         if (keywords.length === 0) return 0;
 
         let totalScore = 0;
         let totalKeywords = 0;
 
-        for (const keyword of keywords as any[]) {
+        for (const keyword of (keywords as any[])) {
             if (!keyword.ranks || keyword.ranks.length === 0) continue;
 
             const rank = keyword.ranks[0];
@@ -119,53 +120,59 @@ export class BrandScoringService {
      * Social Score: Based on social presence, engagement (placeholder for now)
      */
     private async computeSocialScore(businessId: string): Promise<number> {
-        // TODO: Integrate with social media data when available
-        // For now, check if social links exist in BrandProfile (assuming it's available via a repo we'll add logic for)
-
-        // We don't have a direct repo for BrandProfile in the generic 'repositories' export yet unless we add it, 
-        // or we query directly via prisma if available.
-        // For this implementation plan, we assumed repositories.brandProfile exists. 
-        // Checking schema, BrandProfile exists. Let's assume we can access it via prisma generic or add a repo later.
-        // Since we don't have a dedicated repo file for it yet in the list I saw, I'll use raw prisma or generic base if possible.
-        // But since I only have `repositories` exported, and it might not have brandProfile.
-        // Let's check `repositories/index.ts` again.
-
-        // It seems missing from `repositories` object in index.ts based on my previous edit (I added brandRecommendation and brandScore).
-        // I should probably add `brandProfile` repo or use a workaround.
-        // I'll assume for now I can skip detailed social score or use a placeholder 0.
-
-        return 0; // Placeholder
+        const profile = await repositories.brandProfile.findFirst({ where: { businessId } });
+        if (!profile) return 0;
+        // Basic score for having a profile set up
+        let score = 50;
+        if (profile.websiteUrl) score += 10;
+        if (profile.status === 'completed') score += 40;
+        return score;
     }
 
     /**
      * Reputation Score: Based on reviews, ratings, sentiment
      */
     private async computeReputationScore(businessId: string): Promise<number> {
-        // We don't have a review repo exported in the main list? 
-        // Wait, I saw `reviewSyncLogRepository`. 
-        // Let's check `repositories/index.ts` for `reviewRepository`.
-        // It is NOT in the list I saw earlier (lines 1-70).
-        // I will need to check if ReviewRepository exists.
+        const reviews = await repositories.review.findMany({ where: { businessId } });
+        if (!reviews || reviews.length === 0) return 0;
 
-        // Assuming for now it doesn't exist or is not exported. 
-        // I'll implement a basic version that returns 0 if I can't access reviews.
-        return 0;
+        // Calculate average rating
+        const totalRating = reviews.reduce((sum: number, review: any) => sum + (review.rating || 0), 0);
+        const averageRating = totalRating / reviews.length;
+
+        // Normalize 5-star rating to 0-100 score
+        return Math.round((averageRating / 5) * 100);
     }
 
     /**
      * Consistency Score: Based on Brand DNA adherence (rules-based v0)
      */
     private async computeConsistencyScore(businessId: string): Promise<number> {
-        // Also need BrandDNA repo. 
-        // Schema has BrandDNA.
-        return 0; // Placeholder
+        const dna = await repositories.brandDNA.findFirst({ where: { businessId } });
+        if (!dna) return 0;
+
+        let score = 0;
+        // Check for presence of key DNA elements
+        if (dna.values && dna.values.length > 0) score += 25;
+        if (dna.mission) score += 25;
+        if (dna.voice) score += 25;
+        if (dna.audience) score += 25;
+
+        return score;
     }
 
     /**
      * Trust Score: Proxy based on rating velocity, sentiment, response rate
      */
     async computeTrustScore(businessId: string): Promise<number> {
-        return 0; // Placeholder until Review repo is available
+        // Trust is heavily influenced by reputation and engagement
+        const reputationScore = await this.computeReputationScore(businessId);
+
+        // Simple trust proxy: 80% reputation + 20% base trust if DNA exists
+        const consistencyScore = await this.computeConsistencyScore(businessId);
+        const hasIdentity = consistencyScore > 50;
+
+        return Math.round((reputationScore * 0.8) + (hasIdentity ? 20 : 0));
     }
 
     /**

@@ -2,335 +2,257 @@
 
 import { useEffect, useState } from 'react';
 
-import dynamic from 'next/dynamic';
-
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
+import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
+import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
-import { useTheme } from '@mui/material/styles';
+import LinearProgress from '@mui/material/LinearProgress';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import type { ApexOptions } from 'apexcharts';
+import { useTheme } from '@mui/material/styles';
+
+import Timeline from '@mui/lab/Timeline';
+import TimelineConnector from '@mui/lab/TimelineConnector';
+import TimelineContent from '@mui/lab/TimelineContent';
+import TimelineDot from '@mui/lab/TimelineDot';
+import TimelineItem from '@mui/lab/TimelineItem';
+import TimelineSeparator from '@mui/lab/TimelineSeparator';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
-import { useLocationFilter } from '@/hooks/useLocationFilter';
-import type { VisibilityMetric } from '@/services/brand.service';
 import { BrandService } from '@/services/brand.service';
 
-// Dynamically import ApexCharts
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false });
-
-const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [key: string]: any }) => {
+const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number;[key: string]: any }) => {
   return <i className={icon} style={{ fontSize }} {...rest} />
 }
 
-interface ChannelCardProps {
-  title: string;
-  score: string;
-  icon: string;
-  iconColor: string;
-  metrics: { label: string; value: string }[];
-  chartType: 'bar' | 'line' | 'donut' | 'map';
-}
-
-const ChannelCard = ({ title, score, icon, iconColor, metrics, chartType }: ChannelCardProps) => {
+const VisibilityPlanPage = () => {
+  const { businessId } = useBusinessId();
   const theme = useTheme();
 
-  const commonChartOptions: ApexOptions = {
-    chart: { toolbar: { show: false }, sparkline: { enabled: true } },
-    grid: { show: false },
-    dataLabels: { enabled: false },
-    stroke: { curve: 'smooth', width: 2 },
-    colors: [iconColor]
-  };
+  const [loading, setLoading] = useState(true);
+  const [plan, setPlan] = useState<any>(null);
+  const [generating, setGenerating] = useState(false);
 
-  const renderChart = () => {
-    switch (chartType) {
-      case 'bar':
-        return (
-           <AppReactApexCharts
-             type="bar"
-             height={100}
-             options={{ ...commonChartOptions, plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } } }}
-             series={[{ name: 'Rankings', data: [40, 70, 55, 90, 60, 80] }]}
-           />
-        );
-      case 'line':
-        return (
-            <AppReactApexCharts
-                type="line"
-                height={100}
-                options={commonChartOptions}
-                series={[{ name: 'Engagement', data: [30, 40, 35, 50, 49, 60, 70, 91, 125] }]}
-            />
-        );
-      case 'donut':
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                <AppReactApexCharts
-                    type="donut"
-                    height={120}
-                    options={{
-                        ...commonChartOptions,
-                        colors: ['#28C76F', '#FF9F43', '#EA5455'],
-                        legend: { show: false },
-                        stroke: { width: 0 }
-                    }}
-                    series={[82, 12, 6]}
-                />
-            </Box>
-        );
-      case 'map':
-        return (
-            <Box sx={{ height: 100, bgcolor: 'action.hover', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Typography variant="caption" color="text.secondary">Map Visualization</Typography>
-            </Box>
-        );
-      default:
-        return null;
+  const fetchPlan = async () => {
+    if (!businessId) return;
+    setLoading(true);
+    try {
+      const data = await BrandService.getVisibilityPlan(businessId);
+      // Ensure we access the 'data' field of the report if that's how it's stored
+      setPlan(data?.data || null);
+    } catch (error) {
+      // 404 is expected if no plan exists
+      console.log('No plan found or error');
+      setPlan(null);
+    } finally {
+      setLoading(false);
     }
   };
-
-  return (
-    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-             <Icon icon={icon} fontSize={24} style={{ color: iconColor }} />
-             <Typography variant="h6">{title}</Typography>
-          </Box>
-          <Typography variant="h4" color="primary.main" fontWeight="bold">{score}</Typography>
-        </Box>
-
-        <Box sx={{ mb: 3, minHeight: 100 }}>
-            {renderChart()}
-        </Box>
-
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
-           {metrics.map((metric, index) => (
-             <Box key={index} sx={{ textAlign: 'center' }}>
-                <Typography variant="caption" color="text.secondary" display="block">{metric.label}</Typography>
-                <Typography variant="subtitle2" fontWeight="bold">{metric.value}</Typography>
-             </Box>
-           ))}
-        </Box>
-      </CardContent>
-    </Card>
-  );
-};
-
-const VisibilityPage = () => {
-  const [activeTab, setActiveTab] = useState('Search');
-  const { businessId } = useBusinessId();
-  const { locationId } = useLocationFilter();
-  const [loading, setLoading] = useState(false);
-  const [metrics, setMetrics] = useState<VisibilityMetric[]>([]);
-  const [latestMetric, setLatestMetric] = useState<VisibilityMetric | null>(null);
 
   useEffect(() => {
-    const fetchMetrics = async () => {
-      if (!businessId) return;
-      setLoading(true);
-  
-      try {
-          const data = await BrandService.getVisibilityMetrics(businessId, '30d', locationId);
-  
-          setMetrics(data);
-  
-          if (data.length > 0) {
-              setLatestMetric(data[data.length - 1]);
-          }
-      } catch (error) {
-          console.error('Failed to fetch visibility metrics', error);
-      } finally {
-          setLoading(false);
-      }
-    };
+    fetchPlan();
+  }, [businessId]);
 
-    if (businessId) {
-        fetchMetrics();
+  const handleGenerate = async () => {
+    if (!businessId) return;
+    setGenerating(true);
+    try {
+      await BrandService.generateVisibilityPlan(businessId);
+
+      // Poll or wait logic (mocked for now)
+      setTimeout(() => {
+        setGenerating(false);
+        fetchPlan();
+      }, 4000);
+
+    } catch (error) {
+      console.error('Failed to generate plan', error);
+      setGenerating(false);
     }
-  }, [businessId, locationId]);
-
-  const getBreakdownValue = (key: string, subKey: string, defaultValue: string = '0') => {
-      if (!latestMetric?.breakdown) return defaultValue;
-      
-return latestMetric.breakdown[key]?.[subKey] || defaultValue;
-  };
-
-  const trendOptions: ApexOptions = {
-    chart: {
-      type: 'area',
-      toolbar: { show: false },
-      sparkline: { enabled: false }
-    },
-    stroke: { curve: 'smooth', width: 2 },
-    fill: {
-      type: 'gradient',
-      gradient: {
-        shadeIntensity: 1,
-        opacityFrom: 0.2,
-        opacityTo: 0.05,
-        stops: [0, 90, 100]
-      }
-    },
-    colors: ['#7367F0'],
-    xaxis: {
-      categories: metrics.map(m => new Date(m.date).toLocaleDateString()),
-      axisBorder: { show: false },
-      axisTicks: { show: false },
-      labels: { style: { colors: 'var(--mui-palette-text-secondary)' } }
-    },
-    yaxis: {
-        show: false
-    },
-    grid: { show: false },
-    dataLabels: { enabled: false }
   };
 
   if (loading) {
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-            <CircularProgress />
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 10 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!plan) {
+    return (
+      <Card sx={{ p: 5, textAlign: 'center', maxWidth: 600, mx: 'auto', mt: 10 }}>
+        <Box sx={{ mb: 3 }}>
+          <Icon icon="tabler-map-2" fontSize={64} color={theme.palette.primary.main} />
         </Box>
+        <Typography variant="h4" gutterBottom>30-Day Visibility Plan</Typography>
+        <Typography color="text.secondary" mb={4}>
+          Generate a comprehensive, step-by-step action plan tailored to your brand's unique needs and current performance.
+        </Typography>
+        <Button
+          variant="contained"
+          size="large"
+          startIcon={generating ? <CircularProgress size={20} color="inherit" /> : <Icon icon="tabler-wand" fontSize={20} />}
+          onClick={handleGenerate}
+          disabled={generating}
+        >
+          {generating ? 'Crafting Plan...' : 'Generate 30-Day Plan'}
+        </Button>
+      </Card>
     );
   }
 
   return (
-    <Box>
-       {/* Sub Navigation */}
-       <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap' }}>
-          {['Search', 'Local', 'Social', 'Reputation', 'Paid'].map((tab) => (
-             <Button
-                key={tab}
-                variant={activeTab === tab ? 'contained' : 'text'}
-                color={activeTab === tab ? 'primary' : 'secondary'}
-                onClick={() => setActiveTab(tab)}
-                sx={{
-                    borderRadius: 1,
-                    textTransform: 'none',
-                    px: 3,
-                    boxShadow: 'none',
-                    bgcolor: activeTab === tab ? 'primary.main' : 'transparent',
-                    color: activeTab === tab ? 'white' : 'text.secondary',
-                    '&:hover': {
-                         bgcolor: activeTab === tab ? 'primary.dark' : 'action.hover',
-                         boxShadow: 'none'
-                    }
-                }}
-             >
-                {tab}
-             </Button>
-          ))}
-       </Box>
+    <Grid container spacing={4}>
+      <Grid item xs={12}>
+        <Card sx={{ bgcolor: theme.palette.primary.main, color: 'white' }}>
+          <CardContent>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Box>
+                <Typography variant="h4" color="white" gutterBottom>{plan.title || 'Your 30-Day Growth Plan'}</Typography>
+                <Typography variant="body1" sx={{ opacity: 0.9 }}>
+                  {plan.overview || 'Follow this roadmap to significantly boost your local visibility and brand trust.'}
+                </Typography>
+              </Box>
+              <Box sx={{ textAlign: 'right' }}>
+                <Typography variant="h3" color="white">30 Days</Typography>
+                <Typography variant="body2" sx={{ opacity: 0.8 }}>Timeline</Typography>
+              </Box>
+            </Stack>
+          </CardContent>
+        </Card>
+      </Grid>
 
-       <Grid container spacing={4}>
-          {/* Overall Score */}
-          <Grid size={{ xs: 12 }}>
-             <Card sx={{ textAlign: 'center', py: 6 }}>
-                <CardContent>
-                   <Typography variant="subtitle1" color="text.secondary" gutterBottom>Overall Visibility Score</Typography>
-                   <Typography variant="h1" color="primary.main" fontWeight="bold" sx={{ fontSize: '5rem', mb: 2 }}>
-                      {latestMetric?.score || 0}
-                   </Typography>
-                   <Typography variant="body1" color="text.secondary">
-                      Your brand visibility is performing well across all channels
-                   </Typography>
-                </CardContent>
-             </Card>
-          </Grid>
+      <Grid item xs={12} md={8}>
+        <Card>
+          <CardHeader title="Weekly Roadmap" />
+          <Divider />
+          <CardContent>
+            <Timeline position="right">
+              {plan.week1 && (
+                <TimelineItem>
+                  <TimelineSeparator>
+                    <TimelineDot color="primary"><Icon icon="tabler-number-1" fontSize={16} /></TimelineDot>
+                    <TimelineConnector />
+                  </TimelineSeparator>
+                  <TimelineContent sx={{ py: '12px', px: 2 }}>
+                    <Typography variant="h6" component="span">Week 1: Foundation</Typography>
+                    <Typography className='mb-2'>{plan.week1.focus}</Typography>
+                    <Stack spacing={1} mt={1}>
+                      {plan.week1.tasks?.map((task: string, i: number) => (
+                        <Box key={i} sx={{ display: 'flex', gap: 1 }}>
+                          <Icon icon="tabler-check" fontSize={16} color={theme.palette.success.main} />
+                          <Typography variant="body2">{task}</Typography>
+                        </Box>
+                      ))}
+                    </Stack>
+                  </TimelineContent>
+                </TimelineItem>
+              )}
 
-          {/* Trend Chart */}
-          <Grid size={{ xs: 12 }}>
-             <Card>
-                <CardContent>
-                   <Box sx={{ mb: 3 }}>
-                      <Typography variant="h6">Visibility Trend</Typography>
-                      <Typography variant="body2" color="text.secondary">Search visibility performance over time</Typography>
-                   </Box>
-                   <Box sx={{ height: 350, width: '100%' }}>
-                      <AppReactApexCharts
-                        type="area"
-                        height="100%"
-                        width="100%"
-                        options={trendOptions}
-                        series={[{ name: 'Visibility', data: metrics.map(m => m.score) }]}
-                      />
-                   </Box>
-                </CardContent>
-             </Card>
-          </Grid>
+              {plan.week2 && (
+                <TimelineItem>
+                  <TimelineSeparator>
+                    <TimelineDot color="info"><Icon icon="tabler-number-2" fontSize={16} /></TimelineDot>
+                    <TimelineConnector />
+                  </TimelineSeparator>
+                  <TimelineContent sx={{ py: '12px', px: 2 }}>
+                    <Typography variant="h6" component="span">Week 2: Optimization</Typography>
+                    <Typography className='mb-2'>{plan.week2.focus}</Typography>
+                    <Stack spacing={1} mt={1}>
+                      {plan.week2.tasks?.map((task: string, i: number) => (
+                        <Box key={i} sx={{ display: 'flex', gap: 1 }}>
+                          <Icon icon="tabler-check" fontSize={16} color={theme.palette.success.main} />
+                          <Typography variant="body2">{task}</Typography>
+                        </Box>
+                      ))}
+                    </Stack>
+                  </TimelineContent>
+                </TimelineItem>
+              )}
 
-          {/* Channel Cards */}
-          <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-             <ChannelCard
-                title="Organic Search"
-                score={getBreakdownValue('organic', 'score', '0')}
-                icon="tabler-search"
-                iconColor="#7367F0"
-                metrics={[
-                    { label: 'Keywords', value: getBreakdownValue('organic', 'keywords', '0') },
-                    { label: 'Top 10', value: getBreakdownValue('organic', 'top10', '0') },
-                    { label: 'Impressions', value: getBreakdownValue('organic', 'impressions', '0') }
-                ]}
-                chartType="bar"
-             />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-             <ChannelCard
-                title="Local Search"
-                score={getBreakdownValue('local', 'score', '0')}
-                icon="tabler-map-pin"
-                iconColor="#28C76F"
-                metrics={[
-                    { label: 'Locations', value: getBreakdownValue('local', 'locations', '0') },
-                    { label: 'Reviews', value: getBreakdownValue('local', 'reviews', '0') },
-                    { label: 'Avg Rating', value: getBreakdownValue('local', 'avgRating', '0') }
-                ]}
-                chartType="map"
-             />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-             <ChannelCard
-                title="Social Media"
-                score={getBreakdownValue('social', 'score', '0')}
-                icon="tabler-share"
-                iconColor="#FF9F43"
-                metrics={[
-                    { label: 'Followers', value: getBreakdownValue('social', 'followers', '0') },
-                    { label: 'Engagement', value: getBreakdownValue('social', 'engagement', '0') },
-                    { label: 'Posts', value: getBreakdownValue('social', 'posts', '0') }
-                ]}
-                chartType="line"
-             />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-             <ChannelCard
-                title="Reputation"
-                score={getBreakdownValue('reputation', 'score', '0')}
-                icon="tabler-star"
-                iconColor="#7367F0"
-                metrics={[
-                    { label: 'Reviews', value: getBreakdownValue('reputation', 'reviews', '0') },
-                    { label: 'Positive', value: getBreakdownValue('reputation', 'positive', '0') },
-                    { label: 'Response Rate', value: getBreakdownValue('reputation', 'responseRate', '0') }
-                ]}
-                chartType="donut"
-             />
-          </Grid>
-           <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-             <Card sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 300 }}>
-                 <Box sx={{ textAlign: 'center', opacity: 0.5, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                     <Icon icon="tabler-speakerphone" fontSize={48} />
-                     <Typography variant="body1" sx={{ mt: 2 }}>Paid Advertising</Typography>
-                 </Box>
-             </Card>
-           </Grid>
-       </Grid>
-    </Box>
+              {plan.week3 && (
+                <TimelineItem>
+                  <TimelineSeparator>
+                    <TimelineDot color="warning"><Icon icon="tabler-number-3" fontSize={16} /></TimelineDot>
+                    <TimelineConnector />
+                  </TimelineSeparator>
+                  <TimelineContent sx={{ py: '12px', px: 2 }}>
+                    <Typography variant="h6" component="span">Week 3: Engagement</Typography>
+                    <Typography className='mb-2'>{plan.week3.focus}</Typography>
+                    <Stack spacing={1} mt={1}>
+                      {plan.week3.tasks?.map((task: string, i: number) => (
+                        <Box key={i} sx={{ display: 'flex', gap: 1 }}>
+                          <Icon icon="tabler-check" fontSize={16} color={theme.palette.success.main} />
+                          <Typography variant="body2">{task}</Typography>
+                        </Box>
+                      ))}
+                    </Stack>
+                  </TimelineContent>
+                </TimelineItem>
+              )}
+
+              {plan.week4 && (
+                <TimelineItem>
+                  <TimelineSeparator>
+                    <TimelineDot color="success"><Icon icon="tabler-number-4" fontSize={16} /></TimelineDot>
+                  </TimelineSeparator>
+                  <TimelineContent sx={{ py: '12px', px: 2 }}>
+                    <Typography variant="h6" component="span">Week 4: Growth</Typography>
+                    <Typography className='mb-2'>{plan.week4.focus}</Typography>
+                    <Stack spacing={1} mt={1}>
+                      {plan.week4.tasks?.map((task: string, i: number) => (
+                        <Box key={i} sx={{ display: 'flex', gap: 1 }}>
+                          <Icon icon="tabler-check" fontSize={16} color={theme.palette.success.main} />
+                          <Typography variant="body2">{task}</Typography>
+                        </Box>
+                      ))}
+                    </Stack>
+                  </TimelineContent>
+                </TimelineItem>
+              )}
+            </Timeline>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      <Grid item xs={12} md={4}>
+        <Stack spacing={4}>
+          <Card>
+            <CardHeader title="Success Metrics" />
+            <Divider />
+            <CardContent>
+              <Stack spacing={3}>
+                {plan.successMetrics?.map((metric: any, i: number) => (
+                  <Box key={i}>
+                    <Stack direction="row" justifyContent="space-between" mb={1}>
+                      <Typography variant="body2" fontWeight="bold">{metric.metric}</Typography>
+                      <Typography variant="body2" color="primary">{metric.target}</Typography>
+                    </Stack>
+                    <LinearProgress variant="determinate" value={70} color="primary" sx={{ height: 6, borderRadius: 5 }} />
+                  </Box>
+                ))}
+              </Stack>
+            </CardContent>
+          </Card>
+
+          <Alert severity="info" icon={<Icon icon="tabler-info-circle" fontSize={20} />}>
+            This plan is dynamic. As you complete tasks and your metrics improve, generate a new plan to keep your growth momentum.
+          </Alert>
+
+          <Button variant="outlined" color="error" fullWidth>
+            Reset Plan
+          </Button>
+        </Stack>
+      </Grid>
+    </Grid>
   );
 };
 
-export default VisibilityPage;
+export default VisibilityPlanPage;

@@ -8,6 +8,7 @@ import reviewRoutes from './review.routes';
 import brandProfileRoutes from './brand-profile.routes';
 
 import recommendationsRoutes from './recommendations.routes';
+import opportunitiesReportRoutes from './opportunities-report.routes';
 
 const router = Router();
 

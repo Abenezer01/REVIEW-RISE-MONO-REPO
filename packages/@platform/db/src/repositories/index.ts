@@ -56,6 +56,11 @@ import { jobRepository } from './job.repository';
 import { reviewSyncLogRepository } from './review-sync-log.repository';
 import { brandRecommendationRepository } from './brand-recommendation.repository';
 import { brandScoreRepository } from './brand-score.repository';
+import { reviewRepository } from './review.repository';
+import { brandProfileRepository } from './brand-profile.repository';
+import { brandDNARepository } from './brand-dna.repository';
+import { competitorRepository } from './competitor.repository';
+import { reportRepository } from './report.repository';
 
 // Re-export all repositories as a single object for convenience
 export const repositories = {
@@ -77,4 +82,9 @@ export const repositories = {
     reviewSyncLog: reviewSyncLogRepository,
     brandRecommendation: brandRecommendationRepository,
     brandScore: brandScoreRepository,
+    review: reviewRepository,
+    brandProfile: brandProfileRepository,
+    brandDNA: brandDNARepository,
+    competitor: competitorRepository,
+    report: reportRepository,
 } as const;

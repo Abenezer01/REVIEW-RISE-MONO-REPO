@@ -1,6 +1,7 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { repositories, Prisma } from '@platform/db';
-import { RecommendationsOutputSchema, RECOMMENDATION_PROMPTS } from '@platform/contracts';
+import axios from 'axios';
+
+const EXPRESS_AI_URL = process.env.EXPRESS_AI_URL || 'http://localhost:3003';
 
 /**
  * Brand Recommendations Job
@@ -8,13 +9,12 @@ import { RecommendationsOutputSchema, RECOMMENDATION_PROMPTS } from '@platform/c
  * Generates AI-powered recommendations for a brand.
  * This is a background job that:
  * 1. Fetches necessary context (Brand DNA, Competitors, Scores)
- * 2. Generates recommendations using Gemini AI
+ * 2. Generates recommendations using Express AI Service
  * 3. Saves recommendations to the database
  * 4. Updates job status
  */
 export const brandRecommendationsJob = async (jobId: string, payload: { businessId: string }) => {
     const { businessId } = payload;
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
     try {
         // Update job status to in_progress
@@ -24,31 +24,24 @@ export const brandRecommendationsJob = async (jobId: string, payload: { business
         const brandDNA = await repositories.brandDNA.findByBusinessId(businessId);
         const competitors = await repositories.competitor.findMany({ where: { businessId }, take: 5 });
         const latestScore = await repositories.brandScore.findLatestByBusinessId(businessId);
-
         const categories = ['search', 'local', 'social', 'reputation', 'conversion', 'content'] as const;
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
         for (const category of categories) {
             try {
-                const prompt = RECOMMENDATION_PROMPTS[category]
-                    .replace('{brandDNA}', JSON.stringify(brandDNA || {}))
-                    .replace('{currentMetrics}', JSON.stringify(latestScore || {}))
-                    .replace('{competitorInsights}', JSON.stringify(competitors));
-
-                const result = await model.generateContent({
-                    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        responseMimeType: 'application/json',
-                    },
+                // Call Express AI Service
+                const response = await axios.post(`${EXPRESS_AI_URL}/api/v1/ai/generate-recommendations`, {
+                    category,
+                    context: {
+                        brandDNA: brandDNA || {},
+                        currentMetrics: latestScore || {},
+                        competitorInsights: competitors
+                    }
                 });
 
-                const responseText = result.response.text();
-                const parsed = JSON.parse(responseText);
-                const validated = RecommendationsOutputSchema.parse(parsed);
+                const validated = response.data;
 
                 // Normalize inputs
-                const recommendations = validated.recommendations.map(r => ({
+                const recommendations = validated.recommendations.map((r: any) => ({
                     ...r,
                     category
                 }));

@@ -1,6 +1,8 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { repositories, Prisma } from '@platform/db';
-import { VisibilityPlanSchema, VISIBILITY_PLAN_PROMPT } from '@platform/contracts';
+import { VisibilityPlanSchema } from '@platform/contracts';
+import axios from 'axios';
+
+const EXPRESS_AI_URL = process.env.EXPRESS_AI_URL || 'http://localhost:3003';
 
 /**
  * Visibility Plan Job
@@ -9,7 +11,6 @@ import { VisibilityPlanSchema, VISIBILITY_PLAN_PROMPT } from '@platform/contract
  */
 export const visibilityPlanJob = async (jobId: string, payload: { businessId: string }) => {
     const { businessId } = payload;
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
     try {
         await repositories.job.updateStatus(jobId, 'in_progress');
@@ -21,26 +22,18 @@ export const visibilityPlanJob = async (jobId: string, payload: { businessId: st
         // Get top priority recommendations
         const topRecs = await repositories.brandRecommendation.getTopPriority(businessId, 5);
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
-
-        const prompt = VISIBILITY_PLAN_PROMPT
-            .replace('{brandDNA}', JSON.stringify(brandDNA || {}))
-            .replace('{visibilityScore}', latestScore?.visibilityScore?.toString() || '0')
-            .replace('{trustScore}', latestScore?.trustScore?.toString() || '0')
-            .replace('{consistencyScore}', latestScore?.consistencyScore?.toString() || '0')
-            .replace('{topRecommendations}', JSON.stringify(topRecs));
-
-        const result = await model.generateContent({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: {
-                temperature: 0.7,
-                responseMimeType: 'application/json',
-            },
+        // Call Express AI Service
+        const response = await axios.post(`${EXPRESS_AI_URL}/api/v1/ai/generate-visibility-plan`, {
+            context: {
+                brandDNA: brandDNA || {},
+                visibilityScore: latestScore?.visibilityScore || 0,
+                trustScore: latestScore?.trustScore || 0,
+                consistencyScore: latestScore?.consistencyScore || 0,
+                topRecommendations: topRecs
+            }
         });
 
-        const responseText = result.response.text();
-        const parsed = JSON.parse(responseText);
-        const validated = VisibilityPlanSchema.parse(parsed);
+        const validated = response.data;
 
         // Save report
         // We'll save this as a 'Plan' type report in the Report repository
@@ -51,9 +44,23 @@ export const visibilityPlanJob = async (jobId: string, payload: { businessId: st
         await repositories.report.create({
             businessId,
             title: validated.title,
-            type: 'visibility_plan_30d',
-            data: validated as any, // Store the full validated plan object
-            format: 'json',
+
+            htmlContent: JSON.stringify(validated), // Schema says htmlContent is string
+            // Wait, schema for Report says htmlContent @db.Text.
+            // Previous implementation used `data: validated` which matches my assumption of a Json field?
+            // Let's check schema for Report model again. Step 518/639: htmlContent String. There is NO `data` field visible in snippet.
+            // But wait, Step 528 (previous job implementation) had:
+            // data: validated as any, 
+            // So previous implementation might have been broken if logic relied on a field that didn't exist?
+            // "data" field?
+            // Looking at schema snippet Step 632:
+            // model Report { ... htmlContent String ... pdfUrl String? ... }
+            // It does NOT show a `data` field. It shows `htmlContent`.
+            // So I should store JSON in `htmlContent`.
+
+            // I'll stick to `htmlContent: JSON.stringify(validated)` as safe bet.
+
+            version: 'v1.0', // Schema has version
             generatedAt: new Date(),
         } as any);
 

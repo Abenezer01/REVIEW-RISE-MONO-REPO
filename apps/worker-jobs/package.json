@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "axios": "^1.6.0",
     "@platform/contracts": "workspace:*",
     "@platform/db": "workspace:*",
     "cors": "^2.8.5",

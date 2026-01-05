@@ -77,7 +77,8 @@
     "subtitle": "Brand performance and visibility insights",
     "tabs": {
       "overview": "Overview",
-      "visibility": "Visibility",
+      "visibility": "Visibility Plan",
+      "recommendations": "Recommendations",
       "dna": "Brand DNA",
       "competitors": "Competitors",
       "content": "Content & Messaging",
