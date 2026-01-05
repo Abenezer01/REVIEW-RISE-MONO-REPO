@@ -24,7 +24,7 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number;[ke
 }
 
 const RecommendationsPage = () => {
-    const { businessId } = useBusinessId();
+    const { businessId, loading: businessLoading } = useBusinessId();
     const theme = useTheme();
 
     const [loading, setLoading] = useState(true);
@@ -46,8 +46,15 @@ const RecommendationsPage = () => {
     };
 
     useEffect(() => {
+        if (businessLoading) return;
+        
+        if (!businessId) {
+            setLoading(false);
+            return;
+        }
+
         fetchRecommendations();
-    }, [businessId, filterStatus]);
+    }, [businessId, filterStatus, businessLoading]);
 
     const handleGenerate = async () => {
         if (!businessId) return;

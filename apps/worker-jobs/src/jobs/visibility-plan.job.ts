@@ -41,13 +41,17 @@ export const visibilityPlanJob = async (jobId: string, payload: { businessId: st
         // Since we created ReportRepository earlier but didn't modify Schema to add specific Plan fields,
         // we'll store the JSON in `data` field of Report.
 
+        if (!validated) {
+            throw new Error('No data returned from AI');
+        }
+
+        console.log(`[Job] Saving visibility plan for business ${businessId}`);
+
         await repositories.report.create({
             businessId,
-            title: validated.title,
+            title: '30-Day Visibility Plan',
 
-            htmlContent: JSON.stringify(validated), // Schema says htmlContent is string
-            // Wait, schema for Report says htmlContent @db.Text.
-            // Previous implementation used `data: validated` which matches my assumption of a Json field?
+            htmlContent: JSON.stringify(validated), // Store JSON in htmlContent for now
             // Let's check schema for Report model again. Step 518/639: htmlContent String. There is NO `data` field visible in snippet.
             // But wait, Step 528 (previous job implementation) had:
             // data: validated as any, 

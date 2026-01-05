@@ -12,6 +12,7 @@ const AI_PROVIDER = process.env.AI_PROVIDER || 'gemini';
 
 export class BrandStrategistService {
     private async callAI(prompt: string, useJsonFormat: boolean = true): Promise<string | null> {
+        console.log(`[BrandStrategist] Calling AI with provider: ${AI_PROVIDER}`);
         try {
             if (AI_PROVIDER === 'gemini') {
                 const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -26,8 +27,13 @@ export class BrandStrategistService {
                 return result.response.text();
             } else {
                 // OpenAI
+                const apiKey = process.env.OPENAI_API_KEY;
+                if (!apiKey) {
+                     console.warn('[BrandStrategist] OPENAI_API_KEY not set.');
+                }
+                
                 const openai = new OpenAI({
-                    apiKey: process.env.OPENAI_API_KEY,
+                    apiKey: apiKey,
                 });
                 const completion = await openai.chat.completions.create({
                     messages: [{ role: "user", content: prompt }],
@@ -35,7 +41,13 @@ export class BrandStrategistService {
                     ...(useJsonFormat && { response_format: { type: "json_object" } }),
                     temperature: 0.7,
                 });
-                return completion.choices[0].message.content;
+                
+                const choice = completion.choices?.[0];
+                if (!choice?.message) {
+                    throw new Error('Invalid response from OpenAI: No message found');
+                }
+                
+                return choice.message.content;
             }
         } catch (error) {
             console.error(`AI call failed (${AI_PROVIDER}):`, error);
@@ -52,54 +64,31 @@ export class BrandStrategistService {
         }
 
         const promptTemplate = RECOMMENDATION_PROMPTS[category];
-        const prompt = promptTemplate
-            .replace('{brandDNA}', JSON.stringify(context.brandDNA || {}))
-            .replace('{currentMetrics}', JSON.stringify(context.currentMetrics || {}))
-            .replace('{competitorInsights}', JSON.stringify(context.competitorInsights || []));
-
-        // Use current social metrics if category is social (template expects {socialMetrics})
-        // The prompt template might use different variable names per category.
-        // Let's re-check the prompts. 
-        // Search: currentMetrics, competitorInsights
-        // Local: currentMetrics
-        // Social: socialMetrics (Mapping issue here?)
-        // Reputation: reviewMetrics
-        // Conversion: websiteMetrics
-        // Content: competitorContent
-
-        // My previous implementation in job (step 547) passed {currentMetrics} to ALL replacements roughly?
-        // Step 547 line 35: .replace('{currentMetrics}', JSON.stringify(latestScore || {}))
-        // But prompt templates have specific names. 
-        // Step 562 shows:
-        // Social: {socialMetrics}
-        // Reputation: {reviewMetrics}
-        //
-        // So I should replace ALL possible placeholders with the metrics object to be safe, 
-        // or the caller should map them.
-        // In the job implementation (Step 547), it was flawed! 
-        // Line 33 `RECOMMENDATION_PROMPTS[category].replace(... '{currentMetrics}' ...)`
-        // Use of `replace` only replaces the first occurrence or specific string.
-        // If the prompt uses `{socialMetrics}` instead of `{currentMetrics}`, the replacement wouldn't happen 
-        // and the prompt would contain literal `{socialMetrics}`.
-
-        // I will fix this logic here. The user said "metrics" are passed.
-        // I will replace all known placeholders with the passed metrics object.
-
         const metricsStr = JSON.stringify(context.currentMetrics || {});
-        let finalPrompt = promptTemplate
-            .replace('{brandDNA}', JSON.stringify(context.brandDNA || {}))
-            .replace('{competitorInsights}', JSON.stringify(context.competitorInsights || []))
-            .replace('{competitorContent}', JSON.stringify(context.competitorInsights || [])) // Overlap
-            .replace('{currentMetrics}', metricsStr)
-            .replace('{socialMetrics}', metricsStr)
-            .replace('{reviewMetrics}', metricsStr)
-            .replace('{websiteMetrics}', metricsStr);
+        
+        let finalPrompt = promptTemplate;
+        
+        // Helper to replace all occurrences
+        const replaceAll = (str: string, find: string, replace: string) => str.split(find).join(replace);
+
+        finalPrompt = replaceAll(finalPrompt, '{brandDNA}', JSON.stringify(context.brandDNA || {}));
+        finalPrompt = replaceAll(finalPrompt, '{competitorInsights}', JSON.stringify(context.competitorInsights || []));
+        finalPrompt = replaceAll(finalPrompt, '{competitorContent}', JSON.stringify(context.competitorInsights || []));
+        finalPrompt = replaceAll(finalPrompt, '{currentMetrics}', metricsStr);
+        finalPrompt = replaceAll(finalPrompt, '{socialMetrics}', metricsStr);
+        finalPrompt = replaceAll(finalPrompt, '{reviewMetrics}', metricsStr);
+        finalPrompt = replaceAll(finalPrompt, '{websiteMetrics}', metricsStr);
 
         const content = await this.callAI(finalPrompt);
         if (!content) throw new Error('No response from AI');
 
-        const parsed = JSON.parse(content);
-        return RecommendationsOutputSchema.parse(parsed);
+        try {
+            const parsed = JSON.parse(content);
+            return RecommendationsOutputSchema.parse(parsed);
+        } catch (e) {
+            console.error('Failed to parse AI response:', content);
+            throw e;
+        }
     }
 
     async generateVisibilityPlan(context: {

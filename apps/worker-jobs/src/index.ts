@@ -67,6 +67,20 @@ app.post('/jobs/visibility-plan', async (req, res) => {
     res.status(202).json({ message: 'Visibility plan job started', jobId });
 });
 
+import { computeBrandScoresJob } from './jobs/brand-scores.job';
+
+app.post('/jobs/brand-scores', async (req, res) => {
+    const { jobId, businessId } = req.body;
+    if (!jobId || !businessId) { // jobId optional if we want internal use? No, let's require it for consistency with job table
+         return res.status(400).json({ error: 'jobId and businessId are required' });
+    }
+
+    computeBrandScoresJob(jobId, { businessId })
+        .catch(err => console.error(`Brand scores job ${jobId} failed:`, err));
+
+    res.status(202).json({ message: 'Brand scores job started', jobId });
+});
+
 const scheduleDaily = (hour: number = 2) => {
     const now = new Date()
     const next = new Date(now)

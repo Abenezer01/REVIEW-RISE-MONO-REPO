@@ -116,7 +116,7 @@ export class RecommendationsController {
             const plan = await repositories.report.findFirst({
                 where: {
                     businessId,
-                    type: 'visibility_plan_30d',
+                    title: '30-Day Visibility Plan',
                 },
                 orderBy: { generatedAt: 'desc' },
             } as any);
