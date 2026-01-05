@@ -11,6 +11,7 @@ WORKDIR /app
 # Copy workspace configuration files
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml tsconfig.json ./
 
+
 # Copy all package.json files to understand the workspace structure
 COPY packages/@platform/*/package.json ./packages/@platform/
 COPY apps/express-seo-health/package.json ./apps/express-seo-health/
@@ -45,17 +46,20 @@ COPY apps/express-seo-health ./apps/express-seo-health
 RUN pnpm install --frozen-lockfile --offline
 
 # Build shared packages first (if they need building)
+# Generate Prisma client and build DB package
 RUN pnpm --filter "@platform/db" run db:generate
 RUN pnpm --filter "@platform/db" run build
-# Build auth explicitly to ensure it runs
+# Build auth explicitly (now that DB is built)
 RUN pnpm --filter "@platform/auth" run build
 # Verify auth build succeeded and fix structure if nested
 RUN if [ -f packages/@platform/auth/dist/auth/src/index.js ]; then \
   echo "Detected nested build structure. Patching package.json..."; \
   sed -i 's|"./dist/index.js"|"./dist/auth/src/index.js"|g' packages/@platform/auth/package.json && \
   sed -i 's|"./dist/index.d.ts"|"./dist/auth/src/index.d.ts"|g' packages/@platform/auth/package.json; \
-  fi
-
+  fi && \
+  # Verify the file exists at either the standard OR nested location
+  (test -f packages/@platform/auth/dist/index.js || test -f packages/@platform/auth/dist/auth/src/index.js) || \
+  (echo "CRITICAL: Auth build failed" && ls -R packages/@platform/auth && exit 1)
 RUN pnpm --filter "@platform/*" run build
 
 # Build the application
@@ -85,9 +89,21 @@ COPY --from=builder --chown=expressjs:expressjs /app/apps/express-seo-health ./a
 # Copy shared packages (including their node_modules and dist) to satisfy symlinks
 COPY --from=builder --chown=expressjs:expressjs /app/packages ./packages
 
+# Verify auth dist exists in Runner stage
+RUN ls -la packages/@platform/auth/dist && \
+  (test -f packages/@platform/auth/dist/index.js || test -f packages/@platform/auth/dist/auth/src/index.js) || \
+  (echo "CRITICAL: Auth dist missing in RUNNER stage" && exit 1)
+
 # Copy workspace config
 COPY --from=builder --chown=expressjs:expressjs /app/package.json ./package.json
 COPY --from=builder --chown=expressjs:expressjs /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+
+# Copy Prisma schema and migrations for auto-migration on startup
+COPY --from=builder --chown=expressjs:expressjs /app/packages/@platform/db/prisma ./packages/@platform/db/prisma
+COPY --from=builder --chown=expressjs:expressjs /app/packages/@platform/db/package.json ./packages/@platform/db/package.json
+
+# Copy entrypoint script
+COPY --chmod=755 apps/express-seo-health/docker-entrypoint.sh /docker-entrypoint.sh
 
 # Switch to non-root user
 USER expressjs
@@ -99,11 +115,8 @@ EXPOSE 3011
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3011/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
 
-# Use dumb-init to handle signals properly
-ENTRYPOINT ["dumb-init", "--"]
+# Use dumb-init and custom entrypoint for migrations
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 # Set working directory to the app folder so module resolution works as expected
 WORKDIR /app/apps/express-seo-health
-
-# Start the application using the built file in dist
-CMD ["node", "../../dist/apps/express-seo-health/src/index.js"]
