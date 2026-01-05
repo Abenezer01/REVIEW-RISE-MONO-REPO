@@ -6,8 +6,7 @@ export * from '@prisma/client';
 export * from './repositories';
 
 // Export services
-export { VisibilityComputationService, visibilityComputationService } from './services/visibility-computation.service';
-export { RankTrackingService, rankTrackingService } from './services/rank-tracking.service';
+export * from './services';
 
 // Export health check utilities
 export * from './health';
@@ -16,10 +15,16 @@ export * from './health';
 import { prisma } from './client';
 import { repositories } from './repositories';
 import { checkDatabaseHealth, logDatabaseHealth } from './health';
+import { brandScoringService, rankTrackingService, visibilityComputationService } from './services';
 
 export default {
     prisma,
     repositories,
+    services: {
+        brandScoring: brandScoringService,
+        rankTracking: rankTrackingService,
+        visibilityComputation: visibilityComputationService,
+    },
     health: {
         check: checkDatabaseHealth,
         log: logDatabaseHealth,

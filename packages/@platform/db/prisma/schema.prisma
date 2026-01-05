@@ -92,6 +92,8 @@ model Business {
   dna           BrandDNA?
   contentIdeas  ContentIdea[]
   reviews       Review[]
+  recommendations BrandRecommendation[]
+  brandScores     BrandScore[]
 
   @@index([name])
   @@index([status])
@@ -719,3 +721,77 @@ model Review {
   @@unique([platform, externalId])
   @@index([businessId])
 }
+
+// BrandingRise: AI-Generated Recommendations
+model BrandRecommendation {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @db.Uuid
+  
+  // Categorization
+  category    String   // 'search', 'local', 'social', 'reputation', 'conversion', 'content'
+  
+  // Recommendation Details
+  title       String
+  description String   @db.Text
+  why         String[] // Array of reasons/rationale
+  steps       String[] // Array of actionable steps
+  
+  // Prioritization
+  impact      String   // 'low', 'medium', 'high', 'critical'
+  effort      String   // 'low', 'medium', 'high'
+  confidence  Float    @default(0) // 0-100, AI confidence in this recommendation
+  priorityScore Float  @default(0) // Computed: (impact * confidence) / effort
+  
+  // KPI Tracking
+  kpiTarget   Json?    // { metric: 'visibility_score', target: 75, timeframe: '30d' }
+  
+  // Status & Lifecycle
+  status      String   @default("open") // 'open', 'in_progress', 'done', 'dismissed'
+  notes       String?  @db.Text // User notes
+  
+  // Metadata
+  generatedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  dismissedAt DateTime?
+  completedAt DateTime?
+  
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@index([businessId])
+  @@index([category])
+  @@index([status])
+  @@index([priorityScore])
+  @@index([generatedAt])
+}
+
+// BrandingRise: Computed Brand Scores
+model BrandScore {
+  id                    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId            String   @db.Uuid
+  
+  // Core Scores (0-100)
+  visibilityScore       Float    @default(0)
+  trustScore            Float    @default(0)
+  consistencyScore      Float    @default(0)
+  
+  // Visibility Breakdown (weighted components)
+  visibilityBreakdown   Json     // { search: 20, local: 30, social: 15, reputation: 20, consistency: 15 }
+  
+  // Trust Breakdown
+  trustBreakdown        Json     // { rating: 4.5, reviewCount: 120, responseRate: 0.85, sentiment: 0.75 }
+  
+  // Consistency Breakdown
+  consistencyBreakdown  Json     // { namingConsistency: 0.9, brandingConsistency: 0.8, messagingConsistency: 0.7 }
+  
+  // Metadata
+  computedAt            DateTime @default(now())
+  periodStart           DateTime
+  periodEnd             DateTime
+  
+  business              Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@unique([businessId, periodStart, periodEnd])
+  @@index([businessId])
+  @@index([computedAt])
+}
+
