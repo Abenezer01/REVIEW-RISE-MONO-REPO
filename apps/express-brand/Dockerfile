@@ -66,8 +66,24 @@ RUN pnpm --filter @apps/express-brand run build
 # ============================================
 FROM node:20-alpine AS runner
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Install dumb-init AND Puppeteer dependencies
+# We combine them into one layer to keep it clean.
+# Since we are root here by default (alpine), we can just run apk add.
+RUN apk add --no-cache \
+  dumb-init \
+  chromium \
+  nss \
+  freetype \
+  harfbuzz \
+  ca-certificates \
+  ttf-freefont \
+  nodejs \
+  yarn
+
+# Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+  PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
 RUN corepack enable && corepack prepare pnpm@9 --activate
 
 WORKDIR /app
@@ -98,30 +114,6 @@ EXPOSE 3007
 # Add health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3007/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
-
-# Switch to root to install dependencies
-USER root
-
-# ============================================
-# PUPPETEER CONFIGURATION
-# ============================================
-# Install Chromium and dependencies for Puppeteer
-RUN apk add --no-cache \
-  chromium \
-  nss \
-  freetype \
-  harfbuzz \
-  ca-certificates \
-  ttf-freefont \
-  nodejs \
-  yarn
-
-# Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-  PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-
-# Switch back to non-root user
-USER expressjs
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
