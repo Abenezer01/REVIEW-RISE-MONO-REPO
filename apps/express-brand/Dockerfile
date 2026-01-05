@@ -99,6 +99,9 @@ EXPOSE 3007
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3007/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
 
+# Switch to root to install dependencies
+USER root
+
 # ============================================
 # PUPPETEER CONFIGURATION
 # ============================================
@@ -116,6 +119,9 @@ RUN apk add --no-cache \
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
   PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+# Switch back to non-root user
+USER expressjs
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
