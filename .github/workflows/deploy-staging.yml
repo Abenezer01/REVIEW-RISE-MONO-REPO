@@ -188,7 +188,7 @@ jobs:
             
             # Run deployment script
             chmod +x ./scripts/deploy-staging.sh
-            ./scripts/deploy-staging.sh
+            ./scripts/deploy-staging.sh --seed
           EOF
 
       - name: Verify deployment
