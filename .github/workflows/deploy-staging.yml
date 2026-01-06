@@ -122,13 +122,7 @@ jobs:
               StrictHostKeyChecking no
               UserKnownHostsFile /dev/null
 
-      - name: Debug SSH Connection
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-        run: |
-          echo "Testing SSH connection and shell environment..."
-          ssh -tt -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "whoami && echo 'Shell: $0' && env" || echo "WARNING: Simple SSH command failed"
+
 
       - name: Deploy to VPS
         env:
@@ -136,7 +130,7 @@ jobs:
           VPS_USER: ${{ secrets.VPS_USER }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
-          ssh -tt -A -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "export GITHUB_TOKEN='${{ secrets.GHCR_PAT }}'; export GITHUB_ACTOR='${{ github.actor }}'; /bin/bash -s" << 'EOF'
+          ssh -A -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "export GITHUB_TOKEN='${{ secrets.GHCR_PAT }}'; export GITHUB_ACTOR='${{ github.actor }}'; /bin/bash -s" << 'EOF'
             set -e
             set -x # Enable debug logging
             echo "Starting remote deployment script..."
