@@ -7,7 +7,7 @@ const controller = new RecommendationsController();
 // Recommendations
 router.post('/brands/:businessId/recommendations', controller.generate.bind(controller));
 router.get('/brands/:businessId/recommendations', controller.findAll.bind(controller));
-router.patch('/recommendations/:id', controller.updateStatus.bind(controller));
+router.patch('/brands/:businessId/recommendations/:id', controller.updateStatus.bind(controller));
 
 // Brand Scores
 router.get('/brands/:businessId/scores', controller.getScores.bind(controller));

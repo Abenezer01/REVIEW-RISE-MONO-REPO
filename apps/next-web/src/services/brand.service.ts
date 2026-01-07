@@ -193,8 +193,8 @@ export const BrandService = {
     return response.data;
   },
 
-  updateRecommendationStatus: async (id: string, status: string) => {
-    const response = await apiClient.patch<{ data: BrandRecommendation }>(`/recommendations/${id}`, { status });
+  updateRecommendationStatus: async (businessId: string, id: string, status: string) => {
+    const response = await apiClient.patch<{ data: BrandRecommendation }>(`/brands/${businessId}/recommendations/${id}`, { status });
     return response.data.data;
   },
 

@@ -5,7 +5,7 @@ export const metadata = {
   description: 'Page Not Found'
 }
 
-import { Public_Sans } from 'next/font/google'
+// import { Public_Sans } from 'next/font/google'
 
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 
@@ -21,12 +21,13 @@ import { getSystemMode } from '@core/utils/serverHelpers'
 import '@/app/globals.css'
 import '@assets/iconify-icons/generated-icons.css'
 
-const publicSans = Public_Sans({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-public-sans',
-  weight: ['300', '400', '500', '600', '700', '800', '900']
-})
+// const publicSans = Public_Sans({
+//   subsets: ['latin'],
+//   display: 'swap',
+//   variable: '--font-public-sans',
+//   weight: ['300', '400', '500', '600', '700', '800', '900']
+// })
+const publicSans = { variable: 'font-sans-serif', className: 'font-sans-serif' }
 
 export default async function NotFoundLayout({
   children
