@@ -26,6 +26,11 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Review Rise Admin Portal API' });
 });
 
+import locationsRoutes from './routes/locations.routes';
+import businessesRoutes from './routes/businesses.routes';
+app.use('/locations', locationsRoutes);
+app.use('/businesses', businessesRoutes);
+
 // Error Handling
 app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err.stack);

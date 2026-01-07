@@ -89,7 +89,7 @@ export const runVisibilityJob = async () => {
   const businesses = await prisma.business.findMany({
       where: {
           deletedAt: null 
-      },
+      },  
       select: { id: true }
   });
 
