@@ -8,6 +8,7 @@ import {
   Button
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
+import { toast } from 'react-hot-toast';
 
 import { DiscoveryInput } from './components/DiscoveryInput';
 import { CompetitorList } from './components/CompetitorList';
@@ -22,8 +23,44 @@ export default function CompetitorsPage() {
     removeMutation, 
     extractMutation,
     analyzingIds,
-
+    discoverMutation,
+    discoveryStatus,
   } = useCompetitors();
+
+  const handleExportList = () => {
+    try {
+      // Convert competitors to CSV
+      const headers = ['Name', 'Domain', 'Type', 'Relevance Score', 'Source'];
+      const rows = competitors.map(c => [
+        c.name,
+        c.domain || '',
+        c.type,
+        c.relevanceScore || '',
+        c.source || ''
+      ]);
+
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+      ].join('\n');
+
+      // Create download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `competitors-${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success('Competitor list exported successfully');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Failed to export competitor list');
+    }
+  };
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -31,12 +68,17 @@ export default function CompetitorsPage() {
         <Button 
             variant="contained" 
             startIcon={<DownloadIcon />}
+            onClick={handleExportList}
+            disabled={competitors.length === 0}
             sx={{ 
                 bgcolor: '#D38E18', 
                 color: 'white', 
                 fontWeight: 600,
                 textTransform: 'none',
-                '&:hover': { bgcolor: '#B87A15' }
+                '&:hover': { bgcolor: '#B87A15' },
+                '&:disabled': {
+                  bgcolor: 'action.disabledBackground'
+                }
             }}
         >
             Export List
@@ -46,19 +88,11 @@ export default function CompetitorsPage() {
       <Box sx={{ mb: 4 }}>
         <DiscoveryInput 
           onDiscover={(keywords) => {
-             // Trigger discovery logic here (mocked for now or wired to existing)
-             // For now assuming existing addMutation works as single add, 
-             // but discovery usually implies batch finding.
-             // We'll just pass the first keyword to addMutation as a placeholder
-             // or keep the UI interaction.
-             console.log('Discovering for:', keywords);
+            discoverMutation.mutate(keywords);
           }}
-          isLoading={false} 
+          isLoading={discoveryStatus === 'discovering' || discoverMutation.isPending} 
         />
       </Box>
-
-      {/* Show Progress when discovering (mocked state for visual clone) */}
-      {/* <DiscoveryProgress /> */} 
 
       <Box sx={{ mt: 4 }}>
         {isListLoading ? (
