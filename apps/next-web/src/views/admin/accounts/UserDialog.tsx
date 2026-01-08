@@ -68,7 +68,7 @@ const LocationWatcher = ({ setLocations, setLoadingLocations }: { setLocations: 
     }
 
     fetchLocs()
-  }, [businessId, setLocations, setLoadingLocations, setFieldValue]) // Removed values.locationId from deps to avoid infinite loop
+  }, [businessId, setLocations, setLoadingLocations, setFieldValue, values.locationId])
 
   return null
 }

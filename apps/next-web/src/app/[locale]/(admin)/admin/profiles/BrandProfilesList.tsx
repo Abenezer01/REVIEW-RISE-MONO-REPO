@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 
 import {
     Box,
@@ -25,9 +25,9 @@ import {
     Button,
 } from '@mui/material';
 import { useTheme, alpha } from '@mui/material/styles';
-import { 
-    Refresh as RefreshIcon, 
-    Visibility as ViewIcon, 
+import {
+    Refresh as RefreshIcon,
+    Visibility as ViewIcon,
     Delete as DeleteIcon,
     Search as SearchIcon,
     FilterList as FilterIcon,
@@ -65,7 +65,7 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
     const [profileToDelete, setProfileToDelete] = useState<string | null>(null);
     const [reExtractingId, setReExtractingId] = useState<string | null>(null);
 
-    const fetchProfiles = async () => {
+    const fetchProfiles = useCallback(async () => {
         setIsLoading(true);
         setError(null);
 
@@ -87,7 +87,7 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [page, rowsPerPage, search, statusFilter, businessFilter]);
 
     const fetchBusinesses = async () => {
         try {
@@ -107,10 +107,9 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
 
     useEffect(() => {
         fetchProfiles();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, rowsPerPage, search, statusFilter, businessFilter, refreshTrigger]);
+    }, [fetchProfiles, refreshTrigger]);
 
-    const handleReExtract = async (id: string) => {
+    const handleReExtract = useCallback(async (id: string) => {
         setReExtractingId(id);
 
         try {
@@ -121,14 +120,14 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
         } finally {
             setReExtractingId(null);
         }
-    };
+    }, [fetchProfiles]);
 
-    const handleDeleteClick = (id: string) => {
+    const handleDeleteClick = useCallback((id: string) => {
         setProfileToDelete(id);
         setDeleteModalOpen(true);
-    };
+    }, []);
 
-    const handleDeleteConfirm = async () => {
+    const handleDeleteConfirm = useCallback(async () => {
         if (!profileToDelete) return;
 
         try {
@@ -139,9 +138,9 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
         } catch (err: any) {
             setError(err.message || 'Failed to delete brand profile.');
         }
-    };
+    }, [profileToDelete, fetchProfiles]);
 
-    const getStatusColor = (status: string) => {
+    const getStatusColor = useCallback((status: string) => {
         switch (status) {
             case 'completed': return 'success';
             case 'extracting': return 'info';
@@ -149,11 +148,11 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
             case 'failed': return 'error';
             default: return 'default';
         }
-    };
+    }, []);
 
-    const getStatusLabel = (status: string) => {
+    const getStatusLabel = useCallback((status: string) => {
         return t(`status.${status}` as any) || status;
-    };
+    }, [t]);
 
     const columns = useMemo<GridColDef[]>(() => [
         {
@@ -162,9 +161,9 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
             flex: 1.5,
             renderCell: (params) => (
                 <Stack direction="row" spacing={1.5} alignItems="center">
-                    <Box sx={{ 
-                        p: 1, 
-                        borderRadius: 2, 
+                    <Box sx={{
+                        p: 1,
+                        borderRadius: 2,
                         bgcolor: alpha(theme.palette.primary.main, 0.08),
                         color: 'primary.main',
                         display: 'flex'
@@ -194,13 +193,13 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
             renderCell: (params) => (
                 <Stack direction="row" spacing={1} alignItems="center">
                     <WebIcon fontSize="small" sx={{ color: 'text.disabled' }} />
-                    <Typography 
-                        variant="body2" 
-                        component="a" 
-                        href={params.value} 
+                    <Typography
+                        variant="body2"
+                        component="a"
+                        href={params.value}
                         target="_blank"
-                        sx={{ 
-                            color: 'primary.main', 
+                        sx={{
+                            color: 'primary.main',
                             textDecoration: 'none',
                             '&:hover': { textDecoration: 'underline' }
                         }}
@@ -243,8 +242,8 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
             renderCell: (params) => (
                 <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                     <Tooltip title={t('list.actions.view')}>
-                        <IconButton 
-                            size="small" 
+                        <IconButton
+                            size="small"
                             href={`/admin/profiles/${params.row.id}`}
                             sx={{ color: 'primary.main', '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.08) } }}
                         >
@@ -262,9 +261,9 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={t('list.actions.delete')}>
-                        <IconButton 
-                            size="small" 
-                            color="error" 
+                        <IconButton
+                            size="small"
+                            color="error"
                             onClick={() => handleDeleteClick(params.row.id)}
                             sx={{ '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.08) } }}
                         >
@@ -274,16 +273,16 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
                 </Stack>
             )
         }
-    ], [theme, t, reExtractingId]);
+    ], [theme, t, reExtractingId, getStatusLabel, handleReExtract, handleDeleteClick]);
 
     return (
         <Box sx={{ p: 0 }}>
             {/* Filter Bar */}
-            <Box sx={{ 
-                p: 3, 
-                display: 'flex', 
-                gap: 2, 
-                flexWrap: 'wrap', 
+            <Box sx={{
+                p: 3,
+                display: 'flex',
+                gap: 2,
+                flexWrap: 'wrap',
                 alignItems: 'center',
                 borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
                 bgcolor: alpha(theme.palette.background.default, 0.5)
@@ -304,7 +303,7 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
                             </InputAdornment>
                         ),
                     }}
-                    sx={{ 
+                    sx={{
                         minWidth: 300,
                         '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
@@ -359,10 +358,10 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
                 </FormControl>
 
                 <Tooltip title="Refresh Data">
-                    <IconButton 
-                        onClick={fetchProfiles} 
+                    <IconButton
+                        onClick={fetchProfiles}
                         color="primary"
-                        sx={{ 
+                        sx={{
                             bgcolor: alpha(theme.palette.primary.main, 0.08),
                             '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15) }
                         }}
@@ -417,13 +416,13 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button 
+                    <Button
                         onClick={() => setDeleteModalOpen(false)}
                         sx={{ borderRadius: 2, fontWeight: 700 }}
                     >
                         Cancel
                     </Button>
-                    <Button 
+                    <Button
                         onClick={handleDeleteConfirm}
                         variant="contained"
                         color="error"
