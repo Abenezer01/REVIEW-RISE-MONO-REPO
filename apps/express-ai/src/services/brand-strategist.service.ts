@@ -60,7 +60,7 @@ export class BrandStrategistService {
         context: { brandDNA: any, currentMetrics: any, competitorInsights: any }
     ) {
         if (!RECOMMENDATION_PROMPTS[category]) {
-            throw new Error(`Invalid category: ${category}`);
+            throw new Error(`Invalid category: ${String(category)}`);
         }
 
         const promptTemplate = RECOMMENDATION_PROMPTS[category];

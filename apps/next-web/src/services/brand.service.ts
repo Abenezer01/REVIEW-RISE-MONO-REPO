@@ -1,4 +1,5 @@
 import apiClient from '@/lib/apiClient';
+import { formatShortDate, isWithinLast24Hours } from '@/utils/dateHelper';
 
 export interface Competitor {
   id: string;
@@ -29,6 +30,25 @@ export interface Report {
   version: number;
   generatedAt: string;
   generatedBy: string;
+}
+
+export interface Job {
+  id: string;
+  title: string;
+  type: string;
+  status: 'running' | 'completed' | 'failed' | 'pending';
+  progress?: number;
+  startedAt?: string;
+  completedAt?: string;
+  failedAt?: string;
+  estimatedTime?: string;
+  duration?: string;
+  output?: string;
+  reportId?: string;
+  error?: string;
+  retryCount?: string;
+  target?: string;
+  brand?: string;
 }
 
 export const BrandService = {
@@ -212,6 +232,17 @@ export const BrandService = {
   getVisibilityPlan: async (businessId: string) => {
     const response = await apiClient.get<any>(`/brands/${businessId}/visibility-plan`);
     return response.data;
+  },
+
+  // Jobs
+  listJobs: async (businessId: string) => {
+    try {
+      const response = await apiClient.get<{ data: Job[] }>(`/brands/${businessId}/jobs`);
+      return response.data.data || [];
+    } catch (error) {
+      // If endpoint doesn't exist yet, return empty array (component will use mock data)
+      return [];
+    }
   },
 };
 
