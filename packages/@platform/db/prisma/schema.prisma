@@ -116,6 +116,7 @@ model Location {
   visibilityMetrics VisibilityMetric[]
   aiVisibilityMetrics AIVisibilityMetric[]
   reviews           Review[]
+  userBusinessRoles UserBusinessRole[]
 
   @@index([businessId])
 }
@@ -156,17 +157,20 @@ model UserBusinessRole {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId     String    @db.Uuid
   businessId String    @db.Uuid
+  locationId String?   @db.Uuid
   roleId     String    @db.Uuid
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
   business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location   Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
   role       Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, businessId, roleId])
+  @@unique([userId, businessId, roleId, locationId])
   @@index([userId])
   @@index([businessId])
+  @@index([locationId])
 }
 
 model Subscription {

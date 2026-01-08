@@ -3,15 +3,14 @@
 
 import { useMemo, useState, useCallback } from 'react'
 
-import { Box, Chip, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { Box, Chip, ToggleButton, ToggleButtonGroup, Typography, MenuItem } from '@mui/material'
 import type { GridColDef } from '@mui/x-data-grid'
 import Grid from '@mui/material/Grid'
+import CustomTextField from '@core/components/mui/TextField'
 
 import LocationCard from '@/components/admin/locations/LocationCard'
 import LocationForm from '@/components/admin/locations/LocationForm'
-import LocationListSearch from '@/components/admin/locations/LocationListSearch'
 import CustomSideDrawer from '@/components/shared/drawer/side-drawer'
-import CustomSelectBox from '@/components/shared/form/custom-select'
 import ItemsListing from '@/components/shared/listing'
 import { createLocationAdapter } from '@/components/shared/listing/adapters'
 import RowOptions from '@/components/shared/listing/row-options'
@@ -29,22 +28,23 @@ const AccountLocations = () => {
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
 
   // Define Filter Component
-  const FilterComponent = () => {
+  const FilterComponent = ({ formik }: { formik: any }) => {
     return (
-      <Grid container spacing={5}>
-        <Grid size={12}>
-          <CustomSelectBox
-            fullWidth
-            label={t('locations.form.status')}
-            name='status'
-            options={[
-              { value: 'all', label: 'All' },
-              { value: 'active', label: t('locations.form.active') },
-              { value: 'archived', label: t('locations.form.archived') }
-            ]}
-          />
-        </Grid>
-      </Grid>
+      <CustomTextField
+        select
+        fullWidth
+        size='small'
+        name='status'
+        value={formik.values.status || 'all'}
+        onChange={(e) => {
+          formik.setFieldValue('status', e.target.value)
+          setStatus(e.target.value)
+        }}
+      >
+        <MenuItem value='all'>All</MenuItem>
+        <MenuItem value='active'>{t('locations.form.active')}</MenuItem>
+        <MenuItem value='archived'>{t('locations.form.archived')}</MenuItem>
+      </CustomTextField>
     )
   }
 
@@ -179,6 +179,7 @@ const AccountLocations = () => {
 
         <ItemsListing
           title={t('locations.listTitle')}
+          subtitle='Manage your business locations and their operational status'
           items={formattedItems}
           isLoading={isLoading}
           type={viewMode === 'table' ? ITEMS_LISTING_TYPE.table.value : ITEMS_LISTING_TYPE.grid.value}
@@ -210,7 +211,7 @@ const AccountLocations = () => {
               searchKeys: ['name'],
               onSearch: (term: string) => setSearch(term),
               permission: { action: 'manage', subject: 'all' },
-              component: LocationListSearch
+              placeholder: 'Search locations'
             },
             filter: {
               enabled: true,
