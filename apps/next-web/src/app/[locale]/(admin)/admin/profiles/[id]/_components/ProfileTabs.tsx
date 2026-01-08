@@ -11,7 +11,7 @@ import {
 import type { BrandProfile } from '@/services/brand-profile.service';
 
 import BrandIdentityTab from './BrandIdentityTab';
-import ExtractionHistoryTab from './ExtractionHistoryTab';
+import AuditLogTab from './AuditLogTab';
 import ToneMessagingTab from './ToneMessagingTab';
 
 interface ProfileTabsProps {
@@ -22,6 +22,8 @@ interface ProfileTabsProps {
   onCopyAllColors: () => void;
   onUpdateProfile: (data: any) => Promise<void>;
   isUpdating?: boolean;
+  auditLogs: any[];
+  isLoadingLogs?: boolean;
 }
 
 const ProfileTabs: React.FC<ProfileTabsProps> = ({
@@ -31,7 +33,9 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   onCopy,
   onCopyAllColors,
   onUpdateProfile,
-  isUpdating
+  isUpdating,
+  auditLogs,
+  isLoadingLogs
 }) => {
   return (
     <Box>
@@ -63,7 +67,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
         >
           <Tab label="Brand Identity" icon={<PaletteIcon />} iconPosition="start" />
           <Tab label="Tone & Messaging" icon={<VoiceIcon />} iconPosition="start" />
-          <Tab label="Extraction History" icon={<HistoryIcon />} iconPosition="start" />
+          <Tab label="Activity History" icon={<HistoryIcon />} iconPosition="start" />
         </Tabs>
       </Box>
 
@@ -84,8 +88,9 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
         />
       )}
       {activeTab === 2 && (
-        <ExtractionHistoryTab
-          historyVersions={profile.extractedDataVersions || []}
+        <AuditLogTab
+          logs={auditLogs}
+          isLoading={isLoadingLogs}
         />
       )}
     </Box>

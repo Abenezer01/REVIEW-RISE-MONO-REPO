@@ -93,6 +93,16 @@ export const generateBrandTone = async (req: Request, res: Response, next: NextF
   }
 }
 
+export const getAuditLogs = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params
+    const logs = await brandProfileService.getAuditLogs(id)
+    res.status(200).json(logs)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const deleteBrandProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params

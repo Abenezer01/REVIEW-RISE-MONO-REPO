@@ -54,7 +54,9 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
   const t = useTranslations('BrandProfiles'); // Ensure you have translations or use fallback
 
   const [profile, setProfile] = useState<BrandProfile | null>(null);
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingLogs, setIsLoadingLogs] = useState(false);
   const [isReExtracting, setIsReExtracting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -69,12 +71,13 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
 
   const handleUpdateProfile = async (data: any) => {
     setIsUpdating(true);
-    
+
     try {
       const updated = await BrandProfileService.updateBrandProfile(id, data);
-      
+
       setProfile(updated);
       toast.success('Brand profile updated');
+      fetchLogs(); // Refresh history
     } catch (error) {
       console.error('Update failed:', error);
       toast.error('Failed to update brand profile');
@@ -101,11 +104,26 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
     }
   }, [id]);
 
+  const fetchLogs = useCallback(async () => {
+    setIsLoadingLogs(true);
+
+    try {
+      const logs = await BrandProfileService.getAuditLogs(id);
+      
+      setAuditLogs(logs);
+    } catch (err) {
+      console.error('Failed to load audit logs:', err);
+    } finally {
+      setIsLoadingLogs(false);
+    }
+  }, [id]);
+
   useEffect(() => {
     if (id) {
       fetchProfile();
+      fetchLogs();
     }
-  }, [id, fetchProfile]);
+  }, [id, fetchProfile, fetchLogs]);
 
   // Polling for extraction status
   useEffect(() => {
@@ -150,6 +168,7 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
       await BrandProfileService.confirmExtraction(id);
       toast.success('Extraction confirmed');
       fetchProfile(); // Full refresh to show updated relations
+      fetchLogs(); // Refresh history
     } catch (err) {
       toast.error('Failed to confirm extraction');
     } finally {
@@ -270,6 +289,8 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
             onCopyAllColors={handleCopyAllColors}
             onUpdateProfile={handleUpdateProfile}
             isUpdating={isUpdating}
+            auditLogs={auditLogs}
+            isLoadingLogs={isLoadingLogs}
           />
 
       {/* Delete Confirmation Dialog */}

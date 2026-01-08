@@ -326,7 +326,17 @@ export const reExtractBrandProfile = async (id: string) => {
     data: { status: 'extracting' }
   })
 
-    ; (async () => {
+  // Create audit log for starting re-extraction
+  await prisma.auditLog.create({
+    data: {
+      action: 'RE_EXTRACT_BRAND_PROFILE_STARTED',
+      entityId: id,
+      entityType: 'BrandProfile',
+      details: { websiteUrl: brandProfile.websiteUrl },
+    }
+  });
+
+    (async () => {
       try {
         const extractedData = await extractBrandData(brandProfile.websiteUrl)
         const dataToStore = extractedData as unknown as Prisma.JsonObject
@@ -355,11 +365,31 @@ export const reExtractBrandProfile = async (id: string) => {
             extractedData: finalData,
           }
         })
-      } catch {
+
+        // Create audit log for completing re-extraction
+        await prisma.auditLog.create({
+          data: {
+            action: 'RE_EXTRACT_BRAND_PROFILE_COMPLETED',
+            entityId: id,
+            entityType: 'BrandProfile',
+            details: { version: versionCount + 1 },
+          }
+        });
+      } catch (error) {
         await prisma.brandProfile.update({
           where: { id },
           data: { status: 'failed' } // Or revert to previous status
         })
+
+        // Log failure
+        await prisma.auditLog.create({
+          data: {
+            action: 'RE_EXTRACT_BRAND_PROFILE_FAILED',
+            entityId: id,
+            entityType: 'BrandProfile',
+            details: { error: error instanceof Error ? error.message : 'Unknown error' },
+          }
+        });
       }
     })()
 
@@ -407,7 +437,7 @@ export const confirmExtraction = async (brandProfileId: string) => {
       })
     }
 
-    return tx.brandProfile.update({
+    const updated = await tx.brandProfile.update({
       where: { id: brandProfileId },
       data: {
         status: 'completed',
@@ -426,7 +456,41 @@ export const confirmExtraction = async (brandProfileId: string) => {
         }
       }
     })
+
+    // Create audit log entry
+    await tx.auditLog.create({
+      data: {
+        action: 'CONFIRM_BRAND_PROFILE_EXTRACTION',
+        entityId: brandProfileId,
+        entityType: 'BrandProfile',
+        details: { confirmedAt: new Date() },
+      }
+    });
+
+    return updated
   })
+}
+
+export const getAuditLogs = async (id: string) => {
+  return prisma.auditLog.findMany({
+    where: {
+      entityId: id,
+      entityType: 'BrandProfile'
+    },
+    orderBy: {
+      createdAt: 'desc'
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true
+        }
+      }
+    }
+  });
 }
 
 export const getAllBrandProfiles = async (options: {

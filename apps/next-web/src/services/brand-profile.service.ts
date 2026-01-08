@@ -83,6 +83,14 @@ export const BrandProfileService = {
     return response;
   },
 
+  getAuditLogs: async (id: string): Promise<any[]> => {
+    const response = await backendClient(`/api/brands/${id}/logs`, {
+      method: 'GET',
+    });
+
+    return response;
+  },
+
   confirmExtraction: async (brandProfileId: string): Promise<{ message: string; brandProfile: BrandProfile }> => {
     const response = await backendClient(`/api/brands/${brandProfileId}/confirm-extraction`, {
       method: 'POST',
