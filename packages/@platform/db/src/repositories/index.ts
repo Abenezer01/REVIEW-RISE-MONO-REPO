@@ -29,6 +29,13 @@ export { KeywordRankRepository, keywordRankRepository } from './keyword-rank.rep
 export { VisibilityMetricRepository, visibilityMetricRepository } from './visibility-metric.repository';
 export { JobRepository, jobRepository } from './job.repository';
 export { ReviewSyncLogRepository, reviewSyncLogRepository } from './review-sync-log.repository';
+export { BrandRecommendationRepository, brandRecommendationRepository } from './brand-recommendation.repository';
+export { BrandScoreRepository, brandScoreRepository } from './brand-score.repository';
+export { ReviewRepository, reviewRepository } from './review.repository';
+export { BrandProfileRepository, brandProfileRepository } from './brand-profile.repository';
+export { BrandDNARepository, brandDNARepository } from './brand-dna.repository';
+export { CompetitorRepository, competitorRepository } from './competitor.repository';
+export { ReportRepository, reportRepository } from './report.repository';
 
 // Import repositories for the convenience object
 import { userRepository } from './user.repository';
@@ -47,6 +54,13 @@ import { keywordRankRepository } from './keyword-rank.repository';
 import { visibilityMetricRepository } from './visibility-metric.repository';
 import { jobRepository } from './job.repository';
 import { reviewSyncLogRepository } from './review-sync-log.repository';
+import { brandRecommendationRepository } from './brand-recommendation.repository';
+import { brandScoreRepository } from './brand-score.repository';
+import { reviewRepository } from './review.repository';
+import { brandProfileRepository } from './brand-profile.repository';
+import { brandDNARepository } from './brand-dna.repository';
+import { competitorRepository } from './competitor.repository';
+import { reportRepository } from './report.repository';
 
 // Re-export all repositories as a single object for convenience
 export const repositories = {
@@ -66,4 +80,11 @@ export const repositories = {
     visibilityMetric: visibilityMetricRepository,
     job: jobRepository,
     reviewSyncLog: reviewSyncLogRepository,
+    brandRecommendation: brandRecommendationRepository,
+    brandScore: brandScoreRepository,
+    review: reviewRepository,
+    brandProfile: brandProfileRepository,
+    brandDNA: brandDNARepository,
+    competitor: competitorRepository,
+    report: reportRepository,
 } as const;
