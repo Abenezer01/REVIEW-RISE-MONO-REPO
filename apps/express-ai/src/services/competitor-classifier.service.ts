@@ -67,11 +67,11 @@ export class CompetitorClassifierService {
 
             const result = JSON.parse(content);
             const validated = ClassificationSchema.safeParse({ ...result, confidence: 1 });
-            
+
             if (validated.success) {
                 return { type: validated.data.type, reason: validated.data.reasoning };
             }
-            
+
             return { type: 'UNKNOWN' };
         } catch (error) {
             console.error('Classification failed:', error);
@@ -156,11 +156,11 @@ export class CompetitorClassifierService {
         try {
             const prompt = `
             Act as a Brand Strategy Consultant. Analyze the following competitors for a business in the "${businessType}" space:
-            ${JSON.stringify(competitors.map(c => ({ 
-                name: c.name, 
-                uvp: c.uvp, 
+            ${JSON.stringify(competitors.map(c => ({
+                name: c.name,
+                uvp: c.uvp,
                 weaknesses: c.differentiators?.weaknesses || [],
-                offerings: c.serviceList?.slice(0, 5) 
+                offerings: c.serviceList?.slice(0, 5)
             })))}
 
             Generate a strategic opportunities report containing:

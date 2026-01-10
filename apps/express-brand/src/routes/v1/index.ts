@@ -7,10 +7,12 @@ import contentRoutes from './content.routes';
 import reviewRoutes from './review.routes';
 import brandProfileRoutes from './brand-profile.routes';
 
+import recommendationsRoutes from './recommendations.routes';
 import opportunitiesReportRoutes from './opportunities-report.routes';
 
 const router = Router();
 
+router.use('/', recommendationsRoutes); // these routes handle their own /brands/:id/ paths
 router.use('/brands', dashboardRoutes); // has /:id/dashboards/overview
 router.use('/brands/:id/competitors', competitorRoutes);
 router.use('/brands/:id/reports/opportunities', opportunitiesReportRoutes); // sub-resource

@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography';
 import { useTranslations } from 'next-intl';
 
 
-const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [key: string]: any }) => {
+const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number;[key: string]: any }) => {
   return <i className={icon} style={{ fontSize }} {...rest} />
 }
 
@@ -24,17 +24,18 @@ const BrandingRiseLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const { locale } = useParams();
   const t = useTranslations('dashboard');
-  
+
   // Determine active tab based on path
   const getValue = () => {
     if (pathname.includes('/visibility')) return 'visibility';
+    if (pathname.includes('/recommendations')) return 'recommendations';
     if (pathname.includes('/competitors')) return 'competitors';
     if (pathname.includes('/reports')) return 'reports';
     if (pathname.includes('/reviews')) return 'reviews';
     if (pathname.includes('/content')) return 'content';
     if (pathname.includes('/dna')) return 'dna';
-    
-return 'overview';
+
+    return 'overview';
   };
 
   const [value, setValue] = useState(getValue());
@@ -50,53 +51,53 @@ return 'overview';
       {/* Header with Title and Controls */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4, flexWrap: 'wrap', gap: 2 }}>
         <Box>
-           <Typography variant="h4" fontWeight="bold">{t('navigation.brand-rise')}</Typography>
-           <Typography variant="body1" color="text.secondary">{t('brandRise.subtitle')}</Typography>
+          <Typography variant="h4" fontWeight="bold">{t('navigation.brand-rise')}</Typography>
+          <Typography variant="body1" color="text.secondary">{t('brandRise.subtitle')}</Typography>
         </Box>
 
         {/* Controls: Company Dropdown & Date Range */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-           {/* Company Selector (Mock) */}
-           <Button 
-             variant="outlined" 
-             endIcon={<Icon icon="tabler-chevron-down" />}
-             sx={{ 
-                bgcolor: 'background.paper', 
-                color: 'text.primary',
-                borderColor: 'divider',
-                textTransform: 'none',
-                minWidth: 160,
-                justifyContent: 'space-between'
-             }}
-           >
-             Acme Corporation
-           </Button>
+          {/* Company Selector (Mock) */}
+          <Button
+            variant="outlined"
+            endIcon={<Icon icon="tabler-chevron-down" />}
+            sx={{
+              bgcolor: 'background.paper',
+              color: 'text.primary',
+              borderColor: 'divider',
+              textTransform: 'none',
+              minWidth: 160,
+              justifyContent: 'space-between'
+            }}
+          >
+            Acme Corporation
+          </Button>
 
-           {/* Date Range Toggles */}
-           <ButtonGroup variant="outlined" aria-label="date range" sx={{ bgcolor: 'background.paper' }}>
-              {['7d', '30d', '90d'].map((range) => (
-                 <Button 
-                   key={range}
-                   onClick={() => setDateRange(range)}
-                   sx={{ 
-                      textTransform: 'none',
-                      color: dateRange === range ? 'white' : 'text.secondary',
-                      bgcolor: dateRange === range ? 'primary.main' : 'transparent',
-                      borderColor: 'divider',
-                      '&:hover': {
-                         bgcolor: dateRange === range ? 'primary.dark' : 'action.hover',
-                      }
-                   }}
-                 >
-                   {range}
-                 </Button>
-              ))}
-           </ButtonGroup>
+          {/* Date Range Toggles */}
+          <ButtonGroup variant="outlined" aria-label="date range" sx={{ bgcolor: 'background.paper' }}>
+            {['7d', '30d', '90d'].map((range) => (
+              <Button
+                key={range}
+                onClick={() => setDateRange(range)}
+                sx={{
+                  textTransform: 'none',
+                  color: dateRange === range ? 'white' : 'text.secondary',
+                  bgcolor: dateRange === range ? 'primary.main' : 'transparent',
+                  borderColor: 'divider',
+                  '&:hover': {
+                    bgcolor: dateRange === range ? 'primary.dark' : 'action.hover',
+                  }
+                }}
+              >
+                {range}
+              </Button>
+            ))}
+          </ButtonGroup>
 
-           {/* User Profile Avatar (Mock) */}
-           <Avatar sx={{ bgcolor: 'primary.main', width: 40, height: 40 }}>
-              <Box sx={{ width: '100%', height: '100%' }} /> 
-           </Avatar>
+          {/* User Profile Avatar (Mock) */}
+          <Avatar sx={{ bgcolor: 'primary.main', width: 40, height: 40 }}>
+            <Box sx={{ width: '100%', height: '100%' }} />
+          </Avatar>
         </Box>
       </Box>
 
@@ -104,6 +105,7 @@ return 'overview';
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
           <TabList onChange={handleChange} aria-label="BrandingRise Navigation">
             <Tab label={t('brandRise.tabs.overview')} value="overview" />
+            <Tab label={t('brandRise.tabs.recommendations')} value="recommendations" />
             <Tab label={t('brandRise.tabs.visibility')} value="visibility" />
             <Tab label={t('brandRise.tabs.dna')} value="dna" />
             <Tab label={t('brandRise.tabs.competitors')} value="competitors" />

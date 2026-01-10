@@ -16,6 +16,11 @@ export * from './dtos/business.dto';
 export * from './dtos/keyword.dto';
 export * from './dtos/visibility.dto';
 
+// AI Schemas and Prompts
+export * from './ai/recommendation.schema';
+export * from './ai/visibility-plan.schema';
+export * from './ai/prompts/recommendations.prompts';
+
 // Re-export commonly used types from requests
 export type {
     ApiRequest,

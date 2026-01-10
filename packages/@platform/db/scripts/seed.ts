@@ -361,10 +361,11 @@ async function main() {
     console.log('🔗 Assigning users to businesses...');
     await prisma.userBusinessRole.upsert({
         where: {
-            userId_businessId_roleId: {
+            userId_businessId_roleId_locationId: {
                 userId: user1.id,
                 businessId: business1.id,
                 roleId: ownerRole.id,
+                locationId: null as any,
             },
         },
         update: {},
@@ -372,15 +373,17 @@ async function main() {
             userId: user1.id,
             businessId: business1.id,
             roleId: ownerRole.id,
+            locationId: null as any,
         },
     });
 
     await prisma.userBusinessRole.upsert({
         where: {
-            userId_businessId_roleId: {
+            userId_businessId_roleId_locationId: {
                 userId: user2.id,
                 businessId: business1.id,
                 roleId: adminRole.id,
+                locationId: null as any,
             },
         },
         update: {},
@@ -388,15 +391,17 @@ async function main() {
             userId: user2.id,
             businessId: business1.id,
             roleId: adminRole.id,
+            locationId: null as any,
         },
     });
 
     await prisma.userBusinessRole.upsert({
         where: {
-            userId_businessId_roleId: {
+            userId_businessId_roleId_locationId: {
                 userId: user3.id,
                 businessId: business2.id,
                 roleId: managerRole.id,
+                locationId: null as any,
             },
         },
         update: {},
@@ -404,6 +409,7 @@ async function main() {
             userId: user3.id,
             businessId: business2.id,
             roleId: managerRole.id,
+            locationId: null as any,
         },
     });
 

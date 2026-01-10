@@ -6,7 +6,7 @@ const router = Router();
 router.post('/classify-competitor', async (req, res) => {
     try {
         const { domain, title, snippet, businessContext } = req.body;
-        
+
         if (!domain) {
             return res.status(400).json({ error: 'Domain is required' });
         }
@@ -48,6 +48,37 @@ router.get('/provider-status', async (req, res) => {
     } catch (error: any) {
         console.error('API Error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Brand Strategist Routes
+import { brandStrategist } from '../services/brand-strategist.service';
+
+router.post('/generate-recommendations', async (req, res) => {
+    try {
+        const { category, context } = req.body;
+        if (!category || !context) {
+            return res.status(400).json({ error: 'Missing category or context' });
+        }
+        const result = await brandStrategist.generateRecommendations(category, context);
+        res.json(result);
+    } catch (error: any) {
+        console.error('Recommendation Generation Error:', error);
+        res.status(500).json({ error: error.message || 'Internal Server Error' });
+    }
+});
+
+router.post('/generate-visibility-plan', async (req, res) => {
+    try {
+        const { context } = req.body;
+        if (!context) {
+            return res.status(400).json({ error: 'Missing context' });
+        }
+        const result = await brandStrategist.generateVisibilityPlan(context);
+        res.json(result);
+    } catch (error: any) {
+        console.error('Visibility Plan Generation Error:', error);
+        res.status(500).json({ error: error.message || 'Internal Server Error' });
     }
 });
 

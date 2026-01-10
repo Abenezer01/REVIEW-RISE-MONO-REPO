@@ -32,8 +32,20 @@ interface BrandInputSectionProps {
   loading: boolean
 }
 
+import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
+import Chip from '@mui/material/Chip'
+
+// ... (icons remain the same)
+
 const BrandInputSection: React.FC<BrandInputSectionProps> = ({ onAnalyze, loading }) => {
   const [url, setUrl] = useState('')
+
+  const examples = [
+    'https://www.apple.com',
+    'https://www.nike.com',
+    'https://www.tesla.com'
+  ]
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,6 +53,11 @@ const BrandInputSection: React.FC<BrandInputSectionProps> = ({ onAnalyze, loadin
     if (url) {
       onAnalyze(url)
     }
+  }
+
+  const handleExampleClick = (exampleUrl: string) => {
+    setUrl(exampleUrl)
+    onAnalyze(exampleUrl)
   }
 
   return (
@@ -52,7 +69,7 @@ const BrandInputSection: React.FC<BrandInputSectionProps> = ({ onAnalyze, loadin
       <Divider />
       <CardContent>
         <form onSubmit={handleSubmit}>
-          <Grid container spacing={2} alignItems="flex-start">
+          <Grid container spacing={4} alignItems="flex-start">
             <Grid size={{ xs: 12, md: 9 }}>
               <TextField
                 fullWidth
@@ -71,6 +88,18 @@ const BrandInputSection: React.FC<BrandInputSectionProps> = ({ onAnalyze, loadin
                     }
                 }}
               />
+              <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                <Typography variant="caption" color="text.secondary">Try an example:</Typography>
+                {examples.map((example) => (
+                  <Chip
+                    key={example}
+                    label={example.replace('https://www.', '')}
+                    size="small"
+                    onClick={() => handleExampleClick(example)}
+                    sx={{ cursor: 'pointer' }}
+                  />
+                ))}
+              </Box>
             </Grid>
             <Grid size={{ xs: 12, md: 3 }}>
               <Button

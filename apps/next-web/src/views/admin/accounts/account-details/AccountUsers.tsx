@@ -121,6 +121,8 @@ const AccountUsers = ({
 
   return (
     <ItemsListing
+      title='Users'
+      subtitle='Manage your account users and their assigned roles'
       type={ITEMS_LISTING_TYPE.table.value}
       items={usersData.data}
       isLoading={usersLoading}

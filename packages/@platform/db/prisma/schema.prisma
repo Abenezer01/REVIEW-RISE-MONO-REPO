@@ -92,6 +92,8 @@ model Business {
   dna           BrandDNA?
   contentIdeas  ContentIdea[]
   reviews       Review[]
+  recommendations BrandRecommendation[]
+  brandScores     BrandScore[]
 
   @@index([name])
   @@index([status])
@@ -117,6 +119,7 @@ model Location {
   visibilityMetrics VisibilityMetric[]
   aiVisibilityMetrics AIVisibilityMetric[]
   reviews           Review[]
+  userBusinessRoles UserBusinessRole[]
 
   @@index([businessId])
 }
@@ -157,17 +160,20 @@ model UserBusinessRole {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId     String    @db.Uuid
   businessId String    @db.Uuid
+  locationId String?   @db.Uuid
   roleId     String    @db.Uuid
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
   business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location   Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
   role       Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, businessId, roleId])
+  @@unique([userId, businessId, roleId, locationId])
   @@index([userId])
   @@index([businessId])
+  @@index([locationId])
 }
 
 model Subscription {
@@ -202,13 +208,13 @@ model PasswordResetToken {
 
 model AuditLog {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId     String   @db.Uuid
+  userId     String?  @db.Uuid
   action     String
   entityType String
   entityId   String   @db.Uuid
   details    Json?
   createdAt  DateTime @default(now())
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([entityId])
@@ -368,9 +374,12 @@ model BrandProfile {
   id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   businessId           String                 @db.Uuid
   websiteUrl           String
+  title                String?
+  description          String?
   status               String                 @default("pending") // 'pending' | 'extracting' | 'completed' | 'failed' | 'pending_confirmation'
   currentExtractedData Json?
-  createdAt            DateTime               @default(now())
+  tone                 Json?    // { descriptors: string[], writingRules: { do: string[], dont: string[] }, taglines: string[], messagingPillars: { pillar: string, description: string, ctas: string[] }[] }
+  createdAt            DateTime @default(now())
   updatedAt            DateTime               @updatedAt
 
   business             Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
@@ -379,9 +388,21 @@ model BrandProfile {
   fonts                 BrandFont[]
   pages                 BrandPage[]
   socialLinks           BrandSocialLink[]
+  extractedDataVersions ExtractedDataVersion[]
 
   @@index([businessId])
   @@index([status])
+}
+
+model ExtractedDataVersion {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  brandProfileId String       @db.Uuid
+  versionNumber  Int
+  extractedData  Json
+  createdAt      DateTime     @default(now())
+  brandProfile   BrandProfile @relation(fields: [brandProfileId], references: [id], onDelete: Cascade)
+
+  @@index([brandProfileId])
 }
 
 model BrandAsset {
@@ -719,3 +740,77 @@ model Review {
   @@unique([platform, externalId])
   @@index([businessId])
 }
+
+// BrandingRise: AI-Generated Recommendations
+model BrandRecommendation {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @db.Uuid
+  
+  // Categorization
+  category    String   // 'search', 'local', 'social', 'reputation', 'conversion', 'content'
+  
+  // Recommendation Details
+  title       String
+  description String   @db.Text
+  why         String[] // Array of reasons/rationale
+  steps       String[] // Array of actionable steps
+  
+  // Prioritization
+  impact      String   // 'low', 'medium', 'high', 'critical'
+  effort      String   // 'low', 'medium', 'high'
+  confidence  Float    @default(0) // 0-100, AI confidence in this recommendation
+  priorityScore Float  @default(0) // Computed: (impact * confidence) / effort
+  
+  // KPI Tracking
+  kpiTarget   Json?    // { metric: 'visibility_score', target: 75, timeframe: '30d' }
+  
+  // Status & Lifecycle
+  status      String   @default("open") // 'open', 'in_progress', 'done', 'dismissed'
+  notes       String?  @db.Text // User notes
+  
+  // Metadata
+  generatedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  dismissedAt DateTime?
+  completedAt DateTime?
+  
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@index([businessId])
+  @@index([category])
+  @@index([status])
+  @@index([priorityScore])
+  @@index([generatedAt])
+}
+
+// BrandingRise: Computed Brand Scores
+model BrandScore {
+  id                    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId            String   @db.Uuid
+  
+  // Core Scores (0-100)
+  visibilityScore       Float    @default(0)
+  trustScore            Float    @default(0)
+  consistencyScore      Float    @default(0)
+  
+  // Visibility Breakdown (weighted components)
+  visibilityBreakdown   Json     // { search: 20, local: 30, social: 15, reputation: 20, consistency: 15 }
+  
+  // Trust Breakdown
+  trustBreakdown        Json     // { rating: 4.5, reviewCount: 120, responseRate: 0.85, sentiment: 0.75 }
+  
+  // Consistency Breakdown
+  consistencyBreakdown  Json     // { namingConsistency: 0.9, brandingConsistency: 0.8, messagingConsistency: 0.7 }
+  
+  // Metadata
+  computedAt            DateTime @default(now())
+  periodStart           DateTime
+  periodEnd             DateTime
+  
+  business              Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@unique([businessId, periodStart, periodEnd])
+  @@index([businessId])
+  @@index([computedAt])
+}
+
