@@ -48,7 +48,7 @@ const AIVisibilityDashboard = () => {
 
         console.error('Validation API Error:', errorData)
         const message = errorData.message || 'Validation failed'
-        
+
         setErrorMessage(message)
         throw new Error(message)
       }
@@ -88,7 +88,7 @@ const AIVisibilityDashboard = () => {
 
       // If validation passes, proceed with AI analysis
       setLoadingMessage('Analyzing AI visibility and generating insights...')
-      
+
       const response = await fetch('/api/ai-visibility/analyze', {
             method: 'POST',
             headers: {
@@ -102,7 +102,7 @@ const AIVisibilityDashboard = () => {
 
             console.error('Analysis API Error:', errorData)
             const message = errorData.message || 'Analysis failed'
-            
+
             setErrorMessage(message)
             throw new Error(message)
         }
@@ -110,7 +110,31 @@ const AIVisibilityDashboard = () => {
         const data = await response.json()
 
         if (data.success && data.data) {
-            setMetrics(data.data.metrics)
+            // Calculate Technical Readiness Score from validation results
+            let technicalScore = 0
+
+            if (validationResults) {
+                const checks = [
+                    validationResults.urlAccessibility.isPubliclyAccessible,
+                    validationResults.urlAccessibility.noLoginWall,
+                    validationResults.urlAccessibility.noIpRestriction,
+                    validationResults.urlAccessibility.noAggressiveBotBlocking,
+                    validationResults.robotsTxt.allowsAIBots,
+                    validationResults.seoPractices.properHtml,
+                    validationResults.seoPractices.semanticTags,
+                    validationResults.seoPractices.sitemapXml,
+                    validationResults.seoPractices.cleanUrls
+                ]
+
+                const passed = checks.filter(Boolean).length
+
+                technicalScore = Math.round((passed / checks.length) * 100)
+            }
+
+            setMetrics({
+                ...data.data.metrics,
+                technicalReadiness: technicalScore
+            })
             setPlatformData(data.data.platformData)
             setTips(data.data.tips)
             setAnalyzed(true)

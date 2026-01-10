@@ -119,6 +119,7 @@ model Location {
   visibilityMetrics VisibilityMetric[]
   aiVisibilityMetrics AIVisibilityMetric[]
   reviews           Review[]
+  userBusinessRoles UserBusinessRole[]
 
   @@index([businessId])
 }
@@ -159,17 +160,20 @@ model UserBusinessRole {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId     String    @db.Uuid
   businessId String    @db.Uuid
+  locationId String?   @db.Uuid
   roleId     String    @db.Uuid
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
   business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location   Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
   role       Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, businessId, roleId])
+  @@unique([userId, businessId, roleId, locationId])
   @@index([userId])
   @@index([businessId])
+  @@index([locationId])
 }
 
 model Subscription {
@@ -204,13 +208,13 @@ model PasswordResetToken {
 
 model AuditLog {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId     String   @db.Uuid
+  userId     String?  @db.Uuid
   action     String
   entityType String
   entityId   String   @db.Uuid
   details    Json?
   createdAt  DateTime @default(now())
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([entityId])
@@ -370,9 +374,12 @@ model BrandProfile {
   id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   businessId           String                 @db.Uuid
   websiteUrl           String
+  title                String?
+  description          String?
   status               String                 @default("pending") // 'pending' | 'extracting' | 'completed' | 'failed' | 'pending_confirmation'
   currentExtractedData Json?
-  createdAt            DateTime               @default(now())
+  tone                 Json?    // { descriptors: string[], writingRules: { do: string[], dont: string[] }, taglines: string[], messagingPillars: { pillar: string, description: string, ctas: string[] }[] }
+  createdAt            DateTime @default(now())
   updatedAt            DateTime               @updatedAt
 
   business             Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
@@ -381,9 +388,21 @@ model BrandProfile {
   fonts                 BrandFont[]
   pages                 BrandPage[]
   socialLinks           BrandSocialLink[]
+  extractedDataVersions ExtractedDataVersion[]
 
   @@index([businessId])
   @@index([status])
+}
+
+model ExtractedDataVersion {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  brandProfileId String       @db.Uuid
+  versionNumber  Int
+  extractedData  Json
+  createdAt      DateTime     @default(now())
+  brandProfile   BrandProfile @relation(fields: [brandProfileId], references: [id], onDelete: Cascade)
+
+  @@index([brandProfileId])
 }
 
 model BrandAsset {

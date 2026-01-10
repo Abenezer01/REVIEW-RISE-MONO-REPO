@@ -37,9 +37,6 @@ export class AIVisibilityController {
       // 1. Extract Brand Info
       const { brandName, domain } = await aiVisibilityService.extractBrandInfo(url);
 
-      // 2. Generate Prompts
-      const prompts = aiVisibilityService.generatePrompts(brandName);
-
       // 3. Find Business Context
       let business = await prisma.business.findFirst({
         where: {
@@ -75,7 +72,12 @@ export class AIVisibilityController {
         return;
       }
 
-      // 4. Run Analysis (Simulated Parallel Execution)
+      // 4. Generate Prompts
+      // Use business description as industry context if available (first 50 chars)
+      const industryContext = business.description ? business.description.substring(0, 50) : 'General';
+      const prompts = aiVisibilityService.generatePrompts(brandName, industryContext);
+
+      // 5. Run Analysis (Simulated Parallel Execution)
       const platforms = ['ChatGPT', 'Gemini', 'Claude', 'Perplexity', 'Bing Copilot'];
       const analysisResults: PlatformData[] = [];
       let totalMentions = 0;

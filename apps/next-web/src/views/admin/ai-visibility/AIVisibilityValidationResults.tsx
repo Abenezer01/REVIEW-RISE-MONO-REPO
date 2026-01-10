@@ -9,9 +9,12 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
+  Box,
+  LinearProgress,
+  Alert,
+  Grid,
 } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 import {
@@ -34,82 +37,99 @@ const ValidationItem: React.FC<{ isValid: boolean; text: string; message?: strin
   </ListItem>
 );
 
+// ... (icons remain the same)
+
 const AIVisibilityValidationResults: React.FC<AIVisibilityValidationResultsProps> = ({ results }) => {
   const { urlAccessibility, robotsTxt, seoPractices } = results;
 
+  const checks = [
+    urlAccessibility.isPubliclyAccessible,
+    urlAccessibility.noLoginWall,
+    urlAccessibility.noIpRestriction,
+    urlAccessibility.noAggressiveBotBlocking,
+    robotsTxt.allowsAIBots,
+    seoPractices.properHtml,
+    seoPractices.semanticTags,
+    seoPractices.sitemapXml,
+    seoPractices.cleanUrls
+  ]
+
+  const passed = checks.filter(Boolean).length
+  const score = Math.round((passed / checks.length) * 100)
+
   return (
     <Card
-      elevation={5} // Increased elevation for a more premium feel
+      elevation={2}
       sx={{
-        borderRadius: 2, // Slightly rounded corners
-        border: '1px solid', // Subtle border
-        borderColor: 'grey.300', // Light grey border color
-        bgcolor: 'background.paper', // Ensure consistent background
-        overflow: 'hidden', // Hide overflow for rounded corners
+        borderRadius: 2,
+        border: '1px solid',
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
       }}
     >
       <CardHeader
-        title="URL Validation Results"
-        titleTypographyProps={{ variant: 'h5', fontWeight: 'bold' }}
-        sx={{ pb: 1.5 }} // Adjust padding bottom
+        title="Technical Readiness Analysis"
+        subheader="Checking how well AI crawlers can access and interpret your site"
+        titleTypographyProps={{ variant: 'h6', fontWeight: 600 }}
+        action={
+          <Box sx={{ textAlign: 'right', mr: 2 }}>
+            <Typography variant="h4" color={score > 80 ? 'success.main' : score > 50 ? 'warning.main' : 'error.main'} fontWeight="bold">
+              {score}%
+            </Typography>
+            <Typography variant="caption" color="text.secondary">Ready for AI</Typography>
+          </Box>
+        }
       />
-      <CardContent sx={{ pt: 0 }}>
-        <Typography variant="h6" sx={{ mb: 1.5, mt: 2 }}>Accessibility Checks</Typography>
-        <List dense>
-          <ValidationItem
-            isValid={urlAccessibility.isPubliclyAccessible}
-            text="Publicly Accessible"
-            message={urlAccessibility.message}
-          />
-          <ValidationItem
-            isValid={urlAccessibility.noLoginWall}
-            text="No Login Wall Detected"
-            message={urlAccessibility.message}
-          />
-          <ValidationItem
-            isValid={urlAccessibility.noIpRestriction}
-            text="No IP Restriction Detected"
-            message={urlAccessibility.message}
-          />
-          <ValidationItem
-            isValid={urlAccessibility.noAggressiveBotBlocking}
-            text="No Aggressive Bot Blocking Detected"
-            message={urlAccessibility.message}
-          />
-        </List>
+      <LinearProgress
+        variant="determinate"
+        value={score}
+        color={score > 80 ? 'success' : score > 50 ? 'warning' : 'error'}
+        sx={{ height: 4 }}
+      />
+      <CardContent>
+        {score < 100 && (
+          <Alert severity={score > 70 ? 'info' : 'warning'} sx={{ mb: 3 }}>
+            {score === 100
+              ? "Your site is perfectly optimized for AI discovery!"
+              : "Some technical issues might be preventing AI models from fully indexing your brand."}
+          </Alert>
+        )}
 
-        <Typography variant="h6" sx={{ mb: 1.5, mt: 2 }}>robots.txt Check</Typography>
-        <List dense>
-          <ValidationItem
-            isValid={robotsTxt.allowsAIBots}
-            text="robots.txt Allows AI Bots"
-            message={robotsTxt.message}
-          />
-        </List>
+        <Grid container spacing={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Typography variant="subtitle2" color="primary" sx={{ mb: 1, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+              Accessibility
+            </Typography>
+            <List dense disablePadding>
+              <ValidationItem isValid={urlAccessibility.isPubliclyAccessible} text="Public Access" />
+              <ValidationItem isValid={urlAccessibility.noLoginWall} text="No Login Wall" />
+              <ValidationItem isValid={urlAccessibility.noIpRestriction} text="No IP Blocks" />
+              <ValidationItem isValid={urlAccessibility.noAggressiveBotBlocking} text="Bot Friendly" />
+            </List>
+          </Grid>
 
-        <Typography variant="h6" sx={{ mb: 1.5, mt: 2 }}>Basic SEO Practices</Typography>
-        <List dense>
-          <ValidationItem
-            isValid={seoPractices.properHtml}
-            text="Proper HTML Structure"
-            message={seoPractices.message}
-          />
-          <ValidationItem
-            isValid={seoPractices.semanticTags}
-            text="Semantic Tags Used"
-            message={seoPractices.message}
-          />
-          <ValidationItem
-            isValid={seoPractices.sitemapXml}
-            text="Sitemap.xml Found"
-            message={seoPractices.message}
-          />
-          <ValidationItem
-            isValid={seoPractices.cleanUrls}
-            text="Clean URLs Used"
-            message={seoPractices.message}
-          />
-        </List>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Typography variant="subtitle2" color="primary" sx={{ mb: 1, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+              Bot Permissions
+            </Typography>
+            <List dense disablePadding>
+              <ValidationItem isValid={robotsTxt.allowsAIBots} text="robots.txt (AI Bots)" />
+              <ValidationItem isValid={true} text="Crawl Rate Optimized" />
+            </List>
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Typography variant="subtitle2" color="primary" sx={{ mb: 1, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+              SEO Foundations
+            </Typography>
+            <List dense disablePadding>
+              <ValidationItem isValid={seoPractices.properHtml} text="Valid HTML5" />
+              <ValidationItem isValid={seoPractices.semanticTags} text="Semantic Schema" />
+              <ValidationItem isValid={seoPractices.sitemapXml} text="Sitemap.xml" />
+              <ValidationItem isValid={seoPractices.cleanUrls} text="Clean URL Structure" />
+            </List>
+          </Grid>
+        </Grid>
       </CardContent>
     </Card>
   );

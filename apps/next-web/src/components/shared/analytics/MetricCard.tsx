@@ -11,7 +11,7 @@ import { useTheme, alpha } from '@mui/material/styles';
 export type TrendDirection = 'up' | 'down' | 'neutral';
 
 export interface MetricCardProps {
-  title: string;
+  title: React.ReactNode;
   value: string | number;
   icon?: React.ReactNode;
   trend?: {
@@ -149,7 +149,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
       </Box>
 
       <Box>
-        <Typography variant="body2" color="text.secondary" fontWeight={500} sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
+        <Typography variant="body2" component="div" color="text.secondary" fontWeight={500} sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
           {title}
         </Typography>
         <Typography variant="h4" fontWeight={700} color="text.primary" sx={{ my: 0.5 }}>

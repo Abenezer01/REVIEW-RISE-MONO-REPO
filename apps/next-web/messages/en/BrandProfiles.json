@@ -1,6 +1,48 @@
 {
+  "title": "Brand Profiles",
+  "description": "Manage and extract visual identities from brand websites.",
+  "tabs": {
+    "allProfiles": "All Profiles",
+    "addNew": "Add New"
+  },
+  "list": {
+    "searchLabel": "Search by URL",
+    "businessFilterLabel": "Filter by Business",
+    "statusFilterLabel": "Filter by Status",
+    "allBusinesses": "All Businesses",
+    "allStatuses": "All Statuses",
+    "noProfiles": "No brand profiles found",
+    "deleteConfirmTitle": "Confirm Delete",
+    "deleteConfirm": "Are you sure you want to delete this brand profile? This action cannot be undone.",
+    "columns": {
+      "title": "Brand Title",
+      "business": "Business",
+      "websiteUrl": "Website URL",
+      "status": "Status",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "actions": {
+      "view": "View Details",
+      "reExtract": "Re-extract",
+      "delete": "Delete"
+    }
+  },
+  "status": {
+    "pending": "Pending",
+    "extracting": "Extracting",
+    "pending_confirmation": "Pending Confirmation",
+    "completed": "Completed",
+    "failed": "Failed"
+  },
   "wizard": {
     "title": "Website Connect Wizard",
+    "steps": {
+      "input": "Connect Website",
+      "extracting": "Extracting Brand",
+      "review": "Review Identity",
+      "done": "Success"
+    },
     "step1": {
       "title": "Enter Website URL",
       "urlInputLabel": "Website URL",
