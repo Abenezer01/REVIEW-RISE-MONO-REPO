@@ -31,6 +31,7 @@ export default function CompetitorsPage() {
     try {
       // Convert competitors to CSV
       const headers = ['Name', 'Domain', 'Type', 'Relevance Score', 'Source'];
+
       const rows = competitors.map(c => [
         c.name,
         c.domain || '',
@@ -48,6 +49,7 @@ export default function CompetitorsPage() {
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
+
       link.href = url;
       link.setAttribute('download', `competitors-${new Date().toISOString().split('T')[0]}.csv`);
       document.body.appendChild(link);

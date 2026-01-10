@@ -31,7 +31,7 @@ const TableListing = memo(<T,>({ columns, items, pagination, onPagination, isLoa
         pageSize: pagination.pageSize || 10
       });
     }
-  }, [pagination?.page, pagination?.pageSize]);
+  }, [pagination]);
 
   const handlePaginationModelChange = (newPaginationModel: GridPaginationModel) => {
     setPaginationModel(newPaginationModel); // Update model unconditionally

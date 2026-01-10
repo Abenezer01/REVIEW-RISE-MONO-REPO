@@ -273,7 +273,7 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
                 </Stack>
             )
         }
-    ], [theme, t, reExtractingId, getStatusLabel, handleReExtract, handleDeleteClick]);
+    ], [theme, t, reExtractingId, getStatusLabel, handleReExtract, handleDeleteClick, getStatusColor]);
 
     return (
         <Box sx={{ p: 0 }}>

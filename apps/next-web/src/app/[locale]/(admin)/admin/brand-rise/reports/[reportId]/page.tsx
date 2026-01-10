@@ -145,7 +145,9 @@ return reports.find((r: any) => r.id === reportId);
               tags: ['Strategy']
           };
       }
-      return {
+
+      
+return {
           id: i,
           title: gap.title || 'Market Gap',
           description: gap.description || 'Market opportunity identified.',
@@ -163,7 +165,9 @@ return reports.find((r: any) => r.id === reportId);
               icon: i === 0 ? <LightbulbIcon fontSize="large" /> : i === 1 ? <TrendingUpIcon fontSize="large" /> : <MapIcon fontSize="large" />
           };
       }
-      return {
+
+      
+return {
           id: i,
           title: strat.title || 'Strategy',
           description: strat.description || 'Strategic move to capture market share.',
