@@ -14,10 +14,11 @@ export async function assignRoleToUser(userId: string, businessId: string, roleN
   // Create UserBusinessRole
   return prisma.userBusinessRole.upsert({
     where: {
-      userId_businessId_roleId: {
+      userId_businessId_roleId_locationId: {
         userId,
         businessId,
         roleId: role.id,
+        locationId: null as any,
       },
     },
     update: {},
@@ -25,6 +26,7 @@ export async function assignRoleToUser(userId: string, businessId: string, roleN
       userId,
       businessId,
       roleId: role.id,
+      locationId: null as any,
     },
   });
 }

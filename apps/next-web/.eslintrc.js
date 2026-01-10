@@ -99,7 +99,8 @@ module.exports = {
     'import/resolver': {
       node: {},
       typescript: {
-        project: './tsconfig.lint.json'
+        alwaysTryTypes: true,
+        project: './tsconfig.json'
       }
     }
   },

@@ -13,5 +13,8 @@
   "scripts": {
     "build": "tsc",
     "test": "exit 0"
+  },
+  "dependencies": {
+    "zod": "^4.3.5"
   }
 }

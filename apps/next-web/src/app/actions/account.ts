@@ -38,6 +38,12 @@ export async function getAccounts(params: any) {
             include: {
               role: true
             }
+          },
+          userBusinessRoles: {
+            include: {
+              business: true,
+              location: true
+            }
           }
         },
         orderBy: { createdAt: 'desc' }
@@ -51,6 +57,7 @@ export async function getAccounts(params: any) {
       email: u.email,
       image: u.image,
       role: u.userRoles[0]?.role?.name || 'User',
+      userBusinessRoles: u.userBusinessRoles,
       createdAt: u.createdAt,
       status: 'active'
     }))
@@ -66,7 +73,7 @@ export async function getAccounts(params: any) {
     }
   } catch (error: any) {
     console.error('getAccounts error:', error)
-    
+
     return { data: [], meta: { total: 0, page: 1, limit: 10, pages: 0 }, error: error.message }
   }
 }
@@ -83,7 +90,8 @@ export async function getAccount(id: string) {
         },
         userBusinessRoles: {
           include: {
-            business: true
+            business: true,
+            location: true
           }
         }
       }
@@ -100,7 +108,7 @@ export async function getAccount(id: string) {
     }
   } catch (error: any) {
     console.error('getAccount error:', error)
-    
+
     return { error: error.message }
   }
 }
@@ -116,14 +124,14 @@ export async function getCurrentAccount() {
     return getAccount(user.id)
   } catch (error: any) {
     console.error('getCurrentAccount error:', error)
-    
+
     return { error: error.message }
   }
 }
 
 export async function createAccount(data: any) {
   try {
-    const { name, email, password, role } = data
+    const { name, email, password, role, businessId, locationId } = data
 
     const existingUser = await prisma.user.findUnique({
       where: { email }
@@ -166,6 +174,17 @@ export async function createAccount(data: any) {
           })
       }
 
+      if (businessId) {
+        await tx.userBusinessRole.create({
+          data: {
+            userId: user.id,
+            businessId,
+            locationId,
+            roleId: userRole.id
+          }
+        })
+      }
+
       return user
     })
 
@@ -174,17 +193,17 @@ export async function createAccount(data: any) {
     return { success: true, data: result }
   } catch (error: any) {
     console.error('createAccount error:', error)
-    
+
     return { success: false, message: error.message }
   }
 }
 
 export async function updateAccount(id: string, data: any) {
   try {
-    const { password, role, ...userData } = data
-    
+    const { password, role, businessId, locationId, ...userData } = data
+
     const updateData: any = { ...userData }
-    
+
     if (password) {
         updateData.password = await bcrypt.hash(password, 10)
     }
@@ -194,10 +213,10 @@ export async function updateAccount(id: string, data: any) {
             where: { id },
             data: updateData
         })
-        
+
         if (role) {
             const newRole = await tx.role.findUnique({ where: { name: role } })
-            
+
             if (newRole) {
                 await tx.userRole.deleteMany({ where: { userId: id } })
                 await tx.userRole.create({
@@ -206,9 +225,21 @@ export async function updateAccount(id: string, data: any) {
                         roleId: newRole.id
                     }
                 })
+
+                if (businessId) {
+                  await tx.userBusinessRole.deleteMany({ where: { userId: id, businessId } })
+                  await tx.userBusinessRole.create({
+                    data: {
+                      userId: id,
+                      businessId,
+                      locationId,
+                      roleId: newRole.id
+                    }
+                  })
+                }
             }
         }
-        
+
         return user
     })
 
@@ -235,6 +266,21 @@ export async function deleteAccount(id: string) {
   }
 }
 
+export async function getBusinesses() {
+  try {
+    const businesses = await prisma.business.findMany({
+      where: { deletedAt: null },
+      orderBy: { name: 'asc' }
+    })
+
+    return businesses
+  } catch (error: any) {
+    console.error('getBusinesses error:', error)
+
+    return []
+  }
+}
+
 export async function getRoles() {
   try {
     const roles = await prisma.role.findMany()
@@ -242,7 +288,27 @@ export async function getRoles() {
     return roles
   } catch (error: any) {
     console.error('getRoles error:', error)
-    
+
+    return []
+  }
+}
+
+export async function getLocations(businessId: string) {
+  try {
+    const locations = await prisma.location.findMany({
+      where: {
+        businessId,
+        status: 'active'
+      },
+      orderBy: {
+        name: 'asc'
+      }
+    })
+
+    return locations
+  } catch (error: any) {
+    console.error('getLocations error:', error)
+
     return []
   }
 }

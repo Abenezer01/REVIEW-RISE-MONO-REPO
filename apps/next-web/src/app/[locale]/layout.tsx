@@ -2,7 +2,7 @@
 import { notFound } from 'next/navigation'
 
 // Next Imports
-import { Public_Sans } from 'next/font/google'
+// import { Public_Sans } from 'next/font/google'
 
 // MUI Imports
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
@@ -42,12 +42,13 @@ type Props = {
 
 
 // Font Configuration
-const publicSans = Public_Sans({
-    subsets: ['latin'],
-    display: 'swap',
-    variable: '--font-public-sans',
-    weight: ['300', '400', '500', '600', '700', '800', '900']
-})
+// const publicSans = Public_Sans({
+//     subsets: ['latin'],
+//     display: 'swap',
+//     variable: '--font-public-sans',
+//     weight: ['300', '400', '500', '600', '700', '800', '900']
+// })
+const publicSans = { variable: 'font-sans-serif', className: 'font-sans-serif' }
 
 const LocaleLayout = async (props: Props) => {
     const { children, params } = props

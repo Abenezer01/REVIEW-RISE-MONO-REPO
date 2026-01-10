@@ -139,6 +139,12 @@ importers:
       '@google/generative-ai':
         specifier: ^0.24.1
         version: 0.24.1
+      '@platform/contracts':
+        specifier: workspace:*
+        version: link:../../packages/@platform/contracts
+      '@platform/db':
+        specifier: workspace:*
+        version: link:../../packages/@platform/db
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -735,6 +741,9 @@ importers:
       next-intl:
         specifier: ^4.6.1
         version: 4.6.1(next@16.0.3(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
+      pg:
+        specifier: ^8.11.3
+        version: 8.16.3
       react:
         specifier: 19.2.0
         version: 19.2.0
@@ -923,12 +932,18 @@ importers:
 
   apps/worker-jobs:
     dependencies:
+      '@google/generative-ai':
+        specifier: ^0.24.1
+        version: 0.24.1
       '@platform/contracts':
         specifier: workspace:*
         version: link:../../packages/@platform/contracts
       '@platform/db':
         specifier: workspace:*
         version: link:../../packages/@platform/db
+      axios:
+        specifier: ^1.6.0
+        version: 1.13.2
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -996,6 +1011,10 @@ importers:
         version: 5.9.3
 
   packages/@platform/contracts:
+    dependencies:
+      zod:
+        specifier: ^4.3.5
+        version: 4.3.5
     devDependencies:
       typescript:
         specifier: ^5.3.3
@@ -6389,6 +6408,9 @@ packages:
 
   zod@4.3.4:
     resolution: {integrity: sha512-Zw/uYiiyF6pUT1qmKbZziChgNPRu+ZRneAsMUDU6IwmXdWt5JwcUfy2bvLOCUtz5UniaN/Zx5aFttZYbYc7O/A==}
+
+  zod@4.3.5:
+    resolution: {integrity: sha512-k7Nwx6vuWx1IJ9Bjuf4Zt1PEllcwe7cls3VNzm4CQ1/hgtFUK2bRNG3rvnpPUhFjmqJKAKtjV576KnUkHocg/g==}
 
   zustand@5.0.9:
     resolution: {integrity: sha512-ALBtUj0AfjJt3uNRQoL1tL2tMvj6Gp/6e39dnfT6uzpelGru8v1tPOGBzayOWbPJvujM8JojDk3E1LxeFisBNg==}
@@ -12362,6 +12384,8 @@ snapshots:
   zod@4.2.1: {}
 
   zod@4.3.4: {}
+
+  zod@4.3.5: {}
 
   zustand@5.0.9(@types/react@19.2.6)(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)):
     optionalDependencies:

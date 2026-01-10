@@ -28,9 +28,9 @@ app.post('/jobs/compute-visibility', async (req, res) => {
     // Run async, don't wait for completion? Or wait?
     // For cron triggers (HTTP), usually better to wait if < timeout, or return 202 Accepted.
     // Computation might take long. Return 202.
-    
+
     runVisibilityJob().catch(err => console.error('Job failed:', err));
-    
+
     res.status(202).json({ message: 'Visibility computation job started' });
 });
 
@@ -40,6 +40,47 @@ app.post('/jobs/rank-tracking/daily', async (req, res) => {
         .catch(err => console.error('Rank tracking job failed:', err))
     res.status(202).json({ message: 'Rank tracking job started' })
 })
+
+import { brandRecommendationsJob } from './jobs/brand-recommendations.job';
+import { visibilityPlanJob } from './jobs/visibility-plan.job';
+
+app.post('/jobs/brand-recommendations', async (req, res) => {
+    const { jobId, businessId } = req.body;
+    if (!jobId || !businessId) {
+        return res.status(400).json({ error: 'jobId and businessId are required' });
+    }
+
+    brandRecommendationsJob(jobId, { businessId })
+        .catch(err => console.error(`Brand recommendations job ${jobId} failed:`, err));
+
+    res.status(202).json({ message: 'Brand recommendations job started', jobId });
+});
+
+app.post('/jobs/visibility-plan', async (req, res) => {
+    const { jobId, businessId } = req.body;
+    if (!jobId || !businessId) {
+        return res.status(400).json({ error: 'jobId and businessId are required' });
+    }
+
+    visibilityPlanJob(jobId, { businessId })
+        .catch(err => console.error(`Visibility plan job ${jobId} failed:`, err));
+
+    res.status(202).json({ message: 'Visibility plan job started', jobId });
+});
+
+import { computeBrandScoresJob } from './jobs/brand-scores.job';
+
+app.post('/jobs/brand-scores', async (req, res) => {
+    const { jobId, businessId } = req.body;
+    if (!jobId || !businessId) { // jobId optional if we want internal use? No, let's require it for consistency with job table
+         return res.status(400).json({ error: 'jobId and businessId are required' });
+    }
+
+    computeBrandScoresJob(jobId, { businessId })
+        .catch(err => console.error(`Brand scores job ${jobId} failed:`, err));
+
+    res.status(202).json({ message: 'Brand scores job started', jobId });
+});
 
 const scheduleDaily = (hour: number = 2) => {
     const now = new Date()

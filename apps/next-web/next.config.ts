@@ -46,6 +46,19 @@ const nextConfig: NextConfig = {
     ]
   },
 
+  async rewrites() {
+    return [
+      {
+        source: '/api/brands',
+        destination: 'http://localhost:3004/api/v1/brand-profiles',
+      },
+      {
+        source: '/api/brands/:path*',
+        destination: 'http://localhost:3004/api/v1/brand-profiles/:path*',
+      },
+    ]
+  },
+
   transpilePackages: ['@platform/utils', '@platform/contracts', '@platform/i18n', '@platform/db'],
   serverExternalPackages: ['@prisma/client', '@prisma/client-runtime-utils']
 }

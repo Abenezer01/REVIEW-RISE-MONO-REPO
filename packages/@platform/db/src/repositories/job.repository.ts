@@ -165,6 +165,16 @@ export class JobRepository extends BaseRepository<
       },
     });
   }
+
+  /**
+   * Update job status and optional fields
+   */
+  async updateStatus(id: string, status: string, data?: Partial<Prisma.JobUpdateInput>) {
+    return this.update(id, {
+      status,
+      ...data
+    });
+  }
 }
 
 export const jobRepository = new JobRepository();

@@ -79,14 +79,31 @@ export class AIVisibilityService {
   /**
    * Generate relevant prompts for the brand
    */
-  generatePrompts(brandName: string, _industry: string = 'General'): string[] {
-    return [
+  generatePrompts(brandName: string, industry: string = 'General'): string[] {
+    const prompts = [
+      // 1. Core Identification (Informational)
       `What is ${brandName}?`,
-      `Is ${brandName} legitimate?`,
-      `Top alternatives to ${brandName}`,
-      `Review of ${brandName} services`,
-      `How does ${brandName} compare to competitors?`
+      
+      // 2. Trust & Legitimacy (Reputation)
+      `Is ${brandName} a legitimate and reliable company?`,
+      
+      // 3. Competitive Landscape (Commercial)
+      `What are the top 3 alternatives to ${brandName} for ${industry}?`,
+      
+      // 4. Comparative Analysis (Decision Making)
+      `How does ${brandName} compare to other leading ${industry} providers?`,
+      
+      // 5. Value Proposition (Specific)
+      `What are the main benefits and drawbacks of using ${brandName}?`,
+      
+      // 6. Recommendation Intent (Transactional)
+      `I'm looking for a solution in ${industry}. Should I consider ${brandName}?`,
+      
+      // 7. Authority Check (Social Proof)
+      `What do industry experts say about ${brandName}?`
     ];
+
+    return prompts;
   }
 
   /**

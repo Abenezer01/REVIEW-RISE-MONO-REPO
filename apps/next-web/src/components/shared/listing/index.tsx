@@ -35,7 +35,7 @@ const ItemsListing = <T extends object>({
   fetchDataFunction,
   ItemViewComponent,
   title,
-
+  subtitle,
   isLoading = false,
   type = ITEMS_LISTING_TYPE.grid.value,
   onPaginationChange,
@@ -59,6 +59,7 @@ const ItemsListing = <T extends object>({
   fetchDataFunction?: any;
   ItemViewComponent?: React.ComponentType<{ data: T }>;
   title?: string;
+  subtitle?: string;
   baseUrl?: string;
   isLoading?: boolean;
   type?: string;
@@ -199,6 +200,7 @@ const ItemsListing = <T extends object>({
           hasSearch={hasSearch}
           searchKeys={searchKeys}
           title={title || ''}
+          subtitle={subtitle}
           features={features}
         />
       )}
