@@ -357,7 +357,7 @@ return {
                         Top Market Gaps & Opportunities
                     </Typography>
                     <Stack spacing={3}>
-                        {gaps.slice(0, 5).map((gap, i) => ( // limit to 5
+                        {gaps.slice(0, 5).map((gap: any, i: number) => ( // limit to 5
                             <Paper key={i} elevation={0} sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.5), borderRadius: 2, border: 1, borderColor: 'divider' }}>
                                 <Grid container alignItems="center" spacing={2}>
                                     <Grid size={{ xs: 'auto' }}>
@@ -385,7 +385,7 @@ return {
                                             {gap.description}
                                         </Typography>
                                         <Stack direction="row" spacing={1} mt={1.5}>
-                                            {gap.tags.map(tag => (
+                                            {gap.tags.map((tag: string) => (
                                                 <Chip key={tag} label={tag} size="small" sx={{ 
                                                     borderRadius: 1, 
                                                     bgcolor: alpha(theme.palette.text.primary, 0.1), 
@@ -423,7 +423,7 @@ return {
                 Differentiation Strategies
             </Typography>
              <Grid container spacing={3}>
-                {strategies.slice(0, 3).map((strat, i) => (
+                {strategies.slice(0, 3).map((strat: any, i: number) => (
                     <Grid size={{ xs: 12, md: 4 }} key={i}>
                         <Card sx={{ 
                             height: '100%', 
