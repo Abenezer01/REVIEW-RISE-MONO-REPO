@@ -1,5 +1,4 @@
 import apiClient from '@/lib/apiClient';
-import { formatShortDate, isWithinLast24Hours } from '@/utils/dateHelper';
 
 export interface Competitor {
   id: string;
@@ -202,44 +201,59 @@ export const BrandService = {
 
     return response.data.data;
   },
+
   // Recommendations & Brand Strategist
   generateRecommendations: async (businessId: string, category: string) => {
     const response = await apiClient.post<{ message: string, jobId: string }>(`/brands/${businessId}/recommendations`, { category });
-    return response.data;
+
+    
+return response.data;
   },
 
   getRecommendations: async (businessId: string, filters?: { status?: string, category?: string }) => {
     const response = await apiClient.get<BrandRecommendation[]>(`/brands/${businessId}/recommendations`, { params: filters });
-    return response.data;
+
+    
+return response.data;
   },
 
   updateRecommendationStatus: async (businessId: string, id: string, status: string) => {
     const response = await apiClient.patch<{ data: BrandRecommendation }>(`/brands/${businessId}/recommendations/${id}`, { status });
-    return response.data.data;
+
+    
+return response.data.data;
   },
 
   getBrandScores: async (businessId: string) => {
     const response = await apiClient.get<BrandScore>(`/brands/${businessId}/scores`);
-    return response.data;
+
+    
+return response.data;
   },
 
   // Visibility Plan
   generateVisibilityPlan: async (businessId: string) => {
     const response = await apiClient.post<{ message: string, jobId: string }>(`/brands/${businessId}/visibility-plan`);
-    return response.data;
+
+    
+return response.data;
   },
 
   getVisibilityPlan: async (businessId: string) => {
     const response = await apiClient.get<any>(`/brands/${businessId}/visibility-plan`);
-    return response.data;
+
+    
+return response.data;
   },
 
   // Jobs
   listJobs: async (businessId: string) => {
     try {
       const response = await apiClient.get<{ data: Job[] }>(`/brands/${businessId}/jobs`);
-      return response.data.data || [];
-    } catch (error) {
+
+      
+return response.data.data || [];
+    } catch {
       // If endpoint doesn't exist yet, return empty array (component will use mock data)
       return [];
     }

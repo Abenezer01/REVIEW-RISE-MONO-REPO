@@ -1,14 +1,12 @@
+import { useCallback, useEffect, useState } from 'react';
+
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
 import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
-import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import LinearProgress from '@mui/material/LinearProgress';
 import Stack from '@mui/material/Stack';
@@ -36,15 +34,17 @@ export const VisibilityPlanDetails = ({ onBack, reportId }: VisibilityPlanDetail
   const [plan, setPlan] = useState<any>(null);
 
 
-  const fetchPlan = async () => {
+  const fetchPlan = useCallback(async () => {
     if (!businessId) return;
     setLoading(true);
+
     try {
       let data;
       
       if (reportId) {
         // Fetch specific report
         const report = await BrandService.getReport(businessId, reportId);
+
         data = report; 
       } else {
         // Fetch latest/active plan
@@ -54,6 +54,7 @@ export const VisibilityPlanDetails = ({ onBack, reportId }: VisibilityPlanDetail
       if (data && data.htmlContent) {
         try {
           const parsed = JSON.parse(data.htmlContent);
+
           setPlan({ ...parsed, title: data.title, version: data.version }); // Include version/title from wrapper
         } catch (e) {
           console.error('Failed to parse plan content', e);
@@ -68,11 +69,11 @@ export const VisibilityPlanDetails = ({ onBack, reportId }: VisibilityPlanDetail
     } finally {
       setLoading(false);
     }
-  };
+  }, [businessId, reportId]);
 
   useEffect(() => {
     fetchPlan();
-  }, [businessId]);
+  }, [fetchPlan]);
 
 
 
@@ -237,8 +238,10 @@ export const VisibilityPlanDetails = ({ onBack, reportId }: VisibilityPlanDetail
                     {plan.weeks?.map((week: any, wIndex: number) => {
                          // Group tasks by category
                          const tasksByCategory: Record<string, any[]> = {};
+
                          week.tasks?.forEach((task: any) => {
                              const cat = task.category || 'General';
+
                              if (!tasksByCategory[cat]) tasksByCategory[cat] = [];
                              tasksByCategory[cat].push(task);
                          });

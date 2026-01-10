@@ -1,5 +1,4 @@
-import { repositories, Prisma } from '@platform/db';
-import { VisibilityPlanSchema } from '@platform/contracts';
+import { repositories } from '@platform/db';
 import axios from 'axios';
 
 const EXPRESS_AI_URL = process.env.EXPRESS_AI_URL || 'http://localhost:3003';

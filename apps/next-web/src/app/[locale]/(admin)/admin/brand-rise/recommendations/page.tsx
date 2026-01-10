@@ -1,15 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -17,9 +15,11 @@ import { useTheme, alpha } from '@mui/material/styles';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
-import { useBusinessId } from '@/hooks/useBusinessId';
-import { BrandRecommendation, BrandService } from '@/services/brand.service';
 import { Collapse } from '@mui/material';
+
+import { useBusinessId } from '@/hooks/useBusinessId';
+import type { BrandRecommendation} from '@/services/brand.service';
+import { BrandService } from '@/services/brand.service';
 
 const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number;[key: string]: any }) => {
     return <i className={icon} style={{ fontSize }} {...rest} />
@@ -43,9 +43,10 @@ const RecommendationsPage = () => {
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
     const [generating, setGenerating] = useState(false);
 
-    const fetchRecommendations = async () => {
+    const fetchRecommendations = useCallback(async () => {
         if (!businessId) return;
         setLoading(true);
+
         try {
             const data = await BrandService.getRecommendations(businessId);
             
@@ -64,22 +65,24 @@ const RecommendationsPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [businessId]);
 
     useEffect(() => {
         if (businessLoading) return;
         
         if (!businessId) {
             setLoading(false);
-            return;
+            
+return;
         }
 
         fetchRecommendations();
-    }, [businessId, businessLoading]);
+    }, [businessId, businessLoading, fetchRecommendations]);
 
     const handleGenerate = async () => {
         if (!businessId) return;
         setGenerating(true);
+
         try {
             await BrandService.generateRecommendations(businessId, 'search');
             setTimeout(() => {
@@ -100,12 +103,6 @@ const RecommendationsPage = () => {
         } catch (error) {
             console.error('Failed to update status', error);
         }
-    };
-
-    const getPriorityColor = (score: number) => {
-        if (score > 80) return theme.palette.error.main;
-        if (score > 50) return theme.palette.warning.main;
-        return theme.palette.info.main;
     };
 
     const sortedRecommendations = [...recommendations].sort((a, b) => {

@@ -1,6 +1,7 @@
+import { useCallback, useEffect, useState } from 'react';
+
 import { useTranslations } from 'next-intl';
-import { useBusinessId } from '@/hooks/useBusinessId';
-import { BrandService } from '@/services/brand.service';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -11,7 +12,9 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { alpha, useTheme } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
+
+import { BrandService } from '@/services/brand.service';
+import { useBusinessId } from '@/hooks/useBusinessId';
 import { formatRelativeTime, formatShortDate, isWithinLast24Hours } from '@/utils/dateHelper';
 
 
@@ -104,16 +107,15 @@ export const JobsDashboard = ({ onViewReport }: JobsDashboardProps) => {
     const t = useTranslations('dashboard.brandRise.jobs');
     const { businessId } = useBusinessId();
     const [reports, setReports] = useState<any[]>([]);
-    const [loadingReports, setLoadingReports] = useState(true);
     const [generatingPlan, setGeneratingPlan] = useState(false);
     const [jobs, setJobs] = useState<any[]>([]);
-    const [loadingJobs, setLoadingJobs] = useState(true);
 
-    const loadJobs = async () => {
+    const loadJobs = useCallback(async () => {
          if (!businessId) return;
-         setLoadingJobs(true);
+
          try {
             const data = await BrandService.listJobs(businessId);
+
             if (data && data.length > 0) {
                  setJobs(data);
             } else {
@@ -122,16 +124,15 @@ export const JobsDashboard = ({ onViewReport }: JobsDashboardProps) => {
          } catch (error) {
              console.error('Failed to load jobs', error);
              setJobs(MOCK_JOBS); // Fallback on error
-         } finally {
-             setLoadingJobs(false);
          }
-    };
+    }, [businessId]);
 
-    const loadReports = async () => {
+    const loadReports = useCallback(async () => {
          if (!businessId) return;
-         setLoadingReports(true);
+
          try {
             const data = await BrandService.listReports(businessId);
+
             if (data && data.length > 0) {
                  // Transform API data to UI model
                  const uiReports = data.map((r: any) => ({
@@ -146,6 +147,7 @@ export const JobsDashboard = ({ onViewReport }: JobsDashboardProps) => {
                      color: getReportColor(r.type || 'generic'),
                      isNew: isWithinLast24Hours(r.generatedAt)
                  }));
+
                  setReports(uiReports);
             } else {
                  setReports(MOCK_REPORTS); // Keep mock for demo functionality if no real reports
@@ -153,28 +155,28 @@ export const JobsDashboard = ({ onViewReport }: JobsDashboardProps) => {
          } catch (error) {
              console.error('Failed to load reports', error);
              setReports(MOCK_REPORTS); // Fallback on error
-         } finally {
-             setLoadingReports(false);
          }
-    };
+    }, [businessId]);
 
     useEffect(() => {
         loadJobs();
         loadReports();
-    }, [businessId]);
+    }, [loadJobs, loadReports]);
 
     const getReportIcon = (type: string) => {
         if (type.includes('visibility')) return 'tabler-calendar-time';
         if (type.includes('local')) return 'tabler-map-pin';
         if (type.includes('competitor')) return 'tabler-users';
-        return 'tabler-file-analytics';
+        
+return 'tabler-file-analytics';
     };
 
     const getReportColor = (type: string) => {
         if (type.includes('visibility')) return 'primary';
         if (type.includes('local')) return 'warning';
         if (type.includes('competitor')) return 'info';
-        return 'secondary';
+        
+return 'secondary';
     };
 
     const getStatusColor = (status: string) => {
@@ -232,7 +234,7 @@ export const JobsDashboard = ({ onViewReport }: JobsDashboardProps) => {
                                 <Typography variant="h6" fontWeight="bold">Visibility Plan</Typography>
                             </Stack>
                             <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flex: 1 }}>
-                                Generate a data-backed, 30-day roadmap tailored to your brand's unique DNA. Outpace competitors with actionable steps.
+                                Generate a data-backed, 30-day roadmap tailored to your brand&apos;s unique DNA. Outpace competitors with actionable steps.
                             </Typography>
                             <Button 
                                 variant="contained" 
@@ -243,6 +245,7 @@ export const JobsDashboard = ({ onViewReport }: JobsDashboardProps) => {
                                         if (!businessId) return;
                                         setGeneratingPlan(true);
                                         await BrandService.generateVisibilityPlan(businessId);
+
                                         // Wait a bit for backend to process (mock delay if needed, or real)
                                         setTimeout(() => {
                                             loadReports();

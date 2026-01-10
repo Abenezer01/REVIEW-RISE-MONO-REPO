@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+
 import Box from '@mui/material/Box';
+
 import { JobsDashboard } from './components/JobsDashboard';
 import { VisibilityPlanDetails } from './components/VisibilityPlanDetails';
 

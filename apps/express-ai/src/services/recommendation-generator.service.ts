@@ -18,7 +18,6 @@ export class RecommendationGeneratorService {
     ) {
         // Gather context
         const brandDNA = await repositories.brandDNA.findByBusinessId(businessId);
-        const brandProfile = await repositories.brandProfile.findByBusinessId(businessId);
 
         // We access delegate directly for limit if needed, or use base repo method
         // Since base repo findMany accepts options, we use that

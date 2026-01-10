@@ -37,7 +37,9 @@ export const formatRelativeTime = (date: string | Date): string => {
  */
 export const formatShortDate = (date: string | Date): string => {
   const targetDate = typeof date === 'string' ? new Date(date) : date;
-  return targetDate.toLocaleDateString('en-US', {
+
+  
+return targetDate.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
@@ -49,7 +51,9 @@ export const formatShortDate = (date: string | Date): string => {
  */
 export const formatLongDate = (date: string | Date): string => {
   const targetDate = typeof date === 'string' ? new Date(date) : date;
-  return targetDate.toLocaleDateString('en-US', {
+
+  
+return targetDate.toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
     year: 'numeric'
@@ -61,7 +65,9 @@ export const formatLongDate = (date: string | Date): string => {
  */
 export const formatDateTime = (date: string | Date): string => {
   const targetDate = typeof date === 'string' ? new Date(date) : date;
-  return targetDate.toLocaleString('en-US', {
+
+  
+return targetDate.toLocaleString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -82,13 +88,19 @@ export const formatDuration = (durationMs: number): string => {
 
   if (days > 0) {
     const remainingHours = hours % 24;
-    return remainingHours > 0 ? `${days}d ${remainingHours}h` : `${days}d`;
+
+    
+return remainingHours > 0 ? `${days}d ${remainingHours}h` : `${days}d`;
   } else if (hours > 0) {
     const remainingMinutes = minutes % 60;
-    return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+
+    
+return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
   } else if (minutes > 0) {
     const remainingSeconds = seconds % 60;
-    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+
+    
+return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
   } else {
     return `${seconds}s`;
   }
@@ -101,7 +113,9 @@ export const isWithinLast24Hours = (date: string | Date): boolean => {
   const targetDate = typeof date === 'string' ? new Date(date) : date;
   const now = new Date();
   const diffInMs = now.getTime() - targetDate.getTime();
-  return diffInMs < 86400000; // 24 hours in milliseconds
+
+  
+return diffInMs < 86400000; // 24 hours in milliseconds
 };
 
 /**
