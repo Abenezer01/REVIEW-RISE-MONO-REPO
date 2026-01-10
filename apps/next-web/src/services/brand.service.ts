@@ -8,6 +8,8 @@ export interface Competitor {
   type?: string;
   website?: string;
   snapshots?: any[];
+  source?: string;
+  relevanceScore?: number;
 }
 
 export interface DashboardOverview {
