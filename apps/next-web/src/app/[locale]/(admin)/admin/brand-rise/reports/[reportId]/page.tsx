@@ -99,7 +99,7 @@ return reports.find((r: any) => r.id === reportId);
 
   const handleExportPdf = async () => {
       try {
-           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003'}/api/v1/brands/reports/opportunities/${reportId}/pdf`);
+           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3004'}/api/v1/brands/${businessId}/reports/opportunities/${reportId}/pdf`);
 
            if (!response.ok) throw new Error('Download failed');
            
@@ -128,29 +128,60 @@ return reports.find((r: any) => r.id === reportId);
   if (isLoading) return <CircularProgress />;
   if (error || !report) return <Alert severity="error">Report not found or failed to load</Alert>;
 
-  // Types based on schema
-  // Data Transformation for Rich UI
-  const gaps = (report.gaps as string[] || []).map((gap, i) => ({
-      id: i,
-      title: gap,
-      description: 'Market opportunity identified via competitor analysis.', // Placeholder description
-      impact: i === 0 || i === 1 ? 'High Impact' : 'Medium Impact',
-      tags: i === 0 ? ['Technology', 'Differentiation'] : i === 1 ? ['Pricing', 'Trust'] : ['Specialization', 'Expertise']
-  }));
+  // Debug logging
+  console.log('Report data:', report);
+  console.log('Gaps:', report.gaps);
+  console.log('Strategies:', report.strategies);
+  console.log('Content Ideas:', report.contentIdeas);
 
-  const strategies = (report.strategies as string[] || []).map((strat, i) => ({
-      id: i,
-      title: strat,
-      description: 'Strategic move to capture market share based on current gaps.',
-      icon: i === 0 ? <LightbulbIcon fontSize="large" /> : i === 1 ? <TrendingUpIcon fontSize="large" /> : <MapIcon fontSize="large" />
-  }));
+  // Types based on schema - Handle both string and object formats
+  const gaps = (Array.isArray(report.gaps) ? report.gaps : []).map((gap: any, i: number) => {
+      if (typeof gap === 'string') {
+          return {
+              id: i,
+              title: gap,
+              description: 'Market opportunity identified via competitor analysis.',
+              impact: i === 0 || i === 1 ? 'High Impact' : 'Medium Impact',
+              tags: ['Strategy']
+          };
+      }
 
-  const contentIdeas = (report.contentIdeas as any[] || []).map((idea: any, i: number) => ({
+      
+return {
+          id: i,
+          title: gap.title || 'Market Gap',
+          description: gap.description || 'Market opportunity identified.',
+          impact: (gap.priority && gap.priority >= 8) ? 'High Impact' : 'Medium Impact',
+          tags: gap.tags || ['Strategy']
+      };
+  });
+
+  const strategies = (Array.isArray(report.strategies) ? report.strategies : []).map((strat: any, i: number) => {
+      if (typeof strat === 'string') {
+          return {
+              id: i,
+              title: strat,
+              description: 'Strategic move to capture market share.',
+              icon: i === 0 ? <LightbulbIcon fontSize="large" /> : i === 1 ? <TrendingUpIcon fontSize="large" /> : <MapIcon fontSize="large" />
+          };
+      }
+
+      
+return {
+          id: i,
+          title: strat.title || 'Strategy',
+          description: strat.description || 'Strategic move to capture market share.',
+          icon: i === 0 ? <LightbulbIcon fontSize="large" /> : i === 1 ? <TrendingUpIcon fontSize="large" /> : <MapIcon fontSize="large" />
+      };
+  });
+
+  const contentIdeas = (Array.isArray(report.contentIdeas) ? report.contentIdeas : []).map((idea: any, i: number) => ({
       ...idea,
+      topic: idea.topic || idea.title || 'Content Idea',
+      description: idea.description || idea.rationale || '',
       format: idea.format || (i % 2 === 0 ? 'Blog Post' : 'Case Study'),
       demand: i < 2 ? 'High Demand' : 'Medium Demand'
   }));
-
 
   const mapData = report.positioningMap as any || {};
 
@@ -326,7 +357,7 @@ return reports.find((r: any) => r.id === reportId);
                         Top Market Gaps & Opportunities
                     </Typography>
                     <Stack spacing={3}>
-                        {gaps.slice(0, 5).map((gap, i) => ( // limit to 5
+                        {gaps.slice(0, 5).map((gap: any, i: number) => ( // limit to 5
                             <Paper key={i} elevation={0} sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.5), borderRadius: 2, border: 1, borderColor: 'divider' }}>
                                 <Grid container alignItems="center" spacing={2}>
                                     <Grid size={{ xs: 'auto' }}>
@@ -354,7 +385,7 @@ return reports.find((r: any) => r.id === reportId);
                                             {gap.description}
                                         </Typography>
                                         <Stack direction="row" spacing={1} mt={1.5}>
-                                            {gap.tags.map(tag => (
+                                            {gap.tags.map((tag: string) => (
                                                 <Chip key={tag} label={tag} size="small" sx={{ 
                                                     borderRadius: 1, 
                                                     bgcolor: alpha(theme.palette.text.primary, 0.1), 
@@ -392,7 +423,7 @@ return reports.find((r: any) => r.id === reportId);
                 Differentiation Strategies
             </Typography>
              <Grid container spacing={3}>
-                {strategies.slice(0, 3).map((strat, i) => (
+                {strategies.slice(0, 3).map((strat: any, i: number) => (
                     <Grid size={{ xs: 12, md: 4 }} key={i}>
                         <Card sx={{ 
                             height: '100%', 

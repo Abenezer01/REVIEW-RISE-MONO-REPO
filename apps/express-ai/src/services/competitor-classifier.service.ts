@@ -16,7 +16,7 @@ export class CompetitorClassifierService {
         try {
             if (AI_PROVIDER === 'gemini') {
                 const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-                const model = gemini.getGenerativeModel({
+                const model = gemini.getGenerativeModel({ 
                     model: 'gemini-3-flash-preview',
                     generationConfig: {
                         temperature: 0.3,

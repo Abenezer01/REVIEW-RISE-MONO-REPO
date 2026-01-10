@@ -38,6 +38,7 @@ export interface Competitor {
   ranking?: number; // Added ranking
   snapshots?: CompetitorSnapshot[];
   logo?: string;
+  source?: string;
 }
 
 interface CompetitorCardProps {

@@ -1,0 +1,8 @@
+.next/dev/types/validator.ts(440,39): error TS2307: Cannot find module '../../../src/app/api/health/route.js' or its corresponding type declarations.
+.next/types/validator.ts(440,39): error TS2307: Cannot find module '../../src/app/api/health/route.js' or its corresponding type declarations.
+src/app/[locale]/(admin)/admin/brand-rise/competitors/page.tsx(40,11): error TS2339: Property 'source' does not exist on type 'Competitor'.
+src/app/[locale]/(admin)/admin/brand-rise/reports/[reportId]/page.tsx(360,48): error TS7006: Parameter 'gap' implicitly has an 'any' type.
+src/app/[locale]/(admin)/admin/brand-rise/reports/[reportId]/page.tsx(360,53): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/app/[locale]/(admin)/admin/brand-rise/reports/[reportId]/page.tsx(388,59): error TS7006: Parameter 'tag' implicitly has an 'any' type.
+src/app/[locale]/(admin)/admin/brand-rise/reports/[reportId]/page.tsx(426,46): error TS7006: Parameter 'strat' implicitly has an 'any' type.
+src/app/[locale]/(admin)/admin/brand-rise/reports/[reportId]/page.tsx(426,53): error TS7006: Parameter 'i' implicitly has an 'any' type.
