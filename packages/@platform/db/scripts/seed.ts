@@ -359,59 +359,65 @@ async function main() {
 
     // 7. Assign Users to Businesses with Roles
     console.log('🔗 Assigning users to businesses...');
-    await prisma.userBusinessRole.upsert({
+    const existingUserRole1 = await prisma.userBusinessRole.findFirst({
         where: {
-            userId_businessId_roleId_locationId: {
-                userId: user1.id,
-                businessId: business1.id,
-                roleId: ownerRole.id,
-                locationId: null as any,
-            },
-        },
-        update: {},
-        create: {
             userId: user1.id,
             businessId: business1.id,
             roleId: ownerRole.id,
-            locationId: null as any,
+            // @ts-ignore
+            locationId: null,
         },
     });
 
-    await prisma.userBusinessRole.upsert({
-        where: {
-            userId_businessId_roleId_locationId: {
-                userId: user2.id,
+    if (!existingUserRole1) {
+        await prisma.userBusinessRole.create({
+            data: {
+                userId: user1.id,
                 businessId: business1.id,
-                roleId: adminRole.id,
-                locationId: null as any,
+                roleId: ownerRole.id,
             },
-        },
-        update: {},
-        create: {
+        });
+    }
+
+    const existingUserRole2 = await prisma.userBusinessRole.findFirst({
+        where: {
             userId: user2.id,
             businessId: business1.id,
             roleId: adminRole.id,
-            locationId: null as any,
+            // @ts-ignore
+            locationId: null,
         },
     });
 
-    await prisma.userBusinessRole.upsert({
-        where: {
-            userId_businessId_roleId_locationId: {
-                userId: user3.id,
-                businessId: business2.id,
-                roleId: managerRole.id,
-                locationId: null as any,
+    if (!existingUserRole2) {
+        await prisma.userBusinessRole.create({
+            data: {
+                userId: user2.id,
+                businessId: business1.id,
+                roleId: adminRole.id,
             },
-        },
-        update: {},
-        create: {
+        });
+    }
+
+    const existingUserRole3 = await prisma.userBusinessRole.findFirst({
+        where: {
             userId: user3.id,
             businessId: business2.id,
             roleId: managerRole.id,
-            locationId: null as any,
+            // @ts-ignore
+            locationId: null,
         },
     });
+
+    if (!existingUserRole3) {
+        await prisma.userBusinessRole.create({
+            data: {
+                userId: user3.id,
+                businessId: business2.id,
+                roleId: managerRole.id,
+            },
+        });
+    }
 
     console.log(`✅ Assigned users to businesses\n`);
 

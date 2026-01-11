@@ -14,6 +14,7 @@
     "db:migrate:deploy": "tsx scripts/db-admin.ts prisma migrate deploy",
     "db:reset": "tsx scripts/db-admin.ts prisma migrate reset",
     "db:seed": "tsx scripts/seed.ts && tsx scripts/seed-brand-rise.ts && tsx scripts/seed-visibility.ts",
+    "db:seed:all": "tsx scripts/seed-all.ts",
     "db:health": "tsx src/health.ts",
     "test": "exit 0"
   },
