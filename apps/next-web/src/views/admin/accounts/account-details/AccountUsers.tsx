@@ -15,6 +15,9 @@ import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import ItemsListing from '@components/shared/listing'
 
+// Hook Imports
+import useTranslation from '@/hooks/useTranslation'
+
 // Configs & Types
 import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 import { defaultCreateActionConfig } from '@/types/general/listing'
@@ -44,13 +47,14 @@ const AccountUsers = ({
   handleEditUser,
   handleDeleteUser
 }: AccountUsersProps) => {
+  const t = useTranslation('dashboard')
 
   const userColumns = useMemo<GridColDef<any>[]>(() => [
     {
       flex: 0.25,
       minWidth: 200,
       field: 'name',
-      headerName: 'User',
+      headerName: t('accounts.users.columns.user'),
       renderCell: ({ row }) => {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -78,14 +82,14 @@ const AccountUsers = ({
       flex: 0.25,
       minWidth: 200,
       field: 'email',
-      headerName: 'Email',
+      headerName: t('accounts.users.columns.email'),
       valueGetter: (value, row) => row.email
     },
     {
       flex: 0.15,
       minWidth: 120,
       field: 'role',
-      headerName: 'Role',
+      headerName: t('accounts.users.columns.role'),
       renderCell: ({ row }) => (
         <CustomChip
           size='small'
@@ -100,16 +104,16 @@ const AccountUsers = ({
       flex: 0.15,
       minWidth: 100,
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('accounts.users.columns.actions', { defaultValue: 'Actions' }),
       sortable: false,
       renderCell: ({ row }) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Tooltip title='Edit'>
+          <Tooltip title={t('accounts.users.actions.edit', { defaultValue: 'Edit' })}>
             <IconButton size='small' onClick={() => handleEditUser(row)}>
               <i className='tabler-edit' />
             </IconButton>
           </Tooltip>
-          <Tooltip title='Delete'>
+          <Tooltip title={t('accounts.users.actions.delete', { defaultValue: 'Delete' })}>
             <IconButton size='small' onClick={() => handleDeleteUser(row)} sx={{ color: 'error.main' }}>
               <i className='tabler-trash' />
             </IconButton>
@@ -117,12 +121,12 @@ const AccountUsers = ({
         </Box>
       )
     }
-  ], [handleEditUser, handleDeleteUser])
+  ], [handleEditUser, handleDeleteUser, t])
 
   return (
     <ItemsListing
-      title='Users'
-      subtitle='Manage your account users and their assigned roles'
+      title={t('accounts.users.title')}
+      subtitle={t('accounts.users.subtitle')}
       type={ITEMS_LISTING_TYPE.table.value}
       items={usersData.data}
       isLoading={usersLoading}
@@ -145,7 +149,7 @@ const AccountUsers = ({
           enabled: true,
           onSearch: (term) => setUserSearch(term),
           searchKeys: ['name', 'email'],
-          placeholder: 'Search user',
+          placeholder: t('accounts.users.searchPlaceholder'),
           permission: { action: 'read', subject: 'user' }
         }
       }}

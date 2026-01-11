@@ -10,11 +10,16 @@ import Divider from '@mui/material/Divider'
 // Core Component Imports
 import CustomAvatar from '@core/components/mui/Avatar'
 
+// Hook Imports
+import useTranslation from '@/hooks/useTranslation'
+
 const AccountLogs = ({ data }: { data: any }) => {
+  const t = useTranslation('dashboard')
+
   return (
     <Card>
       <CardHeader
-        title='Recent Activity'
+        title={t('accounts.logs.title')}
         avatar={
           <CustomAvatar skin='light' variant='rounded' color='info' sx={{ width: 48, height: 48 }}>
             <i className='tabler-file-text' style={{ fontSize: '1.5rem' }} />
@@ -84,9 +89,9 @@ const AccountLogs = ({ data }: { data: any }) => {
             >
               <i className='tabler-file-off' style={{ fontSize: 28 }} />
             </CustomAvatar>
-            <Typography variant='h6' sx={{ mb: 1 }}>No audit logs found</Typography>
+            <Typography variant='h6' sx={{ mb: 1 }}>{t('accounts.logs.noLogs')}</Typography>
             <Typography variant='body2' color='text.secondary'>
-              Activity will appear here once actions are performed.
+              {t('accounts.logs.noLogsSubtitle')}
             </Typography>
           </Box>
         )}

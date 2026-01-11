@@ -32,18 +32,20 @@ import AccountLocations from './account-details/AccountLocations'
 import AccountUsers from './account-details/AccountUsers'
 import AccountChannels from './account-details/AccountChannels'
 import AccountLogs from './account-details/AccountLogs'
+import { useTranslation } from '@/hooks/useTranslation'
 
 // Utils
 const getInitials = (string: string) =>
   string.split(/\s/).reduce((response, word) => (response += word.slice(0, 1)), '')
 
 const AccountDetail = () => {
+  const t = useTranslation('dashboard')
   const { user } = useAuth()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('overview')
   const [editOpen, setEditOpen] = useState(false)
-  
+
   // Users List State
   const [usersData, setUsersData] = useState<{ data: any[], meta: any }>({ data: [], meta: { total: 0, page: 1, limit: 10, pages: 0 } })
   const [usersLoading, setUsersLoading] = useState(false)
@@ -59,7 +61,7 @@ const AccountDetail = () => {
 
   const fetchUsers = useCallback(async () => {
     setUsersLoading(true)
-    
+
     const res = await getAccounts({
       page: userPage,
       limit: userPageSize,
@@ -69,7 +71,7 @@ const AccountDetail = () => {
     if (res && !('error' in res)) {
       setUsersData(res)
     }
-    
+
     setUsersLoading(false)
   }, [userPage, userPageSize, userSearch])
 
@@ -97,12 +99,12 @@ const AccountDetail = () => {
   const handleDeleteUserConfirm = async () => {
     if (userToDelete) {
       const res = await deleteAccount(userToDelete.id)
-      
+
       if (res.success) {
-        toast.success('User deleted')
+        toast.success(t('accounts.userDeleted'))
         fetchUsers()
       } else {
-        toast.error(res.message || 'Failed to delete user')
+        toast.error(res.message || t('accounts.deleteUserFailed'))
       }
 
       setDeleteUserDialogOpen(false)
@@ -117,7 +119,7 @@ const AccountDetail = () => {
     if (res && !('error' in res)) {
       setData(res)
     } else {
-      toast.error('Failed to load account')
+      toast.error(t('accounts.loadAccountFailed'))
     }
 
     setLoading(false)
@@ -154,7 +156,7 @@ const AccountDetail = () => {
     )
   }
 
-  if (!data) return <Typography>Account not found</Typography>
+  if (!data) return <Typography>{t('accounts.notFound')}</Typography>
 
   const email = user?.email || data.userBusinessRoles?.[0]?.user?.email || data.email
   const statusColor = data.status === 'active' ? 'success' : 'secondary'
@@ -235,31 +237,31 @@ const AccountDetail = () => {
           <CustomTabList pill='true' onChange={handleTabChange} aria-label='account tabs'>
             <Tab
               value='overview'
-              label='Overview'
+              label={t('accounts.tabs.overview')}
               icon={<i className='tabler-info-circle' />}
               iconPosition='start'
             />
             <Tab
               value='locations'
-              label='Locations'
+              label={t('accounts.tabs.locations')}
               icon={<i className='tabler-map-pin' />}
               iconPosition='start'
             />
             <Tab
               value='users'
-              label='Users'
+              label={t('accounts.tabs.users')}
               icon={<i className='tabler-users' />}
               iconPosition='start'
             />
             <Tab
               value='channels'
-              label='Channels'
+              label={t('accounts.tabs.channels')}
               icon={<i className='tabler-share' />}
               iconPosition='start'
             />
             <Tab
               value='logs'
-              label='Audit Logs'
+              label={t('accounts.tabs.auditLogs')}
               icon={<i className='tabler-file-text' />}
               iconPosition='start'
             />
@@ -317,8 +319,8 @@ const AccountDetail = () => {
       <ConfirmationDialog
         open={deleteUserDialogOpen}
         handleClose={() => setDeleteUserDialogOpen(false)}
-        title='Delete User'
-        content={`Are you sure you want to remove ${userToDelete?.name} from this account?`}
+        title={t('accounts.deleteUser.title')}
+        content={t('accounts.deleteUser.confirm', { name: userToDelete?.name })}
         onConfirm={handleDeleteUserConfirm}
         onCancel={() => setDeleteUserDialogOpen(false)}
         type='delete'
