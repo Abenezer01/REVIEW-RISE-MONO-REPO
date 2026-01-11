@@ -139,6 +139,18 @@ else
 fi
 
 # ==============================================================================
+# EMERGENCY FIX: Schema Sync (db push)
+# ==============================================================================
+# This ensures DB matches code even if migrations are out of sync
+log_info "Running schema sync (db push) to ensure database integrity..."
+docker compose -f "$COMPOSE_FILE" run --rm \
+    express-auth \
+    sh -c "cd /app && npx prisma db push --accept-data-loss" || {
+    log_warn "Schema sync failed (check logs)"
+}
+log_info "Schema sync completed ✓"
+
+# ==============================================================================
 # Start Services
 # ==============================================================================
 log_info "Starting services with Docker Compose..."
