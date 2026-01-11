@@ -11,7 +11,7 @@ if ! [ -x "$(command -v docker)" ]; then
   exit 1
 fi
 
-domains=(vyntrise.com www.vyntrise.com app.vyntrise.com)
+domains=(vyntrise.com app.vyntrise.com)
 rsa_key_size=4096
 data_path="./nginx/certbot"
 email="support@vyntrise.com" # Change this to your email
