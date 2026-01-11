@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center relative overflow-hidden">
@@ -27,7 +25,7 @@ export default function Home() {
         </h2>
         
         <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mb-12 leading-relaxed">
-          Dominate your local market with the world's most advanced autonomous marketing strategist. 
+          Dominate your local market with the world&apos;s most advanced autonomous marketing strategist. 
           <span className="block mt-2 text-white/80">Coming soon.</span>
         </p>
 
