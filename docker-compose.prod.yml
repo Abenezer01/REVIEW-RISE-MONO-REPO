@@ -448,7 +448,7 @@ services:
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://express-auth:3010}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://app.vyntrise.com}
       - NEXT_PUBLIC_LLM_COST_WARNING=${NEXT_PUBLIC_LLM_COST_WARNING:-true}
     depends_on:
       postgres:
