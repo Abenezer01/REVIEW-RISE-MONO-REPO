@@ -12,14 +12,19 @@ import Divider from '@mui/material/Divider'
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 
+// Hook Imports
+import useTranslation from '@/hooks/useTranslation'
+
 const AccountOverview = ({ data }: { data: any }) => {
+  const t = useTranslation('dashboard')
+
   return (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12, md: 6 }}>
         <Card sx={{ height: '100%' }}>
           <CardHeader
-            title='Subscription Details'
-            subheader='Current plan and status'
+            title={t('accounts.overview.subscription.title')}
+            subheader={t('accounts.overview.subscription.subtitle')}
             avatar={
               <CustomAvatar skin='light' variant='rounded' color='warning' sx={{ width: 48, height: 48 }}>
                 <i className='tabler-credit-card' style={{ fontSize: '1.5rem' }} />
@@ -40,7 +45,7 @@ const AccountOverview = ({ data }: { data: any }) => {
                     }}
                   >
                     <Typography variant='h5' sx={{ fontWeight: 600, color: 'primary.main' }}>
-                      {sub.plan} Plan
+                      {t('accounts.overview.subscription.planName', { plan: sub.plan })}
                     </Typography>
                     <CustomChip
                       size='small'
@@ -52,7 +57,7 @@ const AccountOverview = ({ data }: { data: any }) => {
                   <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
                     <i className='tabler-calendar-time' style={{ marginRight: 8 }} />
                     <Typography variant='body1'>
-                      Renews on {new Date(sub.currentPeriodEnd).toLocaleDateString()}
+                      {t('accounts.overview.subscription.renewsOn', { date: new Date(sub.currentPeriodEnd).toLocaleDateString() })}
                     </Typography>
                   </Box>
                 </Box>
@@ -63,8 +68,8 @@ const AccountOverview = ({ data }: { data: any }) => {
                   <i className='tabler-alert-circle' />
                 </CustomAvatar>
                 <Box>
-                  <Typography variant='subtitle1'>No active subscription</Typography>
-                  <Typography variant='body2' color='text.secondary'>This account is on the free tier.</Typography>
+                  <Typography variant='subtitle1'>{t('accounts.overview.subscription.noActive')}</Typography>
+                  <Typography variant='body2' color='text.secondary'>{t('accounts.overview.subscription.freeTier')}</Typography>
                 </Box>
               </Box>
             )}
@@ -75,8 +80,8 @@ const AccountOverview = ({ data }: { data: any }) => {
       <Grid size={{ xs: 12, md: 6 }}>
         <Card sx={{ height: '100%' }}>
           <CardHeader
-            title='Account Stats'
-            subheader='Overview of account usage'
+            title={t('accounts.overview.stats.title')}
+            subheader={t('accounts.overview.stats.subtitle')}
             avatar={
               <CustomAvatar skin='light' variant='rounded' color='info' sx={{ width: 48, height: 48 }}>
                 <i className='tabler-chart-bar' style={{ fontSize: '1.5rem' }} />
@@ -101,7 +106,7 @@ const AccountOverview = ({ data }: { data: any }) => {
                   </CustomAvatar>
                   <Box sx={{ textAlign: 'center' }}>
                     <Typography variant='h4' sx={{ fontWeight: 600 }}>{data.locations?.length || 0}</Typography>
-                    <Typography variant='body2' color='text.secondary'>Locations</Typography>
+                    <Typography variant='body2' color='text.secondary'>{t('accounts.overview.stats.locations')}</Typography>
                   </Box>
                 </Box>
               </Grid>
@@ -122,7 +127,7 @@ const AccountOverview = ({ data }: { data: any }) => {
                     <Typography variant='h4' sx={{ fontWeight: 600 }}>
                       {data.userBusinessRoles?.length || 1}
                     </Typography>
-                    <Typography variant='body2' color='text.secondary'>Users</Typography>
+                    <Typography variant='body2' color='text.secondary'>{t('accounts.overview.stats.users')}</Typography>
                   </Box>
                 </Box>
               </Grid>

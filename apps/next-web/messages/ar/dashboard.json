@@ -31,7 +31,9 @@
     "totalReviews": "إجمالي المراجعات",
     "averageRating": "متوسط التقييم",
     "responseRate": "معدل الاستجابة",
-    "pendingReviews": "المراجعات المعلقة"
+    "pendingReviews": "المراجعات المعلقة",
+    "loading": "جاري التحميل...",
+    "noData": "لا توجد بيانات متاحة"
   },
   "stats": {
     "thisWeek": "هذا الأسبوع",
@@ -71,6 +73,100 @@
       "googlePlaceId": "معرف مكان جوجل",
       "facebookPageId": "معرف صفحة فيسبوك",
       "deleteConfirm": "هل أنت متأكد من رغبتك في حذف هذا الفرع؟"
+    }
+  },
+  "accounts": {
+    "title": "تفاصيل الحساب",
+    "notFound": "الحساب غير موجود",
+    "createdOn": "تم الإنشاء في {date}",
+    "userDeleted": "تم حذف المستخدم",
+    "deleteUserFailed": "فشل حذف المستخدم",
+    "loadAccountFailed": "فشل تحميل الحساب",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "locations": "الفروع",
+      "users": "المستخدمين",
+      "channels": "القنوات",
+      "auditLogs": "سجلات التدقيق"
+    },
+    "deleteUser": {
+      "title": "حذف مستخدم",
+      "confirm": "هل أنت متأكد من رغبتك في إزالة {name} من هذا الحساب؟"
+    },
+    "overview": {
+      "subscription": {
+        "title": "تفاصيل الاشتراك",
+        "subtitle": "الخطة الحالية والحالة",
+        "planName": "خطة {plan}",
+        "renewsOn": "يتجدد في {date}",
+        "noActive": "لا يوجد اشتراك نشط",
+        "freeTier": "هذا الحساب على الفئة المجانية."
+      },
+      "stats": {
+        "title": "إحصائيات الحساب",
+        "subtitle": "نظرة عامة على استخدام الحساب",
+        "locations": "الفروع",
+        "users": "المستخدمين"
+      }
+    },
+    "users": {
+      "title": "المستخدمين",
+      "subtitle": "إدارة مستخدمي حسابك والأدوار الموكلة إليهم",
+      "searchPlaceholder": "البحث عن مستخدم",
+      "columns": {
+        "user": "المستخدم",
+        "email": "البريد الإلكتروني",
+        "role": "الدور",
+        "actions": "الإجراءات"
+      },
+      "actions": {
+        "edit": "تعديل المستخدم",
+        "delete": "حذف المستخدم"
+      }
+    },
+    "channels": {
+      "title": "المنصات المرتبطة",
+      "subtitle": "إدارة التكامل مع منصات الطرف الثالث",
+      "googleSubtitle": "ملف تعريف العمل",
+      "facebookSubtitle": "الصفحات",
+      "connected": "متصل",
+      "notConnected": "غير متصل"
+    },
+    "logs": {
+      "title": "النشاط الأخير",
+      "noLogs": "لم يتم العثور على سجلات تدقيق",
+      "noLogsSubtitle": "ستظهر الأنشطة هنا بمجرد تنفيذ الإجراءات."
+    },
+    "accountDialog": {
+      "editTitle": "تعديل الحساب",
+      "newTitle": "حساب جديد",
+      "editSubtitle": "تحديث تفاصيل الحساب والاشتراك",
+      "newSubtitle": "إنشاء حساب منظمة جديد",
+      "fields": {
+        "name": "اسم الحساب",
+        "namePlaceholder": "مثلاً: شركة أكمي",
+        "ownerEmail": "بريد المالك",
+        "ownerEmailPlaceholder": "مثلاً: admin@acme.com",
+        "ownerEmailDisabled": "لا يمكن تغيير بريد المالك مباشرة",
+        "status": "الحالة",
+        "plan": "الخطة",
+        "description": "الوصف",
+        "descriptionPlaceholder": "اكتب شيئاً عن الحساب..."
+      }
+    },
+    "userDialog": {
+      "editTitle": "تعديل مستخدم",
+      "addTitle": "إضافة مستخدم",
+      "fields": {
+        "firstName": "الاسم الأول",
+        "lastName": "اسم العائلة",
+        "email": "البريد الإلكتروني",
+        "role": "الدور",
+        "rolePlaceholder": "اختر الدور",
+        "business": "العمل",
+        "location": "الفرع",
+        "password": "كلمة المرور"
+      }
     }
   },
   "brandRise": {
