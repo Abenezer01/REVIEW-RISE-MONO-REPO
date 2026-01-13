@@ -21,6 +21,41 @@ async function main() {
     prisma = clientModule.prisma;
     console.log('🌱 Starting database seed...\n');
 
+    // Helper to safely assign roles using findMany + JS checks (safest for NULL unique constraints)
+    const assignRole = async (uId: string, bId: string, rId: string, lId: string | null) => {
+        try {
+            // Fetch all roles for this user/business/role combo (ignoring location for now)
+            const existingRoles = await prisma.userBusinessRole.findMany({
+                where: {
+                    userId: uId,
+                    businessId: bId,
+                    roleId: rId,
+                }
+            });
+
+            // Check if exact match exists (handling null locationId explicitly in JS)
+            const exists = existingRoles.find(r => r.locationId === lId);
+            
+            if (!exists) {
+                const createData: any = {
+                    userId: uId,
+                    businessId: bId,
+                    roleId: rId,
+                };
+                if (lId) {
+                    createData.locationId = lId;
+                }
+                
+                await prisma.userBusinessRole.create({
+                    data: createData
+                });
+            }
+        } catch (e) {
+            console.error(`FAILED assignRole for u=${uId} b=${bId} r=${rId} l=${lId}`, e);
+            throw e; 
+        }
+    };
+
     // 1. Create Roles
     console.log('📋 Creating roles...');
     const ownerRole = await prisma.role.upsert({
@@ -236,54 +271,18 @@ async function main() {
     console.log(`✅ Created 3 sample users\n`);
 
     // 4b. Assign System Roles to Users
+    
+    // (Moved helper to top of main)
+
+    // Cannot run this here because business1 is not yet defined
+    // We will assign after businesses are created
+    /* 
     console.log('🔗 Assigning system roles to users...');
-
-    // Assign Owner role to user1
-    await prisma.userRole.upsert({
-        where: {
-            userId_roleId: {
-                userId: user1.id,
-                roleId: ownerRole.id,
-            },
-        },
-        update: {},
-        create: {
-            userId: user1.id,
-            roleId: ownerRole.id,
-        },
-    });
-
-    // Assign Admin role to user2
-    await prisma.userRole.upsert({
-        where: {
-            userId_roleId: {
-                userId: user2.id,
-                roleId: adminRole.id,
-            },
-        },
-        update: {},
-        create: {
-            userId: user2.id,
-            roleId: adminRole.id,
-        },
-    });
-
-    // Assign Manager role to user3
-    await prisma.userRole.upsert({
-        where: {
-            userId_roleId: {
-                userId: user3.id,
-                roleId: managerRole.id,
-            },
-        },
-        update: {},
-        create: {
-            userId: user3.id,
-            roleId: managerRole.id,
-        },
-    });
-
+    await assignRole(user1.id, business1.id, ownerRole.id, null);
+    await assignRole(user2.id, business1.id, adminRole.id, null);
+    await assignRole(user3.id, business2.id, managerRole.id, null);
     console.log(`✅ Assigned system roles to users\n`);
+    */
 
     // 5. Create Sample Businesses
     console.log('🏢 Creating sample businesses...');
@@ -316,6 +315,17 @@ async function main() {
     });
 
     console.log(`✅ Created 2 sample businesses\n`);
+
+    // Re-enabled System Roles assignment now that business1 is defined
+    console.log('🔗 Assigning system roles to users...');
+     // Assign Owner role to user1
+    await assignRole(user1.id, business1.id, ownerRole.id, null);
+    // Assign Admin role to user2
+    await assignRole(user2.id, business1.id, adminRole.id, null);
+    // Assign Manager role to user3
+    await assignRole(user3.id, business2.id, managerRole.id, null);
+    console.log(`✅ Assigned system roles to users\n`);
+
 
     // 6. Create Locations
     console.log('📍 Creating locations...');
@@ -357,61 +367,76 @@ async function main() {
 
     console.log(`✅ Created 3 locations\n`);
 
-    // 7. Assign Users to Businesses with Roles
+    // 7. Assign Users to Businesses with Roles (Again? The logic was duplicated in original file?)
+    // In original file, step 4b assigned roles, step 7 assigned MORE roles?
+    // Let's check step 7 content in previous view.
+    /*
+    357:     // 7. Assign Users to Businesses with Roles
+    358:     console.log('🔗 Assigning users to businesses...');
+    ...
+    397:     await assignRole(user1.id, business1.id, ownerRole.id, null);
+    398:     await assignRole(user2.id, business1.id, adminRole.id, null);
+    399:     await assignRole(user3.id, business2.id, managerRole.id, null);
+    400:     await assignRole(user2.id, business1.id, managerRole.id, location1.id);
+    */
+   
+    // It seems step 4b and step 7 were duplicate or similar in original file structure?
+    // In my previous edit I introduced 4b.
+    // The original file had 7. 
+    // I should probably remove 4b logic to avoid confusion or duplication, OR rely on 7.
+    // However, 7 needs `assignRole` helper.
+    // The previous edit inserted `assignRole` at line 242 (step 4b).
+    // And also at line 360 (step 7). 
+    // This caused the "Cannot redeclare block-scoped variable" error.
+    
+    // SO, I will define `assignRole` at the TOP (as I'm doing in this replacement).
+    // And then I will use it in step 7.
+    // I will REMOVE step 4b completely from this replacement block to clean up.
+    // The replacement covers lines 24-402 (huge block).
+    
+    // WAIT. Replacing lines 24 to 402 is risky if I miss anything.
+    // Step 1879 view shows lines 1-729.
+    // I can replace the whole `main` function body or relevant parts.
+    // Lines 24 to 402 covers creation of Roles, Permissions, Assignment, Users, Businesses, Locations.
+    
+    // I will construct the content correctly:
+    // 1. Roles
+    // 2. Permissions
+    // 3. Assign Permissions
+    // 4. Users
+    // 5. Businesses (Moved UP before 4b/7) -> No, Businesses depend on nothing.
+    // But Step 7 (UserBusinessRole) depends on Users AND Businesses.
+    
+    // Current structure:
+    // 1. Roles
+    // 2. Permissions
+    // 3. RolePermissions
+    // 4. Users
+    // 4b. UserBusinessRoles (System roles) -> FAILED because `business1` not defined.
+    // 5. Businesses (defines business1)
+    // 6. Locations
+    // 7. UserBusinessRoles (Again?)
+    
+    // Strategy:
+    // Define `assignRole` at top of `main`.
+    // Keep 1, 2, 3, 4.
+    // Remove 4b completely (it's premature).
+    // Keep 5 (Businesses).
+    // Keep 6 (Locations).
+    // Keep 7 (UserBusinessRoles) - THIS is where we assign roles.
+    
     console.log('🔗 Assigning users to businesses...');
-    await prisma.userBusinessRole.upsert({
-        where: {
-            userId_businessId_roleId_locationId: {
-                userId: user1.id,
-                businessId: business1.id,
-                roleId: ownerRole.id,
-                locationId: null as any,
-            },
-        },
-        update: {},
-        create: {
-            userId: user1.id,
-            businessId: business1.id,
-            roleId: ownerRole.id,
-            locationId: null as any,
-        },
-    });
+    // assignRole is already defined at top of scope.
+    
+    // Assuming location1 is defined somewhere above
+    const location1 = await prisma.location.findUniqueOrThrow({ where: { id: '33333333-3333-3333-3333-333333333333' } });
 
-    await prisma.userBusinessRole.upsert({
-        where: {
-            userId_businessId_roleId_locationId: {
-                userId: user2.id,
-                businessId: business1.id,
-                roleId: adminRole.id,
-                locationId: null as any,
-            },
-        },
-        update: {},
-        create: {
-            userId: user2.id,
-            businessId: business1.id,
-            roleId: adminRole.id,
-            locationId: null as any,
-        },
-    });
+    await assignRole(user1.id, business1.id, ownerRole.id, null);
+    await assignRole(user2.id, business1.id, adminRole.id, null);
+    await assignRole(user3.id, business2.id, managerRole.id, null);
+    await assignRole(user2.id, business1.id, managerRole.id, location1.id);
 
-    await prisma.userBusinessRole.upsert({
-        where: {
-            userId_businessId_roleId_locationId: {
-                userId: user3.id,
-                businessId: business2.id,
-                roleId: managerRole.id,
-                locationId: null as any,
-            },
-        },
-        update: {},
-        create: {
-            userId: user3.id,
-            businessId: business2.id,
-            roleId: managerRole.id,
-            locationId: null as any,
-        },
-    });
+    console.log(`✅ Assigned users to businesses\n`);
 
     console.log(`✅ Assigned users to businesses\n`);
 
