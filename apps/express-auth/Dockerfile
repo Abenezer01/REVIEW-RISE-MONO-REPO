@@ -54,15 +54,15 @@ RUN pnpm --filter "@platform/auth" run build
 # Verify auth build succeeded
 # Verify auth build succeeded and fix structure if nested
 # Verify auth build succeeded and fix structure if nested
-# The build on VPS produces 'dist/auth/src/index.js' due to monorepo source references.
-# We patch package.json to point to this nested path instead of moving files (which would break relative imports).
-RUN if [ -f packages/@platform/auth/dist/auth/src/index.js ]; then \
-  echo "Detected nested build structure. Patching package.json..."; \
-  sed -i 's|"./dist/index.js"|"./dist/auth/src/index.js"|g' packages/@platform/auth/package.json && \
-  sed -i 's|"./dist/index.d.ts"|"./dist/auth/src/index.d.ts"|g' packages/@platform/auth/package.json; \
+# The build on VPS produces 'dist/src/index.js' due to composite build configuration.
+# We patch package.json to point to this nested path.
+RUN if [ -f packages/@platform/auth/dist/src/index.js ]; then \
+  echo "Detected nested build structure (dist/src). Patching package.json..."; \
+  sed -i 's|"./dist/index.js"|"./dist/src/index.js"|g' packages/@platform/auth/package.json && \
+  sed -i 's|"./dist/index.d.ts"|"./dist/src/index.d.ts"|g' packages/@platform/auth/package.json; \
   fi && \
   # Verify the file exists at either the standard OR nested location (depending on what happened above)
-  (test -f packages/@platform/auth/dist/index.js || test -f packages/@platform/auth/dist/auth/src/index.js) || \
+  (test -f packages/@platform/auth/dist/index.js || test -f packages/@platform/auth/dist/src/index.js) || \
   (echo "CRITICAL: Auth build failed" && ls -R packages/@platform/auth && exit 1)
 RUN pnpm --filter "@platform/*" run build
 
