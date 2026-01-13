@@ -4,8 +4,8 @@ import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 
-import { JobsDashboard } from './components/JobsDashboard';
-import { VisibilityPlanDetails } from './components/VisibilityPlanDetails';
+import { JobsDashboard } from '@/components/brand-rise/visibility/JobsDashboard';
+import { VisibilityPlanDetails } from '@/components/brand-rise/visibility/VisibilityPlanDetails';
 
 const VisibilityPlanPage = () => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'plan_details'>('dashboard');
