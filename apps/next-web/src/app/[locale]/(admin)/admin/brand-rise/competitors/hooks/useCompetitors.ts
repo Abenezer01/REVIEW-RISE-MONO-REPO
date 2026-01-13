@@ -8,7 +8,7 @@ import { useBusinessId } from '@/hooks/useBusinessId';
 import { useLocationFilter } from '@/hooks/useLocationFilter';
 import apiClient from '@/lib/apiClient';
 import { BrandService } from '@/services/brand.service';
-import type { Competitor } from '../components/CompetitorCard';
+import type { Competitor } from '@/components/brand-rise/competitors/CompetitorCard';
 
 export const useCompetitors = () => {
   const t = useTranslations('dashboard');
