@@ -188,6 +188,13 @@ if [ "$NEEDS_INIT" -eq 1 ]; then
     log_info "Removing old/corrupted certificates using Docker..."
     docker compose -f "$COMPOSE_FILE" run --rm --entrypoint "sh -c 'rm -rf /etc/letsencrypt/live/vyntrise.com* && rm -rf /etc/letsencrypt/archive/vyntrise.com* && rm -rf /etc/letsencrypt/renewal/vyntrise.com*.conf'" certbot || true
     
+    # Fix permissions so init-ssl.sh can write to the directory (it runs as host user, but docker creates root-owned files)
+    CURRENT_UID=$(id -u)
+    CURRENT_GID=$(id -g)
+    log_info "Fixing permissions for ./nginx/certbot to $CURRENT_UID:$CURRENT_GID..."
+    # We use the certbot container to chown the mounted volumes
+    docker compose -f "$COMPOSE_FILE" run --rm --entrypoint "chown -R $CURRENT_UID:$CURRENT_GID /etc/letsencrypt /var/www/certbot" certbot || true
+
     # Run init-ssl.sh in non-interactive mode
     chmod +x ./scripts/init-ssl.sh
     ./scripts/init-ssl.sh --non-interactive || {
