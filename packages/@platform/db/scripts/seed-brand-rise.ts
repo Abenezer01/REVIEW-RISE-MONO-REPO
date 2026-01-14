@@ -4,7 +4,11 @@ import path from 'path';
 
 // Properly load env vars from root
 const envPath = path.resolve(__dirname, '../../../../.env');
-dotenv.config({ path: envPath });
+try {
+    dotenv.config({ path: envPath });
+} catch (e) {
+    // Ignore missing .env in production
+}
 
 async function seedBrandRiseData() {
   // Dynamic import to ensure env vars are loaded first
