@@ -12,7 +12,12 @@ import Divider from '@mui/material/Divider'
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 
+// Hook Imports
+import useTranslation from '@/hooks/useTranslation'
+
 const AccountChannels = () => {
+  const t = useTranslation('dashboard')
+
   return (
     <Card>
       <CardHeader
@@ -49,10 +54,10 @@ const AccountChannels = () => {
               <Box sx={{ flexGrow: 1 }}>
                 <Typography variant='h6' sx={{ mb: 0.5 }}>Google</Typography>
                 <Typography variant='body2' color='text.secondary'>
-                  Business Profile
+                  {t('accounts.channels.googleSubtitle')}
                 </Typography>
               </Box>
-              <CustomChip size='small' label='Connected' color='success' variant='tonal' />
+              <CustomChip size='small' label={t('accounts.channels.connected')} color='success' variant='tonal' />
             </Box>
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 4 }}>
@@ -79,10 +84,10 @@ const AccountChannels = () => {
               <Box sx={{ flexGrow: 1 }}>
                 <Typography variant='h6' sx={{ mb: 0.5 }}>Facebook</Typography>
                 <Typography variant='body2' color='text.secondary'>
-                  Pages
+                  {t('accounts.channels.facebookSubtitle')}
                 </Typography>
               </Box>
-              <CustomChip size='small' label='Not Connected' color='secondary' variant='tonal' />
+              <CustomChip size='small' label={t('accounts.channels.notConnected')} color='secondary' variant='tonal' />
             </Box>
           </Grid>
         </Grid>

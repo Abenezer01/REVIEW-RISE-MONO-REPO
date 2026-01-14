@@ -10,8 +10,8 @@ import {
 import DownloadIcon from '@mui/icons-material/Download';
 import { toast } from 'react-hot-toast';
 
-import { DiscoveryInput } from './components/DiscoveryInput';
-import { CompetitorList } from './components/CompetitorList';
+import { DiscoveryInput } from '@/components/brand-rise/competitors/DiscoveryInput';
+import { CompetitorList } from '@/components/brand-rise/competitors/CompetitorList';
 
 import { useCompetitors } from './hooks/useCompetitors';
 

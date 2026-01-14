@@ -22,6 +22,9 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import FormPageWrapper from '@/components/shared/form/form-wrapper'
 
+// Hook Imports
+import useTranslation from '@/hooks/useTranslation'
+
 // Actions
 import { createAccount, updateAccount, getRoles, getLocations, getBusinesses } from '@/app/actions/account'
 
@@ -74,6 +77,7 @@ const LocationWatcher = ({ setLocations, setLoadingLocations }: { setLocations: 
 }
 
 const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId }: UserDialogProps) => {
+  const t = useTranslation('dashboard')
   const [showPassword, setShowPassword] = useState(false)
   const [roles, setRoles] = useState<any[]>([])
   const [businesses, setBusinesses] = useState<any[]>([])
@@ -194,7 +198,7 @@ const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId
       sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 450 } } }}
     >
       <Box sx={{ p: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant='h5'>{user ? 'Edit User' : 'Add User'}</Typography>
+        <Typography variant='h5'>{user ? t('accounts.userDialog.editTitle') : t('accounts.userDialog.addTitle')}</Typography>
         <IconButton size='small' onClick={onClose} sx={{ color: 'text.secondary' }}>
           <i className='tabler-x' style={{ fontSize: '1.5rem' }} />
         </IconButton>
@@ -208,7 +212,7 @@ const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId
           validationSchema={validationSchema}
           initialValues={initialValues}
           edit={!!user}
-          title={user ? 'User' : 'User'}
+          title={user ? t('accounts.userDialog.editTitle') : t('accounts.userDialog.addTitle')}
           onCancel={onClose}
           getPayload={values => ({ data: values })}
           createActionFunc={handleAction}
@@ -225,8 +229,8 @@ const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId
                   <CustomTextField
                     select
                     fullWidth
-                    label='Business'
-                    placeholder='Select Business'
+                    label={t('accounts.userDialog.fields.business')}
+                    placeholder={t('accounts.userDialog.fields.business')}
                     {...formik.getFieldProps('businessId')}
                     error={formik.touched.businessId && Boolean(formik.errors.businessId)}
                     helperText={formik.touched.businessId && (formik.errors.businessId as string)}
@@ -237,7 +241,7 @@ const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId
                     }}
                   >
                     <MenuItem value='' disabled>
-                      <Typography color='text.secondary'>Select Business</Typography>
+                      <Typography color='text.secondary'>{t('accounts.userDialog.fields.business')}</Typography>
                     </MenuItem>
                     {businesses.map((business) => (
                       <MenuItem key={business.id} value={business.id}>
@@ -252,8 +256,8 @@ const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId
                     <CustomTextField
                       select
                       fullWidth
-                      label='Location'
-                      placeholder='Select Location'
+                      label={t('accounts.userDialog.fields.location')}
+                      placeholder={t('accounts.userDialog.fields.location')}
                       {...formik.getFieldProps('locationId')}
                       error={formik.touched.locationId && Boolean(formik.errors.locationId)}
                       helperText={formik.touched.locationId && (formik.errors.locationId as string)}
@@ -266,7 +270,7 @@ const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId
                     >
                       <MenuItem value='' disabled>
                         <Typography color='text.secondary'>
-                          {loadingLocations ? 'Loading locations...' : locations.length > 0 ? 'Select Location' : 'No locations available'}
+                          {loadingLocations ? t('overview.loading') : locations.length > 0 ? t('accounts.userDialog.fields.location') : t('overview.noData')}
                         </Typography>
                       </MenuItem>
                       {locations.map((loc) => (
@@ -281,7 +285,7 @@ const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <CustomTextField
                     fullWidth
-                    label='First Name'
+                    label={t('accounts.userDialog.fields.firstName')}
                     placeholder='e.g. John'
                     {...formik.getFieldProps('firstName')}
                     error={formik.touched.firstName && Boolean(formik.errors.firstName)}
@@ -291,7 +295,7 @@ const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <CustomTextField
                     fullWidth
-                    label='Last Name'
+                    label={t('accounts.userDialog.fields.lastName')}
                     placeholder='e.g. Doe'
                     {...formik.getFieldProps('lastName')}
                     error={formik.touched.lastName && Boolean(formik.errors.lastName)}
@@ -301,7 +305,7 @@ const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId
                 <Grid size={{ xs: 12 }}>
                   <CustomTextField
                     fullWidth
-                    label='Email'
+                    label={t('accounts.userDialog.fields.email')}
                     placeholder='e.g. john@example.com'
                     {...formik.getFieldProps('email')}
                     error={formik.touched.email && Boolean(formik.errors.email)}
@@ -313,8 +317,8 @@ const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId
                   <CustomTextField
                     select
                     fullWidth
-                    label='Role'
-                    placeholder='Select Role'
+                    label={t('accounts.userDialog.fields.role')}
+                    placeholder={t('accounts.userDialog.fields.rolePlaceholder')}
                     {...formik.getFieldProps('role')}
                     error={formik.touched.role && Boolean(formik.errors.role)}
                     helperText={formik.touched.role && (formik.errors.role as string)}
@@ -325,7 +329,7 @@ const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId
                     }}
                   >
                     <MenuItem value='' disabled>
-                      <Typography color='text.secondary'>Select Role</Typography>
+                      <Typography color='text.secondary'>{t('accounts.userDialog.fields.rolePlaceholder')}</Typography>
                     </MenuItem>
                     {roles.map((role) => (
                       <MenuItem key={role.id} value={role.name}>
@@ -339,7 +343,7 @@ const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId
                   <Grid size={{ xs: 12 }}>
                     <CustomTextField
                       fullWidth
-                      label='Password'
+                      label={t('accounts.userDialog.fields.password')}
                       placeholder='············'
                       type={showPassword ? 'text' : 'password'}
                       {...formik.getFieldProps('password')}

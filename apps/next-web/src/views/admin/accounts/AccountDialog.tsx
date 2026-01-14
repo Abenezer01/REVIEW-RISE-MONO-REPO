@@ -23,6 +23,9 @@ import CustomAvatar from '@core/components/mui/Avatar'
 // Shared Imports
 import FormPageWrapper from '@/components/shared/form/form-wrapper'
 
+// Hook Imports
+import useTranslation from '@/hooks/useTranslation'
+
 // Actions
 import { createAccount, updateAccount } from '@/app/actions/account'
 
@@ -42,6 +45,8 @@ const validationSchema = yup.object({
 })
 
 const AccountDialog = ({ open, onClose, onSuccess, account }: AccountDialogProps) => {
+  const t = useTranslation('dashboard')
+ 
   const initialValues = useMemo(
     () => ({
       name: account?.name || '',
@@ -91,7 +96,7 @@ const AccountDialog = ({ open, onClose, onSuccess, account }: AccountDialogProps
       sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
     >
       <Box sx={{ p: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant='h5'>{account ? 'Edit Account' : 'New Account'}</Typography>
+        <Typography variant='h5'>{account ? t('accounts.accountDialog.editTitle') : t('accounts.accountDialog.newTitle')}</Typography>
         <IconButton size='small' onClick={handleClose} sx={{ color: 'text.secondary' }}>
           <i className='tabler-x' style={{ fontSize: '1.5rem' }} />
         </IconButton>
@@ -106,7 +111,7 @@ const AccountDialog = ({ open, onClose, onSuccess, account }: AccountDialogProps
           </CustomAvatar>
         </Box>
         <Typography variant='body2' color='text.secondary' align='center' sx={{ mb: 6 }}>
-          {account ? 'Update account details and subscription' : 'Create a new organization account'}
+          {account ? t('accounts.accountDialog.editSubtitle') : t('accounts.accountDialog.newSubtitle')}
         </Typography>
 
         <FormPageWrapper
@@ -114,7 +119,7 @@ const AccountDialog = ({ open, onClose, onSuccess, account }: AccountDialogProps
           validationSchema={validationSchema}
           initialValues={initialValues}
           edit={!!account}
-          title={account ? 'Account' : 'Account'}
+          title={account ? t('accounts.accountDialog.editTitle') : t('accounts.accountDialog.newTitle')}
           onCancel={handleClose}
           getPayload={values => values}
           createActionFunc={handleAction}
@@ -128,8 +133,8 @@ const AccountDialog = ({ open, onClose, onSuccess, account }: AccountDialogProps
               <Grid size={{ xs: 12 }}>
                 <CustomTextField
                   fullWidth
-                  label='Account Name'
-                  placeholder='e.g. Acme Corp'
+                  label={t('accounts.accountDialog.fields.name')}
+                  placeholder={t('accounts.accountDialog.fields.namePlaceholder')}
                   {...formik.getFieldProps('name')}
                   error={formik.touched.name && Boolean(formik.errors.name)}
                   helperText={formik.touched.name && (formik.errors.name as string)}
@@ -147,13 +152,13 @@ const AccountDialog = ({ open, onClose, onSuccess, account }: AccountDialogProps
               <Grid size={{ xs: 12 }}>
                 <CustomTextField
                   fullWidth
-                  label='Owner Email'
-                  placeholder='e.g. admin@acme.com'
+                  label={t('accounts.accountDialog.fields.ownerEmail')}
+                  placeholder={t('accounts.accountDialog.fields.ownerEmailPlaceholder')}
                   {...formik.getFieldProps('email')}
                   error={formik.touched.email && Boolean(formik.errors.email)}
                   helperText={
                     (formik.touched.email && (formik.errors.email as string)) ||
-                    (account && 'Owner email cannot be changed directly')
+                    (account && t('accounts.accountDialog.fields.ownerEmailDisabled'))
                   }
                   disabled={!!account}
                   slotProps={{
@@ -171,7 +176,7 @@ const AccountDialog = ({ open, onClose, onSuccess, account }: AccountDialogProps
                 <CustomTextField
                   select
                   fullWidth
-                  label='Status'
+                  label={t('accounts.accountDialog.fields.status')}
                   {...formik.getFieldProps('status')}
                   error={formik.touched.status && Boolean(formik.errors.status)}
                   helperText={formik.touched.status && (formik.errors.status as string)}
@@ -194,7 +199,7 @@ const AccountDialog = ({ open, onClose, onSuccess, account }: AccountDialogProps
                 <CustomTextField
                   select
                   fullWidth
-                  label='Plan'
+                  label={t('accounts.accountDialog.fields.plan')}
                   {...formik.getFieldProps('plan')}
                   error={formik.touched.plan && Boolean(formik.errors.plan)}
                   helperText={formik.touched.plan && (formik.errors.plan as string)}
@@ -218,8 +223,8 @@ const AccountDialog = ({ open, onClose, onSuccess, account }: AccountDialogProps
                   fullWidth
                   multiline
                   rows={3}
-                  label='Description'
-                  placeholder='Brief description...'
+                  label={t('accounts.accountDialog.fields.description')}
+                  placeholder={t('accounts.accountDialog.fields.descriptionPlaceholder')}
                   {...formik.getFieldProps('description')}
                   error={formik.touched.description && Boolean(formik.errors.description)}
                   helperText={formik.touched.description && (formik.errors.description as string)}
