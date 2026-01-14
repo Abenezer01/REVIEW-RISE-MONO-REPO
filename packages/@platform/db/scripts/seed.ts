@@ -4,11 +4,19 @@ import path from 'path';
 import bcrypt from 'bcryptjs';
 
 // Load environment variables
+// Load environment variables (optional, for local dev)
 const envPath = path.resolve(__dirname, '../../../../.env');
-const result = dotenv.config({ path: envPath });
+try {
+    const result = dotenv.config({ path: envPath });
+    if (result.error) {
+        console.warn('⚠️  Dotenv loaded with error (ignoring if env vars exist):', result.error.message);
+    } else {
+        console.log('✅ Loaded .env from:', envPath);
+    }
+} catch (error: any) {
+    console.log('ℹ️  Skipping .env load (likely in production/docker):', error.message);
+}
 
-console.log('Loading .env from:', envPath);
-console.log('Dotenv result error:', result.error);
 console.log('DATABASE_URL present:', !!process.env.DATABASE_URL);
 
 // Prisma instance will be imported dynamically
