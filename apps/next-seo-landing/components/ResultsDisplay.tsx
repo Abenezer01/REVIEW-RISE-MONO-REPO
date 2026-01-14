@@ -1329,7 +1329,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
           font-family: 'JetBrains Mono', monospace;
           font-size: 32px;
           font-weight: 900;
-          background: var(--accent-solid);
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;

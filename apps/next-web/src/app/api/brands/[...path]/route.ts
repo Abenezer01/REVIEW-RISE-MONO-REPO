@@ -31,7 +31,6 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ path: str
   } else if (path[0] === 'onboard') {
       targetPath = 'brand-profiles/onboard';
   } else {
-      const id = path[0];
       const subResource = path[1];
 
       if (subResource && BRANDS_FEATURES.includes(subResource)) {

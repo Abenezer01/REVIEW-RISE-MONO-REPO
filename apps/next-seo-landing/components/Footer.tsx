@@ -4,67 +4,108 @@ export default function Footer() {
   return (
     <footer className="footer">
       <div className="container">
-        <div className="footer-content">
-          <div className="footer-section">
-            <div className="logo">
-              <span className="logo-icon">🟠</span>
-              <span className="logo-text">AdRise SEO</span>
-            </div>
-            <p className="copyright">© 2024 AdRise SEO. All rights reserved.</p>
+        <div className="top">
+          <div className="brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L2 19.5h20L12 2z" />
+            </svg>
+            <span>ReviewRise</span>
           </div>
-          
-          <div className="footer-links">
-            <a href="#privacy">Privacy Policy</a>
-            <a href="#terms">Terms of Service</a>
-            <a href="#contact">Contact</a>
+          <div className="links">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How it Works</a>
+            <a href="https://app.reviewrise.com">Sign In</a>
+          </div>
+        </div>
+        <div className="bottom">
+          <p className="copyright">
+            © {new Date().getFullYear()} ReviewRise. All rights reserved.
+          </p>
+          <div className="legal">
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
           </div>
         </div>
       </div>
 
       <style jsx>{`
         .footer {
-          padding: 40px 0;
+          padding: 64px 0 32px;
           border-top: 1px solid var(--border-color);
+          background: var(--bg-primary);
         }
         .container {
           max-width: 1200px;
           margin: 0 auto;
           padding: 0 24px;
         }
-        .footer-content {
+        .top {
           display: flex;
           justify-content: space-between;
           align-items: center;
+          margin-bottom: 48px;
         }
-        .logo {
+        .brand {
           display: flex;
           align-items: center;
-          gap: 12px;
-          font-size: 18px;
-          font-weight: 700;
-          margin-bottom: 8px;
+          gap: 10px;
+          font-size: 15px;
+          font-weight: 600;
+          color: var(--text-primary);
         }
-        .copyright {
-          color: var(--text-secondary);
-          font-size: 14px;
+        .brand svg {
+          color: var(--accent);
         }
-        .footer-links {
+        .links {
           display: flex;
           gap: 32px;
         }
-        .footer-links a {
+        .links a {
           color: var(--text-secondary);
           font-size: 14px;
+          font-weight: 500;
           transition: color 0.2s;
         }
-        .footer-links a:hover {
-          color: var(--text-primary);
+        .links a:hover {
+          color: var(--accent);
+        }
+        .bottom {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-top: 32px;
+          border-top: 1px solid var(--border-color);
+        }
+        .copyright {
+          font-size: 13px;
+          color: var(--text-tertiary);
+        }
+        .legal {
+          display: flex;
+          gap: 24px;
+        }
+        .legal a {
+          font-size: 13px;
+          color: var(--text-tertiary);
+          transition: color 0.2s;
+        }
+        .legal a:hover {
+          color: var(--accent);
         }
         @media (max-width: 768px) {
-          .footer-content {
+          .top {
             flex-direction: column;
             gap: 24px;
-            text-align: center;
+            align-items: flex-start;
+          }
+          .links {
+            flex-direction: column;
+            gap: 16px;
+          }
+          .bottom {
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-start;
           }
         }
       `}</style>

@@ -15,7 +15,6 @@ export default function Hero() {
   const handleAnalyze = async () => {
     if (!url) return;
     
-    // Transform URL: ensure protocol, trim whitespace, remove trailing slash
     let processedUrl = url.trim();
     if (!/^https?:\/\//i.test(processedUrl)) {
       processedUrl = `https://${processedUrl}`;
@@ -49,21 +48,26 @@ export default function Hero() {
     <section className="hero">
       <div className="container">
         <div className="badge">
-          <span className="badge-icon">✨</span> FREE AI-POWERED SEO ANALYSIS
+          <span className="badge-dot"></span>
+          AI-Powered SEO Analysis
         </div>
         
         <h1 className="title">
-          Discover Your Website&apos;s SEO Score<br />in Seconds
+          Instant SEO Insights for<br />Your Website
         </h1>
+
+        <p className="description">
+          Get a comprehensive SEO analysis in seconds. No signup required.
+        </p>
 
         {!loading && !result && (
           <>
             <div className="input-wrapper">
               <div className="input-container">
-                <Globe className="input-icon" size={20} />
+                <Globe className="input-icon" size={18} />
                 <input
                   type="url"
-                  placeholder="Enter your website URL (e.g., www.example.com)"
+                  placeholder="example.com"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAnalyze()}
@@ -73,13 +77,13 @@ export default function Hero() {
                 className="analyze-button"
                 onClick={handleAnalyze}
               >
-                Analyze Now
-                <ArrowRight size={20} />
+                Analyze
+                <ArrowRight size={16} />
               </button>
             </div>
 
-            <p className="subtitle">
-              ✓ Instant results • ✓ No signup required • ✓ Completely free
+            <p className="features-text">
+              Free • Instant Results • No Signup
             </p>
           </>
         )}
@@ -92,25 +96,20 @@ export default function Hero() {
           <div className="stats">
             <div className="stat">
               <div className="stat-value">50K+</div>
-              <div className="stat-label">SITES ANALYZED</div>
+              <div className="stat-label">Sites Analyzed</div>
             </div>
             <div className="stat">
               <div className="stat-value">98%</div>
-              <div className="stat-label">ACCURACY RATE</div>
+              <div className="stat-label">Accuracy</div>
             </div>
             <div className="stat">
-              <div className="stat-value">4.9/5</div>
-              <div className="stat-label">USER RATING</div>
-            </div>
-            <div className="stat">
-              <div className="stat-value">24/7</div>
-              <div className="stat-label">AVAILABLE</div>
+              <div className="stat-value">4.9</div>
+              <div className="stat-label">Rating</div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Detailed Results Section */}
       {result && (
         <div id="results" style={{ scrollMarginTop: '20px' }}>
           <ResultsDisplay result={result} />
@@ -124,44 +123,51 @@ export default function Hero() {
           position: relative;
         }
         .container {
-          max-width: 900px;
+          max-width: 800px;
           margin: 0 auto;
           padding: 0 24px;
         }
         .badge {
           display: inline-flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
           background: rgba(249, 160, 48, 0.1);
-          border: 1px solid rgba(249, 160, 48, 0.2);
-          border-radius: 50px;
-          padding: 12px 28px;
-          font-size: 11px;
-          font-weight: 700;
-          color: var(--accent-solid);
-          margin-bottom: 40px;
-          animation: fadeIn 0.6s ease-out;
-          box-shadow: 0 4px 20px rgba(249, 160, 48, 0.1);
-          letter-spacing: 1.2px;
-          text-transform: uppercase;
+          border: 1px solid rgba(249, 160, 48, 0.3);
+          border-radius: 100px;
+          padding: 6px 14px;
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--accent);
+          margin-bottom: 32px;
         }
-        .badge-icon {
-          font-size: 18px;
+        .badge-dot {
+          width: 6px;
+          height: 6px;
+          background: var(--accent);
+          border-radius: 50%;
+          animation: pulse 2s ease-in-out infinite;
         }
         .title {
-          font-family: 'Plus Jakarta Sans', sans-serif;
-          font-size: 72px;
-          font-weight: 900;
+          font-size: 64px;
+          font-weight: 700;
           line-height: 1.1;
-          margin-bottom: 56px;
-          animation: fadeIn 0.8s ease-out 0.2s both;
-          letter-spacing: -0.02em;
+          margin-bottom: 24px;
+          letter-spacing: -0.03em;
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .description {
+          font-size: 20px;
+          color: var(--text-secondary);
+          margin-bottom: 48px;
+          line-height: 1.5;
         }
         .input-wrapper {
           display: flex;
-          gap: 16px;
-          margin-bottom: 20px;
-          animation: fadeIn 1s ease-out 0.4s both;
+          gap: 12px;
+          margin-bottom: 16px;
         }
         .input-container {
           flex: 1;
@@ -170,156 +176,115 @@ export default function Hero() {
           align-items: center;
         }
         .input-icon {
-          color: var(--accent-solid);
+          color: var(--accent);
           position: absolute;
-          left: 20px;
+          left: 16px;
           z-index: 1;
         }
         input {
           width: 100%;
-          padding: 20px 20px 20px 56px;
-          border-radius: 16px;
-          border: 2px solid var(--border-color);
-          background: var(--card-bg);
-          backdrop-filter: blur(10px);
+          padding: 14px 16px 14px 44px;
+          border-radius: 8px;
+          border: 1px solid var(--border-color);
+          background: var(--bg-primary);
           color: var(--text-primary);
-          font-size: 16px;
+          font-size: 15px;
           outline: none;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: var(--shadow);
+          transition: all 0.2s;
         }
         input:focus {
-          border-color: var(--accent-solid);
-          box-shadow: 0 0 0 4px rgba(249, 160, 48, 0.1), var(--glow);
-          transform: translateY(-2px);
+          border-color: var(--brand-primary);
+          box-shadow: 0 0 0 3px rgba(5, 64, 118, 0.1);
         }
         input::placeholder {
-          color: var(--text-secondary);
+          color: var(--text-tertiary);
         }
         .analyze-button {
           background: var(--accent);
           color: white;
           border: none;
-          padding: 20px 40px;
-          border-radius: 16px;
-          font-weight: 700;
-          font-size: 16px;
+          padding: 14px 24px;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 15px;
           cursor: pointer;
           display: flex;
           align-items: center;
-          gap: 10px;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          gap: 8px;
+          transition: all 0.2s;
           white-space: nowrap;
-          box-shadow: 0 8px 24px rgba(249, 160, 48, 0.25);
-          position: relative;
-          overflow: hidden;
-        }
-        .analyze-button::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-          transition: left 0.5s;
-        }
-        .analyze-button:hover::before {
-          left: 100%;
         }
         .analyze-button:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 32px rgba(249, 160, 48, 0.35);
+          background: var(--accent-hover);
+          transform: translateY(-1px);
         }
-        .analyze-button:active {
-          transform: translateY(-2px);
-        }
-        .subtitle {
-          color: var(--text-secondary);
-          font-size: 16px;
-          margin-bottom: 80px;
-          animation: fadeIn 1.2s ease-out 0.6s both;
-          font-weight: 400;
-          letter-spacing: 0.01em;
+        .features-text {
+          color: var(--text-tertiary);
+          font-size: 14px;
+          margin-bottom: 64px;
         }
         .error {
           background: rgba(239, 68, 68, 0.1);
-          border: 1px solid rgba(239, 68, 68, 0.3);
+          border: 1px solid rgba(239, 68, 68, 0.2);
           color: #ef4444;
-          padding: 16px;
-          border-radius: 12px;
-          margin-top: 20px;
-          animation: slideIn 0.4s ease-out;
+          padding: 12px 16px;
+          border-radius: 8px;
+          margin-top: 16px;
+          font-size: 14px;
         }
         .stats {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 32px;
-          margin-top: 80px;
-          animation: fadeIn 1.4s ease-out 0.8s both;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+          margin-top: 64px;
         }
         .stat {
           text-align: center;
           padding: 24px;
-          background: var(--card-bg);
-          backdrop-filter: blur(10px);
-          border-radius: 20px;
+          background: var(--bg-secondary);
+          border-radius: 12px;
           border: 1px solid var(--border-color);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: var(--shadow);
+          transition: all 0.2s;
         }
         .stat:hover {
-          transform: translateY(-8px);
-          box-shadow: var(--shadow-lg);
-          border-color: var(--accent-solid);
+          border-color: var(--accent);
+          transform: translateY(-2px);
         }
         .stat-value {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 48px;
-          font-weight: 800;
-          background: var(--accent);
+          font-size: 36px;
+          font-weight: 700;
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
-          margin-bottom: 10px;
-          line-height: 1;
-          letter-spacing: -0.03em;
+          margin-bottom: 8px;
+          letter-spacing: -0.02em;
         }
         .stat-label {
-          font-size: 10px;
+          font-size: 13px;
           color: var(--text-secondary);
-          font-weight: 800;
-          letter-spacing: 2px;
-          text-transform: uppercase;
+          font-weight: 500;
         }
         @media (max-width: 768px) {
           .hero {
             padding: 80px 0 60px;
           }
           .title {
-            font-size: 44px;
+            font-size: 40px;
+          }
+          .description {
+            font-size: 18px;
           }
           .input-wrapper {
             flex-direction: column;
-            gap: 12px;
-          }
-          input {
-            font-size: 15px;
-            padding: 18px 18px 18px 52px;
           }
           .analyze-button {
             width: 100%;
             justify-content: center;
           }
           .stats {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr;
             gap: 16px;
-          }
-          .stat {
-            padding: 20px 16px;
-          }
-          .stat-value {
-            font-size: 32px;
           }
         }
       `}</style>
