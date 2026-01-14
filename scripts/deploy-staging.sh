@@ -154,7 +154,7 @@ log_info "Schema sync completed ✓"
 CERT_PATH="./nginx/certbot/conf/live/vyntrise.com/fullchain.pem"
 CORRUPTED_PATH="./nginx/certbot/conf/live/vyntrise.com-0001"
 
-log_info "Checking SSL certificate state..."
+log_info "Checking SSL certificate state using Docker (to avoid host permission issues)..."
 ls -R ./nginx/certbot/conf || log_warn "Certbot conf dir not found or empty"
 
 # 1. Check for -0001 corruption
@@ -163,21 +163,19 @@ if [ -d "$CORRUPTED_PATH" ]; then
     NEEDS_INIT=1
 fi
 
-# 2. Check strict validity
-if [ ! -f "$CERT_PATH" ]; then
-    log_warn "Certificate not found at $CERT_PATH"
-    NEEDS_INIT=1
-else
-    # Verify file is not empty
-    if [ ! -s "$CERT_PATH" ]; then
-        log_warn "Certificate file exists but is empty."
-        NEEDS_INIT=1
-    else
-        # Verify it's a valid certificate
-        if ! openssl x509 -checkend 0 -noout -in "$CERT_PATH" > /dev/null 2>&1; then
-             log_warn "Certificate exists but appears invalid or expired."
-             NEEDS_INIT=1
+# 2. Check strict validity using certbot container
+if [ "$NEEDS_INIT" -eq 0 ]; then
+    if docker compose -f "$COMPOSE_FILE" run --rm --entrypoint "test -s /etc/letsencrypt/live/vyntrise.com/fullchain.pem" certbot > /dev/null 2>&1; then
+        # File exists and is not empty, check validity
+        if docker compose -f "$COMPOSE_FILE" run --rm --entrypoint "openssl x509 -checkend 0 -noout -in /etc/letsencrypt/live/vyntrise.com/fullchain.pem" certbot > /dev/null 2>&1; then
+            log_info "Valid SSL certificate verified inside container ✓"
+        else
+            log_warn "Certificate exists but appears invalid or expired (checked inside container)."
+            NEEDS_INIT=1
         fi
+    else
+        log_warn "Certificate file not found or empty (checked inside container)."
+        NEEDS_INIT=1
     fi
 fi
 
