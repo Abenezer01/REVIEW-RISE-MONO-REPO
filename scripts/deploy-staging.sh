@@ -159,14 +159,11 @@ ls -R ./nginx/certbot/conf || log_warn "Certbot conf dir not found or empty"
 
 # 1. Check for -0001 corruption
 if [ -d "$CORRUPTED_PATH" ]; then
-    log_warn "Detected corrupted SSL directory ($CORRUPTED_PATH). Cleaning up..."
-    rm -rf ./nginx/certbot/conf
-    rm -rf ./nginx/certbot/www
+    log_warn "Detected corrupted SSL directory ($CORRUPTED_PATH)."
+    NEEDS_INIT=1
 fi
 
 # 2. Check strict validity
-NEEDS_INIT=0
-
 if [ ! -f "$CERT_PATH" ]; then
     log_warn "Certificate not found at $CERT_PATH"
     NEEDS_INIT=1
@@ -187,10 +184,9 @@ fi
 if [ "$NEEDS_INIT" -eq 1 ]; then
     log_info "Running automatic SSL initialization..."
     
-    # Aggressive cleanup to ensure clean slate
-    rm -rf ./nginx/certbot/conf/live/vyntrise.com
-    rm -rf ./nginx/certbot/archive/vyntrise.com
-    rm -rf ./nginx/certbot/renewal/vyntrise.com.conf
+    # Aggressive cleanup via Docker to avoid "Permission denied"
+    log_info "Removing old/corrupted certificates using Docker..."
+    docker compose -f "$COMPOSE_FILE" run --rm --entrypoint "sh -c 'rm -rf /etc/letsencrypt/live/vyntrise.com* && rm -rf /etc/letsencrypt/archive/vyntrise.com* && rm -rf /etc/letsencrypt/renewal/vyntrise.com*.conf'" certbot || true
     
     # Run init-ssl.sh in non-interactive mode
     chmod +x ./scripts/init-ssl.sh
