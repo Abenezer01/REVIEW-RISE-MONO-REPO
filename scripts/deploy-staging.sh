@@ -45,7 +45,7 @@ log_error() {
 # Preflight Checks
 # ==============================================================================
 log_info "Starting deployment preflight checks..."
-
+ 
 # Check if Docker is installed
 if ! command -v docker &> /dev/null; then
     log_error "Docker is not installed. Please install Docker first."
@@ -154,17 +154,43 @@ log_info "Schema sync completed ✓"
 CERT_PATH="./nginx/certbot/conf/live/vyntrise.com/fullchain.pem"
 CORRUPTED_PATH="./nginx/certbot/conf/live/vyntrise.com-0001"
 
-# Check for corruption (-0001 directory)
+log_info "Checking SSL certificate state..."
+ls -R ./nginx/certbot/conf || log_warn "Certbot conf dir not found or empty"
+
+# 1. Check for -0001 corruption
 if [ -d "$CORRUPTED_PATH" ]; then
     log_warn "Detected corrupted SSL directory ($CORRUPTED_PATH). Cleaning up..."
     rm -rf ./nginx/certbot/conf
     rm -rf ./nginx/certbot/www
-    log_info "Cleanup completed."
 fi
 
+# 2. Check strict validity
+NEEDS_INIT=0
+
 if [ ! -f "$CERT_PATH" ]; then
-    log_warn "SSL certificates not found at $CERT_PATH"
+    log_warn "Certificate not found at $CERT_PATH"
+    NEEDS_INIT=1
+else
+    # Verify file is not empty
+    if [ ! -s "$CERT_PATH" ]; then
+        log_warn "Certificate file exists but is empty."
+        NEEDS_INIT=1
+    else
+        # Verify it's a valid certificate
+        if ! openssl x509 -checkend 0 -noout -in "$CERT_PATH" > /dev/null 2>&1; then
+             log_warn "Certificate exists but appears invalid or expired."
+             NEEDS_INIT=1
+        fi
+    fi
+fi
+
+if [ "$NEEDS_INIT" -eq 1 ]; then
     log_info "Running automatic SSL initialization..."
+    
+    # Aggressive cleanup to ensure clean slate
+    rm -rf ./nginx/certbot/conf/live/vyntrise.com
+    rm -rf ./nginx/certbot/archive/vyntrise.com
+    rm -rf ./nginx/certbot/renewal/vyntrise.com.conf
     
     # Run init-ssl.sh in non-interactive mode
     chmod +x ./scripts/init-ssl.sh
@@ -174,7 +200,7 @@ if [ ! -f "$CERT_PATH" ]; then
     }
     log_info "SSL initialization completed ✓"
 else
-    log_info "SSL certificates found ✓"
+    log_info "Valid SSL certificate found ✓"
 fi
 
 # ==============================================================================

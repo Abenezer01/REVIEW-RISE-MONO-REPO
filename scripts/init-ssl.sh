@@ -11,6 +11,8 @@ if ! [ -x "$(command -v docker)" ]; then
   exit 1
 fi
 
+set -e # Exit immediately if any command fails
+
 domains=(vyntrise.com app.vyntrise.com)
 rsa_key_size=4096
 data_path="./nginx/certbot"
