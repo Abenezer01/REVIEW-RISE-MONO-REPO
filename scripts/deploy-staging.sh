@@ -153,6 +153,7 @@ log_info "Schema sync completed ✓"
 # ==============================================================================
 CERT_PATH="./nginx/certbot/conf/live/vyntrise.com/fullchain.pem"
 CORRUPTED_PATH="./nginx/certbot/conf/live/vyntrise.com-0001"
+NEEDS_INIT=0
 
 log_info "Checking SSL certificate state using Docker (to avoid host permission issues)..."
 ls -R ./nginx/certbot/conf || log_warn "Certbot conf dir not found or empty"
