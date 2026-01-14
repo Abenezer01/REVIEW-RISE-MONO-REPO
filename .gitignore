@@ -45,3 +45,9 @@ npm-debug.log*
 /node_modules/.prisma
 .vscode
 /backup
+
+# --------------------
+# Nginx / LE Artifacts
+# --------------------
+/nginx/certbot
+/nginx/ssl

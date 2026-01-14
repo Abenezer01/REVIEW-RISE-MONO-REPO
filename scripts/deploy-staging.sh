@@ -149,6 +149,25 @@ docker compose -f "$COMPOSE_FILE" run --rm \
 log_info "Schema sync completed ✓"
 
 # ==============================================================================
+# SSL Certificate Check
+# ==============================================================================
+CERT_PATH="./nginx/certbot/conf/live/vyntrise.com/fullchain.pem"
+if [ ! -f "$CERT_PATH" ]; then
+    log_warn "SSL certificates not found at $CERT_PATH"
+    log_info "Running automatic SSL initialization..."
+    
+    # Run init-ssl.sh in non-interactive mode
+    chmod +x ./scripts/init-ssl.sh
+    ./scripts/init-ssl.sh --non-interactive || {
+        log_error "SSL initialization failed!"
+        exit 1
+    }
+    log_info "SSL initialization completed ✓"
+else
+    log_info "SSL certificates found ✓"
+fi
+
+# ==============================================================================
 # Start Services
 # ==============================================================================
 log_info "Starting services with Docker Compose..."

@@ -18,9 +18,13 @@ email="support@vyntrise.com" # Change this to your email
 staging=0 # Set to 1 if you're testing your setup to avoid hitting request limits
 
 if [ -d "$data_path" ]; then
-  read -p "Existing data found for $domains. Continue and replace existing certificate? (y/N) " decision
-  if [ "$decision" != "Y" ] && [ "$decision" != "y" ]; then
-    exit
+  if [ "${1:-}" == "--non-interactive" ] || [ "${1:-}" == "--force" ]; then
+     echo "Existing data found. Overwriting due to --non-interactive flag."
+  else
+    read -p "Existing data found for $domains. Continue and replace existing certificate? (y/N) " decision
+    if [ "$decision" != "Y" ] && [ "$decision" != "y" ]; then
+      exit
+    fi
   fi
 fi
 
