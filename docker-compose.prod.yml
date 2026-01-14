@@ -446,7 +446,7 @@ services:
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
-      - EXPRESS_BRAND_URL=http://express-brand:3007/api/v1/brand-profiles
+      - EXPRESS_BRAND_URL=http://express-brand:3007/api/v1
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://app.vyntrise.com}
       - NEXT_PUBLIC_LLM_COST_WARNING=${NEXT_PUBLIC_LLM_COST_WARNING:-true}
     depends_on:
