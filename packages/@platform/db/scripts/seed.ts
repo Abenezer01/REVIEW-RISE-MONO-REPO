@@ -84,6 +84,18 @@ async function main() {
         },
     });
 
+    // Helper for system roles
+    const assignSystemRole = async (userId: string, roleName: string) => {
+        const role = await prisma.role.findUnique({ where: { name: roleName } });
+        if (role) {
+             await prisma.userRole.upsert({
+                where: { userId_roleId: { userId, roleId: role.id } },
+                create: { userId, roleId: role.id },
+                update: {}
+             });
+        }
+    };
+
     const managerRole = await prisma.role.upsert({
         where: { name: 'Manager' },
         update: {},
@@ -277,6 +289,13 @@ async function main() {
     });
 
     console.log(`✅ Created 3 sample users\n`);
+
+    // 4b. Assign System Roles to Users (CRITICAL for login)
+    console.log('🔗 Assigning system roles (UserRole) to users...');
+    await assignSystemRole(user1.id, 'Owner');
+    await assignSystemRole(user2.id, 'Admin');
+    await assignSystemRole(user3.id, 'Manager');
+    console.log(`✅ Assigned system roles to users\n`);
 
     // 4b. Assign System Roles to Users
     
