@@ -149,9 +149,19 @@ docker compose -f "$COMPOSE_FILE" run --rm \
 log_info "Schema sync completed ✓"
 
 # ==============================================================================
-# SSL Certificate Check
+# SSL Certificate Check & Cleanup
 # ==============================================================================
 CERT_PATH="./nginx/certbot/conf/live/vyntrise.com/fullchain.pem"
+CORRUPTED_PATH="./nginx/certbot/conf/live/vyntrise.com-0001"
+
+# Check for corruption (-0001 directory)
+if [ -d "$CORRUPTED_PATH" ]; then
+    log_warn "Detected corrupted SSL directory ($CORRUPTED_PATH). Cleaning up..."
+    rm -rf ./nginx/certbot/conf
+    rm -rf ./nginx/certbot/www
+    log_info "Cleanup completed."
+fi
+
 if [ ! -f "$CERT_PATH" ]; then
     log_warn "SSL certificates not found at $CERT_PATH"
     log_info "Running automatic SSL initialization..."
