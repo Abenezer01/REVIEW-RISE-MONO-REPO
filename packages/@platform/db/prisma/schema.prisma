@@ -729,6 +729,9 @@ model Review {
   author      String
   rating      Int
   content     String?  @db.Text
+  sentiment   String?  // Positive, Neutral, Negative
+  tags        String[] @default([])
+  aiSuggestions Json?  // { suggestedReply?: string, analysis?: string }
   publishedAt DateTime
   
   response    String?  @db.Text

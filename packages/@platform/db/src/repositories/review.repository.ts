@@ -25,6 +25,24 @@ export class ReviewRepository extends BaseRepository<
         return this.count({ businessId });
     }
 
+    async findPaginated(params: {
+        where: Prisma.ReviewWhereInput;
+        skip?: number;
+        take?: number;
+        orderBy?: Prisma.ReviewOrderByWithRelationInput;
+    }) {
+        const [items, total] = await Promise.all([
+            this.delegate.findMany({
+                where: params.where,
+                skip: params.skip,
+                take: params.take,
+                orderBy: params.orderBy || { publishedAt: 'desc' },
+            }),
+            this.count(params.where),
+        ]);
+
+        return { items, total };
+    }
     async upsertReview(data: Prisma.ReviewCreateInput) {
         return this.delegate.upsert({
             where: {
