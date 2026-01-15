@@ -84,6 +84,15 @@ app.post('/jobs/brand-scores', async (req, res) => {
     res.status(202).json({ message: 'Brand scores job started', jobId });
 });
 
+import { runReviewSyncJob } from './jobs/review-sync.job';
+
+app.post('/jobs/review-sync', async (req, res) => {
+    runReviewSyncJob()
+        .then(() => console.log('Review sync job finished'))
+        .catch(err => console.error('Review sync job failed:', err));
+    res.status(202).json({ message: 'Review sync job started' });
+});
+
 const scheduleDaily = (hour: number = 2) => {
     const now = new Date()
     const next = new Date(now)
@@ -92,8 +101,10 @@ const scheduleDaily = (hour: number = 2) => {
     const delay = next.getTime() - now.getTime()
     setTimeout(() => {
         runRankTrackingJob().catch(err => console.error('Scheduled rank job failed:', err))
+        runReviewSyncJob().catch(err => console.error('Scheduled review sync job failed:', err))
         setInterval(() => {
             runRankTrackingJob().catch(err => console.error('Scheduled rank job failed:', err))
+            runReviewSyncJob().catch(err => console.error('Scheduled review sync job failed:', err))
         }, 24 * 60 * 60 * 1000)
     }, delay)
 }

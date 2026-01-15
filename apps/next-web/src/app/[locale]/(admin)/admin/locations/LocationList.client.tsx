@@ -2,6 +2,8 @@
 
 import { useMemo, useState, useCallback } from 'react'
 
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
 import {
@@ -48,6 +50,7 @@ const LocationForm = dynamic(
 
 export default function LocationListClient() {
     const t = useTranslation('dashboard')
+    const router = useRouter()
 
     const [search, setSearch] = useState('')
     const [status, setStatus] = useState('all')
@@ -133,9 +136,14 @@ export default function LocationListClient() {
             flex: 1,
             minWidth: 200,
             renderCell: (params: any) => (
-                <Typography fontWeight={600}>
-                    {params.row.primaryLabel}
-                </Typography>
+                <Link href={`/admin/locations/${params.row.id}`} style={{ textDecoration: 'none' }} onClick={(e) => e.stopPropagation()}>
+                    <Typography 
+                        fontWeight={600} 
+                        sx={{ color: 'primary.main', '&:hover': { textDecoration: 'underline' } }}
+                    >
+                        {params.row.primaryLabel}
+                    </Typography>
+                </Link>
             )
         },
         {
