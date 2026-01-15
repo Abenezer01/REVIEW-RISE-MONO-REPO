@@ -346,6 +346,12 @@ importers:
 
   apps/express-reviews:
     dependencies:
+      '@platform/contracts':
+        specifier: workspace:*
+        version: link:../../packages/@platform/contracts
+      '@platform/db':
+        specifier: workspace:*
+        version: link:../../packages/@platform/db
       cors:
         specifier: ^2.8.5
         version: 2.8.5
