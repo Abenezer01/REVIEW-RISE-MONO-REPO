@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import reviewRoutes from './review.routes';
+import reviewRoutes from './reviews.routes';
 
 const router = Router();
 
