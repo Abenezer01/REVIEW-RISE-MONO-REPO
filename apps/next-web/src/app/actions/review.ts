@@ -70,6 +70,7 @@ export async function getReviews(params: {
     }
   } catch (error: any) {
     console.error('getReviews error:', error)
+
     return {
       success: false,
       error: error.message,
@@ -82,6 +83,7 @@ export async function getReviews(params: {
 export async function regenerateAISuggestion(reviewId: string) {
   try {
     const review = await reviewRepository.findById(reviewId)
+
     if (!review) throw new Error('Review not found')
 
     // Mock AI regeneration logic - in a real app, this would call an LLM
@@ -106,6 +108,7 @@ export async function regenerateAISuggestion(reviewId: string) {
     }
   } catch (error: any) {
     console.error('regenerateAISuggestion error:', error)
+
     return {
       success: false,
       error: error.message
@@ -126,6 +129,7 @@ export async function updateReviewReply(reviewId: string, response: string) {
     }
   } catch (error: any) {
     console.error('updateReviewReply error:', error)
+
     return {
       success: false,
       error: error.message

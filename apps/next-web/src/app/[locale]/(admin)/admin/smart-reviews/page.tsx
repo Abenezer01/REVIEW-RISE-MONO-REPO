@@ -1,4 +1,5 @@
 import Grid from '@mui/material/Grid'
+
 import SmartReviewList from '@/views/admin/reviews/SmartReviewList'
 
 const AdminSmartReviewsPage = () => {

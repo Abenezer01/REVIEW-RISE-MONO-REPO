@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
 import Drawer from '@mui/material/Drawer'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import Divider from '@mui/material/Divider'
-import Stack from '@mui/material/Stack'
 import Rating from '@mui/material/Rating'
 import Chip from '@mui/material/Chip'
 import Button from '@mui/material/Button'
@@ -51,11 +51,14 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
   const handleSaveReply = async () => {
     if (!reply.trim()) {
       toast.error('Please enter a reply')
+
       return
     }
 
     setIsSubmitting(true)
+
     const res = await updateReviewReply(currentReview.id, reply)
+
     setIsSubmitting(false)
 
     if (res.success) {
@@ -69,12 +72,15 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
   const handleUseAI = () => {
     const aiReply = currentReview.aiSuggestions?.suggestedReply || 
       `Dear ${currentReview.author}, thank you so much for your ${currentReview.rating}-star review! We appreciate your feedback and hope to see you again soon.`
+
     setReply(aiReply)
   }
 
   const handleRegenerateAI = async () => {
     setIsRegenerating(true)
+
     const res = await regenerateAISuggestion(currentReview.id)
+
     setIsRegenerating(false)
 
     if (res.success) {
@@ -142,7 +148,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
         </Box>
 
         {/* Metadata: Source & Tags */}
-        <GridContainer>
+        <Box sx={{ display: 'flex', gap: 6 }}>
           <Box sx={{ flex: 1 }}>
             <Typography variant='subtitle2' sx={{ mb: 1, textTransform: 'uppercase', color: 'text.disabled' }}>
               Source
@@ -168,7 +174,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
               )}
             </Box>
           </Box>
-        </GridContainer>
+        </Box>
 
         <Divider />
 
@@ -251,11 +257,5 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
     </Drawer>
   )
 }
-
-const GridContainer = ({ children }: { children: React.ReactNode }) => (
-  <Box sx={{ display: 'flex', gap: 4, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
-    {children}
-  </Box>
-)
 
 export default ReviewDetailDrawer

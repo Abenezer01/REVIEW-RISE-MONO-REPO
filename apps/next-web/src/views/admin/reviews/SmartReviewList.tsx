@@ -78,16 +78,19 @@ const SmartReviewList = () => {
 
   const handleFilterChange = (field: string, value: any) => {
     setFilters(prev => ({ ...prev, [field]: value }))
+
     setPage(0)
   }
 
   const handleDateChange = (type: 'start' | 'end', date: string) => {
     const dateObj = date ? new Date(date) : null
+
     setFilters(prev => ({
       ...prev,
       startDate: type === 'start' ? dateObj : prev.startDate,
       endDate: type === 'end' ? dateObj : prev.endDate
     }))
+
     setPage(0)
   }
 
@@ -98,6 +101,7 @@ const SmartReviewList = () => {
       minWidth: 150,
       renderCell: (params) => {
         const date = new Date(params.value)
+
         return (
           <Stack>
             <Typography variant='body2' sx={{ color: 'text.primary', fontWeight: 500 }}>
@@ -132,13 +136,14 @@ const SmartReviewList = () => {
       headerName: 'Source',
       minWidth: 130,
       renderCell: (params) => {
-        const platform = params.value || 'unknown';
+        const platform = params.value || 'unknown'
+
         const iconMap: Record<string, string> = {
           gbp: 'tabler-brand-google',
           google: 'tabler-brand-google',
           facebook: 'tabler-brand-facebook',
           yelp: 'tabler-brand-yelp'
-        };
+        }
 
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -147,7 +152,7 @@ const SmartReviewList = () => {
               {platform}
             </Typography>
           </Box>
-        );
+        )
       }
     },
     {
@@ -169,12 +174,13 @@ const SmartReviewList = () => {
       minWidth: 120,
       renderCell: (params) => {
         // Placeholder logic for sentiment
-        const sentiment = params.value || (params.row.rating >= 4 ? 'Positive' : params.row.rating <= 2 ? 'Negative' : 'Neutral');
+        const sentiment = params.value || (params.row.rating >= 4 ? 'Positive' : params.row.rating <= 2 ? 'Negative' : 'Neutral')
+
         const colorMap: Record<string, any> = {
           Positive: 'success',
           Neutral: 'warning',
           Negative: 'error'
-        };
+        }
 
         return (
           <CustomChip
@@ -184,7 +190,7 @@ const SmartReviewList = () => {
             label={sentiment}
             sx={{ fontWeight: 500 }}
           />
-        );
+        )
       }
     },
     {
@@ -192,7 +198,8 @@ const SmartReviewList = () => {
       headerName: 'Reply Status',
       minWidth: 130,
       renderCell: (params) => {
-        const isResponded = !!params.value;
+        const isResponded = !!params.value
+
         return (
           <CustomChip
             size='small'
@@ -202,7 +209,7 @@ const SmartReviewList = () => {
             icon={<i className={isResponded ? 'tabler-check' : 'tabler-x'} />}
             sx={{ fontWeight: 500 }}
           />
-        );
+        )
       }
     },
     {
