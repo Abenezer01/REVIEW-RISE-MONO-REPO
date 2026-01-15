@@ -21,7 +21,7 @@ const ConnectionSuccessView = ({ onGoToDashboard, onViewLogs }: ConnectionSucces
 
             <Typography variant="h4" fontWeight="bold" gutterBottom>Successfully Connected!</Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 5, maxWidth: 480, mx: 'auto' }}>
-                Your Google Business Profile is now connected and we're syncing your reviews. 
+                Your Google Business Profile is now connected and we are syncing your reviews. 
                 This may take a few minutes depending on the number of reviews.
             </Typography>
 
@@ -103,9 +103,8 @@ const ConnectionSuccessView = ({ onGoToDashboard, onViewLogs }: ConnectionSucces
                 </Box>
              </Box>
 
-            {/* What's Next */}
             <Box sx={{ textAlign: 'left', mb: 5 }}>
-                <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>What's Next?</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>What is Next?</Typography>
                 <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
                     <Box sx={{ p: 0.5, bgcolor: 'warning.dark', borderRadius: 1 }}><CheckCircleIcon fontSize="small" color="inherit" /></Box>
                     <Typography variant="body2">Your reviews will sync automatically every day at 2:00 AM</Typography>

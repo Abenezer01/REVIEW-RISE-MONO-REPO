@@ -54,13 +54,27 @@
     "respondToReview": "Respond to Review",
     "generateResponse": "Generate AI Response",
     "viewDetails": "View Details",
-    "markAsRead": "Mark as Read"
+    "markAsRead": "Mark as Read",
+    "disconnect": "Disconnect",
+    "connectGoogle": "Connect Google"
   },
   "locations": {
     "title": "Location Management",
     "listTitle": "Locations",
     "createTitle": "Create Location",
     "editTitle": "Edit Location",
+    "detail": {
+      "backToAccount": "Back to Account",
+      "backToList": "Back to List",
+      "notFound": "Location not found",
+      "overview": "Location Overview",
+      "tabs": {
+        "overview": "Overview",
+        "reviews": "Reviews",
+        "sources": "Review Sources"
+      },
+      "saveFirst": "Save location first to connect."
+    },
     "form": {
       "name": "Location Name",
       "businessId": "Account",

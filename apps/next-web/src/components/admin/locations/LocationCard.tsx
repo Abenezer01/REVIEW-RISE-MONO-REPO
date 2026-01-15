@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+
 import { Card, CardContent, Typography, Box, Chip, Divider } from '@mui/material'
 
 import type { ListingItem } from '@/types/general/listing-item'

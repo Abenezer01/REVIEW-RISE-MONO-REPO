@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
+import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+
 import apiClient from '@/lib/apiClient';
+
 import { useTranslation } from '@/hooks/useTranslation';
 
 interface ReviewSource {
@@ -15,14 +18,16 @@ interface ReviewSource {
 }
 
 const ReviewSourcesList = ({ locationId }: { locationId: string }) => {
-    // const t = useTranslation('dashboard');
+    const t = useTranslation('dashboard');
     const [sources, setSources] = useState<ReviewSource[]>([]);
+
     // const [loading, setLoading] = useState(false);
 
     const fetchSources = async () => {
         try {
             // Path: via Nginx /api/reviews -> express-reviews
             const res = await apiClient.get(`/reviews/api/v1/locations/${locationId}/sources`);
+
             if (res.data?.data) {
                 setSources(res.data.data);
             }
@@ -41,6 +46,7 @@ const ReviewSourcesList = ({ locationId }: { locationId: string }) => {
             const res = await apiClient.get('/reviews/api/v1/auth/google/connect', {
                 params: { locationId }
             });
+
             if (res.data?.data?.url) {
                 window.location.href = res.data.data.url;
             }
@@ -64,7 +70,7 @@ const ReviewSourcesList = ({ locationId }: { locationId: string }) => {
     return (
         <Grid container spacing={2}>
              <Grid size={{ xs: 12 }}>
-                <Typography variant='h6' sx={{ mb: 2 }}>Review Sources</Typography>
+                <Typography variant='h6' sx={{ mb: 2 }}>{t('locations.detail.tabs.sources')}</Typography>
              </Grid>
              
              {/* Google Business Profile */}
@@ -74,24 +80,24 @@ const ReviewSourcesList = ({ locationId }: { locationId: string }) => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                              {/* Use icon if available or just text */}
                             <Typography variant="h6">
-                                Google Business Profile
+                                Google {t('accounts.channels.googleSubtitle')}
                             </Typography>
                         </div>
                        
                         <Typography color="textSecondary" gutterBottom>
-                            {googleSource ? 'Connected' : 'Not Connected'}
+                            {googleSource ? t('accounts.channels.connected') : t('accounts.channels.notConnected')}
                         </Typography>
                         
                         {googleSource ? (
                             <Button variant="outlined" color="error" onClick={() => handleDisconnect(googleSource.id)}>
-                                Disconnect
+                                {t('actions.disconnect')}
                             </Button>
                         ) : (
                             <Button variant="contained" onClick={handleConnectGoogle} disabled={!locationId}>
-                                Connect Google
+                                {t('actions.connectGoogle')}
                             </Button>
                         )}
-                        {!locationId && <Typography variant="caption" display="block" color="error">Save location first to connect.</Typography>}
+                        {!locationId && <Typography variant="caption" display="block" color="error">{t('locations.detail.saveFirst')}</Typography>}
                     </CardContent>
                 </Card>
              </Grid>

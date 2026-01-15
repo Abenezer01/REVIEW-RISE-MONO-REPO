@@ -1,8 +1,8 @@
 
-import { Box, Button, Card, CardContent, Typography } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 import StarIcon from '@mui/icons-material/Star';
-import { ReviewSource } from './ReviewSourcesDashboard'; // Or define shared type
+import { Box, Button, Card, CardContent, Typography } from '@mui/material';
+
 // Actually, circular dependency if I import from Dashboard. I should create a types file or define interface locally.
 // Let's define locally or shared.
 

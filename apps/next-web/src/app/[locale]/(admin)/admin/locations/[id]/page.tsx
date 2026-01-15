@@ -1,7 +1,8 @@
 'use client'
 
-import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
+
+import { useParams, useRouter } from 'next/navigation'
 
 // MUI Imports
 import TabContext from '@mui/lab/TabContext'
@@ -32,17 +33,21 @@ import apiClient from '@/lib/apiClient'
 import LocationReviews from '@/components/admin/locations/review-sync/LocationReviews'
 
 // Placeholder Components for new tabs
-const LocationOverview = ({ location }: { location: any }) => (
-    <Card>
-        <CardContent>
-            <Typography variant="h6">Location Overview</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                Address: {location?.address}
-            </Typography>
-             {/* Add more stats here later */}
-        </CardContent>
-    </Card>
-)
+const LocationOverview = ({ location }: { location: any }) => {
+    const t = useTranslation('dashboard')
+
+    return (
+        <Card>
+            <CardContent>
+                <Typography variant="h6">{t('locations.detail.overview')}</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                    {t('locations.form.address')}: {location?.address}
+                </Typography>
+                 {/* Add more stats here later */}
+            </CardContent>
+        </Card>
+    )
+}
 
 
 
@@ -64,9 +69,11 @@ const LocationDetailsPage = () => {
 
     const fetchLocation = useCallback(async () => {
         if (!id) return
+
         try {
             setLoading(true)
             const res = await apiClient.get(`/admin/locations/${id}`)
+
             setLocation(res.data)
         } catch (error) {
             console.error('Failed to fetch location', error)
@@ -90,10 +97,8 @@ const LocationDetailsPage = () => {
     }
 
     if (!location) {
-        return <Typography>Location not found</Typography>
+        return <Typography>{t('locations.detail.notFound')}</Typography>
     }
-
-    const statusColor = location.status === 'active' ? 'success' : 'secondary'
 
     return (
         <Grid container spacing={6}>
@@ -105,7 +110,7 @@ const LocationDetailsPage = () => {
                         onClick={() => router.push(location.businessId ? `/admin/accounts/${location.businessId}` : '/admin/accounts')}
                         sx={{ pl: 0 }}
                     >
-                        Back to Account
+                        {t('locations.detail.backToAccount')}
                     </Button>
                 </Box>
                 <Card sx={{ position: 'relative', overflow: 'visible', mt: { xs: 0, md: 4 } }}>
@@ -144,9 +149,9 @@ const LocationDetailsPage = () => {
             <Grid size={12}>
                 <TabContext value={tab}>
                     <CustomTabList pill='true' onChange={handleTabChange} aria-label='location tabs'>
-                        <Tab value='overview' label="Overview" icon={<InfoIcon />} iconPosition='start' />
-                        <Tab value='reviews' label="Reviews" icon={<StarIcon />} iconPosition='start' />
-                        <Tab value='sources' label="Review Sources" icon={<LinkIcon />} iconPosition='start' />
+                        <Tab value='overview' label={t('locations.detail.tabs.overview')} icon={<InfoIcon />} iconPosition='start' />
+                        <Tab value='reviews' label={t('locations.detail.tabs.reviews')} icon={<StarIcon />} iconPosition='start' />
+                        <Tab value='sources' label={t('locations.detail.tabs.sources')} icon={<LinkIcon />} iconPosition='start' />
                     </CustomTabList>
 
                     <Box sx={{ mt: 4 }}>

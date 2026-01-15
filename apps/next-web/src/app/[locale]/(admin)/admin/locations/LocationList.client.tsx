@@ -1,10 +1,9 @@
 'use client'
 
-import { useMemo, useState, useCallback } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 
 import {
     Box,
@@ -16,13 +15,13 @@ import {
 import Grid from '@mui/material/Grid'
 
 
+import CustomSelectBox from '@/components/shared/form/custom-select'
+import { createLocationAdapter } from '@/components/shared/listing/adapters'
+import RowOptions from '@/components/shared/listing/row-options'
 import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 import { usePaginatedList } from '@/hooks/usePaginatedList'
 import useTranslation from '@/hooks/useTranslation'
 import apiClient from '@/lib/apiClient'
-import { createLocationAdapter } from '@/components/shared/listing/adapters'
-import RowOptions from '@/components/shared/listing/row-options'
-import CustomSelectBox from '@/components/shared/form/custom-select'
 
 // 🔥 LAZY LOAD HEAVY COMPONENTS
 const ItemsListing = dynamic(
@@ -50,7 +49,6 @@ const LocationForm = dynamic(
 
 export default function LocationListClient() {
     const t = useTranslation('dashboard')
-    const router = useRouter()
 
     const [search, setSearch] = useState('')
     const [status, setStatus] = useState('all')

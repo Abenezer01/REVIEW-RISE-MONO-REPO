@@ -1,9 +1,15 @@
-import apiClient from '@/lib/apiClient';
+import { useEffect, useState } from 'react';
+
+import { useParams } from 'next/navigation';
+
 import GoogleIcon from '@mui/icons-material/Google';
+
 import StarIcon from '@mui/icons-material/Star';
 import { Avatar, Box, Button, Card, CardContent, CircularProgress, Grid, Rating, Typography } from '@mui/material';
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+
+import apiClient from '@/lib/apiClient';
+
+
 
 
 interface Review {
@@ -40,6 +46,7 @@ const LocationReviews = () => {
                 // Assuming routed via /api/v1/locations/:id/reviews or similar.
                 // Using generic path for now - might need adjustment if gateway prefix differs.
                 const res = await apiClient.get(`/locations/${locationId}/reviews`);
+
                 if (res.data && res.data.data) {
                      setReviews(res.data.data);
                 }

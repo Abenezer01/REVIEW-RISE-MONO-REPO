@@ -1,3 +1,7 @@
+import { useState, useEffect, useCallback } from 'react';
+
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
+
 import { Box, Button, Card, CardContent, Grid, LinearProgress, Typography, Dialog, Snackbar, Alert, Skeleton } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ScheduleIcon from '@mui/icons-material/Schedule';
@@ -5,8 +9,7 @@ import StarIcon from '@mui/icons-material/Star';
 import SyncIcon from '@mui/icons-material/Sync';
 import GoogleIcon from '@mui/icons-material/Google';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, useSearchParams, useRouter } from 'next/navigation';
+
 import apiClient from '@/lib/apiClient';
 
 import ConnectGoogleModal from './ConnectGoogleModal';
@@ -38,6 +41,7 @@ const ReviewSourcesDashboard = () => {
     const [stats, setStats] = useState<ReviewStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [syncing, setSyncing] = useState(false);
+
     const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info' }>({
         open: false, 
         message: '', 
@@ -49,6 +53,7 @@ const ReviewSourcesDashboard = () => {
         if (searchParams.get('google_connected') === 'true') {
             setView('success');
             const newParams = new URLSearchParams(searchParams.toString());
+
             newParams.delete('google_connected');
             router.replace(`?${newParams.toString()}`);
             setSnackbar({ open: true, message: 'Source connected successfully!', severity: 'success' });
@@ -61,8 +66,10 @@ const REVIEWS_API_URL = process.env.NEXT_PUBLIC_REVIEWS_API_URL || 'http://local
 
     const fetchData = useCallback(async () => {
         if (!locationId) return;
+
         try {
             setLoading(true);
+
             const [sourcesRes, statsRes] = await Promise.all([
                 apiClient.get(`${REVIEWS_API_URL}/locations/${locationId}/sources`),
                 apiClient.get(`${REVIEWS_API_URL}/locations/${locationId}/stats`)
@@ -92,6 +99,7 @@ const REVIEWS_API_URL = process.env.NEXT_PUBLIC_REVIEWS_API_URL || 'http://local
             const res = await apiClient.get(`${REVIEWS_API_URL}/auth/google/connect`, {
                 params: { locationId }
             });
+
             if (res.data?.data?.url) {
                 window.location.href = res.data.data.url;
             }
@@ -114,6 +122,7 @@ const REVIEWS_API_URL = process.env.NEXT_PUBLIC_REVIEWS_API_URL || 'http://local
 
     const handleSyncAll = async () => {
         if (!locationId) return;
+
         try {
             setSyncing(true);
             setSnackbar({ open: true, message: 'Sync started...', severity: 'info' });
