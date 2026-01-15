@@ -3,7 +3,11 @@ import path from 'path';
 
 // Properly load env vars from root
 const envPath = path.resolve(__dirname, '../../../../.env');
-dotenv.config({ path: envPath });
+try {
+    dotenv.config({ path: envPath });
+} catch (e) {
+    // Ignore missing .env in production
+}
 
 /**
  * Seed script for SERP Visibility data

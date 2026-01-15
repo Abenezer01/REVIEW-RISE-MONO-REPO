@@ -30,7 +30,7 @@ async function testApi() {
 
     console.log(`✓ Found business: ${business.id}`);
 
-    const API_URL = 'http://localhost:3012/api/v1';
+    const API_URL = process.env.NEXT_PUBLIC_SEO_HEALTH_API_URL || 'http://localhost:3011/api/v1';
     
     // Test 1: List Keywords
     console.log('\n🧪 Testing GET /keywords...');

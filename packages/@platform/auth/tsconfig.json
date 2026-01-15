@@ -5,7 +5,7 @@
         "types": [
             "node"
         ],
-        "composite": true
+        "declaration": true
     },
     "include": [
         "src/**/*"

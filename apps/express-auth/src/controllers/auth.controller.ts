@@ -76,14 +76,14 @@ export const login = async (req: Request, res: Response) => {
         const user = await userRepository.findByEmailWithRoles(email);
 
         if (!user || !user.password) {
-            console.log('User not found or no password', user);
+            // console.log('User not found or no password', user);
             return res.status(401).json(
                 createErrorResponse('Invalid credentials', ErrorCode.UNAUTHORIZED, 401)
             );
         }
 
         const isValidPassword = await bcrypt.compare(password, user.password);
-        console.log('isValidPassword', isValidPassword);
+        // console.log('isValidPassword', isValidPassword);
         if (!isValidPassword) {
             return res.status(401).json(
                 createErrorResponse('Invalid credentials', ErrorCode.UNAUTHORIZED, 401)
@@ -222,11 +222,13 @@ export const me = async (req: Request, res: Response) => {
         }
         const token = authHeader.substring('Bearer '.length);
         // console.log("TOKEN", token)
+        // const token = authHeader.substring('Bearer '.length);
+        // console.log("TOKEN", token)
         // console.log(JWT_SECRET)
         const payload = jwt.verify(token, JWT_SECRET) as any;
-        console.log("PAYLOAD", payload)
+        // console.log("PAYLOAD", payload)
         const roles = Array.isArray(payload.roles) ? payload.roles : [];
-        console.log("ROLES", roles)
+        // console.log("ROLES", roles)
         const user = {
             id: payload.userId,
             email: payload.email,
@@ -476,6 +478,29 @@ export const resendVerificationEmail = async (req: Request, res: Response) => {
 
         // eslint-disable-next-line no-console
         console.error('Resend verification error:', error);
+        res.status(500).json(
+            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
+        );
+    }
+};
+
+export const logout = async (req: Request, res: Response) => {
+    try {
+        const { refreshToken } = req.body;
+
+        if (refreshToken) {
+            const session = await sessionRepository.findSession(refreshToken);
+            if (session) {
+                await sessionRepository.deleteSession(session.id);
+            }
+        }
+
+        res.status(200).json(
+            createSuccessResponse({}, 'Logged out successfully')
+        );
+    } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Logout error:', error);
         res.status(500).json(
             createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
         );

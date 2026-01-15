@@ -1,22 +1,21 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
-
 export default function CTA() {
   return (
     <section className="cta">
       <div className="container">
-        <h2 className="cta-title">Ready to Improve Your SEO?</h2>
-        <button className="cta-button">
-          Analyze Your Website Now
-          <ArrowRight size={20} />
-        </button>
+        <h2 className="title">Ready to improve your SEO?</h2>
+        <p className="subtitle">
+          Join thousands of websites getting better rankings
+        </p>
+        <a href="#" className="cta-button">
+          Get Started →
+        </a>
       </div>
 
       <style jsx>{`
         .cta {
-          padding: 80px 0;
-          background: var(--bg-secondary);
+          padding: 120px 0;
           text-align: center;
         }
         .container {
@@ -24,31 +23,42 @@ export default function CTA() {
           margin: 0 auto;
           padding: 0 24px;
         }
-        .cta-title {
+        .title {
           font-size: 48px;
-          font-weight: 800;
+          font-weight: 700;
+          margin-bottom: 16px;
+          letter-spacing: -0.02em;
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .subtitle {
+          font-size: 18px;
+          color: var(--text-secondary);
           margin-bottom: 32px;
         }
         .cta-button {
-          background: var(--accent);
-          color: white;
-          border: none;
-          padding: 18px 40px;
-          border-radius: 12px;
-          font-weight: 600;
-          font-size: 18px;
-          cursor: pointer;
           display: inline-flex;
           align-items: center;
-          gap: 12px;
-          transition: all 0.3s;
+          gap: 8px;
+          background: var(--accent);
+          color: white;
+          padding: 14px 28px;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 15px;
+          transition: all 0.2s;
         }
         .cta-button:hover {
           background: var(--accent-hover);
-          transform: translateY(-4px);
+          transform: translateY(-2px);
         }
         @media (max-width: 768px) {
-          .cta-title {
+          .cta {
+            padding: 80px 0;
+          }
+          .title {
             font-size: 32px;
           }
         }

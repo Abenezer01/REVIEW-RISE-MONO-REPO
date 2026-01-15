@@ -1,0 +1,218 @@
+name: Deploy to Staging VPS
+
+on:
+  push:
+    branches: [ staging ]
+  workflow_dispatch:  # Allow manual triggers
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: reviewrise/reviewrise
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        service:
+          - name: nginx
+            dockerfile: ./nginx/Dockerfile
+            context: .
+          - name: next-web
+            dockerfile: ./apps/next-web/Dockerfile
+            context: .
+          - name: next-seo-landing
+            dockerfile: ./apps/next-seo-landing/Dockerfile
+            context: .
+          - name: express-auth
+            dockerfile: ./apps/express-auth/Dockerfile
+            context: .
+          - name: express-reviews
+            dockerfile: ./apps/express-reviews/Dockerfile
+            context: .
+          - name: express-ai
+            dockerfile: ./apps/express-ai/Dockerfile
+            context: .
+          - name: express-social
+            dockerfile: ./apps/express-social/Dockerfile
+            context: .
+          - name: express-gbp-rocket
+            dockerfile: ./apps/express-gbp-rocket/Dockerfile
+            context: .
+          - name: express-ad-rise
+            dockerfile: ./apps/express-ad-rise/Dockerfile
+            context: .
+          - name: express-brand
+            dockerfile: ./apps/express-brand/Dockerfile
+            context: .
+          - name: express-seo-health
+            dockerfile: ./apps/express-seo-health/Dockerfile
+            context: .
+          - name: express-admin-portal
+            dockerfile: ./apps/express-admin-portal/Dockerfile
+            context: .
+          - name: notifications-service
+            dockerfile: ./apps/notifications-service/Dockerfile
+            context: .
+          - name: worker-jobs
+            dockerfile: ./apps/worker-jobs/Dockerfile
+            context: .
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service.name }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service.context }}
+          file: ${{ matrix.service.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # cache-from: type=gha # DISABLED TO FIX BUILD ERROR
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+  deploy:
+    name: Deploy to VPS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: unnecessary
+          if_key_exists: replace
+          config: |
+            Host ${{ secrets.VPS_HOST }}
+              StrictHostKeyChecking no
+              UserKnownHostsFile /dev/null
+
+
+
+      - name: Deploy to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          ssh -A -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "export GITHUB_TOKEN='${{ secrets.GHCR_PAT }}'; export GITHUB_ACTOR='${{ github.actor }}'; /bin/bash -s" << 'EOF'
+            set -e
+            set -x # Enable debug logging
+            echo "Starting remote deployment script..."
+            
+            # Ensure deploy directory exists
+            if [ ! -d "${{ secrets.DEPLOY_PATH }}/.git" ]; then
+              echo "Repository not found at ${{ secrets.DEPLOY_PATH }}. Cloning..."
+              mkdir -p ${{ secrets.DEPLOY_PATH }}
+              
+              # Use HTTPS with GITHUB_TOKEN for reliable cloning
+              git clone https://x-access-token:$GITHUB_TOKEN@github.com/REVIEWRISE/REVIEW-RISE-MONO-REPO.git ${{ secrets.DEPLOY_PATH }}
+            
+            else
+              echo "Repository exists. Updating..."
+            fi
+
+            cd ${{ secrets.DEPLOY_PATH }}
+            
+            # Update remote URL to ensure token is fresh (optional but good practice)
+            git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/REVIEWRISE/REVIEW-RISE-MONO-REPO.git
+            
+            # Fetch and Checkout staging branch
+            git fetch origin
+            git reset --hard origin/staging
+            git checkout staging
+            git pull origin staging
+            
+            # Pull latest Docker images
+            # docker compose -f docker-compose.prod.yml pull <--- REMOVED: Script handles this after login
+            
+             # ==============================================================================
+             # INLINE DOCKER LOGIN using GHCR_PAT
+             # ==============================================================================
+            echo "Logging into GHCR with PAT..."
+            if [ -n "$GITHUB_TOKEN" ] && [ -n "$GITHUB_ACTOR" ]; then
+                # Ensure lowercase actor
+                LOWER_ACTOR=$(echo "$GITHUB_ACTOR" | tr '[:upper:]' '[:lower:]')
+                echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$LOWER_ACTOR" --password-stdin || echo "Inline login failed"
+                if [ $? -eq 0 ]; then
+                    echo "✓ Successfully authenticated with GHCR"
+                else
+                    echo "✗ Failed to authenticate with GHCR"
+                    exit 1
+                fi
+            else
+                echo "GITHUB_TOKEN or ACTOR missing for inline login"
+                exit 1
+            fi
+            # ==============================================================================
+            
+            # --- STAGING RESET (For Initial Setup) ---
+            # Remove this block after first successful deployment!
+            echo "⚠️  Wiping database volume to enforce init-db.sh execution..."
+            docker compose -f docker-compose.prod.yml down -v || true
+            # ----------------------------------------
+            
+            # Create/Update .env.production from secret
+            echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
+            
+            # Run deployment script
+            chmod +x ./scripts/deploy-staging.sh
+            ./scripts/deploy-staging.sh --seed
+          EOF
+
+      - name: Verify deployment
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          STAGING_URL: ${{ secrets.STAGING_URL }}
+        run: |
+          # Wait for deployment to stabilize
+          sleep 30
+          
+          # Check if the site is accessible
+          if curl -f -s -o /dev/null -w "%{http_code}" $STAGING_URL/health | grep -q "200"; then
+            echo "✅ Deployment successful - site is accessible"
+          else
+            echo "❌ Deployment may have failed - site not accessible"
+            exit 1
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error::Deployment failed. Check the logs and consider rolling back."
+          # Add Slack/Discord notification here if needed

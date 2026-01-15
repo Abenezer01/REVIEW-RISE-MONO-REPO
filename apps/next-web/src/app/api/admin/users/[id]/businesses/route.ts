@@ -3,13 +3,14 @@ import { NextResponse } from 'next/server';
 
 import { createSuccessResponse, createErrorResponse } from '@platform/contracts';
 
+import { businessRepository } from '@platform/db';
+
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { id } = await params;
-        const { businessRepository } = await import('@platform/db');
 
         // Verify that the requested user ID matches the logged-in user or admin
         // For now, we assume simple route protection is handled by middleware

@@ -24,10 +24,10 @@ const createLocationSchema = z.object({
   status: z.enum(['active', 'archived', 'deleted']).optional()
 });
 
+import { locationRepository } from '@platform/db';
+
 export async function GET(request: Request) {
   try {
-    const { locationRepository } = await import('@platform/db');
-
     const { searchParams } = new URL(request.url);
 
     const pageParam = searchParams.get('page');
@@ -82,8 +82,6 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const { locationRepository } = await import('@platform/db');
-
     const body = await request.json();
     const validation = createLocationSchema.safeParse(body);
 

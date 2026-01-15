@@ -1,8 +1,9 @@
 'use client'
 
-import { useMemo, useState, useCallback } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 
 import {
     Box,
@@ -14,13 +15,13 @@ import {
 import Grid from '@mui/material/Grid'
 
 
+import CustomSelectBox from '@/components/shared/form/custom-select'
+import { createLocationAdapter } from '@/components/shared/listing/adapters'
+import RowOptions from '@/components/shared/listing/row-options'
 import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 import { usePaginatedList } from '@/hooks/usePaginatedList'
 import useTranslation from '@/hooks/useTranslation'
 import apiClient from '@/lib/apiClient'
-import { createLocationAdapter } from '@/components/shared/listing/adapters'
-import RowOptions from '@/components/shared/listing/row-options'
-import CustomSelectBox from '@/components/shared/form/custom-select'
 
 // 🔥 LAZY LOAD HEAVY COMPONENTS
 const ItemsListing = dynamic(
@@ -133,9 +134,14 @@ export default function LocationListClient() {
             flex: 1,
             minWidth: 200,
             renderCell: (params: any) => (
-                <Typography fontWeight={600}>
-                    {params.row.primaryLabel}
-                </Typography>
+                <Link href={`/admin/locations/${params.row.id}`} style={{ textDecoration: 'none' }} onClick={(e) => e.stopPropagation()}>
+                    <Typography 
+                        fontWeight={600} 
+                        sx={{ color: 'primary.main', '&:hover': { textDecoration: 'underline' } }}
+                    >
+                        {params.row.primaryLabel}
+                    </Typography>
+                </Link>
             )
         },
         {

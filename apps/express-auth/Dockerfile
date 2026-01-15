@@ -1,28 +1,126 @@
-FROM node:18-alpine AS builder
+# ============================================
+# Stage 1: Dependencies - Install PNPM and fetch dependencies
+# ============================================
+FROM node:20-alpine AS deps
+
+# Install PNPM globally
+RUN corepack enable && corepack prepare pnpm@9 --activate
 
 WORKDIR /app
 
-# Note: In a monorepo, you typically build from the root context or use Turbo.
-# This assumes a simplified build or that necessary packages can be installed/copied.
-# For a robust monorepo build, consider using a tool like Turbo or copying the full monorepo.
+# Copy workspace configuration files
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml tsconfig.json ./
 
-COPY package.json .
-COPY tsconfig.json .
-COPY src ./src
 
-# If this package depends on local workspace packages, this simple install might fail 
-# without the workspace context. Adjust as needed for specific monorepo build tools.
-RUN npm install
-RUN npm run build
+# Copy all package.json files to understand the workspace structure
+COPY packages/@platform/*/package.json ./packages/@platform/
+COPY apps/express-auth/package.json ./apps/express-auth/
 
-FROM node:18-alpine
+# Fetch dependencies using pnpm - this caches better than install
+RUN pnpm fetch
+
+# ============================================
+# Stage 2: Builder - Build the application
+# ============================================
+FROM node:20-alpine AS builder
+
+RUN corepack enable && corepack prepare pnpm@9 --activate
 
 WORKDIR /app
 
-COPY --from=builder /app/package.json .
-COPY --from=builder /app/dist ./dist
-# COPY --from=builder /app/node_modules ./node_modules 
+# Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=deps /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=deps /app/package.json ./package.json
+COPY --from=deps /app/tsconfig.json ./tsconfig.json
 
+
+# Copy all shared packages source code
+COPY packages/@platform ./packages/@platform
+
+# Copy the specific app source code
+COPY apps/express-auth ./apps/express-auth
+
+# Install all dependencies (uses cached node_modules from stage 1)
+RUN pnpm install --frozen-lockfile --offline
+
+# Build shared packages first (if they need building)
+# Generate Prisma client and build DB package (TypeScript project reference for auth)
+RUN pnpm --filter "@platform/db" run db:generate
+RUN pnpm --filter "@platform/db" run build
+# Build auth explicitly (now that DB is built)
+RUN pnpm --filter "@platform/auth" run build
+# Verify auth build succeeded
+# Verify auth build succeeded and fix structure if nested
+# Verify auth build succeeded and fix structure if nested
+# The build on VPS produces 'dist/src/index.js' due to composite build configuration.
+# We patch package.json to point to this nested path.
+RUN if [ -f packages/@platform/auth/dist/src/index.js ]; then \
+  echo "Detected nested build structure (dist/src). Patching package.json..."; \
+  sed -i 's|"./dist/index.js"|"./dist/src/index.js"|g' packages/@platform/auth/package.json && \
+  sed -i 's|"./dist/index.d.ts"|"./dist/src/index.d.ts"|g' packages/@platform/auth/package.json; \
+  fi && \
+  # Verify the file exists at either the standard OR nested location (depending on what happened above)
+  (test -f packages/@platform/auth/dist/index.js || test -f packages/@platform/auth/dist/src/index.js) || \
+  (echo "CRITICAL: Auth build failed" && ls -R packages/@platform/auth && exit 1)
+RUN pnpm --filter "@platform/*" run build
+
+# Build the express-auth application
+RUN pnpm --filter @apps/express-auth run build
+
+# ============================================
+# Stage 3: Runner - Production image
+# ============================================
+FROM node:20-alpine AS runner
+
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
+WORKDIR /app
+
+# Create a non-root user for security
+RUN addgroup --system --gid 1001 expressjs && \
+  adduser --system --uid 1001 expressjs
+
+# Copy root node_modules (for shared dependencies and pnpm virtual store)
+COPY --from=builder --chown=expressjs:expressjs /app/node_modules ./node_modules
+
+# Copy the specific app (including its node_modules, dist, and config)
+COPY --from=builder --chown=expressjs:expressjs /app/apps/express-auth ./apps/express-auth
+
+# Copy shared packages (including their node_modules and dist) to satisfy symlinks
+COPY --from=builder --chown=expressjs:expressjs /app/packages ./packages
+
+# Verify auth dist exists in Runner stage
+RUN ls -la packages/@platform/auth/dist && \
+  (test -f packages/@platform/auth/dist/index.js || test -f packages/@platform/auth/dist/auth/src/index.js) || \
+  (echo "CRITICAL: Auth dist missing in RUNNER stage" && exit 1)
+
+# Copy workspace config
+COPY --from=builder --chown=expressjs:expressjs /app/package.json ./package.json
+COPY --from=builder --chown=expressjs:expressjs /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+
+# Copy Prisma schema and migrations for auto-migration on startup
+COPY --from=builder --chown=expressjs:expressjs /app/packages/@platform/db/prisma ./packages/@platform/db/prisma
+COPY --from=builder --chown=expressjs:expressjs /app/packages/@platform/db/package.json ./packages/@platform/db/package.json
+
+# Copy entrypoint script
+COPY --chmod=755 apps/express-auth/docker-entrypoint.sh /docker-entrypoint.sh
+
+# Switch to non-root user
+USER expressjs
+
+# Expose the application port
 EXPOSE 3010
 
-CMD ["npm", "start"]
+# Add health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3010/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+
+# Use dumb-init and custom entrypoint for migrations
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+# Set working directory to the app folder so module resolution works as expected
+WORKDIR /app/apps/express-auth

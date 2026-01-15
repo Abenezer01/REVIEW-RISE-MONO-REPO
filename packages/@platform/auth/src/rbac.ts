@@ -1,4 +1,5 @@
 import { prisma } from '@platform/db';
+import type { Prisma } from '@platform/db';
 import { ROLES, PERMISSIONS } from './constants';
 
 export async function assignRoleToUser(userId: string, businessId: string, roleName: string) {
@@ -51,8 +52,25 @@ export async function hasPermission(userId: string, businessId: string, action: 
   });
 
   // Check if any role has the permission
-  return userRoles.some((ubr) =>
-    ubr.role.permissions.some((rp) => rp.permission.action === action)
+  type UserBusinessRoleWithPermissions = Prisma.UserBusinessRoleGetPayload<{
+    include: {
+      role: {
+        include: {
+          permissions: {
+            include: {
+              permission: true;
+            };
+          };
+        };
+      };
+    };
+  }>;
+  type RolePermissionWithPermission = Prisma.RolePermissionGetPayload<{
+    include: { permission: true };
+  }>;
+
+  return (userRoles as UserBusinessRoleWithPermissions[]).some((ubr: UserBusinessRoleWithPermissions) =>
+    ubr.role.permissions.some((rp: RolePermissionWithPermission) => rp.permission.action === action)
   );
 }
 
@@ -86,7 +104,8 @@ export async function getUserRolesForBusiness(userId: string, businessId: string
     where: { userId, businessId },
     include: { role: true },
   });
-  return roles.map(r => r.role.name);
+  type UserBusinessRoleWithRole = Prisma.UserBusinessRoleGetPayload<{ include: { role: true } }>;
+  return (roles as UserBusinessRoleWithRole[]).map((r: UserBusinessRoleWithRole) => r.role.name);
 }
 
 /**
@@ -109,7 +128,8 @@ export async function getUserRoles(userId: string) {
   const result: Record<string, string[]> = {};
   
   // Process business roles
-  for (const r of businessRoles) {
+  type BusinessRoleWithRole = Prisma.UserBusinessRoleGetPayload<{ include: { role: true } }>;
+  for (const r of businessRoles as BusinessRoleWithRole[]) {
     if (!result[r.businessId]) {
       result[r.businessId] = [];
     }
@@ -118,7 +138,8 @@ export async function getUserRoles(userId: string) {
 
   // Process global roles (key: 'platform')
   if (globalRoles.length > 0) {
-    result['platform'] = globalRoles.map(r => r.role.name);
+    type GlobalRoleWithRole = Prisma.UserRoleGetPayload<{ include: { role: true } }>;
+    result['platform'] = (globalRoles as GlobalRoleWithRole[]).map((r: GlobalRoleWithRole) => r.role.name);
   }
 
   return result;

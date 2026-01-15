@@ -1,51 +1,55 @@
 'use client';
 
-import { FileText, Gauge, Lightbulb, Check } from 'lucide-react';
-
 export default function Features() {
   const features = [
     {
-      icon: <FileText size={32} />,
-      title: 'SEO Health Score',
-      description: 'Get a comprehensive 0-100 visibility score based on 50+ key metrics',
-      items: ['Overall performance rating', 'Competitor comparison', 'Industry benchmarks']
+      icon: '⚡',
+      title: 'Instant Analysis',
+      description: 'Get comprehensive SEO insights in seconds, not hours.'
     },
     {
-      icon: <Gauge size={32} />,
-      title: 'Technical Analysis',
-      description: 'Deep dive into technical SEO issues affecting your rankings',
-      items: ['Page speed analysis', 'Mobile optimization', 'Security & HTTPS']
+      icon: '🎯',
+      title: 'Actionable Insights',
+      description: 'Receive clear, prioritized recommendations you can implement immediately.'
     },
     {
-      icon: <Lightbulb size={32} />,
-      title: 'Smart Recommendations',
-      description: 'AI-generated action items to improve your SEO performance',
-      items: ['Prioritized fixes', 'Step-by-step guides', 'Impact estimates']
+      icon: '🤖',
+      title: 'AI-Powered',
+      description: 'Leverage advanced AI to uncover opportunities your competitors miss.'
+    },
+    {
+      icon: '📊',
+      title: 'Detailed Reports',
+      description: 'Access in-depth analysis of meta tags, performance, and content quality.'
+    },
+    {
+      icon: '🔒',
+      title: 'Secure & Private',
+      description: 'Your data is never stored or shared. Complete privacy guaranteed.'
+    },
+    {
+      icon: '💯',
+      title: 'Always Free',
+      description: 'No hidden fees, no credit card required. Professional SEO analysis for everyone.'
     }
   ];
 
   return (
-    <section className="features" id="features">
+    <section id="features" className="features">
       <div className="container">
-        <h2 className="section-title">What You&apos;ll Discover</h2>
-        <p className="section-subtitle">
-          Comprehensive SEO analysis powered by advanced AI algorithms
-        </p>
+        <div className="header">
+          <h2 className="title">Everything you need</h2>
+          <p className="subtitle">
+            Professional SEO analysis tools at your fingertips
+          </p>
+        </div>
 
-        <div className="features-grid">
+        <div className="grid">
           {features.map((feature, index) => (
             <div key={index} className="feature-card">
-              <div className="feature-icon">{feature.icon}</div>
+              <div className="icon">{feature.icon}</div>
               <h3 className="feature-title">{feature.title}</h3>
               <p className="feature-description">{feature.description}</p>
-              <ul className="feature-list">
-                {feature.items.map((item, i) => (
-                  <li key={i}>
-                    <Check size={16} className="check-icon" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
             </div>
           ))}
         </div>
@@ -53,82 +57,76 @@ export default function Features() {
 
       <style jsx>{`
         .features {
-          padding: 80px 0;
-          background: var(--bg-secondary);
+          padding: 120px 0;
+          background: var(--bg-primary);
         }
         .container {
           max-width: 1200px;
           margin: 0 auto;
           padding: 0 24px;
         }
-        .section-title {
+        .header {
           text-align: center;
-          font-size: 40px;
-          font-weight: 800;
+          margin-bottom: 64px;
+        }
+        .title {
+          font-size: 48px;
+          font-weight: 700;
           margin-bottom: 16px;
+          letter-spacing: -0.02em;
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
-        .section-subtitle {
-          text-align: center;
-          color: var(--text-secondary);
+        .subtitle {
           font-size: 18px;
-          margin-bottom: 60px;
+          color: var(--text-secondary);
         }
-        .features-grid {
+        .grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 32px;
+          gap: 24px;
         }
         .feature-card {
-          background: var(--card-bg);
-          border: 1px solid var(--border-color);
-          border-radius: 16px;
           padding: 32px;
-          backdrop-filter: blur(10px);
-          transition: all 0.3s;
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          transition: all 0.2s;
         }
         .feature-card:hover {
-          transform: translateY(-8px);
           border-color: var(--accent);
+          transform: translateY(-4px);
         }
-        .feature-icon {
-          width: 64px;
-          height: 64px;
-          background: var(--accent);
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          margin-bottom: 24px;
+        .icon {
+          font-size: 32px;
+          margin-bottom: 16px;
         }
         .feature-title {
-          font-size: 24px;
-          font-weight: 700;
-          margin-bottom: 12px;
+          font-size: 18px;
+          font-weight: 600;
+          margin-bottom: 8px;
+          color: var(--text-primary);
         }
         .feature-description {
+          font-size: 14px;
           color: var(--text-secondary);
-          margin-bottom: 20px;
           line-height: 1.6;
         }
-        .feature-list {
-          list-style: none;
-        }
-        .feature-list li {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 8px;
-          color: var(--text-secondary);
-          font-size: 14px;
-        }
-        :global(.check-icon) {
-          color: #10b981;
-          flex-shrink: 0;
-        }
-        @media (max-width: 968px) {
-          .features-grid {
+        @media (max-width: 768px) {
+          .features {
+            padding: 80px 0;
+          }
+          .title {
+            font-size: 32px;
+          }
+          .grid {
             grid-template-columns: 1fr;
+            gap: 16px;
+          }
+          .feature-card {
+            padding: 24px;
           }
         }
       `}</style>

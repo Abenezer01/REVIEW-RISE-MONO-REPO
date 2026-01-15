@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import * as brandProfileController from '../../../src/controllers/brand-profile.controller'
+import * as brandProfileController from '../../controllers/brand-profile.controller'
 
 const router = Router()
 

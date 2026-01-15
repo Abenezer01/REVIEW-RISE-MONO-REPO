@@ -22,6 +22,7 @@ import apiClient from '@/lib/apiClient'
 import FormPageWrapper from '@/components/shared/form/form-wrapper'
 
 
+
 const validationSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     address: Yup.string(),
@@ -109,6 +110,7 @@ const LocationForm = ({ initialData, isEdit = false, onCancel, onSuccess }: Loca
     }
 
     return (
+        <>
         <FormPageWrapper
             title={t('locations.listTitle')}
             translatedTitle={isEdit ? t('locations.editTitle') : t('locations.createTitle')}
@@ -189,8 +191,9 @@ const LocationForm = ({ initialData, isEdit = false, onCancel, onSuccess }: Loca
                         />
                     </Grid>
                 </Grid>
-            )}
-        </FormPageWrapper>
+                    )}
+                </FormPageWrapper>
+            </>
     )
 }
 

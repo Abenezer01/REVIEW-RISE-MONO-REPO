@@ -54,13 +54,27 @@
     "respondToReview": "الرد على المراجعة",
     "generateResponse": "إنشاء رد بالذكاء الاصطناعي",
     "viewDetails": "عرض التفاصيل",
-    "markAsRead": "وضع علامة كمقروء"
+    "markAsRead": "وضع علامة كمقروء",
+    "disconnect": "فصل",
+    "connectGoogle": "ربط حساب جوجل"
   },
   "locations": {
     "title": "إدارة الفروع",
     "listTitle": "الفروع",
     "createTitle": "إضافة فرع",
     "editTitle": "تعديل الفرع",
+    "detail": {
+      "backToAccount": "العودة للحساب",
+      "backToList": "العودة للقائمة",
+      "notFound": "الفرع غير موجود",
+      "overview": "نظرة عامة على الفرع",
+      "tabs": {
+        "overview": "نظرة عامة",
+        "reviews": "المراجعات",
+        "sources": "مصادر المراجعات"
+      },
+      "saveFirst": "يرجى حفظ الفرع أولاً للربط."
+    },
     "form": {
       "name": "اسم الفرع",
       "businessId": "الحساب",

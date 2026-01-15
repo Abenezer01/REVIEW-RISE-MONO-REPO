@@ -2,6 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
 dotenv.config();
 
@@ -81,6 +84,15 @@ app.post('/jobs/brand-scores', async (req, res) => {
     res.status(202).json({ message: 'Brand scores job started', jobId });
 });
 
+import { runReviewSyncJob } from './jobs/review-sync.job';
+
+app.post('/jobs/review-sync', async (req, res) => {
+    runReviewSyncJob()
+        .then(() => console.log('Review sync job finished'))
+        .catch(err => console.error('Review sync job failed:', err));
+    res.status(202).json({ message: 'Review sync job started' });
+});
+
 const scheduleDaily = (hour: number = 2) => {
     const now = new Date()
     const next = new Date(now)
@@ -89,13 +101,22 @@ const scheduleDaily = (hour: number = 2) => {
     const delay = next.getTime() - now.getTime()
     setTimeout(() => {
         runRankTrackingJob().catch(err => console.error('Scheduled rank job failed:', err))
+        runReviewSyncJob().catch(err => console.error('Scheduled review sync job failed:', err))
         setInterval(() => {
             runRankTrackingJob().catch(err => console.error('Scheduled rank job failed:', err))
+            runReviewSyncJob().catch(err => console.error('Scheduled review sync job failed:', err))
         }, 24 * 60 * 60 * 1000)
     }, delay)
 }
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+    // Create health check file for Docker
+    try {
+        const healthFile = path.join(os.tmpdir(), 'worker-healthy');
+        fs.writeFileSync(healthFile, 'ok');
+    } catch (e) {
+        console.warn('Could not write health check file:', e);
+    }
     scheduleDaily(2)
 });

@@ -2,7 +2,7 @@ import { prisma, CompetitorType } from '@platform/db';
 import { fetchSerpResults } from './serp.service';
 import axios from 'axios';
 
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:3003';
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:3002';
 
 // Interface for Discovered Competitor
 export interface DiscoveredCompetitor {

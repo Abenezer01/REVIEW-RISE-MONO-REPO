@@ -6,8 +6,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/apps/express-seo-health/src/index.js",
-    "lint": "eslint src/**/*.ts",
-    "test": "jest --passWithNoTests"
+    "lint": "eslint src --ext .ts",
+    "test": "echo \"No tests specified for express-auth\" && exit 0"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

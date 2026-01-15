@@ -86,7 +86,7 @@ export async function refreshAccessToken(): Promise<RefreshResult> {
     if (data?.accessToken) {
       cookieStore.set('accessToken', data.accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production' && process.env.USE_SECURE_COOKIES === 'true',
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 1 week
         path: '/'

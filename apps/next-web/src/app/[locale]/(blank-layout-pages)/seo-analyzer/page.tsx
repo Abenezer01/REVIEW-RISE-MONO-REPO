@@ -79,7 +79,7 @@ export default function SeoAnalyzerPage() {
             // Ensure protocol
             const targetUrl = url.startsWith('http') ? url : `https://${url}`
 
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3012/api'}/v1/seo/analyze`, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_SEO_HEALTH_API_URL || 'http://localhost:3011/api'}/v1/seo/analyze`, {
                 url: targetUrl
             })
 

@@ -3,6 +3,8 @@
 
 import { useMemo, useState, useCallback } from 'react'
 
+import Link from 'next/link'
+
 import { Box, Chip, ToggleButton, ToggleButtonGroup, Typography, MenuItem } from '@mui/material'
 import type { GridColDef } from '@mui/x-data-grid'
 import Grid from '@mui/material/Grid'
@@ -116,9 +118,11 @@ const AccountLocations = () => {
       flex: 1,
       minWidth: 200,
       renderCell: params => (
-        <Typography variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-          {params.row.primaryLabel}
-        </Typography>
+        <Link href={`/admin/locations/${params.row.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Typography variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
+            {params.row.primaryLabel}
+          </Typography>
+        </Link>
       )
     },
     {

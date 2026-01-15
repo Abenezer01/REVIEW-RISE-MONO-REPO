@@ -1,0 +1,569 @@
+# ==================================================
+# PRODUCTION DOCKER COMPOSE CONFIGURATION
+# ==================================================
+# This file orchestrates all Review Rise services for
+# staging/production deployment on a VPS.
+#
+# Key features:
+# - Internal Docker network for service communication
+# - Health checks with service dependencies
+# - Automated restart policies
+# - Resource limits
+# - Environment variable injection
+# ==================================================
+
+networks:
+  reviewrise-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+services:
+  # ==================================================
+  # DATABASE - PostgreSQL
+  # ==================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: reviewrise-postgres
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-reviewrise_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./packages/@platform/db/scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  # ==================================================
+  # CACHE & QUEUE - Redis
+  # ==================================================
+  redis:
+    image: redis:7-alpine
+    container_name: reviewrise-redis
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 256M
+
+  # ==================================================
+  # BACKEND SERVICES - Express.js Microservices
+  # ==================================================
+
+  express-auth:
+    image: ghcr.io/reviewrise/reviewrise-express-auth:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-auth/Dockerfile
+    container_name: reviewrise-express-auth
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      - NODE_ENV=production
+      - PORT=3010
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_ADMIN_URL=${DATABASE_ADMIN_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - JWT_SECRET=${JWT_SECRET}
+      - NOTIFICATIONS_SERVICE_URL=http://notifications-service:3008
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3010/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  express-reviews:
+    image: ghcr.io/reviewrise/reviewrise-express-reviews:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-reviews/Dockerfile
+    container_name: reviewrise-express-reviews
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      - NODE_ENV=production
+      - PORT=3006
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3006/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  express-ai:
+    image: ghcr.io/reviewrise/reviewrise-express-ai:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-ai/Dockerfile
+    container_name: reviewrise-express-ai
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - LLM_PROVIDER_API_KEY=${LLM_PROVIDER_API_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3002/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 384M
+
+  express-social:
+    image: ghcr.io/reviewrise/reviewrise-express-social:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-social/Dockerfile
+    container_name: reviewrise-express-social
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3003/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  express-gbp-rocket:
+    image: ghcr.io/reviewrise/reviewrise-express-gbp-rocket:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-gbp-rocket/Dockerfile
+    container_name: reviewrise-express-gbp-rocket
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      - NODE_ENV=production
+      - PORT=3004
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3004/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  express-ad-rise:
+    image: ghcr.io/reviewrise/reviewrise-express-ad-rise:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-ad-rise/Dockerfile
+    container_name: reviewrise-express-ad-rise
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      - NODE_ENV=production
+      - PORT=3005
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3005/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  express-brand:
+    image: ghcr.io/reviewrise/reviewrise-express-brand:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-brand/Dockerfile
+    container_name: reviewrise-express-brand
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      - NODE_ENV=production
+      - PORT=3007
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - WORKER_JOBS_URL=http://worker-jobs:3009
+      - AI_SERVICE_URL=http://express-ai:3002
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3007/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  express-seo-health:
+    image: ghcr.io/reviewrise/reviewrise-express-seo-health:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-seo-health/Dockerfile
+    container_name: reviewrise-express-seo-health
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      - NODE_ENV=production
+      - PORT=3011
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3011/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  express-admin-portal:
+    image: ghcr.io/reviewrise/reviewrise-express-admin-portal:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/express-admin-portal/Dockerfile
+    container_name: reviewrise-express-admin-portal
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      - NODE_ENV=production
+      - PORT=3012
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3012/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  notifications-service:
+    image: ghcr.io/reviewrise/reviewrise-notifications-service:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/notifications-service/Dockerfile
+    container_name: reviewrise-notifications
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      - NODE_ENV=production
+      - PORT=3008
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3008/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  worker-jobs:
+    image: ghcr.io/reviewrise/reviewrise-worker-jobs:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/worker-jobs/Dockerfile
+    container_name: reviewrise-worker
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 384M
+
+  # ==================================================
+  # FRONTEND SERVICES - Next.js Applications
+  # ==================================================
+
+  next-web:
+    image: ghcr.io/reviewrise/reviewrise-next-web:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/next-web/Dockerfile
+    container_name: reviewrise-next-web
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - EXPRESS_BRAND_URL=http://express-brand:3007/api/v1
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://app.vyntrise.com}
+      - NEXT_PUBLIC_LLM_COST_WARNING=${NEXT_PUBLIC_LLM_COST_WARNING:-true}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      express-auth:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  next-seo-landing:
+    image: ghcr.io/reviewrise/reviewrise-next-seo-landing:staging
+    # build:
+    #   context: .
+    #   dockerfile: apps/next-seo-landing/Dockerfile
+    container_name: reviewrise-next-seo-landing
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3001/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 384M
+
+  # ==================================================
+  # REVERSE PROXY - Nginx
+  # ==================================================
+
+  nginx:
+    image: ghcr.io/reviewrise/reviewrise-nginx:staging
+    # build:
+    #   context: .
+    #   dockerfile: nginx/Dockerfile
+    container_name: reviewrise-nginx
+    restart: unless-stopped
+    networks:
+      - reviewrise-network
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      next-web:
+        condition: service_healthy
+      next-seo-landing:
+        condition: service_healthy
+      express-auth:
+        condition: service_healthy
+      express-reviews:
+        condition: service_healthy
+      express-ai:
+        condition: service_healthy
+      express-social:
+        condition: service_healthy
+      express-gbp-rocket:
+        condition: service_healthy
+      express-ad-rise:
+        condition: service_healthy
+      express-brand:
+        condition: service_healthy
+      express-seo-health:
+        condition: service_healthy
+      express-admin-portal:
+        condition: service_healthy
+      notifications-service:
+        condition: service_healthy
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/certbot/conf:/etc/letsencrypt:ro
+      - ./nginx/certbot/www:/var/www/certbot:ro
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # ==================================================
+  # UTILITIES - Certbot
+  # ==================================================
+  certbot:
+    image: certbot/certbot
+    container_name: reviewrise-certbot
+    volumes:
+      - ./nginx/certbot/conf:/etc/letsencrypt
+      - ./nginx/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
