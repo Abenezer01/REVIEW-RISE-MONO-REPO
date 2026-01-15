@@ -84,12 +84,12 @@ export const runVisibilityJob = async () => {
   // `packages/@platform/db/src/client.ts` exists.
   
   // Let's try deep import.
-  const { prisma } = await import('@platform/db/src/client');
+  const { prisma } = await import('@platform/db');
 
   const businesses = await prisma.business.findMany({
       where: {
           deletedAt: null 
-      },
+      },  
       select: { id: true }
   });
 

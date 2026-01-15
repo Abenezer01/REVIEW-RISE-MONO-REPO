@@ -24,10 +24,17 @@ npm-debug.log*
 # --------------------
 # Environment and Secrets (CRITICAL)
 # --------------------
-# Ignore all.env files (local secrets) but allow the example template
+# Ignore all.env files (local secrets) but allow the# Environment variables
 .env
-.env.*
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+
+# Allow example environment files
 !.env.example
+!.env.production.examplemple
 !apps/**/.env.example
 !packages/**/.env.example
 
@@ -37,3 +44,10 @@ npm-debug.log*
 # Ignore local Prisma Client generation directories if defined differently
 /node_modules/.prisma
 .vscode
+/backup
+
+# --------------------
+# Nginx / LE Artifacts
+# --------------------
+/nginx/certbot
+/nginx/ssl

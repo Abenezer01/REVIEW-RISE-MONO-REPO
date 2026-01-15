@@ -3,33 +3,35 @@
 export default function HowItWorks() {
   const steps = [
     {
-      number: '1',
+      number: '01',
       title: 'Enter Your URL',
-      description: 'Simply paste your website URL into the analyzer. No registration, no payment, no hassle.'
+      description: 'Simply paste your website URL into the analyzer'
     },
     {
-      number: '2',
+      number: '02',
       title: 'AI Analysis',
-      description: 'Our advanced AI scans 50+ SEO factors including technical health, content quality, and backlink profile.'
+      description: 'Our AI scans your site for SEO opportunities'
     },
     {
-      number: '3',
-      title: 'Get Your Report',
-      description: 'Receive your detailed SEO health score with actionable recommendations to boost your rankings.'
+      number: '03',
+      title: 'Get Results',
+      description: 'Receive actionable insights and recommendations'
     }
   ];
 
   return (
-    <section className="how-it-works" id="how-it-works">
+    <section id="how-it-works" className="how-it-works">
       <div className="container">
-        <h2 className="section-title">How It Works</h2>
-        <p className="section-subtitle">
-          Get your complete SEO analysis in 3 simple steps
-        </p>
+        <div className="header">
+          <h2 className="title">How it works</h2>
+          <p className="subtitle">
+            Three simple steps to better SEO
+          </p>
+        </div>
 
-        <div className="steps-grid">
+        <div className="steps">
           {steps.map((step, index) => (
-            <div key={index} className="step-card">
+            <div key={index} className="step">
               <div className="step-number">{step.number}</div>
               <h3 className="step-title">{step.title}</h3>
               <p className="step-description">{step.description}</p>
@@ -40,58 +42,73 @@ export default function HowItWorks() {
 
       <style jsx>{`
         .how-it-works {
-          padding: 80px 0;
+          padding: 120px 0;
+          background: var(--bg-secondary);
+          border-top: 1px solid var(--border-color);
+          border-bottom: 1px solid var(--border-color);
         }
         .container {
           max-width: 1200px;
           margin: 0 auto;
           padding: 0 24px;
         }
-        .section-title {
+        .header {
           text-align: center;
-          font-size: 40px;
-          font-weight: 800;
+          margin-bottom: 64px;
+        }
+        .title {
+          font-size: 48px;
+          font-weight: 700;
           margin-bottom: 16px;
+          letter-spacing: -0.02em;
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
-        .section-subtitle {
-          text-align: center;
-          color: var(--text-secondary);
+        .subtitle {
           font-size: 18px;
-          margin-bottom: 60px;
+          color: var(--text-secondary);
         }
-        .steps-grid {
+        .steps {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 40px;
+          gap: 48px;
         }
-        .step-card {
+        .step {
           text-align: center;
         }
         .step-number {
-          width: 64px;
-          height: 64px;
-          background: var(--accent);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 28px;
-          font-weight: 800;
-          color: white;
-          margin: 0 auto 24px;
+          font-size: 64px;
+          font-weight: 700;
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin-bottom: 16px;
+          letter-spacing: -0.03em;
         }
         .step-title {
-          font-size: 24px;
-          font-weight: 700;
-          margin-bottom: 12px;
+          font-size: 20px;
+          font-weight: 600;
+          margin-bottom: 8px;
+          color: var(--text-primary);
         }
         .step-description {
+          font-size: 14px;
           color: var(--text-secondary);
           line-height: 1.6;
         }
-        @media (max-width: 968px) {
-          .steps-grid {
+        @media (max-width: 768px) {
+          .how-it-works {
+            padding: 80px 0;
+          }
+          .title {
+            font-size: 32px;
+          }
+          .steps {
             grid-template-columns: 1fr;
+            gap: 32px;
           }
         }
       `}</style>

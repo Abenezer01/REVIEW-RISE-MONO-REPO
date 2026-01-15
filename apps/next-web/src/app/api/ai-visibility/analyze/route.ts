@@ -7,7 +7,7 @@ import { getServerAuthHeaders } from '@/utils/getServerAuthHeaders'
 
 export async function POST(request: NextRequest) {
   // Default to localhost:3012/api if not defined
-  const SEO_SERVICE_URL = process.env.SEO_SERVICE_URL
+  const SEO_SERVICE_URL = process.env.NEXT_PUBLIC_SEO_HEALTH_API_URL || 'http://localhost:3011/api/v1'
 
   try {
     const body = await request.json()

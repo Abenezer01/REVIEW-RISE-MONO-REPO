@@ -158,7 +158,7 @@ export async function middleware(request: NextRequest) {
       if (refreshedThisRequest && refreshResponseCookie) {
         redirectResponse.cookies.set('accessToken', refreshResponseCookie, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
+          secure: process.env.NODE_ENV === 'production' && process.env.USE_SECURE_COOKIES === 'true',
           sameSite: 'lax',
           path: '/',
           maxAge: 60 * 60 * 24 * 7
@@ -177,7 +177,7 @@ export async function middleware(request: NextRequest) {
       if (refreshedThisRequest && refreshResponseCookie) {
         redirectResponse.cookies.set('accessToken', refreshResponseCookie, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
+          secure: process.env.NODE_ENV === 'production' && process.env.USE_SECURE_COOKIES === 'true',
           sameSite: 'lax',
           path: '/',
           maxAge: 60 * 60 * 24 * 7
@@ -194,7 +194,7 @@ export async function middleware(request: NextRequest) {
     if (refreshedThisRequest && refreshResponseCookie) {
       rewriteResponse.cookies.set('accessToken', refreshResponseCookie, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production' && process.env.USE_SECURE_COOKIES === 'true',
         sameSite: 'lax',
         path: '/',
         maxAge: 60 * 60 * 24 * 7
@@ -256,7 +256,7 @@ export async function middleware(request: NextRequest) {
         if (refreshedThisRequest && refreshResponseCookie) {
           rewriteResponse.cookies.set('accessToken', refreshResponseCookie, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: process.env.NODE_ENV === 'production' && process.env.USE_SECURE_COOKIES === 'true',
             sameSite: 'lax',
             path: '/',
             maxAge: 60 * 60 * 24 * 7
@@ -274,7 +274,7 @@ export async function middleware(request: NextRequest) {
   if (refreshedThisRequest && refreshResponseCookie) {
     intlResponse.cookies.set('accessToken', refreshResponseCookie, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production' && process.env.USE_SECURE_COOKIES === 'true',
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7

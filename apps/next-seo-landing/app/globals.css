@@ -1,37 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Light theme */
+  /* ReviewRise Brand Colors - Light theme */
   --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --text-primary: #1a1a1a;
+  --bg-secondary: #fafafa;
+  --bg-tertiary: #f4f4f5;
+  --text-primary: #000000;
   --text-secondary: #666666;
-  --accent: linear-gradient(135deg, #F9A030 0%, #FFB74D 100%);
-  --accent-solid: #F9A030;
-  --accent-hover: #E68A00;
+  --text-tertiary: #888888;
+  /* Primary: R:5 G:64 H:118 RGB(5, 64, 118) #054076 */
   --brand-primary: #054076;
-  --card-bg: rgba(255, 255, 255, 0.9);
-  --border-color: #e5e7eb;
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.12);
-  --glow: 0 0 20px rgba(249, 160, 48, 0.3);
+  /* Secondary: R:285 G:255 H:255 RGB(285, 255, 255) */
+  --brand-secondary: rgba(285, 255, 255, 0.8);
+  /* Accent: R:249 G:256 H:48 RGB(249, 256, 48) CMYK 0, 37, 81, 2 */
+  --accent: #F9A030;
+  --accent-hover: #E68A00;
+  --border-color: #eaeaea;
+  --card-bg: #ffffff;
+  --shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
 [data-theme='dark'] {
-  /* Dark theme - Premium */
-  --bg-primary: #020408;
-  --bg-secondary: #0B0F17;
+  /* ReviewRise Brand Colors - Dark theme */
+  --bg-primary: #000000;
+  --bg-secondary: #0a1929;
+  --bg-tertiary: #132f4c;
   --text-primary: #ffffff;
-  --text-secondary: #94a3b8;
-  --accent: linear-gradient(135deg, #F9A030 0%, #FFB74D 100%);
-  --accent-solid: #F9A030;
-  --accent-hover: #FFB74D;
+  --text-secondary: #888888;
+  --text-tertiary: #666666;
   --brand-primary: #054076;
-  --card-bg: rgba(11, 15, 23, 0.8);
-  --border-color: #1e293b;
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.7);
-  --glow: 0 0 30px rgba(249, 160, 48, 0.3);
+  --brand-secondary: rgba(285, 255, 255, 0.1);
+  --accent: #F9A030;
+  --accent-hover: #FFB74D;
+  --border-color: #1e3a52;
+  --card-bg: #0a1929;
+  --shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.7);
 }
 
 * {
@@ -44,22 +49,34 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* ReviewRise brand geometric background pattern */
 [data-theme='dark'] body {
-  background: linear-gradient(135deg, #054076 0%, #04325C 100%);
+  background-image:
+    radial-gradient(at 40% 20%, rgba(5, 64, 118, 0.2) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(249, 160, 48, 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(5, 64, 118, 0.15) 0px, transparent 50%);
+  background-color: var(--bg-primary);
 }
 
 a {
   color: inherit;
   text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--accent);
 }
 
 button {
@@ -67,11 +84,12 @@ button {
   cursor: pointer;
   border: none;
   outline: none;
+  transition: all 0.2s ease;
 }
 
-/* Utility Classes */
+/* ReviewRise Utility Classes */
 .gradient-text {
-  background: var(--accent);
+  background: linear-gradient(to right, var(--brand-primary), var(--accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -82,37 +100,32 @@ button {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
 }
 
-.gradient-border {
-  position: relative;
-  background: var(--card-bg);
-  border-radius: 16px;
+.brand-border {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: border-color 0.2s ease;
 }
 
-.gradient-border::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  padding: 2px;
-  background: var(--accent);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+.brand-border:hover {
+  border-color: var(--brand-primary);
 }
 
 /* Smooth transitions */
 * {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+  transition-property: background-color, color, border-color, transform, opacity;
+  transition-duration: 0.2s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
 
   to {
@@ -124,7 +137,7 @@ button {
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-10px);
   }
 
   to {
@@ -156,14 +169,14 @@ button {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.6s ease-out;
+  animation: fadeIn 0.5s ease-out;
 }
 
 .animate-slide-in {
-  animation: slideIn 0.6s ease-out;
+  animation: slideIn 0.5s ease-out;
 }
 
-/* Scrollbar Styling */
+/* ReviewRise Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -174,10 +187,28 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--accent-solid);
+  background: var(--accent);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-hover);
+}
+
+/* ReviewRise geometric grid pattern */
+.grid-pattern {
+  background-image:
+    linear-gradient(var(--border-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0.3;
+}
+
+/* ReviewRise glow effect */
+.glow-effect {
+  box-shadow: 0 0 20px rgba(249, 160, 48, 0.3);
+}
+
+[data-theme='dark'] .glow-effect {
+  box-shadow: 0 0 30px rgba(249, 160, 48, 0.4);
 }

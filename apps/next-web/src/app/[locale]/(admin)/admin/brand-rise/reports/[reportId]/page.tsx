@@ -99,7 +99,7 @@ return reports.find((r: any) => r.id === reportId);
 
   const handleExportPdf = async () => {
       try {
-           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3004'}/api/v1/brands/${businessId}/reports/opportunities/${reportId}/pdf`);
+           const response = await fetch(`${process.env.EXPRESS_BRAND_URL || 'http://localhost:3007/api/v1'}/brands/${businessId}/reports/opportunities/${reportId}/pdf`);
 
            if (!response.ok) throw new Error('Download failed');
            

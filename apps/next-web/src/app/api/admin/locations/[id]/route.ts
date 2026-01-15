@@ -23,6 +23,8 @@ const updateLocationSchema = z.object({
     status: z.string().optional(),
 });
 
+import { locationRepository } from '@platform/db';
+
 export async function GET(
     request: NextRequest,
     context: { params: Promise<{ id: string }> }
@@ -30,7 +32,6 @@ export async function GET(
     const { id } = await context.params;
 
     try {
-        const { locationRepository } = await import('@platform/db');
         const location = await locationRepository.findWithBusiness(id);
 
         if (!location) {
@@ -60,7 +61,6 @@ export async function PATCH(
     const { id } = await context.params;
 
     try {
-        const { locationRepository } = await import('@platform/db');
         const body = await request.json();
         const validation = updateLocationSchema.safeParse(body);
 
@@ -96,8 +96,6 @@ export async function DELETE(
     const { id } = await context.params;
 
     try {
-        const { locationRepository } = await import('@platform/db');
-        
         await locationRepository.delete(id);
 
         return NextResponse.json(

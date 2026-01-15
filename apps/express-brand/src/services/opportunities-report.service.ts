@@ -3,7 +3,7 @@ import axios from 'axios';
 import crypto from 'crypto';
 // import puppeteer from 'puppeteer';
 
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:3003';
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:3002';
 
 export const generateReport = async (businessId: string) => {
     // 1. Fetch Business & Competitors with Snapshots

@@ -2,9 +2,9 @@ name: Continuous Integration (CI)
 
 on:
   pull_request:
-    branches: [ develop, main ]
+    branches: [ staging, main ]
   push:
-    branches: [ develop, main ]
+    branches: [ staging, main ]
 
 jobs:
   build-and-test:

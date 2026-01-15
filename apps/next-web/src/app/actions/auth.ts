@@ -46,7 +46,9 @@ export async function loginAction(prevState: LoginResponse | null, formData: For
   // Determine local base URL for BFF call
   const headersList = await headers()
   const host = headersList.get('host')
-  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+
+  // Use HTTP for internal server-to-server calls (Nginx handles external HTTPS)
+  const protocol = 'http'
   const API_BASE_URL = `${protocol}://${host}`
 
   try {
@@ -103,7 +105,7 @@ export async function loginAction(prevState: LoginResponse | null, formData: For
 
       cookieStore.set('accessToken', data.accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production' && process.env.USE_SECURE_COOKIES === 'true',
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 1 week
         path: '/'
@@ -112,7 +114,7 @@ export async function loginAction(prevState: LoginResponse | null, formData: For
       if (data.refreshToken) {
         cookieStore.set('refreshToken', data.refreshToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
+          secure: process.env.NODE_ENV === 'production' && process.env.USE_SECURE_COOKIES === 'true',
           sameSite: 'lax',
           maxAge: 60 * 60 * 24 * 7, // 1 week
           path: '/'
@@ -140,7 +142,7 @@ export async function loginAction(prevState: LoginResponse | null, formData: For
         
         cookieStore.set('userInfo', JSON.stringify(user), {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
+          secure: process.env.NODE_ENV === 'production' && process.env.USE_SECURE_COOKIES === 'true',
           sameSite: 'lax',
           maxAge: 60 * 60 * 24 * 7,
           path: '/'

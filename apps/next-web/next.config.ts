@@ -4,6 +4,9 @@ import createNextIntlPlugin from 'next-intl/plugin'
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const nextConfig: NextConfig = {
+  // Standalone output disabled for local development to avoid Windows symlink permission errors
+  // Docker builds will set NEXT_OUTPUT=standalone via environment variable
+  output: process.env.NEXT_OUTPUT as 'standalone' | undefined,
   basePath: process.env.BASEPATH,
 
   // ⚡ Performance Optimizations

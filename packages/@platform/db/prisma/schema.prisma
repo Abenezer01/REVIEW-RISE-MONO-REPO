@@ -1,6 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -119,6 +120,7 @@ model Location {
   visibilityMetrics VisibilityMetric[]
   aiVisibilityMetrics AIVisibilityMetric[]
   reviews           Review[]
+  reviewSources     ReviewSource[]
   userBusinessRoles UserBusinessRole[]
 
   @@index([businessId])
@@ -740,8 +742,30 @@ model Review {
   business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
   location    Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
   
+  reviewSourceId String?       @db.Uuid
+  reviewSource   ReviewSource? @relation(fields: [reviewSourceId], references: [id])
+
   @@unique([platform, externalId])
   @@index([businessId])
+}
+
+model ReviewSource {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  locationId    String   @db.Uuid
+  platform      String   // 'google', 'facebook', 'yelp'
+  accessToken   String?  @db.Text
+  refreshToken  String?  @db.Text
+  expiresAt     BigInt?  // timestamp in ms
+  status        String   @default("active") // active, disconnected, expired
+  metadata      Json?    // platform specific IDs (accountId, locationName)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  location      Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  reviews       Review[]
+
+  @@unique([locationId, platform])
+  @@index([locationId])
 }
 
 // BrandingRise: AI-Generated Recommendations

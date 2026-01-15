@@ -3,7 +3,14 @@ import path from 'path';
 import { spawn } from 'child_process';
 
 const envPath = path.resolve(__dirname, '../../../../.env');
-dotenv.config({ path: envPath });
+try {
+    const result = dotenv.config({ path: envPath });
+    if (result.error) {
+        // console.warn('⚠️  Dotenv loaded with error (ignoring if env vars exist):', result.error.message);
+    }
+} catch (error) {
+    // console.log('ℹ️  Skipping .env load (likely in production/docker)');
+}
 
 function runScript(scriptRelPath: string) {
   return new Promise<void>((resolve, reject) => {

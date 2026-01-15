@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 import { Card, CardContent, Typography, Box, Chip, Divider } from '@mui/material'
 
 import type { ListingItem } from '@/types/general/listing-item'
@@ -15,9 +17,11 @@ const LocationCard = ({ data }: LocationCardProps) => {
             <CardContent sx={{ flexGrow: 1, pb: 2 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Typography variant='h5' sx={{ fontWeight: 600 }}>
-                            {data.primaryLabel}
-                        </Typography>
+                        <Link href={`/admin/locations/${data.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <Typography variant='h5' sx={{ fontWeight: 600, '&:hover': { textDecoration: 'underline', color: 'primary.main' } }}>
+                                {data.primaryLabel}
+                            </Typography>
+                        </Link>
                         <Chip
                             label={data.status?.label || 'Unknown'}
                             color={data.status?.color || 'default'}

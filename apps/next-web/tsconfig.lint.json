@@ -1,0 +1,31 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "paths": {
+            "@platform/db": [
+                "../../packages/@platform/db/src/index.ts"
+            ],
+            "@platform/types": [
+                "../../packages/@platform/types/src/index.ts"
+            ],
+            "@platform/contracts": [
+                "../../packages/@platform/contracts/src/index.ts"
+            ],
+            "@platform/auth": [
+                "../../packages/@platform/auth/src/index.ts"
+            ],
+            "@platform/queues": [
+                "../../packages/@platform/queues/src/index.ts"
+            ],
+            "@platform/utils": [
+                "../../packages/@platform/utils/src/index.ts"
+            ],
+            "@platform/shared-ui/*": [
+                "../../packages/@platform/shared-ui/src/*"
+            ],
+            "@/*": [
+                "./src/*"
+            ]
+        }
+    }
+}

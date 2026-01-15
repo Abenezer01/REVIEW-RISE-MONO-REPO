@@ -104,7 +104,7 @@ export const extractCompetitorData = async (url: string): Promise<ExtractedSnaps
     }
 };
 
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:3003';
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:3002';
 
 export const createSnapshot = async (competitorId: string) => {
     // Get competitor URL

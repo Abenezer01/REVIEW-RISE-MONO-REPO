@@ -15,7 +15,7 @@ import { useAuth } from '@/contexts/AuthContext'
 
 const KeywordListing = dynamic(() => import('@/components/admin/seo/KeywordListing'), { ssr: false })
 
-const API_URL = 'http://localhost:3012/api/v1'
+const API_URL = process.env.NEXT_PUBLIC_SEO_HEALTH_API_URL || 'http://localhost:3011/api/v1'
 
 export default function KeywordManager() {
   const { user } = useAuth()
