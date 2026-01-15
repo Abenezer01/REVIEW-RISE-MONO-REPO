@@ -4,7 +4,7 @@
 import { revalidatePath } from 'next/cache'
 
 import { prisma } from '@platform/db'
-import type { Prisma } from '@prisma/client'
+import type { Prisma } from '@platform/db'
 
 import { getServerUser } from '@/utils/serverAuth'
 

@@ -1,5 +1,4 @@
-import { reviewRepository } from '@platform/db';
-import { Prisma } from '@prisma/client';
+import { reviewRepository, Prisma } from '@platform/db';
 
 export interface ListReviewsParams {
     locationId: string;

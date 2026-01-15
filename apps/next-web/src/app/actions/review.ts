@@ -2,7 +2,7 @@
 'use server'
 
 import { reviewRepository } from '@platform/db'
-import type { Prisma } from '@prisma/client'
+import type { Prisma } from '@platform/db'
 
 export async function getReviews(params: {
   page?: number

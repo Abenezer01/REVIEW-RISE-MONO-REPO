@@ -1,5 +1,4 @@
-import { prisma } from '@platform/db/src/client'
-import { Prisma } from '@prisma/client'
+import { prisma, Prisma } from '@platform/db'
 import axios from 'axios'
 import * as cheerio from 'cheerio'
 
