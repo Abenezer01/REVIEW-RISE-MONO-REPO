@@ -291,6 +291,8 @@ services:
       - PORT=3007
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - WORKER_JOBS_URL=http://worker-jobs:3009
+      - AI_SERVICE_URL=http://express-ai:3002
     depends_on:
       postgres:
         condition: service_healthy
