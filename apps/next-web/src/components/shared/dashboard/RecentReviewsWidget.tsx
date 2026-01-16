@@ -44,7 +44,9 @@ const RecentReviewsWidget = ({ reviews, unrepliedCount, recentRepliesCount }: Re
     } else if (sent === 'negative') {
       return <SentimentDissatisfiedIcon sx={{ color: theme.palette.error.main }} />
     }
-    return <SentimentNeutralIcon sx={{ color: theme.palette.warning.main }} />
+
+    
+return <SentimentNeutralIcon sx={{ color: theme.palette.warning.main }} />
   }
 
   const getSentimentColor = (sentiment?: string | null) => {
@@ -52,12 +54,14 @@ const RecentReviewsWidget = ({ reviews, unrepliedCount, recentRepliesCount }: Re
     
     if (sent === 'positive') return theme.palette.success.main
     if (sent === 'negative') return theme.palette.error.main
-    return theme.palette.warning.main
+    
+return theme.palette.warning.main
   }
 
   const truncateText = (text: string, maxLength: number = 100) => {
     if (text.length <= maxLength) return text
-    return text.substring(0, maxLength) + '...'
+    
+return text.substring(0, maxLength) + '...'
   }
 
   return (

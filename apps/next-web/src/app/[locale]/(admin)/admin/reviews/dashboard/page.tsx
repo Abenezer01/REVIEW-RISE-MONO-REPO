@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import ReviewsIcon from '@mui/icons-material/RateReview'
 import ReplyIcon from '@mui/icons-material/Reply'
 import StarIcon from '@mui/icons-material/Star'
@@ -13,9 +15,9 @@ import FormControl from '@mui/material/FormControl'
 import Grid from '@mui/material/Grid'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
+import type { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select'
 import Typography from '@mui/material/Typography'
-import { useState } from 'react'
 
 import CompetitorComparison from '@/components/shared/dashboard/CompetitorComparison'
 import DashboardLineChart from '@/components/shared/dashboard/DashboardLineChart'
@@ -90,8 +92,10 @@ const ReviewsDashboard = () => {
 
   const mockRatingTrend = Array.from({ length: 7 }, (_, i) => {
     const d = new Date()
+
     d.setDate(d.getDate() - (6 - i))
-    return {
+    
+return {
       date: d.toISOString().split('T')[0],
       averageRating: 4.2 + Math.random() * 0.5
     }
@@ -100,8 +104,10 @@ const ReviewsDashboard = () => {
   // Mock Volume Data
   const mockVolumeData = Array.from({ length: 7 }, (_, i) => {
     const d = new Date()
+
     d.setDate(d.getDate() - (6 - i))
-    return {
+    
+return {
       date: d.toISOString().split('T')[0],
       volumes: {
         Google: Math.floor(Math.random() * 20) + 10,
@@ -114,8 +120,10 @@ const ReviewsDashboard = () => {
   // Mock Sentiment Data
   const mockSentimentData = Array.from({ length: 7 }, (_, i) => {
     const d = new Date()
+
     d.setDate(d.getDate() - (6 - i))
-    return {
+    
+return {
       date: d.toISOString().split('T')[0],
       positive: Math.floor(Math.random() * 20) + 10,
       neutral: Math.floor(Math.random() * 5) + 2,
@@ -153,6 +161,7 @@ const ReviewsDashboard = () => {
         totalReviews: 892,
       }
   ]
+
   // --------------------------------------
 
 
@@ -207,17 +216,23 @@ const ReviewsDashboard = () => {
   // Prepare Volume Series for Chart
   const preparedVolumeSeries = (() => {
       const data = volumeSeriesData
+
       if (!data || data.length === 0) return []
       
       const platforms = new Set<string>()
+
+
       // Check if data item has 'volumes' property (mock structure)
       if (data[0].volumes) {
           data.forEach((d: any) => Object.keys(d.volumes).forEach(p => platforms.add(p)))
-          return Array.from(platforms).map(platform => ({
+          
+return Array.from(platforms).map(platform => ({
             name: platform,
             data: data.map((d: any) => d.volumes[platform] || 0)
           }))
       }
+
+
       // Handle potential API variance if it returns something else? 
       // Assuming API returns same structure as mock for now based on controller code.
       // Controller returns: { date, volumes: { [platform]: number } }

@@ -1,5 +1,7 @@
 'use client'
 
+import React from 'react'
+
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
@@ -7,25 +9,27 @@ import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import { useTheme, alpha } from '@mui/material/styles'
 
+interface Keyword {
+  keyword: string
+  count: number
+}
+
 interface KeywordCloudProps {
   title: string
   subtitle?: string
-  keywords: Array<{
-    keyword: string
-    count: number
-  }>
+  keywords: Keyword[]
 }
 
 const KeywordCloud = ({ title, subtitle, keywords }: KeywordCloudProps) => {
   const theme = useTheme()
 
-  if (keywords.length === 0) {
+  if (!keywords || keywords.length === 0) {
     return (
       <Card sx={{ height: '100%' }}>
         <CardHeader title={title} subheader={subtitle} />
         <CardContent>
           <Box display="flex" alignItems="center" justifyContent="center" minHeight={200}>
-            No keywords found
+            No keywords available
           </Box>
         </CardContent>
       </Card>
@@ -34,21 +38,6 @@ const KeywordCloud = ({ title, subtitle, keywords }: KeywordCloudProps) => {
 
   // Find max count for relative sizing
   const maxCount = Math.max(...keywords.map(k => k.count))
-
-  // Calculate font size based on frequency (min 12px, max 32px)
-  const getFontSize = (count: number) => {
-    const ratio = count / maxCount
-    return Math.round(12 + ratio * 20) // 12px to 32px
-  }
-
-  // Get color intensity based on frequency
-  const getColor = (count: number) => {
-    const ratio = count / maxCount
-    
-    if (ratio > 0.7) return theme.palette.primary.main
-    if (ratio > 0.4) return theme.palette.secondary.main
-    return theme.palette.text.secondary
-  }
 
   return (
     <Card sx={{ height: '100%' }}>
@@ -67,11 +56,6 @@ const KeywordCloud = ({ title, subtitle, keywords }: KeywordCloudProps) => {
             const ratio = item.count / maxCount
             const isTop = ratio > 0.7
             const isMid = ratio > 0.4
-            
-            // Determine color based on tier
-            let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default'
-            if (isTop) color = 'warning'
-            else if (isMid) color = 'primary'
             
             // Determine styling props
             const chipProps = isTop ? {
@@ -105,7 +89,6 @@ const KeywordCloud = ({ title, subtitle, keywords }: KeywordCloudProps) => {
                 size={isTop ? 'medium' : 'small'}
                 color={isTop ? 'warning' : 'default'} // Warning is gold/orange in our theme
                 {...chipProps}
-                clickable
               />
             )
           })}

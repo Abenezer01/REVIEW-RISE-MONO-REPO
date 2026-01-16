@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
@@ -25,6 +26,7 @@ const SentimentHeatmap = ({ title, subtitle, data }: SentimentHeatmapProps) => {
 
   // Transform data for heatmap
   const dates = data.map(d => d.date)
+
   const series = [
     {
       name: 'Positive',

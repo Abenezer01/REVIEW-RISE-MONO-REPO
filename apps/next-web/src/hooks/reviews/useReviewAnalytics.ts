@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
+
 import { useApiGet, useApiPost } from '@/hooks/useApi'
 
 interface RatingTrendParams {
@@ -93,7 +94,9 @@ export const useCompetitorComparison = (params: ComparisonParams) => {
 
 export const useAddCompetitor = () => {
   const queryClient = useQueryClient()
-  return useApiPost(
+
+  
+return useApiPost(
     '/api/reviews/analytics/competitors',
     {
       onSuccess: () => {
