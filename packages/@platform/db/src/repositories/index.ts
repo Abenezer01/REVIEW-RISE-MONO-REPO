@@ -37,6 +37,7 @@ export { ReviewSourceRepository, reviewSourceRepository } from './review-source.
 export { BrandDNARepository, brandDNARepository } from './brand-dna.repository';
 export { CompetitorRepository, competitorRepository } from './competitor.repository';
 export { ReportRepository, reportRepository } from './report.repository';
+export { CompetitorReviewRepository, competitorReviewRepository } from './competitor-review.repository';
 
 // Import repositories for the convenience object
 import { userRepository } from './user.repository';
@@ -63,6 +64,7 @@ import { brandProfileRepository } from './brand-profile.repository';
 import { brandDNARepository } from './brand-dna.repository';
 import { competitorRepository } from './competitor.repository';
 import { reportRepository } from './report.repository';
+import { competitorReviewRepository } from './competitor-review.repository';
 
 // Re-export all repositories as a single object for convenience
 export const repositories = {
@@ -90,4 +92,5 @@ export const repositories = {
     competitor: competitorRepository,
     report: reportRepository,
     reviewSource: reviewSourceRepository,
+    competitorReview: competitorReviewRepository,
 } as const;

@@ -13,6 +13,17 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
     icon: 'tabler-info-circle'
   },
   {
+    label: 'Reviews',
+    icon: 'tabler-star',
+    children: [
+      {
+        label: 'Dashboard',
+        href: '/admin/reviews/dashboard',
+        icon: 'tabler-chart-pie'
+      }
+    ]
+  },
+  {
     label: 'BrandingRise',
     href: '/admin/brand-rise/overview',
     icon: 'tabler-chart-dots'

@@ -29,9 +29,22 @@ const menuData: MenuItem[] = [
   },
   {
     title: 'navigation.reviews',
-    href: '/admin/reviews',
     icon: 'tabler-star',
-    allowedRoles: [ROLES.ADMIN]
+    allowedRoles: [ROLES.ADMIN],
+    children: [
+      {
+        title: 'navigation.reviews-dashboard',
+        href: '/admin/reviews/dashboard',
+        icon: 'tabler-chart-pie',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.reviews-list',
+        href: '/admin/reviews',
+        icon: 'tabler-list',
+        allowedRoles: [ROLES.ADMIN]
+      }
+    ]
   },
   {
     title: 'navigation.social-rise',
