@@ -3,8 +3,8 @@ import { NextResponse } from 'next/server';
 
 const SERVICE_URL = process.env.EXPRESS_BRAND_URL || 'http://localhost:3007/api/v1';
 
-async function proxy(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
-  const { path } = await params;
+async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath?: string[] }> }) {
+  const { brandPath: path = [] } = await params;
   const query = req.nextUrl.search;
 
   // Smart Routing Logic:
