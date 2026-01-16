@@ -2,6 +2,8 @@
   "navigation": {
     "dashboard": "لوحة التحكم",
     "reviews": "المراجعات",
+    "reviews-dashboard": "لوحة تحليلات المراجعات",
+    "reviews-list": "جميع المراجعات",
     "social-rise": "سوشل رايز",
     "seo-intelligence": "تحليلات السيو",
     "accounts": "الحسابات",

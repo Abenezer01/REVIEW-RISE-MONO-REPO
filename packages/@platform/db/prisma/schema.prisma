@@ -95,6 +95,7 @@ model Business {
   reviews       Review[]
   recommendations BrandRecommendation[]
   brandScores     BrandScore[]
+  competitorReviews CompetitorReview[]
 
   @@index([name])
   @@index([status])
@@ -122,6 +123,7 @@ model Location {
   reviews           Review[]
   reviewSources     ReviewSource[]
   userBusinessRoles UserBusinessRole[]
+  competitorReviews CompetitorReview[]
 
   @@index([businessId])
 }
@@ -839,5 +841,34 @@ model BrandScore {
   @@unique([businessId, periodStart, periodEnd])
   @@index([businessId])
   @@index([computedAt])
+}
+
+// Review Analytics: Competitor Review Data
+model CompetitorReview {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId      String    @db.Uuid
+  locationId      String?   @db.Uuid
+  
+  // Competitor Info
+  competitorName  String
+  
+  // Review Metrics
+  averageRating   Float
+  totalReviews    Int
+  
+  // Source of data
+  source          String    // 'google', 'manual', 'api'
+  
+  // Metadata
+  capturedAt      DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+  
+  // Relations
+  business        Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location        Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  
+  @@index([businessId])
+  @@index([locationId])
+  @@index([capturedAt])
 }
 

@@ -15,9 +15,11 @@ interface DashboardLineChartProps {
   subtitle?: string
   series: { name: string; data: number[] }[]
   categories?: string[]
+  yAxisFormatter?: (val: number) => string
+  xAxisType?: 'category' | 'datetime'
 }
 
-const DashboardLineChart = ({ title, subtitle, series, categories }: DashboardLineChartProps) => {
+const DashboardLineChart = ({ title, subtitle, series, categories, yAxisFormatter, xAxisType = 'category' }: DashboardLineChartProps) => {
   const theme = useTheme()
   const textSecondary = 'var(--mui-palette-text-secondary)'
   const divider = 'var(--mui-palette-divider)'
@@ -28,7 +30,14 @@ const DashboardLineChart = ({ title, subtitle, series, categories }: DashboardLi
       toolbar: { show: false },
       zoom: { enabled: false }
     },
-    colors: [theme.palette.primary.main, theme.palette.info.main],
+    colors: [
+      theme.palette.primary.main,
+      theme.palette.info.main,
+      theme.palette.warning.main,
+      theme.palette.success.main,
+      theme.palette.error.main,
+      theme.palette.secondary.main
+    ],
     stroke: {
       width: 3,
       curve: 'smooth',
@@ -40,23 +49,31 @@ const DashboardLineChart = ({ title, subtitle, series, categories }: DashboardLi
       strokeDashArray: 6,
       xaxis: { lines: { show: true } },
       yaxis: { lines: { show: true } },
-      padding: { top: -10, bottom: -10 }
+      padding: { top: 0, bottom: 0, right: 10, left: 10 }
     },
     xaxis: {
+      type: xAxisType,
       categories: categories || [],
       axisBorder: { show: false },
       axisTicks: { show: false },
-      tickAmount: 10, // Limit the number of ticks displayed
+      tickAmount: xAxisType === 'datetime' ? 6 : 10,
       labels: {
         rotate: -45,
         rotateAlways: false,
-        hideOverlappingLabels: true, // Hide labels that overlap
-        style: { colors: textSecondary, fontSize: '13px' }
+        hideOverlappingLabels: true,
+        style: { colors: textSecondary, fontSize: '12px' },
+        datetimeFormatter: {
+           year: 'yyyy',
+           month: 'MMM \'yy',
+           day: 'dd MMM',
+           hour: 'HH:mm'
+        }
       }
     },
     yaxis: {
       labels: {
-        style: { colors: textSecondary, fontSize: '13px' }
+        style: { colors: textSecondary, fontSize: '12px' },
+        formatter: yAxisFormatter
       }
     },
     tooltip: {

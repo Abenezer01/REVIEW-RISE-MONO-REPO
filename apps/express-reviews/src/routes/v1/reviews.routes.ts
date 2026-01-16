@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as reviewsController from '../../controllers/reviews.controller';
 import * as authController from '../../controllers/auth.controller';
 import * as reviewController from '../../controllers/review.controller';
+import * as analyticsController from '../../controllers/analytics.controller';
 
 const router = Router();
 
@@ -19,6 +20,15 @@ router.get('/locations/:locationId/reviews', reviewsController.listLocationRevie
 router.delete('/sources/:id', reviewsController.disconnectReviewSource);
 router.post('/locations/:locationId/sync', reviewsController.syncReviews);
 router.get('/locations/:locationId/stats', reviewsController.getReviewStats);
+
+// Analytics
+router.get('/analytics/rating-trend', analyticsController.getRatingTrend);
+router.get('/analytics/volume', analyticsController.getReviewVolume);
+router.get('/analytics/sentiment', analyticsController.getSentimentHeatmap);
+router.get('/analytics/keywords', analyticsController.getTopKeywords);
+router.get('/analytics/summary', analyticsController.getRecentSummary);
+router.get('/analytics/competitor-comparison', analyticsController.getCompetitorComparison);
+router.post('/analytics/competitors', analyticsController.addCompetitorData);
 
 // OAuth
 router.get('/auth/google/connect', authController.connectGoogle);
