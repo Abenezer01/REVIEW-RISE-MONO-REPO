@@ -19,7 +19,7 @@ import { toast } from 'react-toastify'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
-import { updateReviewReply, regenerateAISuggestion } from '@/app/actions/review'
+import { updateReviewReply, regenerateAISuggestion, rejectReviewReply } from '@/app/actions/review'
 import { getBrandProfileByBusinessId } from '@/app/actions/brand-profile'
 
 interface ReviewDetailDrawerProps {
@@ -47,6 +47,12 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
   const [tonePresets, setTonePresets] = useState(DEFAULT_TONE_PRESETS)
   const [variations, setVariations] = useState<string[]>([])
   const [activeVariationIndex, setActiveVariationIndex] = useState(0)
+
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
     if (review) {
@@ -112,6 +118,21 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
       if (onSuccess) onSuccess(res.data)
     } else {
       toast.error(res.error || 'Failed to save reply')
+    }
+  }
+
+  const handleRejectReply = async () => {
+    setIsSubmitting(true)
+
+    const res = await rejectReviewReply(currentReview.id)
+
+    setIsSubmitting(false)
+
+    if (res.success) {
+      toast.success('Reply rejected/skipped')
+      if (onSuccess) onSuccess(res.data)
+    } else {
+      toast.error(res.error || 'Failed to reject reply')
     }
   }
 
@@ -188,7 +209,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
             />
           </Box>
           <Typography variant='caption' color='text.secondary'>
-            Published on {new Date(currentReview.publishedAt).toLocaleString()}
+            Published on {isMounted ? new Date(currentReview.publishedAt).toLocaleString() : ''}
           </Typography>
         </Box>
 
@@ -252,6 +273,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
             <Typography variant='subtitle2'>Suggested Replies</Typography>
             <CustomTextField
+              id="tone-preset-select"
               select
               size='small'
               value={tonePreset}
@@ -345,6 +367,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
             Your Reply
           </Typography>
           <CustomTextField
+            id="review-reply-editor"
             fullWidth
             multiline
             rows={4}
@@ -353,15 +376,27 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
             onChange={(e) => setReply(e.target.value)}
             sx={{ mb: 4 }}
           />
-          <Button
-            fullWidth
-            variant='contained'
-            onClick={handleSaveReply}
-            disabled={isSubmitting}
-            startIcon={isSubmitting && <i className='tabler-loader spin' />}
-          >
-            {currentReview.response ? 'Update Reply' : 'Post Reply'}
-          </Button>
+          <Box sx={{ display: 'flex', gap: 4 }}>
+            <Button
+              fullWidth
+              variant='tonal'
+              color='error'
+              onClick={handleRejectReply}
+              disabled={isSubmitting}
+              startIcon={isSubmitting && <i className='tabler-loader spin' />}
+            >
+              Reject/Skip
+            </Button>
+            <Button
+              fullWidth
+              variant='contained'
+              onClick={handleSaveReply}
+              disabled={isSubmitting}
+              startIcon={isSubmitting && <i className='tabler-loader spin' />}
+            >
+              {currentReview.response ? 'Update Reply' : 'Post Reply'}
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Drawer>

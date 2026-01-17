@@ -31,6 +31,13 @@ export interface BrandProfile {
     taglines: string[];
     messagingPillars: { pillar: string; description: string; ctas: string[] }[];
   };
+  autoReplySettings?: {
+    enabled: boolean;
+    mode: 'positive' | 'positive_neutral';
+    manualNegativeApproval: boolean;
+    delayHours: number;
+    maxRepliesPerDay: number;
+  };
 }
 
 interface PaginatedBrandProfiles {

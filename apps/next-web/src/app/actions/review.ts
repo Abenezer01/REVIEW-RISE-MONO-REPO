@@ -14,6 +14,7 @@ export async function getReviews(params: {
   startDate?: Date
   endDate?: Date
   sentiment?: string
+  replyStatus?: string
   search?: string
 }) {
   try {
@@ -27,6 +28,7 @@ export async function getReviews(params: {
       startDate,
       endDate,
       sentiment,
+      replyStatus,
       search
     } = params
 
@@ -37,6 +39,10 @@ export async function getReviews(params: {
     if (platform && platform !== 'all') where.platform = platform
     if (rating) where.rating = Number(rating)
     if (sentiment && sentiment !== 'all') where.sentiment = sentiment
+
+    if (replyStatus && replyStatus !== 'all') {
+      ;(where as any).replyStatus = replyStatus
+    }
 
     if (startDate || endDate) {
       where.publishedAt = {}
@@ -133,10 +139,13 @@ export async function regenerateAISuggestion(reviewId: string, options: { tonePr
 
 export async function updateReviewReply(reviewId: string, response: string) {
   try {
+    // When a user manually saves/posts a reply from the UI, 
+    // we mark it as 'approved' so the auto-reply job can pick it up and post it to the platform.
+    // We DON'T set respondedAt yet, as that's handled by the posting service once it's live.
     const updatedReview = await reviewRepository.update(reviewId, {
       response,
-      respondedAt: new Date()
-    })
+      replyStatus: 'approved'
+    } as any)
 
     return {
       success: true,
@@ -144,6 +153,27 @@ export async function updateReviewReply(reviewId: string, response: string) {
     }
   } catch (error: any) {
     console.error('updateReviewReply error:', error)
+
+    return {
+      success: false,
+      error: error.message
+    }
+  }
+}
+
+export async function rejectReviewReply(reviewId: string) {
+  try {
+    const updatedReview = await reviewRepository.update(reviewId, {
+      replyStatus: 'skipped',
+      replyError: 'Manually rejected by admin'
+    } as any)
+
+    return {
+      success: true,
+      data: updatedReview
+    }
+  } catch (error: any) {
+    console.error('rejectReviewReply error:', error)
 
     return {
       success: false,

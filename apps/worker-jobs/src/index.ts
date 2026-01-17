@@ -25,6 +25,15 @@ app.get('/health', (req, res) => {
 
 import { runVisibilityJob } from './jobs/visibility.job';
 import { runRankTrackingJob } from './jobs/rank-tracking.job';
+import { runAutoReplyJob } from './jobs/auto-reply.job';
+
+app.post('/jobs/auto-reply', async (req, res) => {
+    runAutoReplyJob()
+        .then(() => console.log('Auto-reply job completed'))
+        .catch(err => console.error('Auto-reply job failed:', err));
+    
+    res.status(202).json({ message: 'Auto-reply job started' });
+});
 
 app.post('/jobs/compute-visibility', async (req, res) => {
     // Run async, don't wait for completion? Or wait?

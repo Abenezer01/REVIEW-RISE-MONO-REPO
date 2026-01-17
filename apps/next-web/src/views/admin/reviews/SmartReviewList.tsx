@@ -26,10 +26,12 @@ import ItemsListing from '@components/shared/listing'
 
 import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 import { getReviews } from '@/app/actions/review'
+import { useLocationFilter } from '@/hooks/useLocationFilter'
 import ReviewDetailDrawer from './ReviewDetailDrawer'
 
 const SmartReviewList = () => {
   const theme = useTheme()
+  const { locationId } = useLocationFilter()
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
@@ -44,6 +46,7 @@ const SmartReviewList = () => {
     platform: '',
     search: '',
     sentiment: '',
+    replyStatus: '',
     startDate: null as Date | null,
     endDate: null as Date | null
   })
@@ -54,9 +57,11 @@ const SmartReviewList = () => {
     const res = await getReviews({
       page: page + 1,
       limit: rowsPerPage,
+      locationId: locationId || undefined,
       rating: filters.rating ? Number(filters.rating) : undefined,
       platform: filters.platform || undefined,
       sentiment: filters.sentiment || undefined,
+      replyStatus: filters.replyStatus || undefined,
       search: filters.search,
       startDate: filters.startDate || undefined,
       endDate: filters.endDate || undefined
@@ -70,7 +75,11 @@ const SmartReviewList = () => {
     }
 
     setLoading(false)
-  }, [page, rowsPerPage, filters])
+  }, [page, rowsPerPage, filters, locationId])
+
+  useEffect(() => {
+    setPage(0)
+  }, [locationId])
 
   useEffect(() => {
     fetchData()
@@ -194,21 +203,34 @@ const SmartReviewList = () => {
       }
     },
     {
-      field: 'response',
+      field: 'replyStatus',
       headerName: 'Reply Status',
-      minWidth: 130,
+      minWidth: 160,
       renderCell: (params) => {
-        const isResponded = !!params.value
+        const status = params.value || (params.row.response ? 'posted' : 'none')
+
+        const statusConfig: Record<string, { color: any; label: string; icon: string }> = {
+          posted: { color: 'success', label: 'Replied', icon: 'tabler-circle-check' },
+          approved: { color: 'info', label: 'Approved', icon: 'tabler-thumb-up' },
+          pending_approval: { color: 'warning', label: 'Pending', icon: 'tabler-clock' },
+          failed: { color: 'error', label: 'Failed', icon: 'tabler-alert-circle' },
+          skipped: { color: 'secondary', label: 'Skipped', icon: 'tabler-player-skip-forward' },
+          none: { color: 'error', label: 'Not Replied', icon: 'tabler-x' }
+        }
+
+        const config = statusConfig[status] || statusConfig.none
 
         return (
-          <CustomChip
-            size='small'
-            variant='tonal'
-            color={isResponded ? 'success' : 'error'}
-            label={isResponded ? 'Replied' : 'Pending'}
-            icon={<i className={isResponded ? 'tabler-check' : 'tabler-x'} />}
-            sx={{ fontWeight: 500 }}
-          />
+          <Tooltip title={params.row.replyError || ''}>
+            <CustomChip
+              size='small'
+              variant='tonal'
+              color={config.color}
+              label={config.label}
+              icon={<i className={config.icon} style={{ fontSize: '1rem' }} />}
+              sx={{ fontWeight: 500, textTransform: 'capitalize' }}
+            />
+          </Tooltip>
         )
       }
     },
@@ -253,7 +275,7 @@ const SmartReviewList = () => {
                   }
                 }}
               >
-                <i className='tabler-refresh' style={{ fontSize: '1.5rem' }} />
+                <i className={loading ? 'tabler-loader spin' : 'tabler-refresh'} style={{ fontSize: '1.5rem' }} />
               </IconButton>
               <Box>
                 <Typography variant='h5' fontWeight={600} sx={{ mb: 0.5 }}>
@@ -279,12 +301,14 @@ const SmartReviewList = () => {
         />
         <Divider sx={{ borderStyle: 'dashed' }} />
         <CardContent sx={{ pt: 4, pb: 4 }}>
-          <Grid container spacing={4} alignItems="center">
-            <Grid size={{ xs: 12, md: 3 }}>
+          <Grid container spacing={4}>
+            {/* Main Filters: Search and Dates */}
+            <Grid size={{ xs: 12, lg: 7 }}>
               <CustomTextField
+                id="review-search-filter"
                 fullWidth
-                label='Search Reviews or Authors'
-                placeholder='Search...'
+                label='Search'
+                placeholder='Search reviews, authors, or keywords...'
                 value={filters.search}
                 onChange={e => handleFilterChange('search', e.target.value)}
                 InputProps={{
@@ -296,15 +320,58 @@ const SmartReviewList = () => {
                 }}
               />
             </Grid>
+            <Grid size={{ xs: 12, lg: 5 }}>
+              <Box sx={{ display: 'flex', gap: 4 }}>
+                <CustomTextField
+                  id="review-start-date-filter"
+                  fullWidth
+                  type="date"
+                  label="From"
+                  value={filters.startDate ? filters.startDate.toISOString().split('T')[0] : ''}
+                  onChange={(e) => handleDateChange('start', e.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                />
+                <CustomTextField
+                  id="review-end-date-filter"
+                  fullWidth
+                  type="date"
+                  label="To"
+                  value={filters.endDate ? filters.endDate.toISOString().split('T')[0] : ''}
+                  onChange={(e) => handleDateChange('end', e.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Box>
+            </Grid>
 
-            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+            {/* Secondary Filters: Dropdowns */}
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <CustomTextField
+                id="review-rating-filter"
                 select
                 fullWidth
                 label='Rating'
                 value={filters.rating}
                 onChange={e => handleFilterChange('rating', e.target.value)}
-                SelectProps={{ displayEmpty: true }}
+                SelectProps={{ 
+                  displayEmpty: true,
+                  renderValue: (selected) => {
+                    if (!selected) {
+                      return (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: 'text.secondary' }}>
+                          <i className='tabler-star' />
+                          <Typography variant="body2" color="inherit">All Ratings</Typography>
+                        </Box>
+                      )
+                    }
+
+                    return (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <i className='tabler-star' />
+                        <Typography variant="body2">{selected as string} Stars</Typography>
+                      </Box>
+                    )
+                  }
+                }}
               >
                 <MenuItem value=''>All Ratings</MenuItem>
                 {[5, 4, 3, 2, 1].map(num => (
@@ -313,14 +380,36 @@ const SmartReviewList = () => {
               </CustomTextField>
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <CustomTextField
+                id="review-provider-filter"
                 select
                 fullWidth
                 label='Provider'
                 value={filters.platform}
                 onChange={e => handleFilterChange('platform', e.target.value)}
-                SelectProps={{ displayEmpty: true }}
+                SelectProps={{ 
+                  displayEmpty: true,
+                  renderValue: (selected) => {
+                    if (!selected) {
+                      return (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: 'text.secondary' }}>
+                          <i className='tabler-world' />
+                          <Typography variant="body2" color="inherit">All Providers</Typography>
+                        </Box>
+                      )
+                    }
+
+                    const labels: Record<string, string> = { gbp: 'Google', facebook: 'Facebook', yelp: 'Yelp' }
+
+                    return (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <i className='tabler-world' />
+                        <Typography variant="body2">{labels[selected as string] || (selected as string)}</Typography>
+                      </Box>
+                    )
+                  }
+                }}
               >
                 <MenuItem value=''>All Providers</MenuItem>
                 <MenuItem value='gbp'>Google</MenuItem>
@@ -329,14 +418,34 @@ const SmartReviewList = () => {
               </CustomTextField>
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <CustomTextField
+                id="review-sentiment-filter"
                 select
                 fullWidth
                 label='Sentiment'
                 value={filters.sentiment}
                 onChange={e => handleFilterChange('sentiment', e.target.value)}
-                SelectProps={{ displayEmpty: true }}
+                SelectProps={{ 
+                  displayEmpty: true,
+                  renderValue: (selected) => {
+                    if (!selected) {
+                      return (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: 'text.secondary' }}>
+                          <i className='tabler-mood-smile' />
+                          <Typography variant="body2" color="inherit">All Sentiments</Typography>
+                        </Box>
+                      )
+                    }
+
+                    return (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <i className='tabler-mood-smile' />
+                        <Typography variant="body2">{selected as string}</Typography>
+                      </Box>
+                    )
+                  }
+                }}
               >
                 <MenuItem value=''>All Sentiments</MenuItem>
                 <MenuItem value='Positive'>Positive</MenuItem>
@@ -345,25 +454,50 @@ const SmartReviewList = () => {
               </CustomTextField>
             </Grid>
 
-            <Grid size={{ xs: 12, md: 3 }}>
-              <Box sx={{ display: 'flex', gap: 2 }}>
-                <CustomTextField
-                  fullWidth
-                  type="date"
-                  label="Start Date"
-                  value={filters.startDate ? filters.startDate.toISOString().split('T')[0] : ''}
-                  onChange={(e) => handleDateChange('start', e.target.value)}
-                  InputLabelProps={{ shrink: true }}
-                />
-                <CustomTextField
-                  fullWidth
-                  type="date"
-                  label="End Date"
-                  value={filters.endDate ? filters.endDate.toISOString().split('T')[0] : ''}
-                  onChange={(e) => handleDateChange('end', e.target.value)}
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Box>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <CustomTextField
+                id="review-status-filter"
+                select
+                fullWidth
+                label='Reply Status'
+                value={filters.replyStatus}
+                onChange={e => handleFilterChange('replyStatus', e.target.value)}
+                SelectProps={{ 
+                  displayEmpty: true,
+                  renderValue: (selected) => {
+                    if (!selected) {
+                      return (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: 'text.secondary' }}>
+                          <i className='tabler-check' />
+                          <Typography variant="body2" color="inherit">All Statuses</Typography>
+                        </Box>
+                      )
+                    }
+
+                    const labels: Record<string, string> = {
+                      posted: 'Replied',
+                      approved: 'Approved',
+                      pending_approval: 'Pending',
+                      failed: 'Failed',
+                      skipped: 'Skipped'
+                    }
+
+                    return (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <i className='tabler-check' />
+                        <Typography variant="body2">{labels[selected as string] || (selected as string)}</Typography>
+                      </Box>
+                    )
+                  }
+                }}
+              >
+                <MenuItem value=''>All Statuses</MenuItem>
+                <MenuItem value='posted'>Replied</MenuItem>
+                <MenuItem value='approved'>Approved</MenuItem>
+                <MenuItem value='pending_approval'>Pending</MenuItem>
+                <MenuItem value='failed'>Failed</MenuItem>
+                <MenuItem value='skipped'>Skipped</MenuItem>
+              </CustomTextField>
             </Grid>
           </Grid>
         </CardContent>

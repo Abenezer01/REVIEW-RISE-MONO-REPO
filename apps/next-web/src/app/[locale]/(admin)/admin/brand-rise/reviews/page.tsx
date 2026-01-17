@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -15,10 +16,14 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
 import Rating from '@mui/material/Rating';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, alpha } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Stack from '@mui/material/Stack';
 import { useTranslations } from 'next-intl';
+import toast from 'react-hot-toast';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusinessId } from '@/hooks/useBusinessId';
@@ -45,6 +50,7 @@ const ReviewsPage = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [stats, setStats] = useState({ totalReviews: 0, averageRating: 0 });
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState(0); // 0: All, 1: Pending Approval
   
   // Reply State
   const [replyDialogOpen, setReplyDialogOpen] = useState(false);
@@ -60,8 +66,10 @@ const ReviewsPage = () => {
         setLoading(true);
   
         try {
+            const replyStatus = activeTab === 1 ? 'pending_approval' : undefined;
+
             const [reviewsData, statsData] = await Promise.all([
-                BrandService.listReviews(businessId, 1, 50, undefined, locationId), // Get first 50 for now
+                BrandService.listReviews(businessId, 1, 50, undefined, locationId, replyStatus),
                 BrandService.getReviewStats(businessId, locationId)
             ]);
   
@@ -77,14 +85,16 @@ const ReviewsPage = () => {
     if (businessId) {
         fetchData();
     }
-  }, [businessId, locationId]);
+  }, [businessId, locationId, activeTab]);
 
   const refreshData = async () => {
     if (!businessId) return;
 
     try {
+        const replyStatus = activeTab === 1 ? 'pending_approval' : undefined;
+
         const [reviewsData, statsData] = await Promise.all([
-            BrandService.listReviews(businessId, 1, 50, undefined, locationId),
+            BrandService.listReviews(businessId, 1, 50, undefined, locationId, replyStatus),
             BrandService.getReviewStats(businessId, locationId)
         ]);
 
@@ -97,22 +107,41 @@ const ReviewsPage = () => {
 
   const handleOpenReply = (review: Review) => {
       setSelectedReview(review);
-      setReplyText(review.response || '');
+
+      // If there's an AI suggestion, use it as default
+      const suggestion = (review as any).aiSuggestions?.suggestedReply;
+
+      setReplyText(review.response || suggestion || '');
       setReplyDialogOpen(true);
   };
 
   const handleSendReply = async () => {
-      if (!businessId || !selectedReview) return;
+      if (!businessId || !selectedReview || !replyText) return;
       setReplying(true);
 
       try {
-          await BrandService.replyReview(businessId, selectedReview.id, replyText);
+          await BrandService.postReviewReply(businessId, selectedReview.id, replyText);
+          toast.success('Reply posted successfully');
           setReplyDialogOpen(false);
           refreshData(); // Refresh list
       } catch (error) {
           console.error('Failed to send reply', error);
+          toast.error('Failed to post reply');
       } finally {
           setReplying(false);
+      }
+  };
+
+  const handleRejectReply = async (reviewId: string) => {
+      if (!businessId) return;
+      
+      try {
+          await BrandService.rejectReviewReply(businessId, reviewId);
+          toast.success('Reply rejected');
+          refreshData();
+      } catch (error) {
+          console.error('Failed to reject reply', error);
+          toast.error('Failed to reject reply');
       }
   };
 
@@ -131,7 +160,7 @@ const ReviewsPage = () => {
       Math.round((neutral / total) * 100), 
       Math.round((negative / total) * 100)
   ];
- 
+  
   const sentimentLabels = ['Positive', 'Neutral', 'Negative'];
 
   // Helper for sentiment color/label
@@ -139,7 +168,7 @@ const ReviewsPage = () => {
       if (rating >= 4) return { label: 'Positive', color: 'success' };
       if (rating === 3) return { label: 'Neutral', color: 'warning' };
       
-return { label: 'Negative', color: 'error' };
+      return { label: 'Negative', color: 'error' };
   };
 
   const responseRate = (reviews || []).length > 0 
@@ -207,10 +236,35 @@ return { label: 'Negative', color: 'error' };
       {/* Recent Reviews List */}
       <Grid size={{ xs: 12 }}>
          <Card sx={{ height: '100%' }}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs 
+                value={activeTab} 
+                onChange={(_, v) => setActiveTab(v)} 
+                sx={{ px: 2 }}
+                id="reviews-tabs"
+              >
+                <Tab 
+                  label="All Reviews" 
+                  id="reviews-tab-all"
+                  aria-controls="reviews-tabpanel-all"
+                />
+                <Tab 
+                  label="Pending Approval" 
+                  id="reviews-tab-pending"
+                  aria-controls="reviews-tabpanel-pending"
+                />
+              </Tabs>
+            </Box>
             <CardContent>
                <Box sx={{ mb: 4 }}>
-                  <Typography variant="h6">{t('brandRise.reviews.recent')}</Typography>
-                  <Typography variant="body2" color="text.secondary">Latest customer feedback across all platforms</Typography>
+                  <Typography variant="h6">
+                    {activeTab === 0 ? t('brandRise.reviews.recent') : 'Pending AI Replies'}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {activeTab === 0 
+                      ? 'Latest customer feedback across all platforms' 
+                      : 'Reviews waiting for AI reply approval before posting'}
+                  </Typography>
                </Box>
 
                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -223,9 +277,9 @@ return { label: 'Negative', color: 'error' };
                   ) : (
                       reviews.map((review) => {
                          const sentiment = getSentimentInfo(review.rating);
+                         const isPending = (review as any).replyStatus === 'pending_approval';
 
-                         
-return (
+                         return (
                              <Box key={review.id} sx={{ p: 2, borderRadius: 1, bgcolor: 'background.default' }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                                    <Box sx={{ display: 'flex', gap: 2 }}>
@@ -266,17 +320,45 @@ return (
                                             '& .MuiChip-label': { px: 1.5, fontSize: '0.75rem', fontWeight: 600 }
                                           }} 
                                        />
+                                       {isPending && (
+                                         <Chip 
+                                            label="Pending AI Approval" 
+                                            size="small" 
+                                            color="info"
+                                            variant="outlined"
+                                            sx={{ borderRadius: 1, height: 24 }}
+                                         />
+                                       )}
                                    </Box>
                                    {canReply && (
-                                       <Button 
-                                           size="small" 
-                                           variant={review.response ? "outlined" : "contained"} 
-                                           onClick={() => handleOpenReply(review)}
-                                       >
-                                           {review.response ? 'Edit Reply' : 'Reply'}
-                                       </Button>
+                                       <Stack direction="row" spacing={1}>
+                                          {isPending && (
+                                            <Button 
+                                              size="small" 
+                                              variant="outlined" 
+                                              color="error"
+                                              onClick={() => handleRejectReply(review.id)}
+                                            >
+                                              Reject
+                                            </Button>
+                                          )}
+                                          <Button 
+                                              size="small" 
+                                              variant={review.response ? "outlined" : "contained"} 
+                                              onClick={() => handleOpenReply(review)}
+                                          >
+                                              {review.response ? 'Edit Reply' : isPending ? 'Review & Post' : 'Reply'}
+                                          </Button>
+                                       </Stack>
                                    )}
                                 </Box>
+
+                                {isPending && (review as any).aiSuggestions?.suggestedReply && (
+                                    <Box sx={{ mt: 2, pl: 2, borderLeft: `2px solid ${theme.palette.info.main}`, bgcolor: (theme) => alpha(theme.palette.info.main, 0.05), p: 2, borderRadius: 1 }}>
+                                        <Typography variant="caption" fontWeight="bold" color="info.main">AI Suggested Reply:</Typography>
+                                        <Typography variant="body2">{(review as any).aiSuggestions.suggestedReply}</Typography>
+                                    </Box>
+                                )}
 
                                 {review.response && (
                                     <Box sx={{ mt: 2, pl: 2, borderLeft: `2px solid ${theme.palette.primary.main}`, bgcolor: 'action.hover', p: 2, borderRadius: 1 }}>
@@ -295,31 +377,42 @@ return (
 
       {/* Reply Dialog */}
       <Dialog open={replyDialogOpen} onClose={() => setReplyDialogOpen(false)} fullWidth maxWidth="sm">
-          <DialogTitle>Reply to Review</DialogTitle>
+          <DialogTitle>
+            {selectedReview?.response ? 'Edit Reply' : 'Reply to Review'}
+          </DialogTitle>
           <DialogContent>
-              <Box sx={{ mt: 1 }}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                      Replying to <strong>{selectedReview?.author}</strong> on {selectedReview?.platform}
+              <Box sx={{ mt: 2 }}>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>Review content:</Typography>
+                  <Typography variant="body2" sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1, mb: 3 }}>
+                    {selectedReview?.content}
                   </Typography>
                   <TextField
-                      multiline
-                      rows={4}
+                      id="review-reply-dialog-input"
                       fullWidth
-                      label="Your Reply"
+                      multiline
+                      rows={6}
+                      variant="outlined"
+                      placeholder="Type your response here..."
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
-                      sx={{ mt: 2 }}
+                      disabled={replying}
                   />
+                  {(selectedReview as any)?.aiSuggestions?.analysis && (
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                      AI Analysis: {(selectedReview as any).aiSuggestions.analysis}
+                    </Typography>
+                  )}
               </Box>
           </DialogContent>
-          <DialogActions>
-              <Button onClick={() => setReplyDialogOpen(false)}>Cancel</Button>
+          <DialogActions sx={{ p: 3 }}>
+              <Button onClick={() => setReplyDialogOpen(false)} disabled={replying}>Cancel</Button>
               <Button 
-                  onClick={handleSendReply} 
-                  variant="contained" 
-                  disabled={!replyText || replying}
+                variant="contained" 
+                onClick={handleSendReply} 
+                disabled={!replyText || replying}
+                startIcon={replying && <CircularProgress size={20} color="inherit" />}
               >
-                  {replying ? 'Sending...' : 'Send Reply'}
+                {replying ? 'Posting...' : 'Post Reply'}
               </Button>
           </DialogActions>
       </Dialog>
