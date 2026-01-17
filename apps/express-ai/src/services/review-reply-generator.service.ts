@@ -70,7 +70,7 @@ export class ReviewReplyGeneratorService {
             const parsed = JSON.parse(responseText);
             return ReviewReplyVariationsSchema.parse(parsed);
         } catch (error) {
-            console.error('[ReviewReplyGenerator] Failed to parse AI response:', responseText);
+            console.error('[ReviewReplyGenerator] Failed to parse AI response:', responseText, error);
             throw new Error('Failed to generate valid reply variations');
         }
     }

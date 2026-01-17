@@ -84,10 +84,12 @@ export async function regenerateAISuggestion(reviewId: string, options: { tonePr
   try {
     // 1. Fetch Review Context
     const review = await reviewRepository.findById(reviewId)
+
     if (!review) throw new Error('Review not found')
 
     // 2. Fetch Brand Voice Context
     const businessId = review.businessId
+
     const brandProfile = await brandProfileRepository.findFirst({
       where: { businessId }
     })

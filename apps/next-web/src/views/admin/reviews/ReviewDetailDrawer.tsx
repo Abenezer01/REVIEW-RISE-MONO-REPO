@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -11,11 +12,13 @@ import Rating from '@mui/material/Rating'
 import Chip from '@mui/material/Chip'
 import Button from '@mui/material/Button'
 import { useTheme } from '@mui/material/styles'
+import MenuItem from '@mui/material/MenuItem'
+
 import { toast } from 'react-toastify'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
-import MenuItem from '@mui/material/MenuItem'
+
 import { updateReviewReply, regenerateAISuggestion } from '@/app/actions/review'
 import { getBrandProfileByBusinessId } from '@/app/actions/brand-profile'
 
@@ -64,10 +67,13 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
         getBrandProfileByBusinessId(review.businessId).then(res => {
           if (res.success && res.data?.tone) {
             const tone = res.data.tone as any
+
             if (tone.descriptors && Array.isArray(tone.descriptors)) {
               const descriptors = tone.descriptors as string[]
+
               if (descriptors.length > 0) {
                 const newPresets = descriptors.map(d => ({ value: d, label: d }))
+
                 setTonePresets(newPresets)
                 setTonePreset(newPresets[0].value)
               }
@@ -130,6 +136,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
       
       if (updatedReview.aiSuggestions?.variations) {
         setVariations(updatedReview.aiSuggestions.variations)
+
         if (updatedReview.aiSuggestions.variations.length > 0) {
           setReply(updatedReview.aiSuggestions.variations[0])
           setActiveVariationIndex(0)
