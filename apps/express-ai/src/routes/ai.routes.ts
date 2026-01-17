@@ -53,6 +53,23 @@ router.get('/provider-status', async (req, res) => {
 
 // Brand Strategist Routes
 import { brandStrategist } from '../services/brand-strategist.service';
+import { ReviewReplyGeneratorService } from '../services/review-reply-generator.service';
+
+const replyGenerator = new ReviewReplyGeneratorService();
+
+router.post('/generate-review-replies', async (req, res) => {
+    try {
+        const { reviewId, options } = req.body;
+        if (!reviewId) {
+            return res.status(400).json({ error: 'Missing reviewId' });
+        }
+        const result = await replyGenerator.generateReplyVariations(reviewId, options);
+        res.json(result);
+    } catch (error: any) {
+        console.error('Review Reply Generation Error:', error);
+        res.status(500).json({ error: error.message || 'Internal Server Error' });
+    }
+});
 
 router.post('/generate-recommendations', async (req, res) => {
     try {

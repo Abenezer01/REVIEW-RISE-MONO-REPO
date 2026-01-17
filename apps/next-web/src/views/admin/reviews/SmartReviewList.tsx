@@ -404,9 +404,9 @@ const SmartReviewList = () => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         review={selectedReview}
-        onSuccess={() => {
+        onSuccess={(updatedReview, shouldClose = true) => {
           fetchData()
-          setDrawerOpen(false)
+          if (shouldClose) setDrawerOpen(false)
         }}
       />
     </>
