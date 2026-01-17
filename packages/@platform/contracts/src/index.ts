@@ -19,7 +19,9 @@ export * from './dtos/visibility.dto';
 // AI Schemas and Prompts
 export * from './ai/recommendation.schema';
 export * from './ai/visibility-plan.schema';
+export * from './ai/review-reply.schema';
 export * from './ai/prompts/recommendations.prompts';
+export * from './ai/prompts/review-reply.prompts';
 
 // Re-export commonly used types from requests
 export type {
