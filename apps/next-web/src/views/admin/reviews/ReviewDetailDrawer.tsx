@@ -11,8 +11,10 @@ import Divider from '@mui/material/Divider'
 import Rating from '@mui/material/Rating'
 import Chip from '@mui/material/Chip'
 import Button from '@mui/material/Button'
-import { useTheme } from '@mui/material/styles'
+import { useTheme, alpha } from '@mui/material/styles'
 import MenuItem from '@mui/material/MenuItem'
+import Avatar from '@mui/material/Avatar'
+import Stack from '@mui/material/Stack'
 
 import { toast } from 'react-toastify'
 
@@ -176,227 +178,370 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
       open={open}
       onClose={onClose}
       ModalProps={{ keepMounted: true }}
-      sx={{ '& .MuiDrawer-paper': { width: { xs: '100%', sm: 500 } } }}
+      sx={{ '& .MuiDrawer-paper': { width: { xs: '100%', sm: 550 } } }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
-        <Typography variant='h6'>Review Details</Typography>
-        <IconButton size='small' onClick={onClose}>
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between', 
+        px: 5, 
+        py: 4,
+        bgcolor: (theme) => theme.palette.mode === 'light' ? 'grey.50' : 'background.default',
+        borderBottom: theme => `1px solid ${theme.palette.divider}`
+      }}>
+        <Stack direction="row" spacing={3} alignItems="center">
+          <Avatar 
+            variant="rounded"
+            sx={{ 
+              bgcolor: 'primary.main', 
+              color: 'white',
+              width: 38,
+              height: 38,
+              boxShadow: (theme) => `0 4px 12px ${alpha(theme.palette.primary.main, 0.25)}`
+            }}
+          >
+            <i className='tabler-message-2' style={{ fontSize: '1.25rem' }} />
+          </Avatar>
+          <Box>
+            <Typography variant='h6' fontWeight={700}>Review Details</Typography>
+            <Typography variant='caption' color='text.secondary'>View and manage customer feedback</Typography>
+          </Box>
+        </Stack>
+        <IconButton 
+          size='small' 
+          onClick={onClose}
+          sx={{ 
+            borderRadius: 1.5,
+            bgcolor: 'background.paper',
+            boxShadow: theme => theme.shadows[1],
+            '&:hover': { bgcolor: 'background.paper', boxShadow: theme => theme.shadows[2] }
+          }}
+        >
           <i className='tabler-x' />
         </IconButton>
       </Box>
 
-      <Divider />
-
-      <Box sx={{ p: 6, display: 'flex', flexDirection: 'column', gap: 6, overflowY: 'auto' }}>
+      <Box sx={{ p: 0, display: 'flex', flexDirection: 'column', overflowY: 'auto', height: '100%' }}>
         {/* Header: Author & Rating */}
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-            <Box>
-              <Typography variant='h5' sx={{ mb: 1 }}>{currentReview.author}</Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Rating value={currentReview.rating} readOnly />
-                <Typography variant='body2' color='text.secondary'>
-                  ({currentReview.rating}.0)
-                </Typography>
+        <Box sx={{ p: 6 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
+            <Stack direction="row" spacing={4} alignItems="center">
+              <Avatar 
+                sx={{ 
+                  width: 50, 
+                  height: 50, 
+                  fontSize: '1.25rem',
+                  fontWeight: 600,
+                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
+                  color: 'primary.main',
+                  border: theme => `1px solid ${alpha(theme.palette.primary.main, 0.2)}`
+                }}
+              >
+                {currentReview.author ? currentReview.author.charAt(0).toUpperCase() : '?'}
+              </Avatar>
+              <Box>
+                <Typography variant='h5' fontWeight={700} sx={{ mb: 0.5 }}>{currentReview.author}</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Rating value={currentReview.rating} readOnly size="small" />
+                  <Typography variant='body2' fontWeight={600} color='text.primary'>
+                    {currentReview.rating}.0
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
+            </Stack>
             <CustomChip
               round='true'
               size='small'
               variant='tonal'
               color={sentimentColorMap[sentiment] || 'secondary'}
               label={sentiment}
+              sx={{ fontWeight: 600, px: 2 }}
             />
           </Box>
-          <Typography variant='caption' color='text.secondary'>
-            Published on {isMounted ? new Date(currentReview.publishedAt).toLocaleString() : ''}
-          </Typography>
+          
+          <Stack direction="row" spacing={6} sx={{ mb: 0 }}>
+            <Box>
+              <Typography variant='caption' color='text.disabled' sx={{ textTransform: 'uppercase', fontWeight: 700, mb: 1, display: 'block' }}>
+                Published Date
+              </Typography>
+              <Typography variant='body2' fontWeight={500}>
+                {isMounted ? new Date(currentReview.publishedAt).toLocaleDateString('en-US', { 
+                  month: 'long', 
+                  day: 'numeric', 
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                }) : ''}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant='caption' color='text.disabled' sx={{ textTransform: 'uppercase', fontWeight: 700, mb: 1, display: 'block' }}>
+                Source
+              </Typography>
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <i className={currentReview.platform === 'gbp' ? 'tabler-brand-google text-primary' : 'tabler-world text-primary'} style={{ fontSize: '1.1rem' }} />
+                <Typography variant='body2' fontWeight={600} sx={{ textTransform: 'uppercase' }}>
+                  {currentReview.platform === 'gbp' ? 'Google' : currentReview.platform}
+                </Typography>
+              </Stack>
+            </Box>
+          </Stack>
         </Box>
 
         <Divider />
 
         {/* Content */}
-        <Box>
-          <Typography variant='subtitle2' sx={{ mb: 2, textTransform: 'uppercase', color: 'text.disabled' }}>
-            Review Text
+        <Box sx={{ p: 6, bgcolor: (theme) => theme.palette.mode === 'light' ? alpha(theme.palette.primary.main, 0.02) : 'transparent' }}>
+          <Typography variant='subtitle2' sx={{ mb: 3, textTransform: 'uppercase', color: 'text.disabled', fontWeight: 700, letterSpacing: '0.5px' }}>
+            Review Content
           </Typography>
-          <Typography variant='body1' sx={{ whiteSpace: 'pre-wrap' }}>
-            {currentReview.content || 'No content provided.'}
-          </Typography>
-        </Box>
-
-        {/* Metadata: Source & Tags */}
-        <Box sx={{ display: 'flex', gap: 6 }}>
-          <Box sx={{ flex: 1 }}>
-            <Typography variant='subtitle2' sx={{ mb: 1, textTransform: 'uppercase', color: 'text.disabled' }}>
-              Source
+          <Box sx={{ 
+            p: 4, 
+            bgcolor: 'background.paper', 
+            borderRadius: 2, 
+            border: theme => `1px solid ${theme.palette.divider}`,
+            boxShadow: theme => theme.shadows[0]
+          }}>
+            <Typography variant='body1' sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, color: 'text.primary' }}>
+              {currentReview.content || 'No content provided.'}
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <i className={currentReview.platform === 'gbp' ? 'tabler-brand-google' : 'tabler-world'} />
-              <Typography variant='body2' sx={{ textTransform: 'uppercase' }}>
-                {currentReview.platform}
+          </Box>
+          
+          {currentReview.tags && currentReview.tags.length > 0 && (
+            <Box sx={{ mt: 4 }}>
+              <Typography variant='caption' color='text.disabled' sx={{ textTransform: 'uppercase', fontWeight: 700, mb: 2, display: 'block' }}>
+                Internal Tags
               </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                {currentReview.tags.map((tag: string) => (
+                  <Chip 
+                    key={tag} 
+                    label={tag} 
+                    size='small' 
+                    variant='outlined' 
+                    sx={{ borderRadius: 1, fontWeight: 500 }} 
+                  />
+                ))}
+              </Box>
             </Box>
-          </Box>
-          <Box sx={{ flex: 1 }}>
-            <Typography variant='subtitle2' sx={{ mb: 1, textTransform: 'uppercase', color: 'text.disabled' }}>
-              Internal Tags
-            </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {currentReview.tags && currentReview.tags.length > 0 ? (
-                currentReview.tags.map((tag: string) => (
-                  <Chip key={tag} label={tag} size='small' variant='outlined' />
-                ))
-              ) : (
-                <Typography variant='caption' color='text.secondary'>No tags</Typography>
-              )}
-            </Box>
-          </Box>
+          )}
         </Box>
 
         <Divider />
 
-        {/* AI Suggestions (Placeholders) */}
-        <Box sx={{ p: 4, bgcolor: 'action.hover', borderRadius: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-            <i className='tabler-robot' style={{ color: theme.palette.primary.main }} />
-            <Typography variant='subtitle1' color='primary' sx={{ fontWeight: 600 }}>
-              AI Smart Suggestions
-            </Typography>
-          </Box>
-          
-          <Typography variant='subtitle2' sx={{ mb: 1 }}>Analysis</Typography>
-          <Typography variant='body2' sx={{ mb: 4, color: 'text.secondary' }}>
-            {currentReview.aiSuggestions?.analysis || 'AI analysis is being generated... This review shows ' + sentiment.toLowerCase() + ' sentiment regarding the service quality.'}
-          </Typography>
+        {/* AI Suggestions */}
+        <Box sx={{ p: 6 }}>
+          <Box sx={{ 
+            p: 5, 
+            bgcolor: (theme) => theme.palette.mode === 'light' ? alpha(theme.palette.primary.main, 0.04) : alpha(theme.palette.primary.main, 0.08), 
+            borderRadius: 3,
+            border: theme => `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            {/* Decorative element */}
+            <Box sx={{ 
+              position: 'absolute', 
+              top: -20, 
+              right: -20, 
+              width: 100, 
+              height: 100, 
+              borderRadius: '50%', 
+              bgcolor: (theme) => alpha(theme.palette.primary.main, 0.05),
+              zIndex: 0
+            }} />
 
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-            <Typography variant='subtitle2'>Suggested Replies</Typography>
-            <CustomTextField
-              id="tone-preset-select"
-              select
-              size='small'
-              value={tonePreset}
-              onChange={(e) => setTonePreset(e.target.value)}
-              sx={{ minWidth: 150 }}
-            >
-              {tonePresets.map((preset: { value: string; label: string }) => (
-                <MenuItem key={preset.value} value={preset.value}>
-                  {preset.label}
-                </MenuItem>
-              ))}
-            </CustomTextField>
-          </Box>
-
-          {variations.length > 0 ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              {variations.map((variation, index) => (
-                <Box 
-                  key={index}
-                  onClick={() => handleUseVariation(index)}
+            <Box sx={{ position: 'relative', zIndex: 1 }}>
+              <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 4 }}>
+                <Avatar 
                   sx={{ 
-                    p: 3, 
-                    bgcolor: activeVariationIndex === index ? (theme) => `rgba(${theme.palette.primary.mainChannel} / 0.08)` : 'background.paper', 
-                    color: 'text.primary',
-                    border: '1px solid', 
-                    borderColor: activeVariationIndex === index ? 'primary.main' : 'divider', 
-                    borderRadius: 1,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    position: 'relative',
-                    '&:hover': {
-                      borderColor: 'primary.main',
-                      bgcolor: activeVariationIndex === index ? (theme) => `rgba(${theme.palette.primary.mainChannel} / 0.12)` : 'action.hover'
-                    }
+                    bgcolor: 'primary.main', 
+                    width: 32, 
+                    height: 32,
+                    boxShadow: theme => `0 2px 8px ${alpha(theme.palette.primary.main, 0.3)}`
                   }}
                 >
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                    <Chip label={tonePreset} size='small' variant='tonal' color='primary' sx={{ height: 20, fontSize: '0.65rem' }} />
-                    {activeVariationIndex === index && (
-                      <i className='tabler-check text-primary' style={{ fontSize: '1rem' }} />
-                    )}
-                  </Box>
-                  <Typography variant='body2' sx={{ fontStyle: 'italic' }}>
-                    {variation}
+                  <i className='tabler-robot' style={{ fontSize: '1.1rem', color: 'white' }} />
+                </Avatar>
+                <Typography variant='subtitle1' color='primary' sx={{ fontWeight: 800, letterSpacing: '-0.5px' }}>
+                  AI Smart Suggestions
+                </Typography>
+              </Stack>
+              
+              <Box sx={{ mb: 5 }}>
+                <Typography variant='caption' color='text.disabled' sx={{ textTransform: 'uppercase', fontWeight: 700, mb: 1, display: 'block' }}>
+                  AI Analysis
+                </Typography>
+                <Typography variant='body2' sx={{ color: 'text.secondary', lineHeight: 1.5 }}>
+                  {currentReview.aiSuggestions?.analysis || 'AI analysis is being generated... This review shows ' + sentiment.toLowerCase() + ' sentiment regarding the service quality.'}
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                <Typography variant='subtitle2' fontWeight={700}>Suggested Replies</Typography>
+                <CustomTextField
+                  id="tone-preset-select"
+                  select
+                  size='small'
+                  value={tonePreset}
+                  onChange={(e) => setTonePreset(e.target.value)}
+                  sx={{ minWidth: 150 }}
+                  SelectProps={{
+                    sx: { borderRadius: 2, bgcolor: 'background.paper' }
+                  }}
+                >
+                  {tonePresets.map((preset: { value: string; label: string }) => (
+                    <MenuItem key={preset.value} value={preset.value}>
+                      {preset.label}
+                    </MenuItem>
+                  ))}
+                </CustomTextField>
+              </Box>
+
+              {variations.length > 0 ? (
+                <Stack spacing={3}>
+                  {variations.map((variation, index) => (
+                    <Box 
+                      key={index}
+                      onClick={() => handleUseVariation(index)}
+                      sx={{ 
+                        p: 4, 
+                        bgcolor: activeVariationIndex === index ? 'background.paper' : alpha(theme.palette.background.paper, 0.5), 
+                        border: '1px solid', 
+                        borderColor: activeVariationIndex === index ? 'primary.main' : 'divider', 
+                        borderRadius: 2,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        boxShadow: activeVariationIndex === index ? theme => theme.shadows[2] : 'none',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          bgcolor: 'background.paper',
+                          transform: 'translateY(-2px)',
+                          boxShadow: theme => theme.shadows[1]
+                        }
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                        <CustomChip 
+                          label={tonePreset} 
+                          size='small' 
+                          variant='tonal' 
+                          color='primary' 
+                          sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, borderRadius: 1 }} 
+                        />
+                        {activeVariationIndex === index && (
+                          <Avatar sx={{ bgcolor: 'primary.main', width: 20, height: 20 }}>
+                            <i className='tabler-check' style={{ fontSize: '0.8rem', color: 'white' }} />
+                          </Avatar>
+                        )}
+                      </Box>
+                      <Typography variant='body2' sx={{ fontStyle: 'italic', color: 'text.primary', lineHeight: 1.5 }}>
+                        &quot;{variation}&quot;
+                      </Typography>
+                    </Box>
+                  ))}
+                </Stack>
+              ) : (
+                <Box sx={{ 
+                  p: 4, 
+                  bgcolor: 'background.paper', 
+                  border: '1px dashed', 
+                  borderColor: 'divider', 
+                  borderRadius: 2, 
+                  mb: 3,
+                  textAlign: 'center'
+                }}>
+                  <Typography variant='body2' sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+                    {'Dear ' + currentReview.author + ', thank you so much for your ' + currentReview.rating + '-star review! We appreciate your feedback and hope to see you again soon.'}
                   </Typography>
                 </Box>
-              ))}
-            </Box>
-          ) : (
-            <Box sx={{ p: 3, bgcolor: 'background.paper', border: '1px dashed', borderColor: 'divider', borderRadius: 1, mb: 3 }}>
-              <Typography variant='body2' sx={{ fontStyle: 'italic' }}>
-                {'Dear ' + currentReview.author + ', thank you so much for your ' + currentReview.rating + '-star review! We appreciate your feedback and hope to see you again soon.'}
-              </Typography>
-            </Box>
-          )}
+              )}
 
-          <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
-            <Button
-              fullWidth
-              variant='tonal'
-              size='small'
-              startIcon={isRegenerating ? <i className='tabler-loader spin' /> : <i className='tabler-refresh' />}
-              onClick={handleRegenerateAI}
-              disabled={isRegenerating}
-            >
-              {variations.length > 0 ? 'Regenerate' : 'Generate AI Replies'}
-            </Button>
-            <Button
-              fullWidth
-              variant='contained'
-              size='small'
-              startIcon={<i className='tabler-copy' />}
-              onClick={() => {
-                if (variations[activeVariationIndex]) {
-                  setReply(variations[activeVariationIndex])
-                } else {
-                  setReply(`Dear ${currentReview.author}, thank you so much for your ${currentReview.rating}-star review! We appreciate your feedback and hope to see you again soon.`)
-                }
-              }}
-            >
-              Use Suggestion
-            </Button>
+              <Stack direction="row" spacing={3} sx={{ mt: 5 }}>
+                <Button
+                  fullWidth
+                  variant='tonal'
+                  size='medium'
+                  startIcon={isRegenerating ? <i className='tabler-loader spin' /> : <i className='tabler-refresh' />}
+                  onClick={handleRegenerateAI}
+                  disabled={isRegenerating}
+                  sx={{ borderRadius: 2, fontWeight: 600 }}
+                >
+                  {variations.length > 0 ? 'Regenerate' : 'Generate AI'}
+                </Button>
+                <Button
+                  fullWidth
+                  variant='contained'
+                  size='medium'
+                  startIcon={<i className='tabler-copy' />}
+                  onClick={() => {
+                    if (variations[activeVariationIndex]) {
+                      setReply(variations[activeVariationIndex])
+                    } else {
+                      setReply(`Dear ${currentReview.author}, thank you so much for your ${currentReview.rating}-star review! We appreciate your feedback and hope to see you again soon.`)
+                    }
+                  }}
+                  sx={{ borderRadius: 2, fontWeight: 600, boxShadow: theme => `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}` }}
+                >
+                  Use This
+                </Button>
+              </Stack>
+            </Box>
           </Box>
         </Box>
 
         <Divider />
 
         {/* Reply Editor */}
-        <Box>
-          <Typography variant='subtitle2' sx={{ mb: 2, textTransform: 'uppercase', color: 'text.disabled' }}>
+        <Box sx={{ p: 6, mb: 4 }}>
+          <Typography variant='subtitle2' sx={{ mb: 3, textTransform: 'uppercase', color: 'text.disabled', fontWeight: 700, letterSpacing: '0.5px' }}>
             Your Reply
           </Typography>
           <CustomTextField
             id="review-reply-editor"
             fullWidth
             multiline
-            rows={4}
+            rows={5}
             placeholder='Write your reply here...'
             value={reply}
             onChange={(e) => setReply(e.target.value)}
-            sx={{ mb: 4 }}
+            sx={{ 
+              mb: 5,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 3,
+                bgcolor: 'background.paper'
+              }
+            }}
           />
-          <Box sx={{ display: 'flex', gap: 4 }}>
+          <Stack direction="row" spacing={4}>
             <Button
               fullWidth
               variant='tonal'
               color='error'
+              size="large"
               onClick={handleRejectReply}
               disabled={isSubmitting}
-              startIcon={isSubmitting && <i className='tabler-loader spin' />}
+              startIcon={isSubmitting ? <i className='tabler-loader spin' /> : <i className='tabler-trash' />}
+              sx={{ borderRadius: 2.5, fontWeight: 700 }}
             >
-              Reject/Skip
+              Reject
             </Button>
             <Button
               fullWidth
               variant='contained'
+              size="large"
               onClick={handleSaveReply}
               disabled={isSubmitting}
-              startIcon={isSubmitting && <i className='tabler-loader spin' />}
+              startIcon={isSubmitting ? <i className='tabler-loader spin' /> : <i className='tabler-send' />}
+              sx={{ 
+                borderRadius: 2.5, 
+                fontWeight: 700,
+                boxShadow: theme => `0 4px 12px ${alpha(theme.palette.primary.main, 0.25)}`
+              }}
             >
               {currentReview.response ? 'Update Reply' : 'Post Reply'}
             </Button>
-          </Box>
+          </Stack>
         </Box>
       </Box>
     </Drawer>

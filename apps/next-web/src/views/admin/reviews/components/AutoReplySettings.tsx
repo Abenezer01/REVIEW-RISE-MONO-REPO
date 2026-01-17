@@ -36,7 +36,9 @@ import {
   History as HistoryIcon,
   SentimentSatisfiedAlt as PositiveIcon,
   SentimentSatisfied as NeutralIcon,
-  Star as StarIcon
+  Star as StarIcon,
+  AutoGraph as StepIcon,
+  RecordVoiceOver as VoiceIcon
 } from '@mui/icons-material';
 import toast from 'react-hot-toast';
 
@@ -452,15 +454,54 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
 
         <Grid size={{ xs: 12, md: 4 }}>
           <Stack spacing={6}>
-            <Card elevation={0} variant="outlined" sx={{ borderRadius: 3, bgcolor: (theme: Theme) => alpha(theme.palette.info.main, 0.02), borderStyle: 'dashed' }}>
+            <Card 
+              elevation={0} 
+              variant="outlined" 
+              sx={{ 
+                borderRadius: 3, 
+                bgcolor: 'background.paper',
+                border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
+                overflow: 'hidden'
+              }}
+            >
+              <Box sx={{ 
+                p: 5, 
+                bgcolor: (theme: Theme) => alpha(theme.palette.primary.main, 0.03),
+                borderBottom: (theme: Theme) => `1px solid ${theme.palette.divider}`
+              }}>
+                <Stack direction="row" spacing={3} alignItems="center">
+                  <Avatar 
+                    variant="rounded"
+                    sx={{ 
+                      bgcolor: 'primary.main', 
+                      color: 'white',
+                      width: 40,
+                      height: 40,
+                      boxShadow: (theme: Theme) => `0 4px 12px ${alpha(theme.palette.primary.main, 0.25)}`
+                    }}
+                  >
+                    <StepIcon fontSize="small" />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h6" fontWeight="800">Quick Guide</Typography>
+                    <Typography variant="caption" color="text.secondary">How the workflow handles reviews</Typography>
+                  </Box>
+                </Stack>
+              </Box>
+
               <CardContent sx={{ p: 5 }}>
-                <Typography variant="h6" fontWeight="700" color="info.main" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <InfoIcon fontSize="small" /> Quick Guide
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-                  How the automated response workflow handles your business reviews:
-                </Typography>
-                <Stack spacing={4}>
+                <Stack spacing={2} sx={{ position: 'relative' }}>
+                  {/* Vertical Line Connector */}
+                  <Box sx={{ 
+                    position: 'absolute', 
+                    left: 17, 
+                    top: 20, 
+                    bottom: 20, 
+                    width: 2, 
+                    bgcolor: (theme: Theme) => alpha(theme.palette.divider, 0.8),
+                    zIndex: 0
+                  }} />
+
                   {[
                     { step: 1, title: 'Sentiment Analysis', desc: 'New reviews are analyzed for star rating and content sentiment.' },
                     { step: 2, title: 'AI Generation', desc: 'Replies are crafted using your unique Brand Voice and response patterns.' },
@@ -469,27 +510,43 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                   ].map((item) => (
                     <Box key={item.step} sx={{ 
                       display: 'flex', 
-                      gap: 2.5,
-                      p: 2,
+                      gap: 4,
+                      p: 3,
                       borderRadius: 2,
+                      bgcolor: 'transparent',
+                      position: 'relative',
+                      zIndex: 1,
                       transition: 'all 0.2s ease',
                       '&:hover': {
-                        bgcolor: (theme: Theme) => alpha(theme.palette.info.main, 0.04),
-                        transform: 'translateX(4px)'
+                        bgcolor: (theme: Theme) => alpha(theme.palette.primary.main, 0.04),
+                        transform: 'translateX(4px)',
+                        '& .step-number': {
+                          bgcolor: 'primary.main',
+                          color: 'white',
+                          transform: 'scale(1.1)'
+                        }
                       }
                     }}>
-                      <Avatar sx={{ 
-                        width: 28, 
-                        height: 28, 
-                        fontSize: 12, 
-                        bgcolor: 'info.main',
-                        boxShadow: (theme: Theme) => `0 4px 8px ${alpha(theme.palette.info.main, 0.2)}`
-                      }}>
+                      <Avatar 
+                        className="step-number"
+                        sx={{ 
+                          width: 34, 
+                          height: 34, 
+                          fontSize: 14, 
+                          fontWeight: 800,
+                          bgcolor: 'background.paper',
+                          color: 'primary.main',
+                          border: (theme: Theme) => `2px solid ${theme.palette.primary.main}`,
+                          boxShadow: (theme: Theme) => `0 2px 8px ${alpha(theme.palette.primary.main, 0.15)}`,
+                          transition: 'all 0.2s ease',
+                          flexShrink: 0
+                        }}
+                      >
                         {item.step}
                       </Avatar>
                       <Box>
-                        <Typography variant="subtitle2" fontWeight="700">{item.title}</Typography>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, lineHeight: 1.4 }}>
+                        <Typography variant="subtitle2" fontWeight="700" sx={{ color: 'text.primary' }}>{item.title}</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ display: 'block', mt: 0.5, lineHeight: 1.5 }}>
                           {item.desc}
                         </Typography>
                       </Box>
@@ -499,58 +556,88 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
               </CardContent>
             </Card>
 
-            <Paper 
+            <Card 
+              elevation={0} 
               variant="outlined" 
               sx={{ 
-                p: 5, 
                 borderRadius: 3, 
-                bgcolor: (theme: Theme) => alpha(theme.palette.success.main, 0.02),
-                border: (theme: Theme) => `1px solid ${alpha(theme.palette.success.main, 0.1)}`,
-                position: 'relative',
-                overflow: 'hidden'
+                bgcolor: 'background.paper',
+                border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
+                overflow: 'hidden',
+                position: 'relative'
               }}
             >
               <Box sx={{ 
                 position: 'absolute', 
-                top: -10, 
-                right: -10, 
-                width: 100, 
-                height: 100, 
-                bgcolor: (theme: Theme) => alpha(theme.palette.success.main, 0.03),
-                borderRadius: '50%'
+                top: -15, 
+                right: -15, 
+                width: 120, 
+                height: 120, 
+                bgcolor: (theme: Theme) => alpha(theme.palette.success.main, 0.04),
+                borderRadius: '50%',
+                zIndex: 0
               }} />
-              
-              <Stack spacing={3} alignItems="center" textAlign="center" sx={{ position: 'relative' }}>
-                <Avatar sx={{ 
-                  bgcolor: (theme: Theme) => alpha(theme.palette.success.main, 0.1), 
-                  color: 'success.main', 
-                  width: 56, 
-                  height: 56,
-                  boxShadow: (theme: Theme) => `0 8px 16px ${alpha(theme.palette.success.main, 0.15)}`
-                }}>
-                  <CheckIcon fontSize="large" />
-                </Avatar>
-                <Box>
-                  <Typography variant="subtitle1" fontWeight="800" color="success.dark">Brand Voice Ready</Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1, lineHeight: 1.6 }}>
-                    Your responses will automatically reflect your established brand personality and values.
-                  </Typography>
-                </Box>
-                <Button 
-                  variant="outlined" 
-                  size="small" 
-                  color="success"
-                  sx={{ 
-                    borderRadius: 2,
-                    textTransform: 'none',
-                    fontWeight: 700,
-                    px: 3
-                  }}
-                >
-                  Configure Brand Voice
-                </Button>
-              </Stack>
-            </Paper>
+
+              <Box sx={{ 
+                p: 5, 
+                bgcolor: (theme: Theme) => alpha(theme.palette.success.main, 0.03),
+                borderBottom: (theme: Theme) => `1px solid ${theme.palette.divider}`,
+                position: 'relative',
+                zIndex: 1
+              }}>
+                <Stack direction="row" spacing={3} alignItems="center">
+                  <Avatar 
+                    variant="rounded"
+                    sx={{ 
+                      bgcolor: 'success.main', 
+                      color: 'white',
+                      width: 40,
+                      height: 40,
+                      boxShadow: (theme: Theme) => `0 4px 12px ${alpha(theme.palette.success.main, 0.25)}`
+                    }}
+                  >
+                    <VoiceIcon fontSize="small" />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h6" fontWeight="800">Brand Voice</Typography>
+                    <Typography variant="caption" color="text.secondary">Personality & Tone</Typography>
+                  </Box>
+                </Stack>
+              </Box>
+
+              <CardContent sx={{ p: 5, position: 'relative', zIndex: 1 }}>
+                <Stack spacing={4} alignItems="center" textAlign="center">
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight="800" color="success.dark" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5 }}>
+                      <CheckIcon fontSize="small" /> Status: Active
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2, lineHeight: 1.6 }}>
+                      Your responses will automatically reflect your established brand personality and values across all platforms.
+                    </Typography>
+                  </Box>
+                  
+                  <Button 
+                    variant="outlined" 
+                    size="medium" 
+                    color="success"
+                    fullWidth
+                    sx={{ 
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      fontWeight: 700,
+                      py: 2,
+                      borderWidth: 2,
+                      '&:hover': {
+                        borderWidth: 2,
+                        bgcolor: (theme: Theme) => alpha(theme.palette.success.main, 0.04)
+                      }
+                    }}
+                  >
+                    Configure Brand Voice
+                  </Button>
+                </Stack>
+              </CardContent>
+            </Card>
           </Stack>
         </Grid>
       </Grid>
