@@ -1,4 +1,5 @@
-import { reviewRepository, Prisma } from '@platform/db';
+import { reviewRepository, reviewSourceRepository, Prisma } from '@platform/db';
+import { googleReviewsService } from './google-reviews.service';
 
 export interface ListReviewsParams {
     locationId: string;
@@ -9,6 +10,7 @@ export interface ListReviewsParams {
     startDate?: string;
     endDate?: string;
     sentiment?: string;
+    replyStatus?: string;
 }
 
 export const listReviewsByLocation = async (params: ListReviewsParams) => {
@@ -21,6 +23,7 @@ export const listReviewsByLocation = async (params: ListReviewsParams) => {
         startDate,
         endDate,
         sentiment,
+        replyStatus,
     } = params;
 
     const skip = (page - 1) * limit;
@@ -51,6 +54,10 @@ export const listReviewsByLocation = async (params: ListReviewsParams) => {
         where.sentiment = sentiment;
     }
 
+    if (replyStatus && replyStatus !== 'all') {
+        (where as any).replyStatus = replyStatus;
+    }
+
     const { items: reviews, total } = await reviewRepository.findPaginated({
         where,
         skip,
@@ -67,4 +74,50 @@ export const listReviewsByLocation = async (params: ListReviewsParams) => {
             totalPages: Math.ceil(total / limit),
         },
     };
+};
+
+export const postReviewReply = async (reviewId: string, comment: string) => {
+    const review = await reviewRepository.findById(reviewId);
+    if (!review) throw new Error('Review not found');
+
+    if (review.platform === 'google') {
+        // 1. Get the ReviewSource to get the accessToken
+        if (!review.reviewSourceId) throw new Error('Review source not found for this review');
+        
+        const source = await reviewSourceRepository.findById(review.reviewSourceId);
+        if (!source || !source.accessToken) throw new Error('Review source or access token not found');
+
+        const metadata = source.metadata as any;
+        if (!metadata?.locationName) throw new Error('Missing locationName in source metadata');
+
+        // 2. Reconstruct the full review name
+        // locationName is "accounts/{accountId}/locations/{locationId}"
+        // externalId is the reviewId
+        const reviewName = `${metadata.locationName}/reviews/${review.externalId}`;
+
+        // 3. Post the reply
+        await googleReviewsService.updateReply(source.accessToken, reviewName, comment);
+
+        // 4. Update the review in DB
+        await reviewRepository.update(reviewId, {
+            response: comment,
+            respondedAt: new Date(),
+            replyStatus: 'posted'
+        } as any);
+
+        return { success: true };
+    }
+
+    throw new Error(`Platform ${review.platform} not supported for posting replies yet`);
+};
+
+export const rejectReviewReply = async (reviewId: string) => {
+    const review = await reviewRepository.findById(reviewId);
+    if (!review) throw new Error('Review not found');
+
+    await reviewRepository.update(reviewId, {
+        replyStatus: 'rejected'
+    } as any);
+
+    return { success: true };
 };

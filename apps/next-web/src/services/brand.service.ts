@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import apiClient from '@/lib/apiClient';
 
 export interface Competitor {
@@ -61,20 +62,17 @@ export const BrandService = {
 
     const response = await apiClient.get<{ data: Competitor[] }>(`/brands/${businessId}/competitors`, { params });
 
-
     return response.data.data || [];
   },
 
   getCompetitor: async (businessId: string, competitorId: string) => {
     const response = await apiClient.get<{ data: Competitor }>(`/brands/${businessId}/competitors/${competitorId}`);
 
-
     return response.data.data;
   },
 
   addCompetitor: async (businessId: string, data: { name: string; website?: string }) => {
     const response = await apiClient.post<{ data: Competitor }>(`/brands/${businessId}/competitors`, data);
-
 
     return response.data.data;
   },
@@ -91,7 +89,6 @@ export const BrandService = {
 
     const response = await apiClient.get<{ data: DashboardOverview }>(`/brands/${businessId}/dashboards/overview`, { params });
 
-
     return response.data.data;
   },
 
@@ -100,20 +97,20 @@ export const BrandService = {
 
     if (locationId) params.locationId = locationId;
 
-    const response = await apiClient.get<{ data: VisibilityMetric[] }>(`/brands/${businessId}/dashboards/visibility`, {
-      params
-    });
-
+    const response = await apiClient.get<{ data: VisibilityMetric[] }>(`/brands/${businessId}/dashboards/visibility`, { params });
 
     return response.data.data || [];
   },
 
   // Reports
-  listReports: async (businessId: string) => {
-    const response = await apiClient.get<{ data: Report[] }>(`/brands/${businessId}/reports`);
+  listReports: async (businessId: string, locationId?: string | number | null) => {
+    const params: any = {};
 
+    if (locationId) params.locationId = locationId;
 
-    return response.data.data;
+    const response = await apiClient.get<{ data: Report[] }>(`/brands/${businessId}/reports`, { params });
+
+    return response.data.data || [];
   },
 
   getReport: async (businessId: string, reportId: string) => {
@@ -173,8 +170,15 @@ export const BrandService = {
 
   // Reviews
   // Reviews
-  listReviews: async (businessId: string, page: number = 1, limit: number = 10, platform?: string, locationId?: string | number | null) => {
-    const params: any = { page, limit, platform };
+  listReviews: async (
+    businessId: string, 
+    page: number = 1, 
+    limit: number = 10, 
+    platform?: string, 
+    locationId?: string | number | null,
+    replyStatus?: string
+  ) => {
+    const params: any = { page, limit, platform, replyStatus };
 
     if (locationId) params.locationId = locationId;
 
@@ -182,8 +186,19 @@ export const BrandService = {
       params
     });
 
-
     return response.data.data || { reviews: [], total: 0, page: 1, totalPages: 1 };
+  },
+
+  postReviewReply: async (businessId: string, reviewId: string, comment: string) => {
+    const response = await apiClient.post<{ data: any }>(`/brands/${businessId}/reviews/${reviewId}/reply`, { comment });
+
+    return response.data;
+  },
+
+  rejectReviewReply: async (businessId: string, reviewId: string) => {
+    const response = await apiClient.post<{ data: any }>(`/brands/${businessId}/reviews/${reviewId}/reject`);
+
+    return response.data;
   },
 
   getReviewStats: async (businessId: string, locationId?: string | number | null) => {
@@ -208,57 +223,49 @@ export const BrandService = {
   generateRecommendations: async (businessId: string, category: string) => {
     const response = await apiClient.post<{ message: string, jobId: string }>(`/brands/${businessId}/recommendations`, { category });
 
-    
-return response.data;
+    return response.data;
   },
 
   getRecommendations: async (businessId: string, filters?: { status?: string, category?: string }) => {
     const response = await apiClient.get<BrandRecommendation[]>(`/brands/${businessId}/recommendations`, { params: filters });
 
-    
-return response.data;
+    return response.data;
   },
 
   updateRecommendationStatus: async (businessId: string, id: string, status: string) => {
     const response = await apiClient.patch<{ data: BrandRecommendation }>(`/brands/${businessId}/recommendations/${id}`, { status });
 
-    
-return response.data.data;
+    return response.data.data;
   },
 
   getBrandScores: async (businessId: string) => {
     const response = await apiClient.get<BrandScore>(`/brands/${businessId}/scores`);
 
-    
-return response.data;
+    return response.data;
   },
 
   // Visibility Plan
   generateVisibilityPlan: async (businessId: string) => {
     const response = await apiClient.post<{ message: string, jobId: string }>(`/brands/${businessId}/visibility-plan`);
 
-    
-return response.data;
+    return response.data;
   },
 
   getVisibilityPlan: async (businessId: string) => {
     const response = await apiClient.get<any>(`/brands/${businessId}/visibility-plan`);
 
-    
-return response.data;
+    return response.data;
   },
 
   // Jobs
-  listJobs: async (businessId: string) => {
-    try {
-      const response = await apiClient.get<{ data: Job[] }>(`/brands/${businessId}/jobs`);
+  listJobs: async (businessId: string, locationId?: string | number | null) => {
+    const params: any = {};
 
-      
-return response.data.data || [];
-    } catch {
-      // If endpoint doesn't exist yet, return empty array (component will use mock data)
-      return [];
-    }
+    if (locationId) params.locationId = locationId;
+
+    const response = await apiClient.get<{ data: Job[] }>(`/brands/${businessId}/jobs`, { params });
+
+    return response.data.data || [];
   },
 };
 

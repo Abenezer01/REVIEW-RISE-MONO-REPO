@@ -383,6 +383,7 @@ model BrandProfile {
   status               String                 @default("pending") // 'pending' | 'extracting' | 'completed' | 'failed' | 'pending_confirmation'
   currentExtractedData Json?
   tone                 Json?    // { descriptors: string[], writingRules: { do: string[], dont: string[] }, taglines: string[], messagingPillars: { pillar: string, description: string, ctas: string[] }[] }
+  autoReplySettings    Json?    // { enabled: boolean, mode: 'positive' | 'positive_neutral', manualNegativeApproval: boolean, delayHours: number, maxRepliesPerDay: number }
   createdAt            DateTime @default(now())
   updatedAt            DateTime               @updatedAt
 
@@ -738,6 +739,9 @@ model Review {
   
   response    String?  @db.Text
   respondedAt DateTime?
+  
+  replyStatus String?  // 'pending_approval', 'approved', 'posted', 'rejected'
+  replyError  String?  // Log reason if skipped/failed
   
   createdAt   DateTime @default(now())
   

@@ -19,13 +19,15 @@
     "seo-visibility": "ظهور في نتائج البحث",
     "seo-keywords": "الكلمات المفتاحية",
     "smart-reviews": "سمارت ريفيوز",
+    "smart-reviews-overview": "نظرة عامة",
     "gbp-rocket": "جي بي بي روكيت",
     "ad-rise": "أد رايز",
     "brand-rise": "براند رايز",
     "settings": "الإعدادات",
     "system-settings": "إعدادات النظام",
     "feature-flags": "أعلام الميزات",
-    "ai-visibility": "رؤية الذكاء الاصطناعي"
+    "ai-visibility": "رؤية الذكاء الاصطناعي",
+    "auto-reply": "إعدادات الرد التلقائي"
   },
   "overview": {
     "title": "نظرة عامة على لوحة التحكم",
