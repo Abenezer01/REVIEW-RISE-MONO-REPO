@@ -177,6 +177,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
     } else {
       toast.error(analysisRes.error || 'Failed to analyze review')
       setIsRegenerating(false)
+
       return
     }
 

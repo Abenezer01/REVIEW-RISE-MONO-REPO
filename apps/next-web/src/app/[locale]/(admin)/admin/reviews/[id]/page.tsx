@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+
 import { useParams, useRouter } from 'next/navigation'
 
 import Grid from '@mui/material/Grid'
@@ -139,6 +140,7 @@ const ReviewDetailPage = () => {
 
     if (res.success) {
       toast.success('Reply saved successfully')
+
       // Update local state
       setCurrentReview(res.data)
     } else {
@@ -155,6 +157,7 @@ const ReviewDetailPage = () => {
 
     if (res.success) {
       toast.success('Reply rejected/skipped')
+
       // Update local state
       setCurrentReview(res.data)
     } else {
