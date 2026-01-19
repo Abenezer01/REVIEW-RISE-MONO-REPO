@@ -41,12 +41,18 @@ const AutoReplySettingsPage = () => {
         const accountData = await getCurrentAccount()
 
         if (accountData && !('error' in accountData)) {
-          const userBusinesses = accountData.userBusinessRoles?.map((ubr: any) => ubr.business) || []
+          const userBusinessRoles = accountData.userBusinessRoles || []
+          const userBusinesses = userBusinessRoles.map((ubr: any) => ubr.business) || []
 
-          setBusinesses(userBusinesses)
+          // Unique businesses by ID to prevent duplicate key errors in the UI
+          const uniqueBusinesses = Array.from(
+            new Map(userBusinesses.map((b: any) => [b.id, b])).values()
+          )
+
+          setBusinesses(uniqueBusinesses)
           
-          if (userBusinesses.length > 0) {
-            setSelectedBusinessId(userBusinesses[0].id)
+          if (uniqueBusinesses.length > 0) {
+            setSelectedBusinessId(uniqueBusinesses[0].id)
           }
         } else if (accountData && 'error' in accountData) {
           throw new Error(accountData.error)

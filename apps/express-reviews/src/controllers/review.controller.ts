@@ -41,13 +41,17 @@ export const listReviews = async (req: Request, res: Response) => {
 export const postReply = async (req: Request, res: Response) => {
     try {
         const { reviewId } = req.params;
-        const { comment } = req.body;
+        const { comment, authorType, sourceType, userId } = req.body;
 
         if (!reviewId || !comment) {
             return res.status(400).json({ error: 'reviewId and comment are required' });
         }
 
-        const result = await reviewService.postReviewReply(reviewId, comment);
+        const result = await reviewService.postReviewReply(reviewId, comment, {
+            authorType,
+            sourceType,
+            userId
+        });
         return res.json(result);
     } catch (error: any) {
         console.error('Error in postReply controller:', error);

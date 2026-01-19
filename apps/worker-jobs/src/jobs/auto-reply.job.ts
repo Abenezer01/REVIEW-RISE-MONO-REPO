@@ -71,7 +71,9 @@ async function postApprovedReply(review: any) {
     try {
         // Call express-reviews API to post the reply
         await axios.post(`${EXPRESS_REVIEWS_URL}/api/v1/reviews/${review.id}/reply`, {
-            comment: review.response
+            comment: review.response,
+            authorType: 'auto',
+            sourceType: 'ai'
         });
         console.log(`[AutoReplyJob] Successfully posted reply for review ${review.id}.`);
     } catch (err: any) {
@@ -203,6 +205,17 @@ async function processReviewAutoReply(review: any) {
             // until the actual posting job picks it up and sends it to the platform.
             response: finalStatus === 'approved' ? suggestedReply : null
         } as any);
+
+        // 6. Create ReviewReply record if auto-approved
+        if (finalStatus === 'approved') {
+            await repositories.reviewReply.create({
+                review: { connect: { id: review.id } },
+                content: suggestedReply,
+                authorType: 'auto',
+                sourceType: 'ai',
+                status: 'draft' // It's a draft until it's actually posted by the platform service
+            });
+        }
 
         console.log(`[AutoReplyJob] Review ${review.id} processed. Status: ${finalStatus}`);
 

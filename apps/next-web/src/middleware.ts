@@ -134,6 +134,19 @@ export async function middleware(request: NextRequest) {
           refreshedThisRequest = true
           refreshResponseCookie = data.accessToken as string
         }
+      } else if (res.status === 401) {
+        // If refresh token is invalid/expired, clear it to prevent repeated failed attempts
+        const locale = pathnameHasLocale ? pathname.split('/')[1] : defaultLocale
+        const loginUrl = new URL(`/${locale}/login`, request.url)
+
+        loginUrl.searchParams.set('returnUrl', pathWithoutLocale)
+
+        const response = NextResponse.redirect(loginUrl)
+
+        response.cookies.delete('accessToken')
+        response.cookies.delete('refreshToken')
+
+        return response
       }
     } catch {
       // ignore network errors; fallback to normal flow
