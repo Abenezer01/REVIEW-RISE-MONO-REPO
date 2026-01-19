@@ -29,7 +29,7 @@ import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 import { getReviews } from '@/app/actions/review'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
 import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
-import ReviewDetailDrawer from './ReviewDetailDrawer'
+import { Link } from '@/i18n/routing'
 
 const SmartReviewList = () => {
   const theme = useTheme()
@@ -39,9 +39,6 @@ const SmartReviewList = () => {
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  
-  const [selectedReview, setSelectedReview] = useState<any>(null)
-  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const [filters, setFilters] = useState({
     rating: '',
@@ -238,16 +235,14 @@ const SmartReviewList = () => {
       minWidth: 80,
       sortable: false,
       renderCell: (params) => (
-        <IconButton
-          size='small'
-          onClick={() => {
-            setSelectedReview(params.row)
-            setDrawerOpen(true)
-          }}
-          sx={{ color: 'text.secondary' }}
-        >
-          <i className='tabler-eye' />
-        </IconButton>
+        <Link href={`/admin/reviews/${params.row.id}` as any}>
+          <IconButton
+            size='small'
+            sx={{ color: 'text.secondary' }}
+          >
+            <i className='tabler-eye' />
+          </IconButton>
+        </Link>
       )
     }
   ]
@@ -578,16 +573,6 @@ const SmartReviewList = () => {
           title: 'No Reviews Found',
           description: 'Try adjusting your filters to find what you are looking for.',
           icon: 'tabler-message-off'
-        }}
-      />
-
-      <ReviewDetailDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        review={selectedReview}
-        onSuccess={(_updatedReview, shouldClose = true) => {
-          fetchData()
-          if (shouldClose) setDrawerOpen(false)
         }}
       />
     </>

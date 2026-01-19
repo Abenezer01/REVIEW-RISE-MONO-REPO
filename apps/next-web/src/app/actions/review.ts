@@ -86,6 +86,22 @@ export async function getReviews(params: {
   }
 }
 
+export async function getReviewById(id: string) {
+  try {
+    const review = await reviewRepository.findById(id)
+
+    if (!review) {
+      return { success: false, error: 'Review not found' }
+    }
+
+    return { success: true, data: review }
+  } catch (error: any) {
+    console.error('getReviewById error:', error)
+
+    return { success: false, error: error.message }
+  }
+}
+
 export async function regenerateAISuggestion(reviewId: string, options: { tonePreset?: string } = {}) {
   try {
     // 1. Fetch Review Context
