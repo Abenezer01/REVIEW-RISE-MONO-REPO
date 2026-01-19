@@ -255,6 +255,7 @@ async function main() {
             password: hashedPassword,
         },
         create: {
+            id: 'e6f0e74b-2f63-4467-8e10-631742461991',
             email: 'owner@example.com',
             name: 'John Owner',
             emailVerified: new Date(),
@@ -268,6 +269,7 @@ async function main() {
             password: hashedPassword,
         },
         create: {
+            id: 'f7a1f85c-3a74-5578-9f21-742853572002',
             email: 'admin@example.com',
             name: 'Jane Admin',
             emailVerified: new Date(),
@@ -281,6 +283,7 @@ async function main() {
             password: hashedPassword,
         },
         create: {
+            id: 'c5b2c96d-4b85-6689-a032-853964683113',
             email: 'manager@example.com',
             name: 'Bob Manager',
             emailVerified: new Date(),
@@ -297,26 +300,13 @@ async function main() {
     await assignSystemRole(user3.id, 'Manager');
     console.log(`✅ Assigned system roles to users\n`);
 
-    // 4b. Assign System Roles to Users
-    
-    // (Moved helper to top of main)
-
-    // Cannot run this here because business1 is not yet defined
-    // We will assign after businesses are created
-    /* 
-    console.log('🔗 Assigning system roles to users...');
-    await assignRole(user1.id, business1.id, ownerRole.id, null);
-    await assignRole(user2.id, business1.id, adminRole.id, null);
-    await assignRole(user3.id, business2.id, managerRole.id, null);
-    console.log(`✅ Assigned system roles to users\n`);
-    */
-
     // 5. Create Sample Businesses
     console.log('🏢 Creating sample businesses...');
     const business1 = await prisma.business.upsert({
-        where: { slug: 'acme-restaurant' },
+        where: { id: 'a1dd8e07-694c-499f-a01a-2b991c283921' },
         update: {},
         create: {
+            id: 'a1dd8e07-694c-499f-a01a-2b991c283921',
             name: 'ACME Restaurant',
             slug: 'acme-restaurant',
             description: 'Fine dining experience in the heart of the city',
@@ -328,9 +318,10 @@ async function main() {
     });
 
     const business2 = await prisma.business.upsert({
-        where: { slug: 'tech-cafe' },
+        where: { id: 'b2ee9f18-705d-500e-b12b-3c002d394032' },
         update: {},
         create: {
+            id: 'b2ee9f18-705d-500e-b12b-3c002d394032',
             name: 'Tech Cafe',
             slug: 'tech-cafe',
             description: 'Modern cafe with great coffee and workspace',
@@ -343,16 +334,28 @@ async function main() {
 
     console.log(`✅ Created 2 sample businesses\n`);
 
-    // Re-enabled System Roles assignment now that business1 is defined
-    console.log('🔗 Assigning system roles to users...');
-     // Assign Owner role to user1
-    await assignRole(user1.id, business1.id, ownerRole.id, null);
-    // Assign Admin role to user2
-    await assignRole(user2.id, business1.id, adminRole.id, null);
-    // Assign Manager role to user3
-    await assignRole(user3.id, business2.id, managerRole.id, null);
-    console.log(`✅ Assigned system roles to users\n`);
-
+    // Create Brand Profile for business1
+    console.log('🎭 Creating brand profile for business1...');
+    await prisma.brandProfile.upsert({
+        where: { id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' },
+        update: {},
+        create: {
+            id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+            businessId: business1.id,
+            websiteUrl: 'https://acme-restaurant.com',
+            status: 'completed',
+            title: 'ACME Restaurant',
+            description: 'A high-end restaurant focusing on local ingredients and sustainable dining.',
+            autoReplySettings: {
+                enabled: true,
+                minRating: 4,
+                delayHours: 2,
+                tonePreset: 'Professional',
+                excludeKeywords: ['hair', 'dirty', 'rude']
+            }
+        }
+    });
+    console.log('✅ Created brand profile\n');
 
     // 6. Create Locations
     console.log('📍 Creating locations...');
@@ -394,76 +397,23 @@ async function main() {
 
     console.log(`✅ Created 3 locations\n`);
 
-    // 7. Assign Users to Businesses with Roles (Again? The logic was duplicated in original file?)
-    // In original file, step 4b assigned roles, step 7 assigned MORE roles?
-    // Let's check step 7 content in previous view.
-    /*
-    357:     // 7. Assign Users to Businesses with Roles
-    358:     console.log('🔗 Assigning users to businesses...');
-    ...
-    397:     await assignRole(user1.id, business1.id, ownerRole.id, null);
-    398:     await assignRole(user2.id, business1.id, adminRole.id, null);
-    399:     await assignRole(user3.id, business2.id, managerRole.id, null);
-    400:     await assignRole(user2.id, business1.id, managerRole.id, location1.id);
-    */
-   
-    // It seems step 4b and step 7 were duplicate or similar in original file structure?
-    // In my previous edit I introduced 4b.
-    // The original file had 7. 
-    // I should probably remove 4b logic to avoid confusion or duplication, OR rely on 7.
-    // However, 7 needs `assignRole` helper.
-    // The previous edit inserted `assignRole` at line 242 (step 4b).
-    // And also at line 360 (step 7). 
-    // This caused the "Cannot redeclare block-scoped variable" error.
-    
-    // SO, I will define `assignRole` at the TOP (as I'm doing in this replacement).
-    // And then I will use it in step 7.
-    // I will REMOVE step 4b completely from this replacement block to clean up.
-    // The replacement covers lines 24-402 (huge block).
-    
-    // WAIT. Replacing lines 24 to 402 is risky if I miss anything.
-    // Step 1879 view shows lines 1-729.
-    // I can replace the whole `main` function body or relevant parts.
-    // Lines 24 to 402 covers creation of Roles, Permissions, Assignment, Users, Businesses, Locations.
-    
-    // I will construct the content correctly:
-    // 1. Roles
-    // 2. Permissions
-    // 3. Assign Permissions
-    // 4. Users
-    // 5. Businesses (Moved UP before 4b/7) -> No, Businesses depend on nothing.
-    // But Step 7 (UserBusinessRole) depends on Users AND Businesses.
-    
-    // Current structure:
-    // 1. Roles
-    // 2. Permissions
-    // 3. RolePermissions
-    // 4. Users
-    // 4b. UserBusinessRoles (System roles) -> FAILED because `business1` not defined.
-    // 5. Businesses (defines business1)
-    // 6. Locations
-    // 7. UserBusinessRoles (Again?)
-    
-    // Strategy:
-    // Define `assignRole` at top of `main`.
-    // Keep 1, 2, 3, 4.
-    // Remove 4b completely (it's premature).
-    // Keep 5 (Businesses).
-    // Keep 6 (Locations).
-    // Keep 7 (UserBusinessRoles) - THIS is where we assign roles.
-    
+    // 7. Assign Users to Businesses with Roles
     console.log('🔗 Assigning users to businesses...');
-    // assignRole is already defined at top of scope.
     
-    // Assuming location1 is defined somewhere above
-    const location1 = await prisma.location.findUniqueOrThrow({ where: { id: '33333333-3333-3333-3333-333333333333' } });
-
+    // ACME Downtown ID
+    const acmeDowntownId = '11111111-1111-1111-1111-111111111111';
+    
+    // Assign Owner role to user1 for business1
     await assignRole(user1.id, business1.id, ownerRole.id, null);
+    
+    // Assign Admin role to user2 for business1
     await assignRole(user2.id, business1.id, adminRole.id, null);
+    
+    // Assign Manager role to user3 for business2
     await assignRole(user3.id, business2.id, managerRole.id, null);
-    await assignRole(user2.id, business1.id, managerRole.id, location1.id);
-
-    console.log(`✅ Assigned users to businesses\n`);
+    
+    // Assign Manager role to user2 specifically for ACME Downtown
+    await assignRole(user2.id, business1.id, managerRole.id, acmeDowntownId);
 
     console.log(`✅ Assigned users to businesses\n`);
 
@@ -689,6 +639,31 @@ async function main() {
 
     // 10. Create Review Sync Logs
     console.log('📝 Creating review sync logs...');
+    
+    // Clear reviews and replies to check flow from scratch
+    console.log('🗑️ Deleting existing reviews, replies and sources...');
+    await prisma.reviewReply.deleteMany({});
+    await prisma.review.deleteMany({});
+    await prisma.reviewSource.deleteMany({});
+    console.log('✅ Deleted reviews, replies and sources\n');
+
+    // Create Review Source for ACME Downtown
+    console.log('🔌 Creating review source for ACME Downtown...');
+    const reviewSource1 = await prisma.reviewSource.create({
+        data: {
+            id: '77777777-7777-7777-7777-777777777777',
+            locationId: '11111111-1111-1111-1111-111111111111',
+            platform: 'gbp',
+            accessToken: 'dummy_access_token',
+            refreshToken: 'dummy_refresh_token',
+            expiresAt: BigInt(Date.now() + 3600 * 1000),
+            status: 'active',
+            metadata: {
+                locationName: 'accounts/12345/locations/67890'
+            }
+        }
+    });
+    console.log('✅ Created review source\n');
 
     // Log 1: Successful Google Sync for ACME Downtown
     await prisma.reviewSyncLog.create({
@@ -768,6 +743,44 @@ async function main() {
     });
 
     console.log(`✅ Created 3 review sync logs\n`);
+
+    // 11. Create Sample Reviews
+    console.log('⭐ Creating sample reviews...');
+    const location1_id = '11111111-1111-1111-1111-111111111111';
+    
+    await prisma.review.create({
+        data: {
+            author: 'Alice Johnson',
+            rating: 5,
+            content: 'Absolutely amazing experience! The staff was incredibly friendly and the food was top-notch. Highly recommend the steak.',
+            publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+            platform: 'gbp',
+            externalId: 'google_review_1',
+            businessId: business1.id,
+            locationId: location1_id,
+            reviewSourceId: '77777777-7777-7777-7777-777777777777',
+            sentiment: 'Positive',
+            replyStatus: 'pending'
+        }
+    });
+
+    await prisma.review.create({
+        data: {
+            author: 'Mark Smith',
+            rating: 3,
+            content: 'The coffee was decent but the service was quite slow today. It usually is better than this.',
+            publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+            platform: 'gbp',
+            externalId: 'google_review_2',
+            businessId: business1.id,
+            locationId: location1_id,
+            reviewSourceId: '77777777-7777-7777-7777-777777777777',
+            sentiment: 'Neutral',
+            replyStatus: 'pending'
+        }
+    });
+
+    console.log(`✅ Created 2 sample reviews\n`);
 
     console.log('✨ Seed completed successfully!\n');
     console.log('Summary:');

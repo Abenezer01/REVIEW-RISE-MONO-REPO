@@ -2,6 +2,7 @@ generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
   binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
+  output          = "../src/generated/client"
 }
 
 datasource db {
@@ -14,12 +15,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -45,11 +46,11 @@ model User {
   updatedAt         DateTime           @updatedAt
   accounts          Account[]
   auditLogs         AuditLog[]
-  reviewReplies     ReviewReply[]
   seoSnapshots      SeoSnapshot[]
   sessions          Session[]
   userBusinessRoles UserBusinessRole[]
   userRoles         UserRole[]
+  reviewReplies     ReviewReply[]
 }
 
 model UserRole {
@@ -65,36 +66,38 @@ model UserRole {
 }
 
 model Business {
-  id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                 String
-  slug                 String                @unique
-  description          String?
-  phone                String?
-  email                String?
-  website              String?
-  status               String                @default("active")
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-  deletedAt            DateTime?
-  aiVisibilityMetrics  AIVisibilityMetric[]
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
+  slug                String               @unique
+  description         String?
+  phone               String?
+  email               String?
+  website             String?
+  status              String               @default("active")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  deletedAt           DateTime?
+  jobs                Job[]
+  keywords            Keyword[]
+  locations           Location[]
+  reviewSyncLogs      ReviewSyncLog[]
+  subscriptions       Subscription[]
+  userBusinessRoles   UserBusinessRole[]
+  visibilityMetrics   VisibilityMetric[]
+  aiVisibilityMetrics AIVisibilityMetric[]
+  brandProfiles       BrandProfile[]
+
+  // BrandingRise Relations
+  competitors          Competitor[]
+  visibilitySnapshots  VisibilitySnapshot[]
+  reports              Report[]
+  opportunitiesReports OpportunitiesReport[]
   dna                  BrandDNA?
-  brandProfiles        BrandProfile[]
+  contentIdeas         ContentIdea[]
+  reviews              Review[]
   recommendations      BrandRecommendation[]
   brandScores          BrandScore[]
-  competitors          Competitor[]
   competitorReviews    CompetitorReview[]
-  contentIdeas         ContentIdea[]
-  jobs                 Job[]
-  keywords             Keyword[]
-  locations            Location[]
-  opportunitiesReports OpportunitiesReport[]
-  reports              Report[]
-  reviews              Review[]
-  reviewSyncLogs       ReviewSyncLog[]
-  subscriptions        Subscription[]
-  userBusinessRoles    UserBusinessRole[]
-  visibilityMetrics    VisibilityMetric[]
-  visibilitySnapshots  VisibilitySnapshot[]
 
   @@index([name])
   @@index([status])
@@ -113,16 +116,16 @@ model Location {
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   deletedAt           DateTime?
-  aiVisibilityMetrics AIVisibilityMetric[]
-  competitorReviews   CompetitorReview[]
   jobs                Job[]
   keywords            Keyword[]
   business            Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  reviewSyncLogs      ReviewSyncLog[]
+  visibilityMetrics   VisibilityMetric[]
+  aiVisibilityMetrics AIVisibilityMetric[]
   reviews             Review[]
   reviewSources       ReviewSource[]
-  reviewSyncLogs      ReviewSyncLog[]
   userBusinessRoles   UserBusinessRole[]
-  visibilityMetrics   VisibilityMetric[]
+  competitorReviews   CompetitorReview[]
 
   @@index([businessId])
 }
@@ -163,13 +166,13 @@ model UserBusinessRole {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId     String    @db.Uuid
   businessId String    @db.Uuid
+  locationId String?   @db.Uuid
   roleId     String    @db.Uuid
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
-  locationId String?   @db.Uuid
   business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  location   Location? @relation(fields: [locationId], references: [id])
+  location   Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
   role       Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -374,22 +377,23 @@ model Job {
 }
 
 model BrandProfile {
-  id                    String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId            String                 @db.Uuid
-  websiteUrl            String
-  status                String                 @default("pending")
-  currentExtractedData  Json?
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
-  description           String?
-  title                 String?
-  tone                  Json?
-  autoReplySettings     Json?
+  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId           String   @db.Uuid
+  websiteUrl           String
+  title                String?
+  description          String?
+  status               String   @default("pending") // 'pending' | 'extracting' | 'completed' | 'failed' | 'pending_confirmation'
+  currentExtractedData Json?
+  tone                 Json? // { descriptors: string[], writingRules: { do: string[], dont: string[] }, taglines: string[], messagingPillars: { pillar: string, description: string, ctas: string[] }[] }
+  autoReplySettings    Json? // { enabled: boolean, mode: 'positive' | 'positive_neutral', manualNegativeApproval: boolean, delayHours: number, maxRepliesPerDay: number }
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  business              Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
   assets                BrandAsset[]
   colors                BrandColor[]
   fonts                 BrandFont[]
   pages                 BrandPage[]
-  business              Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
   socialLinks           BrandSocialLink[]
   extractedDataVersions ExtractedDataVersion[]
 
@@ -411,7 +415,7 @@ model ExtractedDataVersion {
 model BrandAsset {
   id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   brandProfileId String       @db.Uuid
-  type           String
+  type           String // 'logo', 'favicon', 'og_image', 'header_image'
   url            String
   altText        String?
   createdAt      DateTime     @default(now())
@@ -425,7 +429,7 @@ model BrandColor {
   id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   brandProfileId String       @db.Uuid
   hexCode        String
-  type           String
+  type           String // 'primary', 'secondary', 'accent', 'background'
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   brandProfile   BrandProfile @relation(fields: [brandProfileId], references: [id], onDelete: Cascade)
@@ -437,8 +441,8 @@ model BrandFont {
   id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   brandProfileId String       @db.Uuid
   family         String
-  usage          String
-  url            String?
+  usage          String // 'title', 'body', 'ui'
+  url            String? // URL to font file or CSS
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   brandProfile   BrandProfile @relation(fields: [brandProfileId], references: [id], onDelete: Cascade)
@@ -449,7 +453,7 @@ model BrandFont {
 model BrandPage {
   id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   brandProfileId String       @db.Uuid
-  type           String
+  type           String // 'home', 'about', 'services', 'contact'
   url            String
   summary        String?
   content        String?
@@ -463,7 +467,7 @@ model BrandPage {
 model BrandSocialLink {
   id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   brandProfileId String       @db.Uuid
-  platform       String
+  platform       String // 'facebook', 'twitter', 'linkedin', 'instagram'
   url            String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
@@ -473,16 +477,21 @@ model BrandSocialLink {
 }
 
 model FeatureFlag {
-  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name              String   @unique
-  description       String?
-  isEnabled         Boolean  @default(false)
-  rolloutPercentage Int      @default(100)
-  rules             Json?
-  owner             String?
-  tags              String[]
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String  @unique
+  description String?
+
+  // Control logic
+  isEnabled         Boolean @default(false)
+  rolloutPercentage Int     @default(100)
+  rules             Json? // Flexible targeting rules (e.g. specific users, emails, regions)
+
+  // Metadata
+  owner String?
+  tags  String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([name])
 }
@@ -498,60 +507,94 @@ model SystemSetting {
   @@index([key])
 }
 
+// AI Visibility Metrics (Brand mentions, sentiment, etc.)
 model AIVisibilityMetric {
-  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId        String           @db.Uuid
-  locationId        String?          @db.Uuid
-  visibilityScore   Float            @default(0)
-  sentimentScore    Float            @default(0)
-  shareOfVoice      Float            @default(0)
-  citationAuthority Float            @default(0)
-  periodStart       DateTime
-  periodEnd         DateTime
-  periodType        String
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-  platformData      AIPlatformData[]
-  business          Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  location          Location?        @relation(fields: [locationId], references: [id])
+  id         String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String  @db.Uuid
+  locationId String? @db.Uuid
+
+  // Metrics
+  visibilityScore   Float @default(0) // 0-100
+  sentimentScore    Float @default(0) // 0-100
+  shareOfVoice      Float @default(0) // 0-100
+  citationAuthority Float @default(0) // 0-100
+
+  // Time period
+  periodStart DateTime
+  periodEnd   DateTime
+  periodType  String // daily, weekly, monthly
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  business     Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location     Location?        @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  platformData AIPlatformData[]
 
   @@index([businessId])
   @@index([locationId])
   @@index([periodStart, periodEnd])
 }
 
+// Platform-specific AI data (ChatGPT, Gemini, etc.)
 model AIPlatformData {
-  id                   String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  aIVisibilityMetricId String             @db.Uuid
-  platform             String
-  rank                 Int?
-  sentiment            String
-  mentioned            Boolean            @default(false)
-  sourcesCount         Int                @default(0)
-  responseSnippet      String?
-  capturedAt           DateTime           @default(now())
-  aIVisibilityMetric   AIVisibilityMetric @relation(fields: [aIVisibilityMetricId], references: [id], onDelete: Cascade)
+  id                   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  aIVisibilityMetricId String @db.Uuid
+
+  // Platform Info
+  platform String // ChatGPT, Gemini, Claude, Perplexity, etc.
+
+  // Metrics
+  rank         Int? // Rank in AI results (null if not found)
+  sentiment    String // Positive, Neutral, Negative
+  mentioned    Boolean @default(false)
+  sourcesCount Int     @default(0)
+
+  // Raw response/evidence
+  responseSnippet String? @db.Text
+
+  // Metadata
+  capturedAt DateTime @default(now())
+
+  // Relations
+  aIVisibilityMetric AIVisibilityMetric @relation(fields: [aIVisibilityMetricId], references: [id], onDelete: Cascade)
 
   @@index([aIVisibilityMetricId])
   @@index([platform])
 }
 
+// Competitor Type Enum
+enum CompetitorType {
+  DIRECT_LOCAL // Direct local competitor
+  CONTENT // Content competitor (blogs, guides)
+  AGGREGATOR // Directories, aggregators (Yelp, etc.)
+  UNKNOWN // Not yet classified
+}
+
+// BrandingRise: Competitor Analysis
 model Competitor {
-  id             String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId     String               @db.Uuid
-  name           String
-  website        String?
-  domain         String?
-  type           CompetitorType       @default(UNKNOWN)
-  source         String?
-  relevanceScore Float?
-  ranking        Int?
-  isUserAdded    Boolean              @default(false)
-  isHidden       Boolean              @default(false)
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
-  business       Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  snapshots      CompetitorSnapshot[]
+  id         String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String  @db.Uuid
+  name       String
+  website    String?
+
+  // Discovery & Classification
+  domain         String? // Normalized domain (e.g., example.com)
+  type           CompetitorType @default(UNKNOWN)
+  source         String? // "discovery" or "manual"
+  relevanceScore Float? // 0-100 ranking from SERP
+  ranking        Int? // Position in competitor list
+  isUserAdded    Boolean        @default(false)
+  isHidden       Boolean        @default(false)
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  business  Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  snapshots CompetitorSnapshot[]
 
   @@unique([businessId, name])
   @@unique([businessId, domain])
@@ -560,69 +603,98 @@ model Competitor {
 }
 
 model CompetitorSnapshot {
-  id                String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  competitorId      String     @db.Uuid
-  headline          String?
-  uvp               String?
-  serviceList       String[]
-  pricingCues       String[]
-  trustSignals      Json?
-  ctaStyles         String[]
-  contentCategories String[]
-  differentiators   Json?
-  whatToLearn       String[]
-  whatToAvoid       String[]
-  techStack         Json?
-  trafficMetrics    Json?
-  metrics           Json?
-  capturedAt        DateTime   @default(now())
-  competitor        Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+  id           String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  competitorId String @db.Uuid
+
+  // Extracted Brand Elements
+  headline          String?  @db.Text // Main UVP/headline
+  uvp               String?  @db.Text // Full value proposition
+  serviceList       String[] // List of services offered
+  pricingCues       String[] // Pricing indicators found
+  trustSignals      Json? // { badges: [], certifications: [], reviewCount: 0, avgRating: 0 }
+  ctaStyles         String[] // CTA button texts/styles
+  contentCategories String[] // Blog/content categories
+
+  // Differentiators Analysis (AI-generated)
+  differentiators Json? // { strengths: [], weaknesses: [], unique: [] }
+  whatToLearn     String[] // Insights to adopt
+  whatToAvoid     String[] // Patterns to avoid
+
+  // Optional Enrichments
+  techStack      Json? // Wappalyzer data
+  trafficMetrics Json? // SimilarWeb data
+
+  // Legacy field for backwards compatibility
+  metrics Json?
+
+  capturedAt DateTime @default(now())
+
+  competitor Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
 
   @@index([competitorId])
   @@index([capturedAt])
 }
 
+// BrandingRise: Visibility Snapshots (for unified dashboard history)
 model VisibilitySnapshot {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId String   @db.Uuid
-  range      String
-  score      Float
-  breakdown  Json
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String @db.Uuid
+
+  range String // 7d, 30d, 90d (snapshot covers this range ending at capturedAt)
+  score Float // Overall visibility score (0-100)
+
+  // Detailed breakdown
+  breakdown Json // { "organic": 40, "maps": 30, "social": 15, "reviews": 15 }
+
   capturedAt DateTime @default(now())
-  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
   @@index([capturedAt])
 }
 
+// BrandingRise: Reports
 model Report {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId  String   @db.Uuid
-  title       String
-  version     String
-  htmlContent String
-  pdfUrl      String?
-  generatedBy String?  @db.Uuid
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String @db.Uuid
+
+  title   String
+  version String // v1.0, v1.1 etc.
+
+  // Content
+  htmlContent String  @db.Text
+  pdfUrl      String? // Optional link if we generate PDF later
+
+  // Metadata
+  generatedBy String?  @db.Uuid // specific user who generated it
   generatedAt DateTime @default(now())
-  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
   @@index([generatedAt])
 }
 
+// BrandingRise: Opportunities Report
 model OpportunitiesReport {
-  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId        String    @db.Uuid
-  positioningMap    Json
-  gaps              Json
-  strategies        Json
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String @db.Uuid
+
+  // Report Content
+  positioningMap    Json // { competitors: [...], axes: { x: 'price', y: 'quality' } }
+  gaps              Json // [{ title: '', description: '', priority: 1-10 }]
+  strategies        Json // [{ title: '', description: '', pros: [], cons: [] }]
   suggestedTaglines String[]
-  contentIdeas      Json
-  generatedAt       DateTime  @default(now())
-  expiresAt         DateTime?
-  shareToken        String?   @unique
-  pdfUrl            String?
-  business          Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  contentIdeas      Json // [{ topic: '', rationale: '', competitorGap: '' }]
+
+  // Metadata
+  generatedAt DateTime  @default(now())
+  expiresAt   DateTime?
+  shareToken  String?   @unique // For shareable link
+  pdfUrl      String?
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
   @@index([shareToken])
@@ -635,7 +707,8 @@ model BrandDNA {
   voice      String?
   audience   String?
   mission    String?
-  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 }
 
 model ContentIdea {
@@ -646,32 +719,38 @@ model ContentIdea {
   platform    String
   status      String   @default("draft")
   createdAt   DateTime @default(now())
-  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
 }
 
 model Review {
-  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId     String        @db.Uuid
-  locationId     String?       @db.Uuid
-  platform       String
-  externalId     String
-  author         String
-  rating         Int
-  content        String?
-  publishedAt    DateTime
-  response       String?
-  respondedAt    DateTime?
-  createdAt      DateTime      @default(now())
-  aiSuggestions  Json?
-  replyError     String?
-  replyStatus    String?
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId    String   @db.Uuid
+  locationId    String?  @db.Uuid
+  platform      String
+  externalId    String
+  author        String
+  rating        Int
+  content       String?  @db.Text
+  sentiment     String? // Positive, Neutral, Negative
+  tags          String[] @default([])
+  aiSuggestions Json? // { suggestedReply?: string, analysis?: string }
+  publishedAt   DateTime
+
+  response    String?   @db.Text
+  respondedAt DateTime?
+
+  replyStatus String? // 'pending_approval', 'approved', 'posted', 'rejected'
+  replyError  String? // Log reason if skipped/failed
+
+  createdAt DateTime @default(now())
+
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+
   reviewSourceId String?       @db.Uuid
-  sentiment      String?
-  tags           String[]      @default([])
-  business       Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  location       Location?     @relation(fields: [locationId], references: [id])
   reviewSource   ReviewSource? @relation(fields: [reviewSourceId], references: [id])
   replies        ReviewReply[]
 
@@ -680,18 +759,21 @@ model Review {
 }
 
 model ReviewReply {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  reviewId   String   @db.Uuid
-  content    String
-  authorType String
-  sourceType String
-  status     String   @default("draft")
-  externalId String?
-  userId     String?  @db.Uuid
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  review     Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-  user       User?    @relation(fields: [userId], references: [id])
+  id         String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reviewId   String  @db.Uuid
+  content    String  @db.Text
+  authorType String // 'user', 'auto'
+  sourceType String // 'ai', 'manual'
+  status     String  @default("draft") // 'draft', 'posted', 'failed'
+  externalId String? // ID from GBP or other platform
+
+  userId String? @db.Uuid // If authorType is user
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([reviewId])
   @@index([status])
@@ -700,41 +782,56 @@ model ReviewReply {
 model ReviewSource {
   id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   locationId   String   @db.Uuid
-  platform     String
-  accessToken  String?
-  refreshToken String?
-  expiresAt    BigInt?
-  status       String   @default("active")
-  metadata     Json?
+  platform     String // 'google', 'facebook', 'yelp'
+  accessToken  String?  @db.Text
+  refreshToken String?  @db.Text
+  expiresAt    BigInt? // timestamp in ms
+  status       String   @default("active") // active, disconnected, expired
+  metadata     Json? // platform specific IDs (accountId, locationName)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  reviews      Review[]
-  location     Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  reviews  Review[]
 
   @@unique([locationId, platform])
   @@index([locationId])
 }
 
+// BrandingRise: AI-Generated Recommendations
 model BrandRecommendation {
-  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId    String    @db.Uuid
-  category      String
-  title         String
-  description   String
-  why           String[]
-  steps         String[]
-  impact        String
-  effort        String
-  confidence    Float     @default(0)
-  priorityScore Float     @default(0)
-  kpiTarget     Json?
-  status        String    @default("open")
-  notes         String?
-  generatedAt   DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  dismissedAt   DateTime?
-  completedAt   DateTime?
-  business      Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String @db.Uuid
+
+  // Categorization
+  category String // 'search', 'local', 'social', 'reputation', 'conversion', 'content'
+
+  // Recommendation Details
+  title       String
+  description String   @db.Text
+  why         String[] // Array of reasons/rationale
+  steps       String[] // Array of actionable steps
+
+  // Prioritization
+  impact        String // 'low', 'medium', 'high', 'critical'
+  effort        String // 'low', 'medium', 'high'
+  confidence    Float  @default(0) // 0-100, AI confidence in this recommendation
+  priorityScore Float  @default(0) // Computed: (impact * confidence) / effort
+
+  // KPI Tracking
+  kpiTarget Json? // { metric: 'visibility_score', target: 75, timeframe: '30d' }
+
+  // Status & Lifecycle
+  status String  @default("open") // 'open', 'in_progress', 'done', 'dismissed'
+  notes  String? @db.Text // User notes
+
+  // Metadata
+  generatedAt DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  dismissedAt DateTime?
+  completedAt DateTime?
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
   @@index([category])
@@ -743,46 +840,62 @@ model BrandRecommendation {
   @@index([generatedAt])
 }
 
+// BrandingRise: Computed Brand Scores
 model BrandScore {
-  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId           String   @db.Uuid
-  visibilityScore      Float    @default(0)
-  trustScore           Float    @default(0)
-  consistencyScore     Float    @default(0)
-  visibilityBreakdown  Json
-  trustBreakdown       Json
-  consistencyBreakdown Json
-  computedAt           DateTime @default(now())
-  periodStart          DateTime
-  periodEnd            DateTime
-  business             Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String @db.Uuid
+
+  // Core Scores (0-100)
+  visibilityScore  Float @default(0)
+  trustScore       Float @default(0)
+  consistencyScore Float @default(0)
+
+  // Visibility Breakdown (weighted components)
+  visibilityBreakdown Json // { search: 20, local: 30, social: 15, reputation: 20, consistency: 15 }
+
+  // Trust Breakdown
+  trustBreakdown Json // { rating: 4.5, reviewCount: 120, responseRate: 0.85, sentiment: 0.75 }
+
+  // Consistency Breakdown
+  consistencyBreakdown Json // { namingConsistency: 0.9, brandingConsistency: 0.8, messagingConsistency: 0.7 }
+
+  // Metadata
+  computedAt  DateTime @default(now())
+  periodStart DateTime
+  periodEnd   DateTime
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@unique([businessId, periodStart, periodEnd])
   @@index([businessId])
   @@index([computedAt])
 }
 
+// Review Analytics: Competitor Review Data
 model CompetitorReview {
-  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId     String    @db.Uuid
-  locationId     String?   @db.Uuid
+  id         String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String  @db.Uuid
+  locationId String? @db.Uuid
+
+  // Competitor Info
   competitorName String
-  averageRating  Float
-  totalReviews   Int
-  source         String
-  capturedAt     DateTime  @default(now())
-  createdAt      DateTime  @default(now())
-  business       Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  location       Location? @relation(fields: [locationId], references: [id])
+
+  // Review Metrics
+  averageRating Float
+  totalReviews  Int
+
+  // Source of data
+  source String // 'google', 'manual', 'api'
+
+  // Metadata
+  capturedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  // Relations
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
 
   @@index([businessId])
   @@index([locationId])
   @@index([capturedAt])
-}
-
-enum CompetitorType {
-  DIRECT_LOCAL
-  CONTENT
-  AGGREGATOR
-  UNKNOWN
 }
