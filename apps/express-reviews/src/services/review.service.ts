@@ -1,4 +1,4 @@
-import { reviewRepository, reviewSourceRepository, Prisma } from '@platform/db';
+import { reviewRepository, reviewSourceRepository, reviewReplyRepository, Prisma } from '@platform/db';
 import { googleReviewsService } from './google-reviews.service';
 
 export interface ListReviewsParams {
@@ -76,36 +76,138 @@ export const listReviewsByLocation = async (params: ListReviewsParams) => {
     };
 };
 
-export const postReviewReply = async (reviewId: string, comment: string) => {
+export const postReviewReply = async (
+    reviewId: string, 
+    comment: string,
+    options: {
+        authorType?: 'user' | 'auto';
+        sourceType?: 'ai' | 'manual';
+        userId?: string;
+    } = {}
+) => {
     const review = await reviewRepository.findById(reviewId);
     if (!review) throw new Error('Review not found');
 
-    if (review.platform === 'google') {
+    // Create a draft reply record first
+    const replyRecord = await reviewReplyRepository.create({
+        review: { connect: { id: reviewId } },
+        content: comment,
+        authorType: options.authorType || 'user',
+        sourceType: options.sourceType || 'manual',
+        status: 'draft',
+        user: options.userId ? { connect: { id: options.userId } } : undefined
+    });
+
+    // Handle both 'google' and 'gbp' as platform identifiers
+    if (review.platform === 'google' || review.platform === 'gbp') {
         // 1. Get the ReviewSource to get the accessToken
-        if (!review.reviewSourceId) throw new Error('Review source not found for this review');
+        if (!review.reviewSourceId) {
+            const errorMsg = 'Review source not found for this review';
+            await Promise.all([
+                reviewRepository.update(reviewId, { replyStatus: 'failed', replyError: errorMsg } as any),
+                reviewReplyRepository.update(replyRecord.id, { status: 'failed' })
+            ]);
+            throw new Error(errorMsg);
+        }
         
         const source = await reviewSourceRepository.findById(review.reviewSourceId);
-        if (!source || !source.accessToken) throw new Error('Review source or access token not found');
+        if (!source) {
+            const errorMsg = 'Review source not found in database';
+            await Promise.all([
+                reviewRepository.update(reviewId, { replyStatus: 'failed', replyError: errorMsg } as any),
+                reviewReplyRepository.update(replyRecord.id, { status: 'failed' })
+            ]);
+            throw new Error(errorMsg);
+        }
+
+        let accessToken = source.accessToken;
+
+        // 2. Check if token is expired and refresh if necessary (with 5 min buffer)
+        const now = Date.now();
+        if (source.refreshToken && source.expiresAt && Number(source.expiresAt) <= (now + 300000)) {
+            console.log(`[GBP] Token expired for source ${source.id}, refreshing...`);
+            try {
+                const credentials = await googleReviewsService.refreshAccessToken(source.refreshToken);
+                if (credentials.access_token) {
+                    accessToken = credentials.access_token;
+                    const expiresAt = credentials.expiry_date || (now + 3600 * 1000);
+                    
+                    await reviewSourceRepository.updateTokens(
+                        source.id, 
+                        accessToken, 
+                        credentials.refresh_token || undefined, 
+                        expiresAt
+                    );
+                    console.log(`[GBP] Token refreshed successfully for source ${source.id}`);
+                }
+            } catch (refreshError: any) {
+                const errorMsg = `Failed to refresh Google token: ${refreshError.message}`;
+                await Promise.all([
+                    reviewRepository.update(reviewId, { replyStatus: 'failed', replyError: errorMsg } as any),
+                    reviewReplyRepository.update(replyRecord.id, { status: 'failed' })
+                ]);
+                throw new Error(errorMsg);
+            }
+        }
+
+        if (!accessToken) {
+            const errorMsg = 'No access token available for GBP';
+            await Promise.all([
+                reviewRepository.update(reviewId, { replyStatus: 'failed', replyError: errorMsg } as any),
+                reviewReplyRepository.update(replyRecord.id, { status: 'failed' })
+            ]);
+            throw new Error(errorMsg);
+        }
 
         const metadata = source.metadata as any;
-        if (!metadata?.locationName) throw new Error('Missing locationName in source metadata');
+        if (!metadata?.locationName) {
+            const errorMsg = 'Missing locationName in source metadata';
+            await Promise.all([
+                reviewRepository.update(reviewId, { replyStatus: 'failed', replyError: errorMsg } as any),
+                reviewReplyRepository.update(replyRecord.id, { status: 'failed' })
+            ]);
+            throw new Error(errorMsg);
+        }
 
-        // 2. Reconstruct the full review name
-        // locationName is "accounts/{accountId}/locations/{locationId}"
-        // externalId is the reviewId
+        // 3. Reconstruct the full review name
+        // locationName format: "accounts/{accountId}/locations/{locationId}"
+        // externalId is the platform-specific reviewId
         const reviewName = `${metadata.locationName}/reviews/${review.externalId}`;
 
-        // 3. Post the reply
-        await googleReviewsService.updateReply(source.accessToken, reviewName, comment);
+        try {
+            console.log(`[GBP] Posting/Updating reply for review ${reviewId} (${reviewName})`);
+            
+            // 4. Post the reply (PUT handles both creation and updates in GBP API)
+            const result = await googleReviewsService.updateReply(accessToken, reviewName, comment);
 
-        // 4. Update the review in DB
-        await reviewRepository.update(reviewId, {
-            response: comment,
-            respondedAt: new Date(),
-            replyStatus: 'posted'
-        } as any);
+            // 5. Update the review and reply record in DB
+            await Promise.all([
+                reviewRepository.update(reviewId, {
+                    response: comment,
+                    respondedAt: new Date(),
+                    replyStatus: 'posted',
+                    replyError: null // Clear any previous errors
+                } as any),
+                reviewReplyRepository.update(replyRecord.id, {
+                    status: 'posted'
+                })
+            ]);
 
-        return { success: true };
+            return { success: true, data: result };
+        } catch (apiError: any) {
+            const errorMsg = `Google API Error: ${apiError.response?.data?.error?.message || apiError.message}`;
+            console.error(`[GBP] Error posting reply:`, errorMsg);
+            
+            await Promise.all([
+                reviewRepository.update(reviewId, { 
+                    replyStatus: 'failed', 
+                    replyError: errorMsg 
+                } as any),
+                reviewReplyRepository.update(replyRecord.id, { status: 'failed' })
+            ]);
+            
+            throw new Error(errorMsg);
+        }
     }
 
     throw new Error(`Platform ${review.platform} not supported for posting replies yet`);

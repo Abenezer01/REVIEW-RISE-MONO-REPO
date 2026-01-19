@@ -123,7 +123,7 @@ const AccountDetail = () => {
     }
 
     setLoading(false)
-  }, [])
+  }, [t])
 
   useEffect(() => {
     fetchData()

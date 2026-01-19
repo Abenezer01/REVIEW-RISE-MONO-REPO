@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+/* eslint-disable import/no-unresolved */
+import { useCallback, useEffect, useState } from 'react';
 
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -23,7 +24,7 @@ const ReviewSourcesList = ({ locationId }: { locationId: string }) => {
 
     // const [loading, setLoading] = useState(false);
 
-    const fetchSources = async () => {
+    const fetchSources = useCallback(async () => {
         try {
             // Path: via Nginx /api/reviews -> express-reviews
             const res = await apiClient.get(`/reviews/api/v1/locations/${locationId}/sources`);
@@ -34,11 +35,11 @@ const ReviewSourcesList = ({ locationId }: { locationId: string }) => {
         } catch (error) {
             console.error('Failed to fetch sources', error);
         }
-    };
+    }, [locationId]);
 
     useEffect(() => {
         if (locationId) fetchSources();
-    }, [locationId]);
+    }, [locationId, fetchSources]);
 
     const handleConnectGoogle = async () => {
         try {

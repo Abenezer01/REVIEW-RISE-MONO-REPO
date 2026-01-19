@@ -70,6 +70,20 @@ export class ReviewRepository extends BaseRepository<
         });
     }
 
+    async findByIdWithReplies(id: string) {
+        return this.delegate.findUnique({
+            where: { id },
+            include: {
+                business: { select: { name: true } },
+                location: { select: { name: true } },
+                replies: {
+                    orderBy: { createdAt: 'desc' },
+                    include: { user: { select: { name: true, image: true } } }
+                }
+            }
+        });
+    }
+
     /**
      * Get rating trend over time grouped by day
      */

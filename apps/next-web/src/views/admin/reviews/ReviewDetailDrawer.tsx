@@ -18,12 +18,19 @@ import Stack from '@mui/material/Stack'
 
 import { toast } from 'react-toastify'
 
+import Timeline from '@mui/lab/Timeline'
+import TimelineItem from '@mui/lab/TimelineItem'
+import TimelineSeparator from '@mui/lab/TimelineSeparator'
+import TimelineConnector from '@mui/lab/TimelineConnector'
+import TimelineContent from '@mui/lab/TimelineContent'
+import TimelineDot from '@mui/lab/TimelineDot'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
 import EmotionChips from '@/components/shared/reviews/EmotionChips'
 
-import { updateReviewReply, regenerateAISuggestion, rejectReviewReply } from '@/app/actions/review'
+import { updateReviewReply, regenerateAISuggestion, rejectReviewReply, getReviewWithHistory } from '@/app/actions/review'
 import { getBrandProfileByBusinessId } from '@/app/actions/brand-profile'
 
 interface ReviewDetailDrawerProps {
@@ -60,18 +67,22 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
 
   useEffect(() => {
     if (review) {
-      setCurrentReview(review)
-      setReply(review.response || '')
-      
-      // Load variations from aiSuggestions if available
-      if (review.aiSuggestions?.variations) {
-        setVariations(review.aiSuggestions.variations)
-      } else if (review.aiSuggestions?.suggestedReply) {
-        setVariations([review.aiSuggestions.suggestedReply])
-      } else {
-        setVariations([])
-      }
+      // Fetch full review with history
+      getReviewWithHistory(review.id).then(res => {
+        if (res.success && res.data) {
+          const fetchedReview = res.data as any
 
+          setCurrentReview(fetchedReview)
+          setReply(fetchedReview.response || '')
+          
+          // Clear variations on load to ensure user must click "Generate"
+          setVariations([])
+        } else {
+          setCurrentReview(review)
+          setReply(review.response || '')
+        }
+      })
+      
       // Fetch brand profile for tone descriptors
       if (review.businessId) {
         getBrandProfileByBusinessId(review.businessId).then(res => {
@@ -108,12 +119,22 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
 
     setIsSubmitting(true)
 
-    const res = await updateReviewReply(currentReview.id, reply)
+    const isAISuggestionUsed = variations.includes(reply)
+
+    const res = await updateReviewReply(currentReview.id, reply, {
+      sourceType: isAISuggestionUsed ? 'ai' : 'manual',
+      authorType: 'user'
+    })
 
     setIsSubmitting(false)
 
     if (res.success) {
       toast.success('Reply saved successfully')
+      
+      if (res.data) {
+        setCurrentReview(res.data as any)
+      }
+      
       if (onSuccess) onSuccess(res.data)
     } else {
       toast.error(res.error || 'Failed to save reply')
@@ -143,7 +164,6 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
   const handleAnalyzeReview = async () => {
     setIsRegenerating(true)
 
-
     // Dynamically import to avoid server/client issues
     const { analyzeSingleReview } = await import('@/app/actions/review')
     const analysisRes = await analyzeSingleReview(currentReview.id)
@@ -157,12 +177,11 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
     } else {
       toast.error(analysisRes.error || 'Failed to analyze review')
       setIsRegenerating(false)
-
       return
-    } 
+    }
 
     const suggestionRes = await regenerateAISuggestion(currentReview.id, { tonePreset })
-
+    
     setIsRegenerating(false)
 
     if (suggestionRes.success && suggestionRes.data) {
@@ -367,6 +386,85 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
 
 
 
+        {/* Reply History Timeline */}
+        {currentReview.replies && currentReview.replies.length > 0 && (
+          <>
+            <Box sx={{ p: 6, bgcolor: theme => theme.palette.mode === 'light' ? alpha(theme.palette.secondary.main, 0.02) : 'transparent' }}>
+              <Typography variant='subtitle2' sx={{ mb: 4, textTransform: 'uppercase', color: 'text.disabled', fontWeight: 700, letterSpacing: '0.5px' }}>
+                Reply History
+              </Typography>
+              <Timeline sx={{ 
+                p: 0, 
+                m: 0,
+                [`& .MuiTimelineItem-root:before`]: { display: 'none' } 
+              }}>
+                {currentReview.replies.map((historyReply: any, index: number) => (
+                  <TimelineItem key={historyReply.id} sx={{ minHeight: 60 }}>
+                    <TimelineSeparator>
+                      <TimelineDot 
+                        color={historyReply.status === 'posted' ? 'success' : historyReply.status === 'failed' ? 'error' : 'primary'} 
+                        variant="tonal"
+                        sx={{ boxShadow: 'none', mt: 1 }}
+                      >
+                        <i className={historyReply.status === 'posted' ? 'tabler-check' : historyReply.status === 'failed' ? 'tabler-x' : 'tabler-history'} style={{ fontSize: '0.8rem' }} />
+                      </TimelineDot>
+                      {index !== currentReview.replies.length - 1 && <TimelineConnector />}
+                    </TimelineSeparator>
+                    <TimelineContent sx={{ pr: 0, pt: 0, pb: 6 }}>
+                      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <Box>
+                          <Typography variant='body2' fontWeight={700}>
+                            {historyReply.authorType === 'auto' ? 'AI Auto-Reply' : (historyReply.user?.name || 'Team Member')}
+                          </Typography>
+                          <Typography variant='caption' color='text.disabled'>
+                            {isMounted ? new Date(historyReply.createdAt).toLocaleString('en-US', { 
+                              month: 'short', 
+                              day: 'numeric', 
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            }) : ''}
+                          </Typography>
+                        </Box>
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          {historyReply.status === 'posted' && (
+                            <CustomChip 
+                              label="Live" 
+                              size='small' 
+                              variant='tonal' 
+                              color='success' 
+                              icon={<i className='tabler-brand-google' style={{ fontSize: '0.8rem' }} />}
+                              sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }} 
+                            />
+                          )}
+                          <CustomChip 
+                            label={historyReply.sourceType} 
+                            size='small' 
+                            variant='outlined' 
+                            color='secondary'
+                            sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }} 
+                          />
+                        </Stack>
+                      </Box>
+                      <Box sx={{ 
+                        p: 3, 
+                        bgcolor: 'background.paper', 
+                        borderRadius: 2, 
+                        border: theme => `1px solid ${theme.palette.divider}`,
+                      }}>
+                        <Typography variant='body2' sx={{ color: 'text.primary', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                          {historyReply.content}
+                        </Typography>
+                      </Box>
+                    </TimelineContent>
+                  </TimelineItem>
+                ))}
+              </Timeline>
+            </Box>
+            <Divider />
+          </>
+        )}
+
         {/* AI Suggestions */}
         <Box sx={{ p: 6 }}>
           <Box sx={{ 
@@ -481,17 +579,36 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                 </Stack>
               ) : (
                 <Box sx={{ 
-                  p: 4, 
-                  bgcolor: 'background.paper', 
+                  p: 8, 
+                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.02), 
                   border: '1px dashed', 
-                  borderColor: 'divider', 
-                  borderRadius: 2, 
+                  borderColor: (theme) => alpha(theme.palette.primary.main, 0.2), 
+                  borderRadius: 3, 
                   mb: 3,
-                  textAlign: 'center'
+                  textAlign: 'center',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 3
                 }}>
-                  <Typography variant='body2' sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
-                    {'Dear ' + currentReview.author + ', thank you so much for your ' + currentReview.rating + '-star review! We appreciate your feedback and hope to see you again soon.'}
-                  </Typography>
+                  <Avatar 
+                    sx={{ 
+                      bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1), 
+                      color: 'primary.main',
+                      width: 48,
+                      height: 48
+                    }}
+                  >
+                    <i className='tabler-sparkles' style={{ fontSize: '1.5rem' }} />
+                  </Avatar>
+                  <Box>
+                    <Typography variant='subtitle2' fontWeight={700} sx={{ mb: 1 }}>
+                      No Suggestions Yet
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary' sx={{ maxWidth: 250, display: 'block' }}>
+                      Click the &quot;Generate AI&quot; button below to get 3 personalized reply variations for this review.
+                    </Typography>
+                  </Box>
                 </Box>
               )}
 
@@ -501,7 +618,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                   variant='tonal'
                   size='medium'
                   startIcon={isRegenerating ? <i className='tabler-loader spin' /> : <i className='tabler-refresh' />}
-                  onClick={handleRegenerateAI}
+                  onClick={() => handleRegenerateAI()}
                   disabled={isRegenerating}
                   sx={{ borderRadius: 2, fontWeight: 600 }}
                 >
@@ -519,7 +636,8 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                       setReply(`Dear ${currentReview.author}, thank you so much for your ${currentReview.rating}-star review! We appreciate your feedback and hope to see you again soon.`)
                     }
                   }}
-                  sx={{ borderRadius: 2, fontWeight: 600, boxShadow: theme => `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}` }}
+                  disabled={variations.length === 0}
+                  sx={{ borderRadius: 2, fontWeight: 600, boxShadow: theme => variations.length > 0 ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}` : 'none' }}
                 >
                   Use This
                 </Button>

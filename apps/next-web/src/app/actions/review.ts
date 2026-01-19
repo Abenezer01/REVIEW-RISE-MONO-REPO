@@ -99,6 +99,26 @@ export async function getReviewById(id: string) {
     console.error('getReviewById error:', error)
 
     return { success: false, error: error.message }
+    }
+}
+
+export async function getReviewWithHistory(reviewId: string) {
+  try {
+    const review = await reviewRepository.findByIdWithReplies(reviewId)
+
+    if (!review) throw new Error('Review not found')
+
+    return {
+      success: true,
+      data: review
+    }
+  } catch (error: any) {
+    console.error('getReviewWithHistory error:', error)
+
+    return {
+      success: false,
+      error: error.message
+    }
   }
 }
 
@@ -116,7 +136,6 @@ export async function regenerateAISuggestion(reviewId: string, options: { tonePr
       where: { businessId }
     })
 
-    const brandVoice = brandProfile?.description || 'A professional and customer-focused brand.'
     const sentiment = review.sentiment || (review.rating >= 4 ? 'Positive' : review.rating <= 2 ? 'Negative' : 'Neutral')
     const tone = options.tonePreset || 'Professional'
 
@@ -126,9 +145,9 @@ export async function regenerateAISuggestion(reviewId: string, options: { tonePr
 
     // Simulated Variations using the fetched context
     const variations = [
-      `[${tone}] Hi ${review.author}, thank you for your ${sentiment.toLowerCase()} feedback! As a brand that values ${brandVoice.substring(0, 30)}..., we appreciate your ${review.rating}-star review.`,
-      `[${tone}] Thank you ${review.author}. We noticed your ${sentiment.toLowerCase()} experience. Our team at ${brandProfile?.title || 'our company'} is glad you gave us ${review.rating} stars!`,
-      `[${tone}] Dear ${review.author}, we appreciate the ${review.rating}-star review. We always strive to maintain our voice of being ${tone.toLowerCase()} while addressing your feedback.`
+      `Hi ${review.author}, thank you for your ${sentiment.toLowerCase()} feedback! We appreciate you taking the time to share your experience with us.`,
+      `Thank you ${review.author}. We're glad you had a ${sentiment.toLowerCase()} experience. Our team at ${brandProfile?.title || 'our company'} values your ${review.rating}-star rating!`,
+      `Dear ${review.author}, we appreciate the ${review.rating}-star review. We always strive to provide the best service possible and value your feedback.`
     ]
 
     const updatedReview = await reviewRepository.update(reviewId, {
@@ -211,19 +230,64 @@ export async function analyzeSingleReview(reviewId: string) {
   }
 }
 
-export async function updateReviewReply(reviewId: string, response: string) {
+export async function updateReviewReply(
+  reviewId: string, 
+  response: string, 
+  options: { 
+    sourceType?: 'ai' | 'manual', 
+    authorType?: 'user' | 'auto',
+    userId?: string
+  } = {}
+) {
   try {
+    const { sourceType = 'manual', authorType = 'user', userId } = options
+
     // When a user manually saves/posts a reply from the UI, 
     // we mark it as 'approved' so the auto-reply job can pick it up and post it to the platform.
-    // We DON'T set respondedAt yet, as that's handled by the posting service once it's live.
     const updatedReview = await reviewRepository.update(reviewId, {
       response,
       replyStatus: 'approved'
     } as any)
 
-    return {
-      success: true,
-      data: updatedReview
+    // Attempt to post immediately to the platform service
+    // This provides faster feedback to the user than waiting for the worker job
+    try {
+      const EXPRESS_REVIEWS_URL = process.env.EXPRESS_REVIEWS_URL || 'http://localhost:3006'
+
+      // We don't await this or we can await it if we want to return the result of the post
+      // Let's await it so the UI can show if the ACTUAL posting failed
+      const response_post = await fetch(`${EXPRESS_REVIEWS_URL}/api/v1/reviews/${reviewId}/reply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          comment: response,
+          sourceType,
+          authorType,
+          userId
+        })
+      })
+
+      if (!response_post.ok) {
+        const errorData = await response_post.json()
+
+        throw new Error(errorData.error || 'Failed to post reply to platform')
+      }
+
+      // If successful, the backend already updated the status to 'posted'
+      const finalReview = await reviewRepository.findByIdWithReplies(reviewId)
+
+      return {
+        success: true,
+        data: finalReview || updatedReview
+      }
+    } catch (postError: any) {
+      console.error('Immediate post failed:', postError.message)
+
+      return {
+        success: false,
+        error: `Reply saved to database but failed to post to platform: ${postError.message}. The system will retry automatically.`,
+        data: updatedReview
+      }
     }
   } catch (error: any) {
     console.error('updateReviewReply error:', error)
@@ -254,4 +318,5 @@ export async function rejectReviewReply(reviewId: string) {
       error: error.message
     }
   }
+  
 }
