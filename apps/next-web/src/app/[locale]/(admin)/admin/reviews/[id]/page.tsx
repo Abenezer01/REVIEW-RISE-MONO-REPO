@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import Link from 'next/link'
 
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
