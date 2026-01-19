@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import { useState, useEffect, useCallback } from 'react';
 
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
@@ -28,6 +29,8 @@ interface ReviewStats {
     totalReviews: number;
     averageRating: number;
 }
+
+const REVIEWS_API_URL = process.env.NEXT_PUBLIC_REVIEWS_API_URL || 'http://localhost:3006/api/v1';
 
 const ReviewSourcesDashboard = () => {
     const params = useParams();
@@ -61,8 +64,6 @@ const ReviewSourcesDashboard = () => {
              setSnackbar({ open: true, message: 'Failed to connect source.', severity: 'error' });
         }
     }, [searchParams, router]);
-
-const REVIEWS_API_URL = process.env.NEXT_PUBLIC_REVIEWS_API_URL || 'http://localhost:3006/api/v1';
 
     const fetchData = useCallback(async () => {
         if (!locationId) return;

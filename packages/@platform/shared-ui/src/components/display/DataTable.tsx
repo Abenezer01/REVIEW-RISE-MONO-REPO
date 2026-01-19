@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -28,7 +28,7 @@ const DataTable = <T extends { id: string | number }>({
     ...props
 }: DataTableProps<T>) => {
 
-    const paginationModel = React.useMemo(() => ({
+    const paginationModel = useMemo(() => ({
         page: pagination ? pagination.page - 1 : 0,
         pageSize: pagination ? pagination.pageSize : 10,
     }), [pagination]);
