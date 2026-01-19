@@ -1,8 +1,8 @@
 /* eslint-disable import/no-unresolved */
-import { Fragment, useState, useMemo, useCallback, lazy, Suspense } from 'react';
+import { useState, useMemo, useCallback, lazy, Suspense } from 'react';
 
 import type { GridSize } from '@mui/material';
-import { Container, useMediaQuery } from '@mui/material';
+import { useMediaQuery, Box, Fade, Stack } from '@mui/material';
 import type { GridColDef } from '@mui/x-data-grid';
 
 
@@ -190,7 +190,7 @@ const ItemsListing = <T extends object>({
   }), [ItemViewComponent, items, breakpoints, tableProps, isLoading, pagination, onPagination]);
 
   return (
-    <>
+    <Box sx={{ position: 'relative', width: '100%' }}>
       {hasListHeader && (
         <ListHeader
           createActionConfig={createActionConfig}
@@ -206,43 +206,57 @@ const ItemsListing = <T extends object>({
       )}
 
       {error ? (
-        <ErrorState
-          message={error.message || 'An error occurred while loading data'}
-          onRetry={onRetry}
-          showDetails={process.env.NODE_ENV === 'development'}
-          details={error.stack}
-        />
+        <Fade in timeout={500}>
+          <Box>
+            <ErrorState
+              message={error.message || 'An error occurred while loading data'}
+              onRetry={onRetry}
+              showDetails={process.env.NODE_ENV === 'development'}
+              details={error.stack}
+            />
+          </Box>
+        </Fade>
       ) : isLoading ? (
-        <>
-          {adjustedType === ITEMS_LISTING_TYPE.table.value && <SkeletonTable rows={5} columns={tableProps?.headers?.length || 4} />}
-          {adjustedType === ITEMS_LISTING_TYPE.grid.value && <SkeletonGrid count={6} columns={breakpoints as any} />}
-          {(adjustedType === ITEMS_LISTING_TYPE.list.value || adjustedType === ITEMS_LISTING_TYPE.masonry.value) && <SkeletonCard count={4} />}
-        </>
+        <Fade in timeout={300}>
+          <Box sx={{ width: '100%' }}>
+            {adjustedType === ITEMS_LISTING_TYPE.table.value && (
+              <Box sx={{ mt: 2 }}>
+                <SkeletonTable rows={5} columns={tableProps?.headers?.length || 4} />
+              </Box>
+            )}
+            {adjustedType === ITEMS_LISTING_TYPE.grid.value && <SkeletonGrid count={6} columns={breakpoints as any} />}
+            {(adjustedType === ITEMS_LISTING_TYPE.list.value || adjustedType === ITEMS_LISTING_TYPE.masonry.value) && <SkeletonCard count={4} />}
+          </Box>
+        </Fade>
       ) : (
         Array.isArray(items) && (
-          <Fragment>
-            {items.length === 0 && !showEmptyTable ? (
-              <EmptyState
-                title={emptyStateConfig?.title}
-                description={emptyStateConfig?.description}
-                action={emptyStateConfig?.action}
-                illustration={emptyStateConfig?.illustration}
-                icon={emptyStateConfig?.icon}
-              />
-            ) : (
-              <>
-                {listingComponents[adjustedType] || listingComponents.default}
-                {adjustedType !== ITEMS_LISTING_TYPE.table.value && pagination && (
-                  <Container>
-                    <PaginationComponent onPaginationChange={onPagination} pagination={pagination} />
-                  </Container>
-                )}
-              </>
-            )}
-          </Fragment>
+          <Fade in timeout={500}>
+            <Box sx={{ width: '100%' }}>
+              {items.length === 0 && !showEmptyTable ? (
+                <EmptyState
+                  title={emptyStateConfig?.title}
+                  description={emptyStateConfig?.description}
+                  action={emptyStateConfig?.action}
+                  illustration={emptyStateConfig?.illustration}
+                  icon={emptyStateConfig?.icon}
+                />
+              ) : (
+                <Stack spacing={6}>
+                  <Box sx={{ width: '100%' }}>
+                    {listingComponents[adjustedType] || listingComponents.default}
+                  </Box>
+                  {adjustedType !== ITEMS_LISTING_TYPE.table.value && pagination && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', pb: 4 }}>
+                      <PaginationComponent onPaginationChange={onPagination} pagination={pagination} />
+                    </Box>
+                  )}
+                </Stack>
+              )}
+            </Box>
+          </Fade>
         )
       )}
-    </>
+    </Box>
   );
 };
 

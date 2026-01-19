@@ -109,6 +109,38 @@ export class GoogleReviewsService {
             throw error; // Handle or rethrow
         }
     }
+    /**
+     * Post or update a reply to a review.
+     * reviewName format: "accounts/{accountId}/locations/{locationId}/reviews/{reviewId}"
+     */
+    async updateReply(accessToken: string, reviewName: string, comment: string) {
+        try {
+            const response = await axios.put(`https://mybusiness.googleapis.com/v4/${reviewName}/reply`, {
+                comment: comment
+            }, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error updating review reply:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Delete a reply to a review.
+     */
+    async deleteReply(accessToken: string, reviewName: string) {
+        try {
+            await axios.delete(`https://mybusiness.googleapis.com/v4/${reviewName}/reply`, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            return { success: true };
+        } catch (error) {
+            console.error('Error deleting review reply:', error);
+            throw error;
+        }
+    }
 }
 
 export const googleReviewsService = new GoogleReviewsService();

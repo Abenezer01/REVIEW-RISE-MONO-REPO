@@ -382,8 +382,10 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
             <ListingProvider
                 items={profiles}
                 isLoading={isLoading}
+                error={error ? new Error(error) : null}
                 initialLayout="table"
                 tableColumns={columns}
+                onRetry={fetchProfiles}
                 pagination={{
             total: totalCount,
             pageSize: rowsPerPage,

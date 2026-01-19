@@ -22,6 +22,10 @@ router.post('/locations/:locationId/sync', reviewsController.syncReviews);
 router.get('/locations/:locationId/stats', reviewsController.getReviewStats);
 router.get('/locations/:locationId/keywords', reviewsController.getLocationKeywords);
 
+// Review Actions
+router.post('/:reviewId/reply', reviewController.postReply);
+router.post('/:reviewId/reject', reviewController.rejectReply);
+
 // Analytics
 router.get('/analytics/rating-trend', analyticsController.getRatingTrend);
 router.get('/analytics/volume', analyticsController.getReviewVolume);

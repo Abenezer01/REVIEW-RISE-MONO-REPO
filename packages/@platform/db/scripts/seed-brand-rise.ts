@@ -16,20 +16,47 @@ async function seedBrandRiseData() {
   
   console.log('🌱 Seeding Brand Rise dashboard data...');
 
-  const businessId = '33333333-3333-3333-3333-333333333333'; // Tech Cafe (from seed.ts)
-  // Check if business exists, if not create it (in case seed.ts wasn't run)
-  let business = await prisma.business.findUnique({ where: { id: businessId } });
+  const TECH_CAFE_LOCATION_ID = '33333333-3333-3333-3333-333333333333';
+
+  // 0. Find the Tech Cafe business (created in seed.ts)
+  let business = await prisma.business.findFirst({
+    where: { OR: [{ slug: 'tech-cafe' }, { slug: 'tech-cafe-brand-rise' }] }
+  });
+
   if (!business) {
-      console.log('Business not found, creating Tech Cafe...');
-       business = await prisma.business.create({
-          data: {
-              id: businessId,
-              name: 'Tech Cafe',
-              slug: 'tech-cafe-brand-rise',
-              description: 'Modern cafe with great coffee and workspace',
-              status: 'active',
-          }
-       });
+    console.log('Business "tech-cafe" not found, creating it...');
+    business = await prisma.business.create({
+      data: {
+        name: 'Tech Cafe',
+        slug: 'tech-cafe',
+        description: 'Modern cafe with great coffee and workspace',
+        status: 'active',
+      }
+    });
+  }
+
+  const businessId = business.id;
+  console.log(`Using Business ID: ${businessId} for ${business.name}`);
+
+  // Ensure the location exists and is associated with this business
+  let location = await prisma.location.findUnique({ where: { id: TECH_CAFE_LOCATION_ID } });
+  if (!location) {
+    console.log('Location not found, creating Tech Cafe Main location...');
+    location = await prisma.location.create({
+      data: {
+        id: TECH_CAFE_LOCATION_ID,
+        name: 'Tech Cafe Main',
+        address: '789 Tech Boulevard, San Francisco, CA 94102, US',
+        status: 'active',
+        businessId: businessId,
+      }
+    });
+  } else if (location.businessId !== businessId) {
+    console.log('Updating location to match businessId...');
+    await prisma.location.update({
+      where: { id: TECH_CAFE_LOCATION_ID },
+      data: { businessId: businessId }
+    });
   }
 
   // 1. Brand DNA
@@ -45,6 +72,38 @@ async function seedBrandRiseData() {
           mission: 'To provide the best fuel for the modern workforce.'
       }
   });
+
+  // 1.5 Brand Profile
+  console.log('🏢 Seeding Brand Profile...');
+  const brandProfileData = {
+      businessId,
+      websiteUrl: 'https://techcafe.io',
+      title: 'Tech Cafe',
+      description: 'Modern cafe with great coffee and workspace',
+      status: 'completed',
+      autoReplySettings: {
+          enabled: true,
+          mode: 'positive_neutral',
+          manualNegativeApproval: true,
+          delayHours: 2,
+          maxRepliesPerDay: 50
+      }
+  };
+
+  const existingProfile = await prisma.brandProfile.findFirst({
+      where: { businessId, websiteUrl: 'https://techcafe.io' }
+  });
+
+  if (existingProfile) {
+      await prisma.brandProfile.update({
+          where: { id: existingProfile.id },
+          data: brandProfileData as any
+      });
+  } else {
+      await prisma.brandProfile.create({
+          data: brandProfileData as any
+      });
+  }
 
   // 2. Competitors
   console.log('⚔️ Seeding Competitors...');
@@ -250,25 +309,39 @@ async function seedBrandRiseData() {
       { author: 'Alice M.', rating: 5, content: 'Best coffee in the city! fast wifi too.' },
       { author: 'Bob D.', rating: 4, content: 'Great atmosphere, but a bit crowded.' },
       { author: 'Charlie T.', rating: 5, content: 'Love the new cold brew.' },
-      { author: 'Dave W.', rating: 3, content: 'Service was slow today.' },
-      { author: 'Eve S.', rating: 5, content: 'My go-to spot for meetings.' }
+      { author: 'Dave W.', rating: 3, content: 'Service was slow today.', replyStatus: 'pending_approval' },
+      { author: 'Eve S.', rating: 2, content: 'Coffee was cold and the staff was rude.', replyStatus: 'pending_approval' }
   ];
 
   for (const [i, review] of reviews.entries()) {
       await prisma.review.upsert({
         where: { platform_externalId: { platform: platforms[i % 3], externalId: `review-${i}` } },
-        update: {},
+        update: {
+            businessId,
+            locationId: TECH_CAFE_LOCATION_ID,
+            replyStatus: (review as any).replyStatus || null,
+            aiSuggestions: (review as any).replyStatus === 'pending_approval' ? {
+                suggestedReply: `Hi ${review.author.split(' ')[0]}, we're sorry to hear about your experience. We'd love to make it right!`,
+                analysis: "Customer expressed dissatisfaction with service/staff."
+            } : null
+        },
         create: {
           businessId,
+          locationId: TECH_CAFE_LOCATION_ID,
           platform: platforms[i % 3],
           externalId: `review-${i}`,
           author: review.author,
           rating: review.rating,
           content: review.content,
+          replyStatus: (review as any).replyStatus || null,
+          aiSuggestions: (review as any).replyStatus === 'pending_approval' ? {
+              suggestedReply: `Hi ${review.author.split(' ')[0]}, we're sorry to hear about your experience. We'd love to make it right!`,
+              analysis: "Customer expressed dissatisfaction with service/staff."
+          } : null,
           publishedAt: new Date(Date.now() - i * 86400000), // 1 day apart
           createdAt: new Date()
         }
-      });
+      } as any);
   }
 
   // 5. Reports

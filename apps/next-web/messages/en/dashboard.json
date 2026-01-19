@@ -4,6 +4,7 @@
     "reviews": "Reviews",
     "reviews-dashboard": "Reviews Dashboard",
     "reviews-list": "All Reviews",
+    "auto-reply": "Auto-Reply Settings",
     "social-rise": "SocialRise",
     "seo-intelligence": "SEO Intelligence",
     "accounts": "Accounts",
@@ -18,7 +19,8 @@
     "seo-overview": "Overview",
     "seo-visibility": "SERP Visibility",
     "seo-keywords": "SEO Keywords",
-    "smart-reviews": "SmartReviews",
+    "smart-reviews": "Smart Reviews",
+    "smart-reviews-overview": "Overview",
     "gbp-rocket": "GBPRocket",
     "ad-rise": "AdRise",
     "brand-rise": "BrandRise",
@@ -27,6 +29,7 @@
     "feature-flags": "Feature Flags",
     "ai-visibility": "AI Visibility"
   },
+  "auto-reply": "Auto-Reply Settings",
   "overview": {
     "title": "Dashboard Overview",
     "welcome": "Welcome back",

@@ -80,9 +80,22 @@ const menuData: MenuItem[] = [
   },
   {
     title: 'navigation.smart-reviews',
-    href: '/admin/smart-reviews',
     icon: 'tabler-sparkles',
-    allowedRoles: [ROLES.ADMIN]
+    allowedRoles: [ROLES.ADMIN],
+    children: [
+      {
+        title: 'navigation.smart-reviews-overview',
+        href: '/admin/smart-reviews',
+        icon: 'tabler-list',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.auto-reply',
+        href: '/admin/reviews/auto-reply',
+        icon: 'tabler-robot',
+        allowedRoles: [ROLES.ADMIN]
+      }
+    ]
   },
   {
     title: 'navigation.gbp-rocket',

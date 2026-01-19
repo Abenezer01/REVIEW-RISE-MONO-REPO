@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import Grid from '@mui/material/Grid'
 
 import SmartReviewList from '@/views/admin/reviews/SmartReviewList'
