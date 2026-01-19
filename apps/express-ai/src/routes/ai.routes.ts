@@ -99,4 +99,23 @@ router.post('/generate-visibility-plan', async (req, res) => {
     }
 });
 
+// Review Sentiment Analysis Routes
+import { reviewSentimentService } from '../services/review-sentiment.service';
+
+router.post('/reviews/analyze', async (req, res) => {
+    try {
+        const { content, rating } = req.body;
+        
+        if (rating === undefined || rating === null) {
+            return res.status(400).json({ error: 'Rating is required' });
+        }
+
+        const result = await reviewSentimentService.analyzeReview(content || '', rating);
+        res.json(result);
+    } catch (error: any) {
+        console.error('Review Analysis Error:', error);
+        res.status(500).json({ error: error.message || 'Internal Server Error' });
+    }
+});
+
 export default router;

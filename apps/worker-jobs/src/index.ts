@@ -102,6 +102,24 @@ app.post('/jobs/review-sync', async (req, res) => {
     res.status(202).json({ message: 'Review sync job started' });
 });
 
+import { runReviewSentimentJob, reprocessReviews } from './jobs/review-sentiment.job';
+
+app.post('/jobs/review-sentiment', async (req, res) => {
+    const { reprocess = false, batchSize = 50 } = req.body;
+    
+    if (reprocess) {
+        reprocessReviews(batchSize)
+            .then(result => console.log('Review sentiment re-processing finished:', result))
+            .catch(err => console.error('Review sentiment re-processing failed:', err));
+        res.status(202).json({ message: 'Review sentiment re-processing job started' });
+    } else {
+        runReviewSentimentJob()
+            .then(result => console.log('Review sentiment analysis finished:', result))
+            .catch(err => console.error('Review sentiment analysis failed:', err));
+        res.status(202).json({ message: 'Review sentiment analysis job started' });
+    }
+});
+
 const scheduleDaily = (hour: number = 2) => {
     const now = new Date()
     const next = new Date(now)
@@ -111,9 +129,11 @@ const scheduleDaily = (hour: number = 2) => {
     setTimeout(() => {
         runRankTrackingJob().catch(err => console.error('Scheduled rank job failed:', err))
         runReviewSyncJob().catch(err => console.error('Scheduled review sync job failed:', err))
+        runReviewSentimentJob().catch(err => console.error('Scheduled review sentiment job failed:', err))
         setInterval(() => {
             runRankTrackingJob().catch(err => console.error('Scheduled rank job failed:', err))
             runReviewSyncJob().catch(err => console.error('Scheduled review sync job failed:', err))
+            runReviewSentimentJob().catch(err => console.error('Scheduled review sentiment job failed:', err))
         }, 24 * 60 * 60 * 1000)
     }, delay)
 }

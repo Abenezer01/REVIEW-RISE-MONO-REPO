@@ -38,10 +38,12 @@ interface ComparisonParams {
   locationId?: string
 }
 
+const REVIEWS_API = process.env.NEXT_PUBLIC_REVIEWS_API_URL || 'http://localhost:3006/api/v1'
+
 export const useRatingTrend = (params: RatingTrendParams) => {
   return useApiGet(
     ['analytics', 'rating-trend', params.businessId, params.locationId || 'all', String(params.period)],
-    '/api/reviews/analytics/rating-trend',
+    `${REVIEWS_API}/reviews/analytics/rating-trend`,
     params,
     { enabled: !!params.businessId }
   )
@@ -50,7 +52,7 @@ export const useRatingTrend = (params: RatingTrendParams) => {
 export const useReviewVolume = (params: VolumeParams) => {
   return useApiGet(
     ['analytics', 'volume', params.businessId, params.locationId || 'all', String(params.period)],
-    '/api/reviews/analytics/volume',
+    `${REVIEWS_API}/reviews/analytics/volume`,
     params,
     { enabled: !!params.businessId }
   )
@@ -59,7 +61,7 @@ export const useReviewVolume = (params: VolumeParams) => {
 export const useSentimentHeatmap = (params: SentimentParams) => {
   return useApiGet(
     ['analytics', 'sentiment', params.businessId, params.locationId || 'all', String(params.period), params.groupBy || 'day'],
-    '/api/reviews/analytics/sentiment',
+    `${REVIEWS_API}/reviews/analytics/sentiment`,
     params,
     { enabled: !!params.businessId }
   )
@@ -68,7 +70,7 @@ export const useSentimentHeatmap = (params: SentimentParams) => {
 export const useTopKeywords = (params: KeywordsParams) => {
   return useApiGet(
     ['analytics', 'keywords', params.businessId, params.locationId || 'all', String(params.limit)],
-    '/api/reviews/analytics/keywords',
+    `${REVIEWS_API}/reviews/analytics/keywords`,
     params,
     { enabled: !!params.businessId }
   )
@@ -77,7 +79,7 @@ export const useTopKeywords = (params: KeywordsParams) => {
 export const useRecentSummary = (params: SummaryParams) => {
   return useApiGet(
     ['analytics', 'summary', params.businessId, params.locationId || 'all', String(params.limit)],
-    '/api/reviews/analytics/summary',
+    `${REVIEWS_API}/reviews/analytics/summary`,
     params,
     { enabled: !!params.businessId }
   )
@@ -86,7 +88,7 @@ export const useRecentSummary = (params: SummaryParams) => {
 export const useCompetitorComparison = (params: ComparisonParams) => {
   return useApiGet(
     ['analytics', 'competitor-comparison', params.businessId, params.locationId || 'all'],
-    '/api/reviews/analytics/competitor-comparison',
+    `${REVIEWS_API}/reviews/analytics/competitor-comparison`,
     params,
     { enabled: !!params.businessId }
   )
@@ -97,12 +99,21 @@ export const useAddCompetitor = () => {
 
   
 return useApiPost(
-    '/api/reviews/analytics/competitors',
+    `${REVIEWS_API}/reviews/analytics/competitors`,
     {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['analytics', 'competitor-comparison'] })
       }
     }
+  )
+}
+
+export const useDashboardMetrics = (params: SummaryParams) => {
+  return useApiGet(
+    ['analytics', 'metrics', params.businessId, params.locationId || 'all', String(params.limit)],
+    `${REVIEWS_API}/reviews/analytics/metrics`,
+    params,
+    { enabled: !!params.businessId }
   )
 }
 
@@ -113,6 +124,7 @@ export const useReviewAnalytics = (businessId: string, locationId?: string, peri
   const keywords = useTopKeywords({ businessId, locationId: locationId === 'all' ? undefined : locationId })
   const summary = useRecentSummary({ businessId, locationId: locationId === 'all' ? undefined : locationId })
   const comparison = useCompetitorComparison({ businessId, locationId: locationId === 'all' ? undefined : locationId })
+  const metrics = useDashboardMetrics({ businessId, locationId: locationId === 'all' ? undefined : locationId, limit: period })
   const addCompetitor = useAddCompetitor()
 
   return {
@@ -122,8 +134,9 @@ export const useReviewAnalytics = (businessId: string, locationId?: string, peri
     keywordsData: keywords,
     summaryData: summary,
     competitorData: comparison,
+    dashboardMetrics: metrics,
     addCompetitor,
-    isLoading: trend.isLoading || volume.isLoading || sentiment.isLoading || keywords.isLoading || summary.isLoading || comparison.isLoading,
-    isError: trend.isError || volume.isError || sentiment.isError || keywords.isError || summary.isError || comparison.isError
+    isLoading: trend.isLoading || volume.isLoading || sentiment.isLoading || keywords.isLoading || summary.isLoading || comparison.isLoading || metrics.isLoading,
+    isError: trend.isError || volume.isError || sentiment.isError || keywords.isError || summary.isError || comparison.isError || metrics.isError
   }
 }

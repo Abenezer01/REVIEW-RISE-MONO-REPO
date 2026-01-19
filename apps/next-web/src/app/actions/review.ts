@@ -86,6 +86,22 @@ export async function getReviews(params: {
   }
 }
 
+export async function getReviewById(id: string) {
+  try {
+    const review = await reviewRepository.findById(id)
+
+    if (!review) {
+      return { success: false, error: 'Review not found' }
+    }
+
+    return { success: true, data: review }
+  } catch (error: any) {
+    console.error('getReviewById error:', error)
+
+    return { success: false, error: error.message }
+    }
+}
+
 export async function getReviewWithHistory(reviewId: string) {
   try {
     const review = await reviewRepository.findByIdWithReplies(reviewId)
@@ -148,6 +164,64 @@ export async function regenerateAISuggestion(reviewId: string, options: { tonePr
     }
   } catch (error: any) {
     console.error('regenerateAISuggestion error:', error)
+
+    return {
+      success: false,
+      error: error.message
+    }
+  }
+}
+
+export async function analyzeSingleReview(reviewId: string) {
+  try {
+    const review = await reviewRepository.findById(reviewId)
+
+    if (!review) throw new Error('Review not found')
+
+    // Call Express AI service
+    const expressAiUrl = process.env.EXPRESS_AI_URL || 'http://localhost:3002'
+    
+    const response = await fetch(`${expressAiUrl}/api/v1/ai/reviews/analyze`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        content: review.content || '',
+        rating: review.rating
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error(`AI Service returned ${response.status}`)
+    }
+
+    const analysis = await response.json()
+
+    // Update review with analysis results
+    const tags = [
+        ...(analysis.emotions || []),
+        ...(analysis.keywords || [])
+    ]
+
+    const updatedReview = await reviewRepository.update(reviewId, {
+      sentiment: analysis.sentiment,
+      tags: tags,
+      aiSuggestions: {
+        confidence: analysis.confidence,
+        reasoning: analysis.reasoning,
+        primaryEmotion: analysis.primaryEmotion,
+        topics: analysis.topics,
+        analyzedAt: new Date().toISOString()
+      }
+    } as any)
+
+    return {
+      success: true,
+      data: updatedReview
+    }
+  } catch (error: any) {
+    console.error('analyzeSingleReview error:', error)
 
     return {
       success: false,
@@ -244,4 +318,5 @@ export async function rejectReviewReply(reviewId: string) {
       error: error.message
     }
   }
+  
 }

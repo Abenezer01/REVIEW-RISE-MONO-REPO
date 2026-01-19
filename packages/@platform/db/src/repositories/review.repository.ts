@@ -43,7 +43,7 @@ export class ReviewRepository extends BaseRepository<
 
         return { items, total };
     }
-    async upsertReview(data: Prisma.ReviewCreateInput) {
+     async upsertReview(data: Prisma.ReviewCreateInput) {
         return this.delegate.upsert({
             where: {
                 platform_externalId: {
@@ -302,6 +302,87 @@ export class ReviewRepository extends BaseRepository<
             reviews,
             unrepliedCount,
             recentRepliesCount
+        };
+    }
+
+    /**
+     * Get dashboard metrics with comparison to previous period
+     */
+    async getDashboardMetrics(params: {
+        businessId: string;
+        locationId?: string;
+        periodDays: number;
+    }) {
+        const now = new Date();
+        const currentStartDate = new Date();
+        currentStartDate.setDate(now.getDate() - params.periodDays);
+
+        const previousEndDate = new Date(currentStartDate);
+        const previousStartDate = new Date();
+        previousStartDate.setDate(previousEndDate.getDate() - params.periodDays);
+
+        const whereBase = {
+            businessId: params.businessId,
+            ...(params.locationId && { locationId: params.locationId })
+        };
+
+        // Helper to get stats for a date range
+        const getStatsForRange = async (start: Date, end: Date) => {
+            const whereRange = { ...whereBase, publishedAt: { gte: start, lt: end } };
+            
+            const count = await this.delegate.count({ where: whereRange });
+            
+            const aggregations = await this.delegate.aggregate({
+                where: whereRange,
+                _avg: { rating: true }
+            });
+
+            // Replies in this range (based on respondedAt)
+            // Note: This logic assumes replies happened in the same period, 
+            // but usually we count replies made *in that period* regardless of when review was posted.
+            // Using separate query for replies based on respondedAt
+            const replyWhere = {
+                ...whereBase,
+                respondedAt: { gte: start, lt: end },
+                response: { not: null }
+            };
+            const replyCount = await this.delegate.count({ where: replyWhere });
+
+            // Positive Sentiment Count
+            const positiveCount = await this.delegate.count({
+                where: { ...whereRange, sentiment: 'positive' }
+            });
+
+            return {
+                count,
+                avgRating: aggregations._avg.rating || 0,
+                replyCount,
+                positiveCount
+            };
+        };
+
+        const [currentStats, previousStats] = await Promise.all([
+            getStatsForRange(currentStartDate, now),
+            getStatsForRange(previousStartDate, previousEndDate)
+        ]);
+
+        return {
+            current: {
+                totalReviews: currentStats.count,
+                averageRating: Number(currentStats.avgRating.toFixed(1)),
+                responseCount: currentStats.replyCount,
+                positiveSentiment: currentStats.count > 0 
+                    ? Math.round((currentStats.positiveCount / currentStats.count) * 100) 
+                    : 0
+            },
+            previous: {
+                totalReviews: previousStats.count,
+                averageRating: Number(previousStats.avgRating.toFixed(1)),
+                responseCount: previousStats.replyCount,
+                positiveSentiment: previousStats.count > 0 
+                    ? Math.round((previousStats.positiveCount / previousStats.count) * 100) 
+                    : 0
+            }
         };
     }
 }

@@ -3,7 +3,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 
-import { useTheme } from '@mui/material/styles'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Grid from '@mui/material/Grid'
@@ -14,8 +13,12 @@ import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import InputAdornment from '@mui/material/InputAdornment'
 import Rating from '@mui/material/Rating'
-import { toast } from 'react-toastify'
+import Button from '@mui/material/Button'
+import { CardHeader, Divider } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import type { GridColDef } from '@mui/x-data-grid'
+
+import { toast } from 'react-toastify'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -25,7 +28,8 @@ import ItemsListing from '@components/shared/listing'
 import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 import { getReviews } from '@/app/actions/review'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
-import ReviewDetailDrawer from './ReviewDetailDrawer'
+import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
+import { Link } from '@/i18n/routing'
 
 const SmartReviewList = () => {
   const theme = useTheme()
@@ -35,9 +39,6 @@ const SmartReviewList = () => {
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  
-  const [selectedReview, setSelectedReview] = useState<any>(null)
-  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const [filters, setFilters] = useState({
     rating: '',
@@ -188,28 +189,10 @@ const SmartReviewList = () => {
       headerName: 'Sentiment',
       minWidth: 120,
       renderCell: (params) => {
-        const sentiment = params.value || (params.row.rating >= 4 ? 'Positive' : params.row.rating <= 2 ? 'Negative' : 'Neutral')
-
-        const colorMap: Record<string, any> = {
-          Positive: 'success',
-          Neutral: 'warning',
-          Negative: 'error'
-        }
-
-        const iconMap: Record<string, string> = {
-          Positive: 'tabler-mood-smile',
-          Neutral: 'tabler-mood-neutral',
-          Negative: 'tabler-mood-sad'
-        }
-
         return (
-          <CustomChip
-            icon={<i className={iconMap[sentiment] || 'tabler-mood-smile'} style={{ fontSize: '1rem' }} />}
-            size='small'
-            variant='tonal'
-            color={colorMap[sentiment] || 'secondary'}
-            label={sentiment}
-            sx={{ fontWeight: 500, borderRadius: '4px' }}
+          <SentimentBadge 
+            sentiment={params.value?.toLowerCase() as any} 
+            size='small' 
           />
         )
       }
@@ -252,28 +235,84 @@ const SmartReviewList = () => {
       minWidth: 80,
       sortable: false,
       renderCell: (params) => (
-        <IconButton
-          size='small'
-          onClick={() => {
-            setSelectedReview(params.row)
-            setDrawerOpen(true)
-          }}
-          sx={{ color: 'text.secondary' }}
-        >
-          <i className='tabler-eye' />
-        </IconButton>
+        <Link href={`/admin/reviews/${params.row.id}` as any}>
+          <IconButton
+            size='small'
+            sx={{ color: 'text.secondary' }}
+          >
+            <i className='tabler-eye' />
+          </IconButton>
+        </Link>
       )
     }
   ]
 
   return (
     <>
-      <Card elevation={0} sx={{ mb: 6, border: theme => `1px solid ${theme.palette.divider}`, borderRadius: 3, overflow: 'hidden' }}>
-        <Box sx={{ 
-          p: 5, 
-          bgcolor: (theme) => theme.palette.mode === 'light' ? 'grey.50' : 'background.default',
-          borderBottom: theme => `1px solid ${theme.palette.divider}`
-        }}>
+      <Card elevation={0} sx={{ mb: 4, border: theme => `1px solid ${theme.palette.divider}`, borderRadius: 2 }}>
+        <CardHeader
+          title={
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <IconButton
+                onClick={fetchData}
+                sx={{
+                  p: 1.5,
+                  borderRadius: 1.5,
+                  bgcolor: (theme) => `rgba(${theme.palette.primary.mainChannel} / 0.1)`,
+                  color: 'primary.main',
+                  '&:hover': {
+                    bgcolor: (theme) => `rgba(${theme.palette.primary.mainChannel} / 0.2)`,
+                  }
+                }}
+              >
+                <i className='tabler-refresh' style={{ fontSize: '1.5rem' }} />
+              </IconButton>
+              <Box>
+                <Typography variant='h5' fontWeight={600} sx={{ mb: 0.5 }}>
+                  Smart Reviews™
+                </Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  View and manage all your customer reviews in one place
+                </Typography>
+              </Box>
+            </Box>
+          }
+          action={
+            <Box sx={{ display: 'flex', gap: 1, mt: 1, mr: 1, alignItems: 'center' }}>
+                <Button 
+                    variant="contained" 
+                    color="primary"
+                    startIcon={<i className="tabler-wand" />}
+                    onClick={async () => {
+                        toast.info('Starting sentiment analysis...');
+
+                        // Dynamic import to avoid server-side issues if any
+                        const { triggerSentimentAnalysis } = await import('@/app/actions/job');
+                        const res = await triggerSentimentAnalysis();
+
+                        if (res.success) {
+                            toast.success('Sentiment analysis started via background job');
+                            setTimeout(fetchData, 2000); // Reload after a bit
+                        } else {
+                            toast.error(res.error || 'Failed to start analysis');
+                        }
+                    }}
+                    size="small"
+                >
+                    Run Sentiment Analysis
+                </Button>
+              <CustomChip
+                label={`${total} Reviews`}
+                size='small'
+                variant='tonal'
+                color='primary'
+              />
+            </Box>
+          }
+          sx={{ pb: 3 }}
+        />
+        <Divider sx={{ borderStyle: 'dashed' }} />
+        <CardContent sx={{ pt: 4, pb: 4 }}>
           <Grid container spacing={4} alignItems="center">
             <Grid size={{ xs: 12, md: 6 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -343,7 +382,7 @@ const SmartReviewList = () => {
               </Box>
             </Grid>
           </Grid>
-        </Box>
+        </CardContent>
 
         <CardContent sx={{ p: 5 }}>
           <Grid container spacing={4}>
@@ -534,16 +573,6 @@ const SmartReviewList = () => {
           title: 'No Reviews Found',
           description: 'Try adjusting your filters to find what you are looking for.',
           icon: 'tabler-message-off'
-        }}
-      />
-
-      <ReviewDetailDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        review={selectedReview}
-        onSuccess={(_updatedReview, shouldClose = true) => {
-          fetchData()
-          if (shouldClose) setDrawerOpen(false)
         }}
       />
     </>

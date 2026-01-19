@@ -114,3 +114,61 @@ export const syncReviews = async (req: Request, res: Response) => {
     }
 };
 
+export const getLocationKeywords = async (req: Request, res: Response) => {
+    try {
+        const { locationId } = req.params;
+        const { timeRange = '30d' } = req.query;
+
+        // Calculate date range
+        const now = new Date();
+        const startDate = new Date();
+        
+        switch (timeRange) {
+            case '7d':
+                startDate.setDate(now.getDate() - 7);
+                break;
+            case '90d':
+                startDate.setDate(now.getDate() - 90);
+                break;
+            case '30d':
+            default:
+                startDate.setDate(now.getDate() - 30);
+                break;
+        }
+
+        // Fetch reviews in the time range
+        const reviews = await reviewRepository.findMany({
+            where: {
+                locationId,
+                publishedAt: {
+                    gte: startDate
+                }
+            }
+        });
+
+        // Aggregate keywords from tags
+        const keywordCounts = new Map<string, number>();
+        
+        reviews.forEach(review => {
+            review.tags.forEach(tag => {
+                const count = keywordCounts.get(tag) || 0;
+                keywordCounts.set(tag, count + 1);
+            });
+        });
+
+        // Convert to array and sort by count
+        const keywords = Array.from(keywordCounts.entries())
+            .map(([keyword, count]) => ({ keyword, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 20); // Top 20 keywords
+
+        res.status(200).json(
+            createSuccessResponse({ keywords }, 'Keywords fetched successfully')
+        );
+    } catch (error) {
+        console.error('Get location keywords error:', error);
+        res.status(500).json(
+            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
+        );
+    }
+};

@@ -27,6 +27,8 @@ import TimelineDot from '@mui/lab/TimelineDot'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
+import EmotionChips from '@/components/shared/reviews/EmotionChips'
 
 import { updateReviewReply, regenerateAISuggestion, rejectReviewReply, getReviewWithHistory } from '@/app/actions/review'
 import { getBrandProfileByBusinessId } from '@/app/actions/brand-profile'
@@ -105,11 +107,6 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
 
   if (!currentReview) return null
 
-  const sentimentColorMap: Record<string, any> = {
-    Positive: 'success',
-    Neutral: 'warning',
-    Negative: 'error'
-  }
 
   const sentiment = currentReview.sentiment || (currentReview.rating >= 4 ? 'Positive' : currentReview.rating <= 2 ? 'Negative' : 'Neutral')
 
@@ -164,21 +161,34 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
     setReply(variations[index])
   }
 
-  const handleRegenerateAI = async (reviewId?: string) => {
-     const id = reviewId || currentReview?.id
-
-     if (!id) return
-
+  const handleAnalyzeReview = async () => {
     setIsRegenerating(true)
 
-    const res = await regenerateAISuggestion(id, { tonePreset })
+    // Dynamically import to avoid server/client issues
+    const { analyzeSingleReview } = await import('@/app/actions/review')
+    const analysisRes = await analyzeSingleReview(currentReview.id)
 
+    if (analysisRes.success) {
+      toast.success('Review analysis completed')
+
+      // Update with analysis result first
+      setCurrentReview(analysisRes.data)
+      if (onSuccess) onSuccess(analysisRes.data, false)
+    } else {
+      toast.error(analysisRes.error || 'Failed to analyze review')
+      setIsRegenerating(false)
+
+      return
+    }
+
+    const suggestionRes = await regenerateAISuggestion(currentReview.id, { tonePreset })
+    
     setIsRegenerating(false)
 
-    if (res.success && res.data) {
+    if (suggestionRes.success && suggestionRes.data) {
       toast.success('AI suggestions regenerated')
       
-      const updatedReview = res.data as any
+      const updatedReview = suggestionRes.data as any
       
       setCurrentReview(updatedReview)
       
@@ -193,9 +203,12 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
       
       if (onSuccess) onSuccess(updatedReview, false)
     } else {
-      toast.error(res.error || 'Failed to regenerate suggestions')
+      toast.error(suggestionRes.error || 'Failed to regenerate suggestions')
     }
   }
+
+  // Handle Regenerate button also calling the same analysis
+  const handleRegenerateAI = handleAnalyzeReview
 
   return (
     <Drawer
@@ -274,13 +287,9 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                 </Box>
               </Box>
             </Stack>
-            <CustomChip
-              round='true'
-              size='small'
-              variant='tonal'
-              color={sentimentColorMap[sentiment] || 'secondary'}
-              label={sentiment}
-              sx={{ fontWeight: 600, px: 2 }}
+            <SentimentBadge
+              sentiment={sentiment?.toLowerCase() as any}
+              size='medium'
             />
           </Box>
           
@@ -350,9 +359,33 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
               </Box>
             </Box>
           )}
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant='subtitle2' sx={{ mb: 1, textTransform: 'uppercase', color: 'text.disabled' }}>
+              Extracted Emotions & Topics
+            </Typography>
+            {currentReview.tags && currentReview.tags.length > 0 ? (
+              <EmotionChips emotions={currentReview.tags} maxDisplay={5} />
+            ) : (
+              <Typography variant='caption' color='text.secondary'>No analysis available</Typography>
+            )}
+            
+            {currentReview.aiSuggestions?.topics && currentReview.aiSuggestions.topics.length > 0 && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant='caption' sx={{ color: 'text.disabled', display: 'block', mb: 0.5 }}>
+                  Key Topics
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  {currentReview.aiSuggestions.topics.map((topic: string) => (
+                     <Chip key={topic} label={topic} size='small' variant='outlined' />
+                  ))}
+                </Box>
+              </Box>
+            )}
+          </Box>
         </Box>
 
-        <Divider />
+
 
         {/* Reply History Timeline */}
         {currentReview.replies && currentReview.replies.length > 0 && (
@@ -667,7 +700,6 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
             </Button>
           </Stack>
         </Box>
-      </Box>
     </Drawer>
   )
 }

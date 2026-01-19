@@ -30,7 +30,6 @@ import { useBusinessId } from '@/hooks/useBusinessId'
 
 const ReviewsDashboard = () => {
   const [period, setPeriod] = useState<number>(30)
-  const [locationId, setLocationId] = useState<string>('all')
   const { businessId, loading: businessLoading } = useBusinessId()
 
   const {
@@ -40,177 +39,65 @@ const ReviewsDashboard = () => {
     keywordsData,
     summaryData,
     competitorData,
+    dashboardMetrics,
     isLoading: analyticsLoading
-  } = useReviewAnalytics(businessId || '', locationId, period)
+  } = useReviewAnalytics(businessId || '', 'all', period)
 
   const handlePeriodChange = (event: SelectChangeEvent<number>) => {
     setPeriod(event.target.value as number)
   }
 
-  const handleLocationChange = (event: SelectChangeEvent<string>) => {
-    setLocationId(event.target.value)
-  }
-
-  // --- Mock Data Constants (Fallback) ---
-  const mockMetrics = {
-    avgRating: 4.7,
-    totalReviews: 1847,
-    aiReplies: 342,
-    positiveSentiment: 87,
-    unrepliedCount: 23,
-    recentRepliesCount: 89,
-    reviews: [
-      {
-        id: '1',
-        author: 'John Doe',
-        rating: 5,
-        content: 'Excellent service! Highly recommend this business.',
-        sentiment: 'positive',
-        publishedAt: new Date().toISOString(),
-        response: 'Thank you for your kind words!'
-      },
-      {
-        id: '2',
-        author: 'Jane Smith',
-        rating: 4,
-        content: 'Good experience overall, but wait time could be better.',
-        sentiment: 'positive',
-        publishedAt: new Date(Date.now() - 86400000).toISOString(),
-        response: null
-      },
-      {
-        id: '3',
-        author: 'Mike Johnson',
-        rating: 3,
-        content: 'Average service, nothing special.',
-        sentiment: 'neutral',
-        publishedAt: new Date(Date.now() - 172800000).toISOString(),
-        response: null
-      }
-    ]
-  }
-
-  const mockRatingTrend = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date()
-
-    d.setDate(d.getDate() - (6 - i))
-    
-return {
-      date: d.toISOString().split('T')[0],
-      averageRating: 4.2 + Math.random() * 0.5
-    }
-  })
-
-  // Mock Volume Data
-  const mockVolumeData = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date()
-
-    d.setDate(d.getDate() - (6 - i))
-    
-return {
-      date: d.toISOString().split('T')[0],
-      volumes: {
-        Google: Math.floor(Math.random() * 20) + 10,
-        Yelp: Math.floor(Math.random() * 10) + 5,
-        Facebook: Math.floor(Math.random() * 5) + 2
-      }
-    }
-  })
-
-  // Mock Sentiment Data
-  const mockSentimentData = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date()
-
-    d.setDate(d.getDate() - (6 - i))
-    
-return {
-      date: d.toISOString().split('T')[0],
-      positive: Math.floor(Math.random() * 20) + 10,
-      neutral: Math.floor(Math.random() * 5) + 2,
-      negative: Math.floor(Math.random() * 3)
-    }
-  })
-
-  const mockKeywords = [
-    { keyword: 'excellent service', count: 45 },
-    { keyword: 'fast delivery', count: 38 },
-    { keyword: 'friendly staff', count: 35 },
-    { keyword: 'great quality', count: 30 },
-    { keyword: 'highly recommend', count: 28 },
-    { keyword: 'clean', count: 22 },
-    { keyword: 'professional', count: 20 },
-    { keyword: 'affordable', count: 18 },
-    { keyword: 'convenient', count: 15 },
-    { keyword: 'reliable', count: 12 }
-  ]
-
-  const mockCompetitorList = [
-      {
-        competitorName: 'Competitor A',
-        averageRating: 4.5,
-        totalReviews: 2300,
-      },
-      {
-        competitorName: 'Competitor B',
-        averageRating: 4.3,
-        totalReviews: 1500,
-      },
-      {
-        competitorName: 'Competitor C',
-        averageRating: 4.6,
-        totalReviews: 892,
-      }
-  ]
-
-  // --------------------------------------
-
-
   const isLoading = businessLoading || analyticsLoading || !businessId
-
-  // --- Data Selection Logic (Real vs Mock) ---
   
-  // Metrics: checks if summaryData returned actual values, otherwise try competitor stats, otherwise mock
-  const apiMetrics = summaryData.data?.data
-  const apiBusinessStats = competitorData.data?.data?.business
+  // Data for Recent Reviews Widget (keep using summaryData)
+  const recentSummary = summaryData.data?.data
 
-  // Helper to determine if we should use mock for metrics
-  // We use mock if BOTH apiMetrics and apiBusinessStats are effectively empty/default
-  const useMockMetrics = !apiMetrics?.recentRepliesCount && !apiBusinessStats?.totalReviews
+  // Data for Metric Cards (use new dashboardMetrics)
+  const dashboardStats = dashboardMetrics.data?.data
 
-  const metrics = useMockMetrics ? mockMetrics : {
-    reviews: apiMetrics?.reviews || [],
-    unrepliedCount: apiMetrics?.unrepliedCount || 0,
-    recentRepliesCount: apiMetrics?.recentRepliesCount || 0,
-    avgRating: apiBusinessStats?.averageRating || 0,
-    totalReviews: apiBusinessStats?.totalReviews || 0,
-    positiveSentiment: 0, // Still need to derive this or get from API
-    aiReplies: apiMetrics?.recentRepliesCount || 0 // Proxying for now
+  const metrics = {
+    // Top Cards Data
+    avgRating: dashboardStats?.averageRating || 0,
+    totalReviews: dashboardStats?.totalReviews || 0,
+    responseCount: dashboardStats?.responseCount || 0,
+    positiveSentiment: dashboardStats?.positiveSentiment || 0,
+    
+    // Changes
+    avgRatingChange: dashboardStats?.changes?.averageRating || 0,
+    totalReviewsChange: dashboardStats?.changes?.totalReviews || 0,
+    responseCountChange: dashboardStats?.changes?.responseCount || 0,
+    sentimentChange: dashboardStats?.changes?.positiveSentiment || 0,
+
+    // Widget Data
+    reviews: recentSummary?.reviews || [],
+    unrepliedCount: recentSummary?.unrepliedCount || 0,
+    recentRepliesCount: recentSummary?.recentRepliesCount || 0,
   }
   
   // Rating Trend
   const trendData = (ratingTrend.data?.data && ratingTrend.data.data.length > 0) 
     ? ratingTrend.data.data 
-    : mockRatingTrend
+    : []
 
   // Volume
   const volumeSeriesData = (volumeData.data?.data && volumeData.data.data.length > 0)
     ? volumeData.data.data
-    : mockVolumeData
+    : []
 
   // Sentiment
   const sentimentHeatmapData = (sentimentData.data?.data && sentimentData.data.data.length > 0)
     ? sentimentData.data.data
-    : mockSentimentData
+    : []
 
     // Keywords
   const keywordsCloudData = (keywordsData.data?.data && keywordsData.data.data.length > 0)
     ? keywordsData.data.data
-    : mockKeywords
+    : []
 
   // Competitors
   const competitorListData = (competitorData.data?.data?.competitors && competitorData.data.data.competitors.length > 0)
     ? competitorData.data.data.competitors
-    : mockCompetitorList
+    : []
 
 
   // Prepare Volume Series for Chart
@@ -271,16 +158,6 @@ return Array.from(platforms).map(platform => ({
             </Typography>
           </Box>
 
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Location</InputLabel>
-            <Select value={locationId} onChange={handleLocationChange} label="Location">
-              <MenuItem value="all">📍 All Locations</MenuItem>
-              {/* TODO: Populate locations dynamically */}
-              <MenuItem value="loc-1">Location 1</MenuItem>
-              <MenuItem value="loc-2">Location 2</MenuItem>
-            </Select>
-          </FormControl>
-
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>Period</InputLabel>
             <Select value={period} onChange={handlePeriodChange} label="Period">
@@ -328,7 +205,7 @@ return Array.from(platforms).map(platform => ({
               value={metrics.avgRating?.toFixed(1) || '0.0'}
               icon={<StarIcon />}
               color="warning"
-              change={0.3} // TODO: Calculate real change
+              change={metrics.avgRatingChange}
               subtitle="vs last period"
             />
           </Grid>
@@ -339,28 +216,29 @@ return Array.from(platforms).map(platform => ({
               value={metrics.totalReviews?.toLocaleString() || '0'}
               icon={<ReviewsIcon />}
               color="info"
-              change={12} // TODO: Calculate real change
+              change={metrics.totalReviewsChange}
+              subtitle="vs last period"
             />
           </Grid>
 
           <Grid size={{xs: 12, sm: 6, md: 3}}>
             <ReviewMetricCard
-              title="AI REPLIES"
-              value={metrics.recentRepliesCount || 0}
+              title="TOTAL REPLIES"
+              value={metrics.responseCount?.toLocaleString() || '0'}
               icon={<ReplyIcon />}
               color="success"
-              change={28}
-              subtitle="last 7 days"
+              change={metrics.responseCountChange}
+              subtitle="vs last period"
             />
           </Grid>
 
           <Grid size={{xs: 12, sm: 6, md: 3}}>
             <ReviewMetricCard
               title="POSITIVE SENTIMENT"
-              value={`${metrics.positiveSentiment || 87}%`} 
+              value={`${metrics.positiveSentiment || 0}%`} 
               icon={<StarIcon />}
               color="secondary"
-              change={5}
+              change={metrics.sentimentChange}
               subtitle="improvement"
             />
           </Grid>
