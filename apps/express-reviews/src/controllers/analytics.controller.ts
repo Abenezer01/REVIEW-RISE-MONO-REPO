@@ -24,8 +24,32 @@ export const getRatingTrend = async (req: Request, res: Response) => {
             periodDays
         });
 
+        // Fill in missing dates
+        const filledTrendData: { date: string; averageRating: number }[] = [];
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - (periodDays - 1)); // -1 to include today
+
+        let lastKnownRating = 0;
+
+        // Try to find an initial rating from earlier if possible, otherwise 0
+        // (For now, we start at 0 or the first data point found)
+
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const dateStr = d.toISOString().split('T')[0];
+            const existingData = trendData.find(t => t.date === dateStr);
+
+            if (existingData) {
+                lastKnownRating = existingData.averageRating;
+                filledTrendData.push(existingData);
+            } else {
+                // Carry forward last known rating for proper trend visualization
+                filledTrendData.push({ date: dateStr, averageRating: lastKnownRating });
+            }
+        }
+
         res.status(200).json(
-            createSuccessResponse(trendData, 'Rating trend fetched successfully')
+            createSuccessResponse(filledTrendData, 'Rating trend fetched successfully')
         );
     } catch (error) {
         console.error('Get rating trend error:', error);
@@ -43,6 +67,7 @@ export const getReviewVolume = async (req: Request, res: Response) => {
     try {
         const { locationId, businessId, period = '30' } = req.query;
 
+        // Validation...
         if (!businessId || typeof businessId !== 'string') {
             return res.status(400).json(
                 createErrorResponse('businessId is required', ErrorCode.VALIDATION_ERROR, 400)
@@ -57,8 +82,26 @@ export const getReviewVolume = async (req: Request, res: Response) => {
             periodDays
         });
 
+        // Fill in missing dates
+        const filledVolumeData: { date: string; volumes: Record<string, number> }[] = [];
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - (periodDays - 1));
+
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const dateStr = d.toISOString().split('T')[0];
+            const existingData = volumeData.find(v => v.date === dateStr);
+
+            if (existingData) {
+                filledVolumeData.push(existingData);
+            } else {
+                // Fill with empty volumes
+                filledVolumeData.push({ date: dateStr, volumes: {} });
+            }
+        }
+
         res.status(200).json(
-            createSuccessResponse(volumeData, 'Review volume fetched successfully')
+            createSuccessResponse(filledVolumeData, 'Review volume fetched successfully')
         );
     } catch (error) {
         console.error('Get review volume error:', error);
@@ -97,8 +140,29 @@ export const getSentimentHeatmap = async (req: Request, res: Response) => {
             groupBy: groupBy as 'day' | 'week'
         });
 
+        // Fill in missing dates only if grouped by day (weekly is trickier and usually less sparse)
+        let filledSentimentData = sentimentData;
+
+        if (groupBy === 'day') {
+            filledSentimentData = [];
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(endDate.getDate() - (periodDays - 1));
+
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                const existingData = sentimentData.find(s => s.date === dateStr);
+
+                if (existingData) {
+                    filledSentimentData.push(existingData);
+                } else {
+                    filledSentimentData.push({ date: dateStr, positive: 0, neutral: 0, negative: 0 });
+                }
+            }
+        }
+
         res.status(200).json(
-            createSuccessResponse(sentimentData, 'Sentiment heatmap fetched successfully')
+            createSuccessResponse(filledSentimentData, 'Sentiment heatmap fetched successfully')
         );
     } catch (error) {
         console.error('Get sentiment heatmap error:', error);
@@ -254,6 +318,55 @@ export const addCompetitorData = async (req: Request, res: Response) => {
         );
     } catch (error) {
         console.error('Add competitor data error:', error);
+        res.status(500).json(
+            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
+        );
+    }
+};
+
+/**
+ * Get dashboard card metrics
+ * @route GET /api/v1/reviews/analytics/metrics
+ */
+export const getDashboardMetrics = async (req: Request, res: Response) => {
+    try {
+        const { locationId, businessId, period = '30' } = req.query;
+
+        if (!businessId || typeof businessId !== 'string') {
+            return res.status(400).json(
+                createErrorResponse('businessId is required', ErrorCode.VALIDATION_ERROR, 400)
+            );
+        }
+
+        const periodDays = parseInt(period as string, 10);
+
+        const metrics = await reviewRepository.getDashboardMetrics({
+            businessId,
+            locationId: locationId as string | undefined,
+            periodDays
+        });
+
+        const calculateChange = (current: number, previous: number) => {
+            if (previous === 0) return current > 0 ? 100 : 0;
+            return ((current - previous) / previous) * 100;
+        };
+
+        const responseData = {
+            ...metrics.current,
+            previous: metrics.previous,
+            changes: {
+                totalReviews: calculateChange(metrics.current.totalReviews, metrics.previous.totalReviews),
+                averageRating: calculateChange(metrics.current.averageRating, metrics.previous.averageRating),
+                responseCount: calculateChange(metrics.current.responseCount, metrics.previous.responseCount),
+                positiveSentiment: metrics.current.positiveSentiment - metrics.previous.positiveSentiment // Percentage point difference
+            }
+        };
+
+        res.status(200).json(
+            createSuccessResponse(responseData, 'Dashboard metrics fetched successfully')
+        );
+    } catch (error) {
+        console.error('Get dashboard metrics error:', error);
         res.status(500).json(
             createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
         );

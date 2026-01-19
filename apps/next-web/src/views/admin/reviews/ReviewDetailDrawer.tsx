@@ -15,7 +15,9 @@ import { toast } from 'react-toastify'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
-import { updateReviewReply, regenerateAISuggestion } from '@/app/actions/review'
+import { updateReviewReply } from '@/app/actions/review'
+import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
+import EmotionChips from '@/components/shared/reviews/EmotionChips'
 
 interface ReviewDetailDrawerProps {
   open: boolean
@@ -76,21 +78,26 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
     setReply(aiReply)
   }
 
-  const handleRegenerateAI = async () => {
+  const handleAnalyzeReview = async () => {
     setIsRegenerating(true)
 
-    const res = await regenerateAISuggestion(currentReview.id)
+    // Dynamically import to avoid server/client issues
+    const { analyzeSingleReview } = await import('@/app/actions/review')
+    const res = await analyzeSingleReview(currentReview.id)
 
     setIsRegenerating(false)
 
     if (res.success) {
-      toast.success('AI suggestion regenerated')
+      toast.success('Review analysis completed')
       setCurrentReview(res.data)
       if (onSuccess) onSuccess(res.data)
     } else {
-      toast.error(res.error || 'Failed to regenerate suggestion')
+      toast.error(res.error || 'Failed to analyze review')
     }
   }
+
+  // Handle Regenerate button also calling the same analysis
+  const handleRegenerateAI = handleAnalyzeReview
 
   return (
     <Drawer
@@ -122,12 +129,9 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                 </Typography>
               </Box>
             </Box>
-            <CustomChip
-              round='true'
-              size='small'
-              variant='tonal'
-              color={sentimentColorMap[sentiment] || 'secondary'}
-              label={sentiment}
+            <SentimentBadge 
+              sentiment={sentiment?.toLowerCase() as any}
+              size='medium'
             />
           </Box>
           <Typography variant='caption' color='text.secondary'>
@@ -162,17 +166,26 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
           </Box>
           <Box sx={{ flex: 1 }}>
             <Typography variant='subtitle2' sx={{ mb: 1, textTransform: 'uppercase', color: 'text.disabled' }}>
-              Internal Tags
+              Extracted Emotions & Topics
             </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {currentReview.tags && currentReview.tags.length > 0 ? (
-                currentReview.tags.map((tag: string) => (
-                  <Chip key={tag} label={tag} size='small' variant='outlined' />
-                ))
-              ) : (
-                <Typography variant='caption' color='text.secondary'>No tags</Typography>
-              )}
-            </Box>
+            {currentReview.tags && currentReview.tags.length > 0 ? (
+              <EmotionChips emotions={currentReview.tags} maxDisplay={5} />
+            ) : (
+              <Typography variant='caption' color='text.secondary'>No analysis available</Typography>
+            )}
+            
+            {currentReview.aiSuggestions?.topics && currentReview.aiSuggestions.topics.length > 0 && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant='caption' sx={{ color: 'text.disabled', display: 'block', mb: 0.5 }}>
+                  Key Topics
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  {currentReview.aiSuggestions.topics.map((topic: string) => (
+                     <Chip key={topic} label={topic} size='small' variant='outlined' />
+                  ))}
+                </Box>
+              </Box>
+            )}
           </Box>
         </Box>
 
@@ -188,9 +201,46 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
           </Box>
           
           <Typography variant='subtitle2' sx={{ mb: 1 }}>Analysis</Typography>
-          <Typography variant='body2' sx={{ mb: 4, color: 'text.secondary' }}>
-            {currentReview.aiSuggestions?.analysis || 'AI analysis is being generated... This review shows ' + sentiment.toLowerCase() + ' sentiment regarding the service quality.'}
-          </Typography>
+          <Box sx={{ mb: 4 }}>
+             {currentReview.aiSuggestions?.reasoning ? (
+               <>
+                 <Typography variant='body2' sx={{ mb: 1, color: 'text.primary' }}>
+                   {currentReview.aiSuggestions.reasoning}
+                 </Typography>
+                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                    {currentReview.aiSuggestions.confidence && (
+                      <CustomChip 
+                         label={`Confidence: ${currentReview.aiSuggestions.confidence}%`}
+                         size='small'
+                         color={currentReview.aiSuggestions.confidence > 80 ? 'success' : 'warning'}
+                         variant='tonal'
+                      />
+                    )}
+                    {currentReview.aiSuggestions?.primaryEmotion && (
+                      <Typography variant='caption' color='text.secondary'>
+                        Primary Emotion: <strong>{currentReview.aiSuggestions.primaryEmotion}</strong>
+                      </Typography>
+                    )}
+                 </Box>
+               </>
+             ) : (
+               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Typography variant='body2' sx={{ color: 'text.secondary' }}>
+                    This review has not yet been analyzed by AI.
+                  </Typography>
+                  <Button 
+                    variant="outlined" 
+                    size="small" 
+                    onClick={handleAnalyzeReview}
+                    disabled={isRegenerating}
+                    startIcon={isRegenerating ? <i className='tabler-loader' /> : <i className='tabler-wand' />}
+                    sx={{ width: 'fit-content' }}
+                  >
+                    {isRegenerating ? 'Analyzing...' : 'Analyze Sentiment'}
+                  </Button>
+               </Box>
+             )}
+          </Box>
 
           <Typography variant='subtitle2' sx={{ mb: 1 }}>Suggested Reply</Typography>
           <Box sx={{ p: 3, bgcolor: 'background.paper', border: '1px dashed', borderColor: 'divider', borderRadius: 1, mb: 3 }}>
@@ -206,10 +256,10 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
               variant='outlined' 
               size='small' 
               disabled={isRegenerating}
-              startIcon={isRegenerating ? <i className='tabler-loader' /> : <i className='tabler-refresh' />} 
+              startIcon={isRegenerating ? <i className='tabler-loader' /> : (currentReview.aiSuggestions?.reasoning ? <i className='tabler-refresh' /> : <i className='tabler-wand' />)} 
               onClick={handleRegenerateAI}
             >
-              Regenerate
+              {currentReview.aiSuggestions?.reasoning ? 'Regenerate' : 'Analyze with AI'}
             </Button>
           </Box>
         </Box>

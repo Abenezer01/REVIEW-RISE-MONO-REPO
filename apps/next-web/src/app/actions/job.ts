@@ -143,3 +143,30 @@ export async function bulkRetryJobs(ids: string[]) {
     return { success: false, error: error.message }
   }
 }
+
+export async function triggerSentimentAnalysis(reprocess: boolean = false) {
+  try {
+    // Assuming worker-jobs is running on localhost:3009 for now.
+    // In production this should come from env var but for now hardcoding is fine for dev.
+    const workerUrl = process.env.WORKER_JOBS_URL || 'http://localhost:3009';
+    
+    // We use fetch to call the worker service
+    const response = await fetch(`${workerUrl}/jobs/review-sentiment`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ reprocess })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Worker service returned ${response.status}`);
+    }
+
+    revalidatePath('/admin/reviews/dashboard'); // Revalidate reviews page
+    return { success: true, message: 'Sentiment analysis started' };
+  } catch (error: any) {
+    console.error('triggerSentimentAnalysis error:', error);
+    return { success: false, error: error.message };
+  }
+}

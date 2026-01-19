@@ -20,6 +20,7 @@ export * from './dtos/visibility.dto';
 export * from './ai/recommendation.schema';
 export * from './ai/visibility-plan.schema';
 export * from './ai/prompts/recommendations.prompts';
+export * from './ai/prompts/review-sentiment.prompts';
 
 // Re-export commonly used types from requests
 export type {

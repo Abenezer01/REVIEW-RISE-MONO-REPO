@@ -20,6 +20,7 @@ router.get('/locations/:locationId/reviews', reviewsController.listLocationRevie
 router.delete('/sources/:id', reviewsController.disconnectReviewSource);
 router.post('/locations/:locationId/sync', reviewsController.syncReviews);
 router.get('/locations/:locationId/stats', reviewsController.getReviewStats);
+router.get('/locations/:locationId/keywords', reviewsController.getLocationKeywords);
 
 // Analytics
 router.get('/analytics/rating-trend', analyticsController.getRatingTrend);
@@ -28,6 +29,7 @@ router.get('/analytics/sentiment', analyticsController.getSentimentHeatmap);
 router.get('/analytics/keywords', analyticsController.getTopKeywords);
 router.get('/analytics/summary', analyticsController.getRecentSummary);
 router.get('/analytics/competitor-comparison', analyticsController.getCompetitorComparison);
+router.get('/analytics/metrics', analyticsController.getDashboardMetrics);
 router.post('/analytics/competitors', analyticsController.addCompetitorData);
 
 // OAuth

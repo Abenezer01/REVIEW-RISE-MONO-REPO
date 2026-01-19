@@ -17,6 +17,7 @@ import Tooltip from '@mui/material/Tooltip'
 import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
 import Rating from '@mui/material/Rating'
+import Button from '@mui/material/Button'
 import { toast } from 'react-toastify'
 import type { GridColDef } from '@mui/x-data-grid'
 
@@ -27,6 +28,7 @@ import ItemsListing from '@components/shared/listing'
 import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 import { getReviews } from '@/app/actions/review'
 import ReviewDetailDrawer from './ReviewDetailDrawer'
+import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
 
 const SmartReviewList = () => {
   const theme = useTheme()
@@ -173,22 +175,10 @@ const SmartReviewList = () => {
       headerName: 'Sentiment',
       minWidth: 120,
       renderCell: (params) => {
-        // Placeholder logic for sentiment
-        const sentiment = params.value || (params.row.rating >= 4 ? 'Positive' : params.row.rating <= 2 ? 'Negative' : 'Neutral')
-
-        const colorMap: Record<string, any> = {
-          Positive: 'success',
-          Neutral: 'warning',
-          Negative: 'error'
-        }
-
         return (
-          <CustomChip
-            size='small'
-            variant='tonal'
-            color={colorMap[sentiment] || 'secondary'}
-            label={sentiment}
-            sx={{ fontWeight: 500 }}
+          <SentimentBadge 
+            sentiment={params.value?.toLowerCase() as any} 
+            size='small' 
           />
         )
       }
@@ -266,7 +256,27 @@ const SmartReviewList = () => {
             </Box>
           }
           action={
-            <Box sx={{ display: 'flex', gap: 1, mt: 1, mr: 1 }}>
+            <Box sx={{ display: 'flex', gap: 1, mt: 1, mr: 1, alignItems: 'center' }}>
+                <Button 
+                    variant="contained" 
+                    color="primary"
+                    startIcon={<i className="tabler-wand" />}
+                    onClick={async () => {
+                        toast.info('Starting sentiment analysis...');
+                        // Dynamic import to avoid server-side issues if any
+                        const { triggerSentimentAnalysis } = await import('@/app/actions/job');
+                        const res = await triggerSentimentAnalysis();
+                        if (res.success) {
+                            toast.success('Sentiment analysis started via background job');
+                            setTimeout(fetchData, 2000); // Reload after a bit
+                        } else {
+                            toast.error(res.error || 'Failed to start analysis');
+                        }
+                    }}
+                    size="small"
+                >
+                    Run Sentiment Analysis
+                </Button>
               <CustomChip
                 label={`${total} Reviews`}
                 size='small'
