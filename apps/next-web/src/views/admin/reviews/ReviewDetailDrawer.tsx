@@ -96,11 +96,6 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
 
   if (!currentReview) return null
 
-  const sentimentColorMap: Record<string, any> = {
-    Positive: 'success',
-    Neutral: 'warning',
-    Negative: 'error'
-  }
 
   const sentiment = currentReview.sentiment || (currentReview.rating >= 4 ? 'Positive' : currentReview.rating <= 2 ? 'Negative' : 'Neutral')
 
@@ -148,18 +143,21 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
   const handleAnalyzeReview = async () => {
     setIsRegenerating(true)
 
+
     // Dynamically import to avoid server/client issues
     const { analyzeSingleReview } = await import('@/app/actions/review')
     const analysisRes = await analyzeSingleReview(currentReview.id)
 
     if (analysisRes.success) {
       toast.success('Review analysis completed')
+
       // Update with analysis result first
       setCurrentReview(analysisRes.data)
       if (onSuccess) onSuccess(analysisRes.data, false)
     } else {
       toast.error(analysisRes.error || 'Failed to analyze review')
       setIsRegenerating(false)
+
       return
     } 
 

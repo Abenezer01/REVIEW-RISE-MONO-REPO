@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+
 import Chip from '@mui/material/Chip'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
@@ -56,6 +57,7 @@ const SentimentBadge = ({ sentiment, size = 'small', showIcon = true }: Sentimen
 
   // Handle unknown sentiment values safely
   const sentimentKey = (sentiment || '').toLowerCase() as keyof typeof config
+
   if (!config[sentimentKey]) {
      // Fallback for unknown values
      return (

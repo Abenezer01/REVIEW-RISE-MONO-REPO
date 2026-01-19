@@ -121,7 +121,7 @@ export const getLocationKeywords = async (req: Request, res: Response) => {
 
         // Calculate date range
         const now = new Date();
-        let startDate = new Date();
+        const startDate = new Date();
         
         switch (timeRange) {
             case '7d':
@@ -143,9 +143,6 @@ export const getLocationKeywords = async (req: Request, res: Response) => {
                 publishedAt: {
                     gte: startDate
                 }
-            },
-            select: {
-                tags: true
             }
         });
 

@@ -3,7 +3,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 
-import { useTheme } from '@mui/material/styles'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Grid from '@mui/material/Grid'
@@ -15,8 +14,11 @@ import Tooltip from '@mui/material/Tooltip'
 import InputAdornment from '@mui/material/InputAdornment'
 import Rating from '@mui/material/Rating'
 import Button from '@mui/material/Button'
-import { toast } from 'react-toastify'
+import { CardHeader, Divider } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import type { GridColDef } from '@mui/x-data-grid'
+
+import { toast } from 'react-toastify'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -26,9 +28,8 @@ import ItemsListing from '@components/shared/listing'
 import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 import { getReviews } from '@/app/actions/review'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
-import ReviewDetailDrawer from './ReviewDetailDrawer'
 import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
-import { CardHeader, Divider } from '@mui/material'
+import ReviewDetailDrawer from './ReviewDetailDrawer'
 
 const SmartReviewList = () => {
   const theme = useTheme()
@@ -289,9 +290,11 @@ const SmartReviewList = () => {
                     startIcon={<i className="tabler-wand" />}
                     onClick={async () => {
                         toast.info('Starting sentiment analysis...');
+
                         // Dynamic import to avoid server-side issues if any
                         const { triggerSentimentAnalysis } = await import('@/app/actions/job');
                         const res = await triggerSentimentAnalysis();
+
                         if (res.success) {
                             toast.success('Sentiment analysis started via background job');
                             setTimeout(fetchData, 2000); // Reload after a bit

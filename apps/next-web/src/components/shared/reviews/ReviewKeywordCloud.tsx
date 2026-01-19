@@ -1,18 +1,18 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
+import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
+import FormControl from '@mui/material/FormControl'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
 import axios from 'axios'
-import KeywordCloud from '../dashboard/KeywordCloud' // Reusing existing component
+
+import KeywordCloud from '../dashboard/KeywordCloud'; // Reusing existing component
 
 interface ReviewKeywordCloudProps {
   locationId: string
@@ -26,6 +26,7 @@ const ReviewKeywordCloud = ({ locationId }: ReviewKeywordCloudProps) => {
   useEffect(() => {
     const fetchKeywords = async () => {
       setLoading(true)
+
       try {
         const res = await axios.get(`/api/v1/reviews/locations/${locationId}/keywords`, {
             params: { timeRange }

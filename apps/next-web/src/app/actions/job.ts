@@ -164,9 +164,11 @@ export async function triggerSentimentAnalysis(reprocess: boolean = false) {
     }
 
     revalidatePath('/admin/reviews/dashboard'); // Revalidate reviews page
-    return { success: true, message: 'Sentiment analysis started' };
+    
+return { success: true, message: 'Sentiment analysis started' };
   } catch (error: any) {
     console.error('triggerSentimentAnalysis error:', error);
-    return { success: false, error: error.message };
+    
+return { success: false, error: error.message };
   }
 }
