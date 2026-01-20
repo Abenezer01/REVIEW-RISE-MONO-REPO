@@ -1,23 +1,16 @@
-import Typography from '@mui/material/Typography'
+/* eslint-disable import/no-unresolved */
 import Grid from '@mui/material/Grid'
-import { useTranslations } from 'next-intl'
 
-const AdminReviewsPage = () => {
-  const tDashboard = useTranslations('dashboard')
-  const tCommon = useTranslations('common')
-  
+import SmartReviewList from '@/views/admin/reviews/SmartReviewList'
+
+const AdminSmartReviewsPage = () => {
   return (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12 }}>
-        <Typography variant='h3' className='mbe-2'>
-          {tDashboard('reviews.title')}
-        </Typography>
-        <Typography variant='body1'>
-          {tCommon('app.description')}
-        </Typography>
+        <SmartReviewList />
       </Grid>
     </Grid>
   )
 }
 
-export default AdminReviewsPage
+export default AdminSmartReviewsPage
