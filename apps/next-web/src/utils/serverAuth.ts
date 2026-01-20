@@ -3,10 +3,11 @@ import { cookies } from 'next/headers'
 
 import { backendClient } from '@/utils/backendClient'
 import { getServerAuthHeaders } from '@/utils/getServerAuthHeaders'
+import { SERVICES_CONFIG } from '@/configs/services'
 
 import type { User } from '@/contexts/AuthContext'
 
-const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL
+const AUTH_SERVICE_URL = SERVICES_CONFIG.auth.url
 
 export const getServerUser = async (): Promise<User | null> => {
   try {
@@ -37,7 +38,7 @@ export const getServerUser = async (): Promise<User | null> => {
         if (parsed && parsed.id && parsed.email) {
           return parsed as User
         }
-      } catch {}
+      } catch { }
     }
 
     if (!accessToken) {
@@ -68,18 +69,18 @@ export const getServerUser = async (): Promise<User | null> => {
             (parts[0] || undefined) ||
             (claims?.given_name as string | undefined)
 
-            const lastName =
+          const lastName =
             (u.lastName as string | undefined) ||
             (parts.slice(1).join(' ') || undefined) ||
             (claims?.family_name as string | undefined)
 
-            const avatar =
+          const avatar =
             (u.avatar as string | undefined) ||
             (u.image as string | undefined) ||
             (claims?.picture as string | undefined) ||
             undefined
 
-            const username =
+          const username =
             (u.username as string | undefined) ||
             (claims?.preferred_username as string | undefined) ||
             u.email

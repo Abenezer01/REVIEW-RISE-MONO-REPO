@@ -1,9 +1,8 @@
-'use client'
-
 import { useState } from 'react'
 
 import axios from 'axios'
 import { useTranslations } from 'next-intl'
+
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
@@ -27,6 +26,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import WarningIcon from '@mui/icons-material/Warning'
 import ErrorIcon from '@mui/icons-material/Error'
+
+import { SERVICES_CONFIG } from '@/configs/services'
 
 // Tabler Icons (Simple SVG Wrappers)
 const IconWorld = () => (
@@ -79,7 +80,7 @@ export default function SeoAnalyzerPage() {
             // Ensure protocol
             const targetUrl = url.startsWith('http') ? url : `https://${url}`
 
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_SEO_HEALTH_API_URL || 'http://localhost:3011/api'}/v1/seo/analyze`, {
+            const response = await axios.post(`${SERVICES_CONFIG.seo.url}/seo/analyze`, {
                 url: targetUrl
             })
 
@@ -99,8 +100,8 @@ export default function SeoAnalyzerPage() {
     const getScoreColor = (score: number) => {
         if (score >= 90) return '#4caf50' // Green
         if (score >= 70) return '#ff9800' // Orange
-        
-return '#f44336' // Red
+
+        return '#f44336' // Red
     }
 
     return (

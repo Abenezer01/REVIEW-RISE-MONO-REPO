@@ -13,7 +13,9 @@ import CustomTextBox from '@/components/shared/form/custom-text-box'
 import CustomTagsInput from '@/components/shared/form/custom-tags-input'
 import CustomSelectBox from '@/components/shared/form/custom-select'
 
-const API_URL = process.env.NEXT_PUBLIC_SEO_HEALTH_API_URL || 'http://localhost:3011/api/v1'
+import { SERVICES_CONFIG } from '@/configs/services';
+
+const API_URL = SERVICES_CONFIG.seo.url;
 
 interface KeywordFormProps {
   businessId: string
