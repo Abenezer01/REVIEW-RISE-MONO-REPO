@@ -43,6 +43,12 @@ const menuData: MenuItem[] = [
         href: '/admin/reviews',
         icon: 'tabler-list',
         allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.auto-reply',
+        href: '/admin/reviews/auto-reply',
+        icon: 'tabler-robot',
+        allowedRoles: [ROLES.ADMIN]
       }
     ]
   },
@@ -58,42 +64,22 @@ const menuData: MenuItem[] = [
     allowedRoles: [ROLES.ADMIN],
     children: [
       {
-    title: 'navigation.ai-visibility',
-    href: '/admin/ai-visibility',
-    icon: 'tabler-eye',
-    allowedRoles: [ROLES.ADMIN]
-  },
-  {
+        title: 'navigation.ai-visibility',
+        href: '/admin/ai-visibility',
+        icon: 'tabler-eye',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
         title: 'navigation.seo-overview',
         href: '/admin/seo-intelligence'
       },
       {
         title: 'navigation.seo-visibility',
         href: '/admin/seo-intelligence/visibility'
-      }
-      ,
+      },
       {
         title: 'navigation.seo-keywords',
         href: '/admin/seo-intelligence/keywords'
-      }
-    ]
-  },
-  {
-    title: 'navigation.smart-reviews',
-    icon: 'tabler-sparkles',
-    allowedRoles: [ROLES.ADMIN],
-    children: [
-      {
-        title: 'navigation.smart-reviews-overview',
-        href: '/admin/smart-reviews',
-        icon: 'tabler-list',
-        allowedRoles: [ROLES.ADMIN]
-      },
-      {
-        title: 'navigation.auto-reply',
-        href: '/admin/reviews/auto-reply',
-        icon: 'tabler-robot',
-        allowedRoles: [ROLES.ADMIN]
       }
     ]
   },

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
@@ -21,14 +22,22 @@ import CardContent from '@mui/material/CardContent'
 import Skeleton from '@mui/material/Skeleton'
 import Alert from '@mui/material/Alert'
 
+import Timeline from '@mui/lab/Timeline'
+import TimelineItem from '@mui/lab/TimelineItem'
+import TimelineSeparator from '@mui/lab/TimelineSeparator'
+import TimelineConnector from '@mui/lab/TimelineConnector'
+import TimelineContent from '@mui/lab/TimelineContent'
+import TimelineDot from '@mui/lab/TimelineDot'
+
 import { toast } from 'react-toastify'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+
 import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
 import EmotionChips from '@/components/shared/reviews/EmotionChips'
 
-import { updateReviewReply, regenerateAISuggestion, rejectReviewReply, getReviewById } from '@/app/actions/review'
+import { updateReviewReply, regenerateAISuggestion, rejectReviewReply, getReviewWithHistory } from '@/app/actions/review'
 import { getBrandProfileByBusinessId } from '@/app/actions/brand-profile'
 
 const DEFAULT_TONE_PRESETS = [
@@ -70,7 +79,7 @@ const ReviewDetailPage = () => {
     setError('')
     
     try {
-      const res = await getReviewById(id as string)
+      const res = await getReviewWithHistory(id as string)
       
       if (res.success && res.data) {
         setCurrentReview(res.data)
@@ -438,6 +447,84 @@ const ReviewDetailPage = () => {
                             </Button>
                         </Stack>
                     </Box>
+
+                    {currentReview.replies && currentReview.replies.length > 0 && ( 
+                    <> 
+                        <Box sx={{ p: 6, bgcolor: theme => theme.palette.mode === 'light' ? alpha(theme.palette.secondary.main, 0.02) : 'transparent' }}> 
+                        <Typography variant='subtitle2' sx={{ mb: 4, textTransform: 'uppercase', color: 'text.disabled', fontWeight: 700, letterSpacing: '0.5px' }}> 
+                            Reply History 
+                        </Typography> 
+                        <Timeline sx={{ 
+                            p: 0, 
+                            m: 0, 
+                            [`& .MuiTimelineItem-root:before`]: { display: 'none' } 
+                        }}> 
+                            {currentReview.replies.map((historyReply: any, index: number) => ( 
+                            <TimelineItem key={historyReply.id} sx={{ minHeight: 60 }}> 
+                                <TimelineSeparator> 
+                                <TimelineDot 
+                                    color={historyReply.status === 'posted' ? 'success' : historyReply.status === 'failed' ? 'error' : 'primary'} 
+                                    variant="tonal" 
+                                    sx={{ boxShadow: 'none', mt: 1 }} 
+                                > 
+                                    <i className={historyReply.status === 'posted' ? 'tabler-check' : historyReply.status === 'failed' ? 'tabler-x' : 'tabler-history'} style={{ fontSize: '0.8rem' }} /> 
+                                </TimelineDot> 
+                                {index !== currentReview.replies.length - 1 && <TimelineConnector />} 
+                                </TimelineSeparator> 
+                                <TimelineContent sx={{ pr: 0, pt: 0, pb: 6 }}> 
+                                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}> 
+                                    <Box> 
+                                    <Typography variant='body2' fontWeight={700}> 
+                                        {historyReply.authorType === 'auto' ? 'AI Auto-Reply' : (historyReply.user?.name || 'Team Member')} 
+                                    </Typography> 
+                                    <Typography variant='caption' color='text.disabled'> 
+                                        {isMounted ? new Date(historyReply.createdAt).toLocaleString('en-US', { 
+                                        month: 'short', 
+                                        day: 'numeric', 
+                                        year: 'numeric', 
+                                        hour: '2-digit', 
+                                        minute: '2-digit' 
+                                        }) : ''} 
+                                    </Typography> 
+                                    </Box> 
+                                    <Stack direction="row" spacing={2} alignItems="center"> 
+                                    {historyReply.status === 'posted' && ( 
+                                        <CustomChip 
+                                        label="Live" 
+                                        size='small' 
+                                        variant='tonal' 
+                                        color='success' 
+                                        icon={<i className='tabler-brand-google' style={{ fontSize: '0.8rem' }} />} 
+                                        sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }} 
+                                        /> 
+                                    )} 
+                                    <CustomChip 
+                                        label={historyReply.sourceType} 
+                                        size='small' 
+                                        variant='outlined' 
+                                        color='secondary' 
+                                        sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }} 
+                                    /> 
+                                    </Stack> 
+                                </Box> 
+                                <Box sx={{ 
+                                    p: 3, 
+                                    bgcolor: 'background.paper', 
+                                    borderRadius: 2, 
+                                    border: theme => `1px solid ${theme.palette.divider}`, 
+                                }}> 
+                                    <Typography variant='body2' sx={{ color: 'text.primary', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}> 
+                                    {historyReply.content} 
+                                    </Typography> 
+                                </Box> 
+                                </TimelineContent> 
+                            </TimelineItem> 
+                            ))} 
+                        </Timeline> 
+                        </Box> 
+                        <Divider /> 
+                    </> 
+                    )}
                 </CardContent>
             </Card>
         </Grid>
