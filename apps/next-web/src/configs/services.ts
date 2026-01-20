@@ -1,17 +1,37 @@
+// Helper to get environment variable at runtime (works in both server and client)
+const getEnv = (key: string) => {
+    if (typeof window === 'undefined') {
+        // Server-side
+        return process.env[key];
+    }
+    // Client-side - only NEXT_PUBLIC_ vars are available
+    return (process.env as any)[key];
+};
+
 export const SERVICES_CONFIG = {
     auth: {
-        url: process.env.AUTH_SERVICE_URL || 'http://localhost:3010/api',
+        get url() {
+            return getEnv('AUTH_SERVICE_URL') || 'http://localhost:3010/api';
+        },
     },
     brand: {
-        url: process.env.EXPRESS_BRAND_URL || 'http://localhost:3007/api/v1',
+        get url() {
+            return getEnv('EXPRESS_BRAND_URL') || 'http://localhost:3007/api/v1';
+        },
     },
     seo: {
-        url: process.env.NEXT_PUBLIC_SEO_HEALTH_API_URL || 'http://localhost:3011/api/v1',
+        get url() {
+            return getEnv('NEXT_PUBLIC_SEO_HEALTH_API_URL') || 'http://localhost:3011/api/v1';
+        },
     },
     review: {
-        url: process.env.NEXT_PUBLIC_REVIEWS_API_URL || process.env.EXPRESS_REVIEWS_URL || 'http://localhost:3006/api/v1',
+        get url() {
+            return getEnv('NEXT_PUBLIC_REVIEWS_API_URL') || getEnv('EXPRESS_REVIEWS_URL') || 'http://localhost:3006/api/v1';
+        },
     },
     ai: {
-        url: process.env.EXPRESS_AI_URL || 'http://localhost:3002',
+        get url() {
+            return getEnv('EXPRESS_AI_URL') || 'http://localhost:3002';
+        },
     },
 };
