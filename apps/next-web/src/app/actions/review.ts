@@ -3,6 +3,7 @@
 
 import { reviewRepository, brandProfileRepository } from '@platform/db'
 import type { Prisma } from '@platform/db'
+
 import { SERVICES_CONFIG } from '@/configs/services'
 
 export async function getReviews(params: {
