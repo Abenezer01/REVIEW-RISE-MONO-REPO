@@ -4,19 +4,14 @@ import { z } from 'zod'
 
 import { backendClient } from '@/utils/backendClient'
 
+import { SERVICES_CONFIG } from '@/configs/services'
+
 const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1, 'Refresh token is required'),
 })
 
 export async function POST(request: NextRequest) {
-  const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL
-
-  if (!AUTH_SERVICE_URL) {
-    return NextResponse.json(
-      { message: 'Server configuration error: AUTH_SERVICE_URL not set' },
-      { status: 500 }
-    )
-  }
+  const AUTH_SERVICE_URL = SERVICES_CONFIG.auth.url
 
   try {
     const body = await request.json()

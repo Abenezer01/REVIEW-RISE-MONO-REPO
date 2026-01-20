@@ -5,6 +5,8 @@ import { z } from 'zod'
 
 import { backendClient } from '@/utils/backendClient'
 
+import { SERVICES_CONFIG } from '@/configs/services'
+
 // Define validation schema
 const loginSchema = z.object({
   email: z.email('Invalid email address'),
@@ -12,14 +14,7 @@ const loginSchema = z.object({
 })
 
 export async function POST(request: NextRequest) {
-  const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL
-
-  if (!AUTH_SERVICE_URL) {
-    return NextResponse.json(
-      { message: 'Server configuration error: AUTH_SERVICE_URL not set' },
-      { status: 500 }
-    )
-  }
+  const AUTH_SERVICE_URL = SERVICES_CONFIG.auth.url
 
   try {
     const body = await request.json()

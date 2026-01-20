@@ -1,7 +1,9 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const SERVICE_URL = process.env.EXPRESS_BRAND_URL || 'http://localhost:3007/api/v1';
+import { SERVICES_CONFIG } from '@/configs/services';
+
+const SERVICE_URL = SERVICES_CONFIG.brand.url;
 
 async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath?: string[] }> }) {
   const { brandPath: path = [] } = await params;
@@ -10,36 +12,36 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
   // Smart Routing Logic:
   // Distinguishes between "Brand Features" (recommendations, dashboards, etc.)
   // and "Brand Profile Actions" (CRUD, onboard, etc.)
-  
+
   let targetPath = '';
-  
+
   // Sub-resources mapping to /brands/:id/...
   const BRANDS_FEATURES = [
-      'recommendations', 
-      'dashboards', 
-      'competitors', 
-      'reports', 
-      'dna', 
-      'content', 
-      'reviews',
-      'visibility-plan', 
-      'scores'
+    'recommendations',
+    'dashboards',
+    'competitors',
+    'reports',
+    'dna',
+    'content',
+    'reviews',
+    'visibility-plan',
+    'scores'
   ];
 
   if (path.length === 0) {
-      targetPath = 'brand-profiles';
+    targetPath = 'brand-profiles';
   } else if (path[0] === 'onboard') {
-      targetPath = 'brand-profiles/onboard';
+    targetPath = 'brand-profiles/onboard';
   } else {
-      const subResource = path[1];
+    const subResource = path[1];
 
-      if (subResource && BRANDS_FEATURES.includes(subResource)) {
-          // It's a feature -> /brands/:id/resource
-          targetPath = `brands/${path.join('/')}`;
-      } else {
-          // It's a profile action or simple GET -> /brand-profiles/:id...
-          targetPath = `brand-profiles/${path.join('/')}`;
-      }
+    if (subResource && BRANDS_FEATURES.includes(subResource)) {
+      // It's a feature -> /brands/:id/resource
+      targetPath = `brands/${path.join('/')}`;
+    } else {
+      // It's a profile action or simple GET -> /brand-profiles/:id...
+      targetPath = `brand-profiles/${path.join('/')}`;
+    }
   }
 
   const url = `${SERVICE_URL}/${targetPath}${query}`;
