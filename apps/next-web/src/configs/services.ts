@@ -4,6 +4,8 @@ const getEnv = (key: string) => {
         // Server-side
         return process.env[key];
     }
+
+
     // Client-side - only NEXT_PUBLIC_ vars are available
     return (process.env as any)[key];
 };
