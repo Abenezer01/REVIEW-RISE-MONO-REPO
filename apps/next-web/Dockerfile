@@ -37,6 +37,8 @@ COPY --from=deps /app/tsconfig.json ./tsconfig.json
 COPY packages/@platform ./packages/@platform
 COPY apps/next-web ./apps/next-web
 
+ENV NEXT_OUTPUT=standalone
+
 RUN pnpm install --frozen-lockfile --offline
 
 # Build shared packages first

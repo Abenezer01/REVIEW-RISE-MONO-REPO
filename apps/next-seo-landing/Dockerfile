@@ -35,6 +35,8 @@ COPY --from=deps /app/tsconfig.json ./tsconfig.json
 COPY packages/@platform ./packages/@platform
 COPY apps/next-seo-landing ./apps/next-seo-landing
 
+ENV NEXT_OUTPUT=standalone
+
 RUN pnpm install --frozen-lockfile --offline
 RUN pnpm --filter "@platform/*" run build || true
 RUN pnpm --filter @apps/next-seo-landing run build
