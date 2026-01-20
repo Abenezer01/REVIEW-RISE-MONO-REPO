@@ -61,6 +61,31 @@ RUN pnpm --filter "@platform/*" run build
 # Build the application
 RUN pnpm --filter @apps/express-gbp-rocket run build
 
+# Verify build output and fix structure robustly
+RUN echo "Checking build output structure..." && \
+  ls -R apps/express-gbp-rocket/dist && \
+  # Find the main index.js file (looking for src/index.js or just index.js)
+  FOUND_INDEX=$(find apps/express-gbp-rocket/dist -name "index.js" | grep "/src/index.js$" | head -n 1) && \
+  if [ -z "$FOUND_INDEX" ]; then \
+  FOUND_INDEX=$(find apps/express-gbp-rocket/dist -name "index.js" | head -n 1); \
+  fi && \
+  echo "Found index.js at: $FOUND_INDEX" && \
+  if [ -z "$FOUND_INDEX" ]; then \
+  echo "ERROR: Build failed to produce index.js"; exit 1; \
+  fi && \
+  # If file is nested (not directly in dist/), flatten it
+  DIR_NAME=$(dirname "$FOUND_INDEX") && \
+  EXPECTED_DIR="apps/express-gbp-rocket/dist" && \
+  # Normalize paths for comparison (ignoring ./ prefix)
+  if [ "$DIR_NAME" != "$EXPECTED_DIR" ] && [ "$DIR_NAME" != "./$EXPECTED_DIR" ]; then \
+  echo "Flattening build from $DIR_NAME to $EXPECTED_DIR..." && \
+  cp -af "$DIR_NAME"/* "$EXPECTED_DIR/" && \
+  # Cleanup potential nested folders to save space
+  rm -rf "$EXPECTED_DIR/apps" "$EXPECTED_DIR/packages" || true; \
+  else \
+  echo "Build structure is already flat."; \
+  fi
+
 # ============================================
 # Stage 3: Runner - Production image
 # ============================================

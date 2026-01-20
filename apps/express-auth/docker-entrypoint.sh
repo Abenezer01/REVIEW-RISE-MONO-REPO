@@ -29,5 +29,5 @@ if [ $# -gt 0 ]; then
     exec dumb-init -- "$@"
 else
     # Otherwise start the main application
-    exec dumb-init -- node dist/apps/express-auth/src/index.js
+    exec dumb-init -- node dist/index.js
 fi
