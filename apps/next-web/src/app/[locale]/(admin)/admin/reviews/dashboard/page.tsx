@@ -27,10 +27,14 @@ import ReviewMetricCard from '@/components/shared/dashboard/ReviewMetricCard'
 import SentimentHeatmap from '@/components/shared/dashboard/SentimentHeatmap'
 import { useReviewAnalytics } from '@/hooks/reviews/useReviewAnalytics'
 import { useBusinessId } from '@/hooks/useBusinessId'
+import { useSearchParams } from 'next/navigation'
 
 const ReviewsDashboard = () => {
   const [period, setPeriod] = useState<number>(30)
   const { businessId, loading: businessLoading } = useBusinessId()
+
+  const searchParams = useSearchParams()
+  const locationId = searchParams.get('locationId') || 'all'
 
   const {
     ratingTrend,
@@ -41,7 +45,7 @@ const ReviewsDashboard = () => {
     competitorData,
     dashboardMetrics,
     isLoading: analyticsLoading
-  } = useReviewAnalytics(businessId || '', 'all', period)
+  } = useReviewAnalytics(businessId || '', locationId, period)
 
   const handlePeriodChange = (event: SelectChangeEvent<number>) => {
     setPeriod(event.target.value as number)

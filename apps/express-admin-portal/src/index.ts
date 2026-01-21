@@ -28,8 +28,10 @@ app.get('/', (req, res) => {
 
 import locationsRoutes from './routes/locations.routes';
 import businessesRoutes from './routes/businesses.routes';
+import usersRoutes from './routes/users.routes';
 app.use('/locations', locationsRoutes);
 app.use('/businesses', businessesRoutes);
+app.use('/users', usersRoutes);
 
 // Error Handling
 app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {

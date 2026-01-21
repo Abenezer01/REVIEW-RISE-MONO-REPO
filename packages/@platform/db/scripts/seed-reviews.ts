@@ -61,22 +61,22 @@ async function main() {
 
     const reviewTemplates = [
         // Positive Reviews
-        { rating: 5, sentiment: 'Positive', content: 'Absolutely loved the service! The staff was friendly and efficient.', tags: ['service', 'staff', 'friendly'] },
-        { rating: 5, sentiment: 'Positive', content: 'Best experience I have had in a long time. Highly recommend to everyone.', tags: ['experience', 'recommend'] },
-        { rating: 4, sentiment: 'Positive', content: 'Great food, but the wait was a bit long. Still worth it!', tags: ['food', 'wait time'] },
-        { rating: 5, sentiment: 'Positive', content: 'Amazing atmosphere and delicious meals. Will definitely come back.', tags: ['atmosphere', 'food'] },
-        { rating: 4, sentiment: 'Positive', content: 'Good value for money. The portions were huge.', tags: ['value', 'portions'] },
+        { rating: 5, sentiment: 'positive', content: 'Absolutely loved the service! The staff was friendly and efficient.', tags: ['service', 'staff', 'friendly'] },
+        { rating: 5, sentiment: 'positive', content: 'Best experience I have had in a long time. Highly recommend to everyone.', tags: ['experience', 'recommend'] },
+        { rating: 4, sentiment: 'positive', content: 'Great food, but the wait was a bit long. Still worth it!', tags: ['food', 'wait time'] },
+        { rating: 5, sentiment: 'positive', content: 'Amazing atmosphere and delicious meals. Will definitely come back.', tags: ['atmosphere', 'food'] },
+        { rating: 4, sentiment: 'positive', content: 'Good value for money. The portions were huge.', tags: ['value', 'portions'] },
 
         // Neutral Reviews
-        { rating: 3, sentiment: 'Neutral', content: 'It was okay. Nothing special, but not bad either.', tags: ['average'] },
-        { rating: 3, sentiment: 'Neutral', content: 'Service was average. Food was decent.', tags: ['service', 'food'] },
-        { rating: 3, sentiment: 'Neutral', content: 'A bit pricey for what you get, but convenient location.', tags: ['price', 'location'] },
+        { rating: 3, sentiment: 'neutral', content: 'It was okay. Nothing special, but not bad either.', tags: ['average'] },
+        { rating: 3, sentiment: 'neutral', content: 'Service was average. Food was decent.', tags: ['service', 'food'] },
+        { rating: 3, sentiment: 'neutral', content: 'A bit pricey for what you get, but convenient location.', tags: ['price', 'location'] },
 
         // Negative Reviews
-        { rating: 2, sentiment: 'Negative', content: 'Disappointed with the quality. The food was cold.', tags: ['quality', 'food', 'cold'] },
-        { rating: 1, sentiment: 'Negative', content: 'Terrible service. Waiter was rude and ignored us.', tags: ['service', 'rude', 'waiter'] },
-        { rating: 1, sentiment: 'Negative', content: 'Complete waste of money. Do not recommend.', tags: ['value', 'recommend'] },
-        { rating: 2, sentiment: 'Negative', content: 'Too noisy and crowded. Could not hear myself think.', tags: ['atmosphere', 'noise'] },
+        { rating: 2, sentiment: 'negative', content: 'Disappointed with the quality. The food was cold.', tags: ['quality', 'food', 'cold'] },
+        { rating: 1, sentiment: 'negative', content: 'Terrible service. Waiter was rude and ignored us.', tags: ['service', 'rude', 'waiter'] },
+        { rating: 1, sentiment: 'negative', content: 'Complete waste of money. Do not recommend.', tags: ['value', 'recommend'] },
+        { rating: 2, sentiment: 'negative', content: 'Too noisy and crowded. Could not hear myself think.', tags: ['atmosphere', 'noise'] },
     ];
 
     const platforms = ['google', 'facebook', 'yelp'];
@@ -98,7 +98,7 @@ async function main() {
             const isAnalyzed = Math.random() > 0.3;
 
             const publishedAt = new Date();
-            publishedAt.setDate(publishedAt.getDate() - Math.floor(Math.random() * 90)); // Random date in last 90 days
+            publishedAt.setDate(publishedAt.getDate() - Math.floor(Math.random() * 30)); // Random date in last 30 days for better dashboard visibility
 
             try {
                 await prisma.review.create({

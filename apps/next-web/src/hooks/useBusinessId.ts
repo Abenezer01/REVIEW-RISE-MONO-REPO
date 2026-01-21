@@ -22,8 +22,8 @@ export const useBusinessId = () => {
             params: { limit: 1 }
         });
         
-        if (response.data?.data?.[0]?.id) {
-            setBusinessId(response.data.data[0].id);
+        if (response.data?.data?.[0]?.businessId) {
+            setBusinessId(response.data.data[0].businessId);
         }
       } catch (error) {
         console.error('Failed to fetch business ID', error);
