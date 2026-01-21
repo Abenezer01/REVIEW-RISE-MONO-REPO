@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useSearchParams } from 'next/navigation'
+
 import ReviewsIcon from '@mui/icons-material/RateReview'
 import ReplyIcon from '@mui/icons-material/Reply'
 import StarIcon from '@mui/icons-material/Star'
@@ -27,7 +29,6 @@ import ReviewMetricCard from '@/components/shared/dashboard/ReviewMetricCard'
 import SentimentHeatmap from '@/components/shared/dashboard/SentimentHeatmap'
 import { useReviewAnalytics } from '@/hooks/reviews/useReviewAnalytics'
 import { useBusinessId } from '@/hooks/useBusinessId'
-import { useSearchParams } from 'next/navigation'
 
 const ReviewsDashboard = () => {
   const [period, setPeriod] = useState<number>(30)
