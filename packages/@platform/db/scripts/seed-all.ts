@@ -42,6 +42,9 @@ async function main() {
   console.log('🌱 Seeding: brand rise data');
   await runScript('scripts/seed-brand-rise.ts');
 
+  console.log('🌱 Seeding: reviews data');
+  await runScript('scripts/seed-reviews.ts');
+  
   console.log('✅ All seeders completed');
 }
 
