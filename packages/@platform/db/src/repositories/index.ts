@@ -34,6 +34,7 @@ export { BrandScoreRepository, brandScoreRepository } from './brand-score.reposi
 export { ReviewRepository, reviewRepository } from './review.repository';
 export { BrandProfileRepository, brandProfileRepository } from './brand-profile.repository';
 export { ReviewSourceRepository, reviewSourceRepository } from './review-source.repository';
+export { SocialConnectionRepository, socialConnectionRepository } from './social-connection.repository';
 export { ReviewReplyRepository, reviewReplyRepository } from './review-reply.repository';
 export { BrandDNARepository, brandDNARepository } from './brand-dna.repository';
 export { CompetitorRepository, competitorRepository } from './competitor.repository';
@@ -61,6 +62,7 @@ import { brandRecommendationRepository } from './brand-recommendation.repository
 import { brandScoreRepository } from './brand-score.repository';
 import { reviewRepository } from './review.repository';
 import { reviewSourceRepository } from './review-source.repository';
+import { socialConnectionRepository } from './social-connection.repository';
 import { reviewReplyRepository } from './review-reply.repository';
 import { brandProfileRepository } from './brand-profile.repository';
 import { brandDNARepository } from './brand-dna.repository';
@@ -94,6 +96,7 @@ export const repositories = {
     competitor: competitorRepository,
     report: reportRepository,
     reviewSource: reviewSourceRepository,
+    socialConnection: socialConnectionRepository,
     reviewReply: reviewReplyRepository,
     competitorReview: competitorReviewRepository,
 } as const;

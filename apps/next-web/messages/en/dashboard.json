@@ -74,7 +74,8 @@
       "tabs": {
         "overview": "Overview",
         "reviews": "Reviews",
-        "sources": "Review Sources"
+        "sources": "Review Sources",
+        "social": "Social Connections"
       },
       "saveFirst": "Save location first to connect."
     },

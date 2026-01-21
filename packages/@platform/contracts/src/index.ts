@@ -10,9 +10,15 @@ export * from './requests';
 // Response types
 export * from './responses';
 
+// Utilities
+export * from './utils/encryption.util';
+
 // DTOs
 export * from './dtos/location.dto';
 export * from './dtos/business.dto';
+
+// Utilities
+export * from './utils/encryption.util';
 export * from './dtos/keyword.dto';
 export * from './dtos/visibility.dto';
 

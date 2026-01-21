@@ -448,7 +448,11 @@ services:
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
+      - AUTH_SERVICE_URL=http://express-auth:3010/api
       - EXPRESS_BRAND_URL=http://express-brand:3007/api/v1
+      - EXPRESS_REVIEWS_URL=${EXPRESS_REVIEWS_URL:-http://express-reviews:3006}
+      - NEXT_PUBLIC_REVIEWS_API_URL=${NEXT_PUBLIC_REVIEWS_API_URL:-https://app.vyntrise.com/api/reviews/v1}
+      - NEXT_PUBLIC_SEO_HEALTH_API_URL=${NEXT_PUBLIC_SEO_HEALTH_API_URL:-https://app.vyntrise.com/api/seo/v1}
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://app.vyntrise.com}
       - NEXT_PUBLIC_LLM_COST_WARNING=${NEXT_PUBLIC_LLM_COST_WARNING:-true}
     depends_on:

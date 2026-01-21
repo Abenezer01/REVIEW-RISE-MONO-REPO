@@ -12,6 +12,11 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
+// Routes
+import socialRoutes from './routes/v1/social.routes';
+
+app.use('/', socialRoutes);
+
 app.get('/', (req, res) => {
     res.json({ message: 'Express Social Service is running' });
 });
