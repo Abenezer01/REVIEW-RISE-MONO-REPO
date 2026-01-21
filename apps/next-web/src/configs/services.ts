@@ -1,39 +1,74 @@
-// Helper to get environment variable at runtime (works in both server and client)
-const getEnv = (key: string) => {
+// Helper to determine if we're in production based on the current URL
+const isProduction = () => {
     if (typeof window === 'undefined') {
-        // Server-side
-        return process.env[key];
+        // Server-side: check NODE_ENV
+        return process.env.NODE_ENV === 'production';
     }
+    // Client-side: check the hostname
+    return window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+};
 
-
-    // Client-side - only NEXT_PUBLIC_ vars are available
-    return (process.env as any)[key];
+// Helper to get the base URL for client-side requests
+const getClientBaseUrl = () => {
+    if (typeof window === 'undefined') return '';
+    return `${window.location.protocol}//${window.location.host}`;
 };
 
 export const SERVICES_CONFIG = {
     auth: {
         get url() {
-            return getEnv('AUTH_SERVICE_URL') || 'http://localhost:3010/api';
+            if (typeof window === 'undefined') {
+                // Server-side
+                return process.env.AUTH_SERVICE_URL || 'http://localhost:3010/api';
+            }
+            // Client-side: auth is always server-side, shouldn't be called from client
+            return '/api/auth';
         },
     },
     brand: {
         get url() {
-            return getEnv('EXPRESS_BRAND_URL') || 'http://localhost:3007/api/v1';
+            if (typeof window === 'undefined') {
+                // Server-side
+                return process.env.EXPRESS_BRAND_URL || 'http://localhost:3007/api/v1';
+            }
+            // Client-side: use proxy through Next.js API routes
+            return '/api/brands';
         },
     },
     seo: {
         get url() {
-            return getEnv('NEXT_PUBLIC_SEO_HEALTH_API_URL') || 'http://localhost:3011/api/v1';
+            if (typeof window === 'undefined') {
+                // Server-side
+                return process.env.NEXT_PUBLIC_SEO_HEALTH_API_URL || 'http://localhost:3011/api/v1';
+            }
+            // Client-side
+            if (isProduction()) {
+                return `${getClientBaseUrl()}/api/seo`;
+            }
+            return 'http://localhost:3011/api/v1';
         },
     },
     review: {
         get url() {
-            return getEnv('NEXT_PUBLIC_REVIEWS_API_URL') || getEnv('EXPRESS_REVIEWS_URL') || 'http://localhost:3006/api/v1';
+            if (typeof window === 'undefined') {
+                // Server-side
+                return process.env.EXPRESS_REVIEWS_URL || 'http://localhost:3006/api/v1';
+            }
+            // Client-side
+            if (isProduction()) {
+                return `${getClientBaseUrl()}/api/reviews`;
+            }
+            return 'http://localhost:3006/api/v1';
         },
     },
     ai: {
         get url() {
-            return getEnv('EXPRESS_AI_URL') || 'http://localhost:3002';
+            if (typeof window === 'undefined') {
+                // Server-side
+                return process.env.EXPRESS_AI_URL || 'http://localhost:3002';
+            }
+            // Client-side: AI is server-side only
+            return '/api/ai';
         },
     },
 };
