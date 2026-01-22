@@ -8,7 +8,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:push": "tsx scripts/db-admin.ts prisma db push",
@@ -27,6 +27,7 @@
     "seed": "tsx scripts/seed.ts && tsx scripts/seed-visibility.ts"
   },
   "dependencies": {
+    "@platform/contracts": "workspace:*",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.1.0",
     "@prisma/client-runtime-utils": "^7.2.0",

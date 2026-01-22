@@ -10,9 +10,15 @@ export * from './requests';
 // Response types
 export * from './responses';
 
+// Utilities
+export * from './utils/encryption.util';
+
 // DTOs
 export * from './dtos/location.dto';
 export * from './dtos/business.dto';
+
+// Utilities
+export * from './utils/encryption.util';
 export * from './dtos/keyword.dto';
 export * from './dtos/visibility.dto';
 
@@ -23,6 +29,9 @@ export * from './ai/review-reply.schema';
 export * from './ai/prompts/recommendations.prompts';
 export * from './ai/prompts/review-sentiment.prompts';
 export * from './ai/prompts/review-reply.prompts';
+
+// Social Media Integration Schemas
+export * from './social';
 
 // Re-export commonly used types from requests
 export type {

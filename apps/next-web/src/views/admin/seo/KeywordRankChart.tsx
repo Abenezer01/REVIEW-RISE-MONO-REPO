@@ -20,7 +20,9 @@ interface Props {
   onClose: () => void
 }
 
-const API_URL = process.env.NEXT_PUBLIC_SEO_HEALTH_API_URL || 'http://localhost:3011/api/v1'
+import { SERVICES_CONFIG } from '@/configs/services';
+
+const API_URL = SERVICES_CONFIG.seo.url;
 
 export default function KeywordRankChart({ keywordId, keywordText, open, onClose }: Props) {
   const [series, setSeries] = useState<any[]>([])

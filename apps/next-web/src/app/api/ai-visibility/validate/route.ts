@@ -3,10 +3,11 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 import { backendClient } from '@/utils/backendClient'
 import { getServerAuthHeaders } from '@/utils/getServerAuthHeaders'
+import { SERVICES_CONFIG } from '@/configs/services'
 
 export async function POST(request: NextRequest) {
   // Default to localhost:3012/api if not defined
-  const SEO_SERVICE_URL = process.env.NEXT_PUBLIC_SEO_HEALTH_API_URL || 'http://localhost:3011/api/v1'
+  const SEO_SERVICE_URL = SERVICES_CONFIG.seo.url
 
   try {
     const body = await request.json()

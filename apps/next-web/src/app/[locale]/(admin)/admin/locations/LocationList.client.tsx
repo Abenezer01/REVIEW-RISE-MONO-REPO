@@ -22,6 +22,7 @@ import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 import { usePaginatedList } from '@/hooks/usePaginatedList'
 import useTranslation from '@/hooks/useTranslation'
 import apiClient from '@/lib/apiClient'
+import { SERVICES } from '@/configs/services'
 
 // 🔥 LAZY LOAD HEAVY COMPONENTS
 const ItemsListing = dynamic(
@@ -74,10 +75,12 @@ export default function LocationListClient() {
         </Grid>
     ), [t])
 
+
+
     const { data, meta, setPage, setPageSize, isLoading, refetch } =
         usePaginatedList(
             ['admin', 'locations', 'list', search, status],
-            '/admin/locations',
+            `${SERVICES.admin.url}/locations`,
             {
                 search: search || undefined,
                 status: status === 'all' ? undefined : status,
@@ -135,8 +138,8 @@ export default function LocationListClient() {
             minWidth: 200,
             renderCell: (params: any) => (
                 <Link href={`/admin/locations/${params.row.id}`} style={{ textDecoration: 'none' }} onClick={(e) => e.stopPropagation()}>
-                    <Typography 
-                        fontWeight={600} 
+                    <Typography
+                        fontWeight={600}
                         sx={{ color: 'primary.main', '&:hover': { textDecoration: 'underline' } }}
                     >
                         {params.row.primaryLabel}

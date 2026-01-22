@@ -38,7 +38,9 @@ interface ComparisonParams {
   locationId?: string
 }
 
-const REVIEWS_API = process.env.NEXT_PUBLIC_REVIEWS_API_URL || 'http://localhost:3006/api/v1'
+import { SERVICES_CONFIG } from '@/configs/services'
+
+const REVIEWS_API = SERVICES_CONFIG.review.url
 
 export const useRatingTrend = (params: RatingTrendParams) => {
   return useApiGet(
@@ -97,8 +99,8 @@ export const useCompetitorComparison = (params: ComparisonParams) => {
 export const useAddCompetitor = () => {
   const queryClient = useQueryClient()
 
-  
-return useApiPost(
+
+  return useApiPost(
     `${REVIEWS_API}/reviews/analytics/competitors`,
     {
       onSuccess: () => {

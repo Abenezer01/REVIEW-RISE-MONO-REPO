@@ -4,6 +4,8 @@
 import { reviewRepository, brandProfileRepository } from '@platform/db'
 import type { Prisma } from '@platform/db'
 
+import { SERVICES_CONFIG } from '@/configs/services'
+
 export async function getReviews(params: {
   page?: number
   limit?: number
@@ -41,7 +43,7 @@ export async function getReviews(params: {
     if (sentiment && sentiment !== 'all') where.sentiment = sentiment
 
     if (replyStatus && replyStatus !== 'all') {
-      ;(where as any).replyStatus = replyStatus
+      ; (where as any).replyStatus = replyStatus
     }
 
     if (startDate || endDate) {
@@ -99,7 +101,7 @@ export async function getReviewById(id: string) {
     console.error('getReviewById error:', error)
 
     return { success: false, error: error.message }
-    }
+  }
 }
 
 export async function getReviewWithHistory(reviewId: string) {
@@ -179,9 +181,9 @@ export async function analyzeSingleReview(reviewId: string) {
     if (!review) throw new Error('Review not found')
 
     // Call Express AI service
-    const expressAiUrl = process.env.EXPRESS_AI_URL || 'http://localhost:3002'
-    
-    const response = await fetch(`${expressAiUrl}/api/v1/ai/reviews/analyze`, {
+    const expressAiUrl = SERVICES_CONFIG.ai.url
+
+    const response = await fetch(`${expressAiUrl}/ai/reviews/analyze`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -200,8 +202,8 @@ export async function analyzeSingleReview(reviewId: string) {
 
     // Update review with analysis results
     const tags = [
-        ...(analysis.emotions || []),
-        ...(analysis.keywords || [])
+      ...(analysis.emotions || []),
+      ...(analysis.keywords || [])
     ]
 
     const updatedReview = await reviewRepository.update(reviewId, {
@@ -231,10 +233,10 @@ export async function analyzeSingleReview(reviewId: string) {
 }
 
 export async function updateReviewReply(
-  reviewId: string, 
-  response: string, 
-  options: { 
-    sourceType?: 'ai' | 'manual', 
+  reviewId: string,
+  response: string,
+  options: {
+    sourceType?: 'ai' | 'manual',
     authorType?: 'user' | 'auto',
     userId?: string
   } = {}
@@ -252,14 +254,14 @@ export async function updateReviewReply(
     // Attempt to post immediately to the platform service
     // This provides faster feedback to the user than waiting for the worker job
     try {
-      const EXPRESS_REVIEWS_URL = process.env.EXPRESS_REVIEWS_URL || 'http://localhost:3006'
+      const EXPRESS_REVIEWS_URL = SERVICES_CONFIG.review.url
 
       // We don't await this or we can await it if we want to return the result of the post
       // Let's await it so the UI can show if the ACTUAL posting failed
-      const response_post = await fetch(`${EXPRESS_REVIEWS_URL}/api/v1/reviews/${reviewId}/reply`, {
+      const response_post = await fetch(`${EXPRESS_REVIEWS_URL}/reviews/${reviewId}/reply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           comment: response,
           sourceType,
           authorType,
@@ -318,5 +320,4 @@ export async function rejectReviewReply(reviewId: string) {
       error: error.message
     }
   }
-  
 }

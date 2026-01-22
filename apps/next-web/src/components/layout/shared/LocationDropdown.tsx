@@ -24,6 +24,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
 
 import apiClient from '@/lib/apiClient'
+import { SERVICES } from '@/configs/services'
 
 interface Location {
   id: number | string
@@ -57,15 +58,15 @@ const LocationDropdown = () => {
   useEffect(() => {
     // console.log('LocationDropdown Debug:', { locationId, userLocationId: user?.locationId, user })
     if (!locationId) {
-        if (user?.locationId) {
-             // Case 1: Use cached location from session
-            // console.log('Setting default location from User Session:', user.locationId)
-            setLocationId(user.locationId)
-        } else if (locations.length > 0) {
-            // Case 2: User has no locationId in session, but we have fetched locations. Select the first one.
-            // console.log('Setting default location from First Available:', locations[0].id)
-            setLocationId(locations[0].id)
-        }
+      if (user?.locationId) {
+        // Case 1: Use cached location from session
+        // console.log('Setting default location from User Session:', user.locationId)
+        setLocationId(user.locationId)
+      } else if (locations.length > 0) {
+        // Case 2: User has no locationId in session, but we have fetched locations. Select the first one.
+        // console.log('Setting default location from First Available:', locations[0].id)
+        setLocationId(locations[0].id)
+      }
     }
   }, [locationId, user?.locationId, setLocationId, locations])
 
@@ -73,7 +74,9 @@ const LocationDropdown = () => {
     try {
       setLoading(true)
 
-      const response = await apiClient.get('/admin/locations', {
+
+
+      const response = await apiClient.get(`${SERVICES.admin.url}/locations`, {
         params: {
           limit: 10,
           status: 'active',
@@ -90,7 +93,7 @@ const LocationDropdown = () => {
         // OR just leave it empty. The original code had commented out default selection.
         // Let's respect the "global" nature: if URL has ID, we use it. 
         // If not, we could arguably default to the first one, but let's stick to explicit selection for now unless requested.
-        
+
         // However, we need to ensure the selected location from URL is actually in the list 
         // if we want to display its name correctly. 
         // If the list is paginated/searched, we might not have the selected location in the initial list.

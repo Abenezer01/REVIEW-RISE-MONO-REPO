@@ -30,7 +30,9 @@ interface ReviewStats {
     averageRating: number;
 }
 
-const REVIEWS_API_URL = process.env.NEXT_PUBLIC_REVIEWS_API_URL || 'http://localhost:3006/api/v1';
+import { SERVICES_CONFIG } from '@/configs/services';
+
+const REVIEWS_API_URL = SERVICES_CONFIG.review.url;
 
 const ReviewSourcesDashboard = () => {
     const params = useParams();
@@ -46,8 +48,8 @@ const ReviewSourcesDashboard = () => {
     const [syncing, setSyncing] = useState(false);
 
     const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info' }>({
-        open: false, 
-        message: '', 
+        open: false,
+        message: '',
         severity: 'info'
     });
 
@@ -61,7 +63,7 @@ const ReviewSourcesDashboard = () => {
             router.replace(`?${newParams.toString()}`);
             setSnackbar({ open: true, message: 'Source connected successfully!', severity: 'success' });
         } else if (searchParams.get('google_error')) {
-             setSnackbar({ open: true, message: 'Failed to connect source.', severity: 'error' });
+            setSnackbar({ open: true, message: 'Failed to connect source.', severity: 'error' });
         }
     }, [searchParams, router]);
 
@@ -148,9 +150,9 @@ const ReviewSourcesDashboard = () => {
 
     return (
         <Box>
-            <Snackbar 
-                open={snackbar.open} 
-                autoHideDuration={6000} 
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
                 onClose={handleCloseSnackbar}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
@@ -159,14 +161,14 @@ const ReviewSourcesDashboard = () => {
                 </Alert>
             </Snackbar>
 
-            <ConnectGoogleModal 
-                open={modalOpen} 
-                onClose={() => setModalOpen(false)} 
-                onConnect={handleConnectGoogle} 
+            <ConnectGoogleModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onConnect={handleConnectGoogle}
             />
 
-            <Dialog 
-                open={view === 'success'} 
+            <Dialog
+                open={view === 'success'}
                 onClose={handleGoToDashboard}
                 maxWidth="sm"
                 fullWidth
@@ -180,10 +182,10 @@ const ReviewSourcesDashboard = () => {
                     <Typography variant="h4" fontWeight="bold">Review Sources</Typography>
                     <Typography variant="body2" color="text.secondary">Connect and manage your review platforms</Typography>
                 </Box>
-                <Button 
-                    variant="contained" 
-                    color="warning" 
-                    startIcon={<SyncIcon />} 
+                <Button
+                    variant="contained"
+                    color="warning"
+                    startIcon={<SyncIcon />}
                     onClick={handleSyncAll}
                     disabled={syncing || loading}
                 >
@@ -193,7 +195,7 @@ const ReviewSourcesDashboard = () => {
 
             {/* Summary Cards */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid size={{xs: 12, md: 4}}>
+                <Grid size={{ xs: 12, md: 4 }}>
                     <Card sx={{ bgcolor: 'background.paper', height: '100%' }}>
                         <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <Box>
@@ -211,8 +213,8 @@ const ReviewSourcesDashboard = () => {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid size={{xs: 12, md: 4}}>
-                     <Card sx={{ bgcolor: 'background.paper', height: '100%' }}>
+                <Grid size={{ xs: 12, md: 4 }}>
+                    <Card sx={{ bgcolor: 'background.paper', height: '100%' }}>
                         <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <Box>
                                 <Typography variant="caption" color="text.secondary">TOTAL REVIEWS</Typography>
@@ -229,8 +231,8 @@ const ReviewSourcesDashboard = () => {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid size={{xs: 12, md: 4}}>
-                     <Card sx={{ bgcolor: 'background.paper', height: '100%' }}>
+                <Grid size={{ xs: 12, md: 4 }}>
+                    <Card sx={{ bgcolor: 'background.paper', height: '100%' }}>
                         <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <Box>
                                 <Typography variant="caption" color="text.secondary">SYNC STATUS</Typography>
@@ -251,9 +253,9 @@ const ReviewSourcesDashboard = () => {
 
             <Grid container spacing={3}>
                 {/* Connected Sources List */}
-                <Grid size={{xs: 12, md: 8}}>
+                <Grid size={{ xs: 12, md: 8 }}>
                     <Typography variant="h6" sx={{ mb: 2 }}>Connected Sources</Typography>
-                    
+
                     {loading ? (
                         <>
                             <Skeleton variant="rectangular" height={100} sx={{ mb: 2, borderRadius: 2 }} />
@@ -262,10 +264,10 @@ const ReviewSourcesDashboard = () => {
                     ) : (
                         sources.length > 0 ? (
                             sources.map(source => (
-                                <ConnectedSourceCard 
-                                    key={source.id} 
-                                    source={source} 
-                                    onDisconnect={handleDisconnect} 
+                                <ConnectedSourceCard
+                                    key={source.id}
+                                    source={source}
+                                    onDisconnect={handleDisconnect}
                                     onConfigure={() => setSnackbar({ open: true, message: 'Configuration coming soon', severity: 'info' })}
                                 />
                             ))
@@ -275,7 +277,7 @@ const ReviewSourcesDashboard = () => {
                     )}
 
                     <Typography variant="h6" sx={{ mb: 2 }}>Available Sources</Typography>
-                    
+
                     {/* Filter out already connected specific platforms? For MVP, Google is unique. */}
                     {!sources.some(s => s.platform === 'google') && (
                         <Card sx={{ mb: 2, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
@@ -299,34 +301,34 @@ const ReviewSourcesDashboard = () => {
                 </Grid>
 
                 {/* Sidebar */}
-                <Grid size={{xs: 12, md: 4}}>
+                <Grid size={{ xs: 12, md: 4 }}>
                     <Card sx={{ mb: 3, bgcolor: 'background.paper' }}>
                         <CardContent>
-                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                                 <ScheduleIcon color="secondary" />
-                                 <Typography variant="h6">Sync Status</Typography>
-                             </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                                <ScheduleIcon color="secondary" />
+                                <Typography variant="h6">Sync Status</Typography>
+                            </Box>
 
-                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                 <Typography variant="caption" color="text.secondary">Next Scheduled Sync</Typography>
-                                 <Typography variant="caption" fontWeight="bold">In 4 hours</Typography>
-                             </Box>
-                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                 <Typography variant="caption" color="text.secondary">Sync Frequency</Typography>
-                                 <Typography variant="caption" fontWeight="bold">Daily at 2:00 AM</Typography>
-                             </Box>
-                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-                                 <Typography variant="caption" color="text.secondary">Last Sync Duration</Typography>
-                                 <Typography variant="caption" fontWeight="bold">2m 34s</Typography>
-                             </Box>
-                             
-                             <Typography variant="caption" color="text.secondary" gutterBottom>Current Sync Progress</Typography>
-                             <LinearProgress variant="determinate" value={syncing ? 30 : 0} sx={{ bgcolor: 'action.hover', '& .MuiLinearProgress-bar': { bgcolor: 'warning.main' } }} />
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                <Typography variant="caption" color="text.secondary">Next Scheduled Sync</Typography>
+                                <Typography variant="caption" fontWeight="bold">In 4 hours</Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                <Typography variant="caption" color="text.secondary">Sync Frequency</Typography>
+                                <Typography variant="caption" fontWeight="bold">Daily at 2:00 AM</Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+                                <Typography variant="caption" color="text.secondary">Last Sync Duration</Typography>
+                                <Typography variant="caption" fontWeight="bold">2m 34s</Typography>
+                            </Box>
+
+                            <Typography variant="caption" color="text.secondary" gutterBottom>Current Sync Progress</Typography>
+                            <LinearProgress variant="determinate" value={syncing ? 30 : 0} sx={{ bgcolor: 'action.hover', '& .MuiLinearProgress-bar': { bgcolor: 'warning.main' } }} />
                         </CardContent>
                     </Card>
 
                     <Card>
-                         <CardContent>
+                        <CardContent>
                             <Typography variant="h6" sx={{ mb: 2 }}>Recent Activity</Typography>
                             <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
                                 <Box sx={{ p: 0.5, bgcolor: 'success.main', borderRadius: 1, height: 'fit-content', color: 'success.contrastText' }}>
@@ -337,7 +339,7 @@ const ReviewSourcesDashboard = () => {
                                     <Typography variant="caption" color="text.secondary">2 hours ago • 23 new reviews</Typography>
                                 </Box>
                             </Box>
-                         </CardContent>
+                        </CardContent>
                     </Card>
                 </Grid>
             </Grid>

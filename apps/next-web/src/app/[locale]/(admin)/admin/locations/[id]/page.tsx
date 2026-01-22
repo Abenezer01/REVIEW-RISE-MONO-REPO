@@ -23,14 +23,19 @@ import LinkIcon from '@mui/icons-material/Link'
 import StarIcon from '@mui/icons-material/Star'
 
 // Core Components
+import ShareIcon from '@mui/icons-material/Share'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTabList from '@core/components/mui/TabList'
 
 import ReviewSourcesDashboard from '@/components/admin/locations/review-sync/ReviewSourcesDashboard'
 import { useTranslation } from '@/hooks/useTranslation'
 import apiClient from '@/lib/apiClient'
+import { SERVICES } from '@/configs/services'
 
 import LocationReviews from '@/components/admin/locations/review-sync/LocationReviews'
+import { SocialConnectionList } from '@/components/admin/locations/social/SocialConnectionList'
+
 
 // Placeholder Components for new tabs
 const LocationOverview = ({ location }: { location: any }) => {
@@ -43,7 +48,7 @@ const LocationOverview = ({ location }: { location: any }) => {
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
                     {t('locations.form.address')}: {location?.address}
                 </Typography>
-                 {/* Add more stats here later */}
+                {/* Add more stats here later */}
             </CardContent>
         </Card>
     )
@@ -52,7 +57,7 @@ const LocationOverview = ({ location }: { location: any }) => {
 
 
 const getInitials = (string: string) =>
-  string.split(/\s/).reduce((response, word) => (response += word.slice(0, 1)), '')
+    string.split(/\s/).reduce((response, word) => (response += word.slice(0, 1)), '')
 
 const LocationDetailsPage = () => {
     const params = useParams()
@@ -70,9 +75,11 @@ const LocationDetailsPage = () => {
     const fetchLocation = useCallback(async () => {
         if (!id) return
 
+
+
         try {
             setLoading(true)
-            const res = await apiClient.get(`/admin/locations/${id}`)
+            const res = await apiClient.get(`${SERVICES.admin.url}/locations/${id}`)
 
             setLocation(res.data)
         } catch (error) {
@@ -88,7 +95,7 @@ const LocationDetailsPage = () => {
 
     if (loading) {
         return (
-             <Grid container spacing={6}>
+            <Grid container spacing={6}>
                 <Grid size={12}>
                     <Skeleton variant="rectangular" height={200} />
                 </Grid>
@@ -105,8 +112,8 @@ const LocationDetailsPage = () => {
             {/* Header Section */}
             <Grid size={12}>
                 <Box sx={{ mb: 2 }}>
-                    <Button 
-                        startIcon={<ArrowBackIcon />} 
+                    <Button
+                        startIcon={<ArrowBackIcon />}
                         onClick={() => router.push(location.businessId ? `/admin/accounts/${location.businessId}` : '/admin/accounts')}
                         sx={{ pl: 0 }}
                     >
@@ -116,16 +123,16 @@ const LocationDetailsPage = () => {
                 <Card sx={{ position: 'relative', overflow: 'visible', mt: { xs: 0, md: 4 } }}>
                     <CardContent sx={{ pb: 4 }}>
                         <Box sx={{ display: 'flex', alignItems: { xs: 'flex-start', md: 'center' }, flexDirection: { xs: 'column', md: 'row' }, gap: 5 }}>
-                             <CustomAvatar
+                            <CustomAvatar
                                 skin='light'
                                 variant='rounded'
                                 color='primary'
                                 sx={{ width: 100, height: 100, fontSize: '2.5rem', boxShadow: 3 }}
-                             >
+                            >
                                 {getInitials(location.name || 'Loc')}
-                             </CustomAvatar>
+                            </CustomAvatar>
 
-                             <Box sx={{ flexGrow: 1 }}>
+                            <Box sx={{ flexGrow: 1 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 2, flexWrap: 'wrap' }}>
                                     <Typography variant='h4' sx={{ fontWeight: 600 }}>
                                         {location.name}
@@ -139,7 +146,7 @@ const LocationDetailsPage = () => {
                                         </Typography>
                                     </Box>
                                 </Box>
-                             </Box>
+                            </Box>
                         </Box>
                     </CardContent>
                 </Card>
@@ -152,6 +159,7 @@ const LocationDetailsPage = () => {
                         <Tab value='overview' label={t('locations.detail.tabs.overview')} icon={<InfoIcon />} iconPosition='start' />
                         <Tab value='reviews' label={t('locations.detail.tabs.reviews')} icon={<StarIcon />} iconPosition='start' />
                         <Tab value='sources' label={t('locations.detail.tabs.sources')} icon={<LinkIcon />} iconPosition='start' />
+                        <Tab value='social' label={t('locations.detail.tabs.social') || 'Social'} icon={<ShareIcon />} iconPosition='start' />
                     </CustomTabList>
 
                     <Box sx={{ mt: 4 }}>
@@ -159,10 +167,19 @@ const LocationDetailsPage = () => {
                             <LocationOverview location={location} />
                         </TabPanel>
                         <TabPanel value='reviews' sx={{ p: 0 }}>
-                             <LocationReviews />
+                            <LocationReviews />
                         </TabPanel>
                         <TabPanel value='sources' sx={{ p: 0 }}>
                             <ReviewSourcesDashboard />
+                        </TabPanel>
+                        <TabPanel value='social' sx={{ p: 0 }}>
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="h4">Social Integrations</Typography>
+                                <Typography color="textSecondary">
+                                    Connect your social media accounts to sync posts and reviews.
+                                </Typography>
+                            </Box>
+                            <SocialConnectionList businessId={location.businessId} locationId={id as string} />
                         </TabPanel>
                     </Box>
                 </TabContext>

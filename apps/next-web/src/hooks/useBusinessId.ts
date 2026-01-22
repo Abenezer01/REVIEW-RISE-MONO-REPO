@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 
+import { SERVICES } from '@/configs/services';
 import apiClient from '@/lib/apiClient';
 
 export const useBusinessId = () => {
@@ -18,12 +19,12 @@ export const useBusinessId = () => {
         // }
 
         // Fallback: Fetch first available business/location
-        const response = await apiClient.get('/admin/locations', {
-            params: { limit: 1 }
+        const response = await apiClient.get(`${SERVICES.admin.url}/locations`, {
+          params: { limit: 1 }
         });
-        
-        if (response.data?.data?.[0]?.id) {
-            setBusinessId(response.data.data[0].id);
+
+        if (response.data?.data?.[0]?.businessId) {
+          setBusinessId(response.data.data[0].businessId);
         }
       } catch (error) {
         console.error('Failed to fetch business ID', error);
