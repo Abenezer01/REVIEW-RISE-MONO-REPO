@@ -221,7 +221,6 @@ return;
 
     const confirmFacebookPage = async (page: FacebookPage) => {
         try {
-            setConnectingFb(true);
             await apiClient.post(`${SERVICES.social.url}/facebook/connect`, {
                 businessId, locationId, page, userAccessToken: tempToken
             });
@@ -231,8 +230,6 @@ return;
         } catch (err) {
             console.error(err);
             alert('Failed to connect page');
-        } finally {
-            setConnectingFb(false);
         }
     };
 
