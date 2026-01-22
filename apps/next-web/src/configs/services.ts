@@ -86,9 +86,12 @@ export const SERVICES_CONFIG = {
             if (typeof window === 'undefined') {
                 return process.env.EXPRESS_SOCIAL_URL || 'http://localhost:3003';
             }
+
             if (isProduction()) {
                 return `${getClientBaseUrl()}/api/social`;
             }
+
+
             // Use proxy in dev as well to handle HttpOnly cookies
             return '/api/social';
         }
@@ -98,10 +101,13 @@ export const SERVICES_CONFIG = {
             if (typeof window === 'undefined') {
                 return process.env.EXPRESS_ADMIN_URL || 'http://localhost:3012';
             }
+
             if (isProduction()) {
                 return `${getClientBaseUrl()}/api/admin`;
             }
-            return 'http://localhost:3012';
+
+            
+return 'http://localhost:3012';
         }
     }
 };

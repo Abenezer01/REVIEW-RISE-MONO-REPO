@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { socialConnectionRepository } from '@platform/db';
-import { encrypt, decrypt } from '@platform/contracts';
+import { FACEBOOK_API } from '../config/external-apis.config';
 
 interface FacebookTokenResponse {
     access_token: string;
@@ -20,7 +20,6 @@ export class FacebookService {
     private readonly appId: string;
     private readonly appSecret: string;
     private readonly redirectUri: string;
-    private readonly apiVersion = 'v18.0';
 
     constructor() {
         this.appId = process.env.FACEBOOK_APP_ID || '';
@@ -49,7 +48,7 @@ export class FacebookService {
             'business_management'
         ];
 
-        return `https://www.facebook.com/${this.apiVersion}/dialog/oauth?client_id=${this.appId}&redirect_uri=${encodeURIComponent(this.redirectUri)}&state=${state}&scope=${scopes.join(',')}&response_type=code`;
+        return `${FACEBOOK_API.OAUTH_DIALOG_URL}?client_id=${this.appId}&redirect_uri=${encodeURIComponent(this.redirectUri)}&state=${state}&scope=${scopes.join(',')}&response_type=code`;
     }
 
     /**
@@ -57,7 +56,7 @@ export class FacebookService {
      */
     async exchangeCodeForToken(code: string): Promise<FacebookTokenResponse> {
         try {
-            const response = await axios.get(`https://graph.facebook.com/${this.apiVersion}/oauth/access_token`, {
+            const response = await axios.get(`${FACEBOOK_API.GRAPH_API_URL}/oauth/access_token`, {
                 params: {
                     client_id: this.appId,
                     client_secret: this.appSecret,
@@ -78,7 +77,7 @@ export class FacebookService {
      */
     async getLongLivedUserToken(shortLivedToken: string): Promise<FacebookTokenResponse> {
         try {
-            const response = await axios.get(`https://graph.facebook.com/${this.apiVersion}/oauth/access_token`, {
+            const response = await axios.get(`${FACEBOOK_API.GRAPH_API_URL}/oauth/access_token`, {
                 params: {
                     grant_type: 'fb_exchange_token',
                     client_id: this.appId,
@@ -99,7 +98,7 @@ export class FacebookService {
      */
     async listPages(userAccessToken: string): Promise<FacebookPage[]> {
         try {
-            const response = await axios.get(`https://graph.facebook.com/${this.apiVersion}/me/accounts`, {
+            const response = await axios.get(`${FACEBOOK_API.GRAPH_API_URL}/me/accounts`, {
                 params: {
                     access_token: userAccessToken,
                     fields: 'id,name,access_token,category,tasks',
@@ -119,7 +118,7 @@ export class FacebookService {
      */
     async getInstagramBusinessAccount(pageId: string, pageAccessToken: string) {
         try {
-            const response = await axios.get(`https://graph.facebook.com/${this.apiVersion}/${pageId}`, {
+            const response = await axios.get(`${FACEBOOK_API.GRAPH_API_URL}/${pageId}`, {
                 params: {
                     access_token: pageAccessToken,
                     fields: 'instagram_business_account',
@@ -200,7 +199,7 @@ export class FacebookService {
             // We need page access token to query IG details broadly, but user token works for some basic info if linked
             // First get the page token again or use user token
             // Let's assume we use user token to fetch IG details
-            const response = await axios.get(`https://graph.facebook.com/${this.apiVersion}/${igAccountId}`, {
+            const response = await axios.get(`${FACEBOOK_API.GRAPH_API_URL}/${igAccountId}`, {
                 params: {
                     access_token: userAccessToken,
                     fields: 'username,name,profile_picture_url',
@@ -218,7 +217,7 @@ export class FacebookService {
 
             const data = {
                 businessId,
-                locationId,
+                locationId: locationId || undefined,
                 platform: 'instagram',
                 pageId: pageId, // Linked FB Page ID
                 profileId: igAccountId,
@@ -243,6 +242,26 @@ export class FacebookService {
         } catch (error: any) {
             console.error('Error connecting Instagram:', error.response?.data || error.message);
             throw error;
+        }
+    }
+    /**
+     * Refresh Page Access Token
+     * Uses the long-lived user token (stored as refreshToken) to get a fresh page token
+     */
+    async refreshPageToken(pageId: string, userAccessToken: string): Promise<string> {
+        try {
+            // Get fresh page access token using user token
+            const response = await axios.get(`${FACEBOOK_API.GRAPH_API_URL}/${pageId}`, {
+                params: {
+                    access_token: userAccessToken,
+                    fields: 'access_token'
+                }
+            });
+
+            return response.data.access_token;
+        } catch (error: any) {
+            console.error('Error refreshing page token:', error.response?.data || error.message);
+            throw new Error('Failed to refresh Facebook page token');
         }
     }
 }

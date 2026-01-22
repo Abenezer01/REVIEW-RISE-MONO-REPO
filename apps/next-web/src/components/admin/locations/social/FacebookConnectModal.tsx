@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+
 import {
     Dialog,
-    DialogTitle,
     DialogContent,
     DialogActions,
     Button,
@@ -34,7 +34,7 @@ import {
     Close as CloseIcon
 } from '@mui/icons-material';
 
-import { FacebookPage } from './types';
+import type { FacebookPage } from './types';
 
 interface Props {
     open: boolean;
@@ -67,6 +67,7 @@ export const FacebookConnectModal = ({ open, onClose, onStartAuth, onConfirmPage
 
     const handleConnect = () => {
         const page = pages.find(p => p.id === selectedPageId);
+
         if (page) {
             onConfirmPage(page);
             setActiveStep(2); // Optimistically move to complete

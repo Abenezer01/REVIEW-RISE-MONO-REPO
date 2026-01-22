@@ -8,6 +8,7 @@ import {
 
 export const PlatformIcon = ({ platform, size = 40 }: { platform: string, size?: number }) => {
     const sx = { width: size, height: size };
+
     switch (platform.toLowerCase()) {
         case 'facebook': return <FacebookIcon sx={{ ...sx, color: '#1877F2' }} />;
         case 'instagram': return <InstagramIcon sx={{ ...sx, color: '#E4405F' }} />;

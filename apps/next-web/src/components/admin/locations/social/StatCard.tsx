@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import {
     Box,
     Card,
@@ -8,7 +10,6 @@ import {
     useTheme,
     alpha
 } from '@mui/material';
-import { ReactNode } from 'react';
 
 interface StatCardProps {
     title: string;
@@ -20,7 +21,9 @@ interface StatCardProps {
 
 export const StatCard = ({ title, value, subtext, icon, color }: StatCardProps) => {
     const theme = useTheme();
-    return (
+
+    
+return (
         <Card sx={{ height: '100%', bgcolor: 'background.paper', border: `1px solid ${theme.palette.divider}` }}>
             <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="flex-start">

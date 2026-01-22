@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import {
     Box,
     Button,
@@ -10,7 +12,6 @@ import {
     alpha
 } from '@mui/material';
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
-import { ReactNode } from 'react';
 
 interface PlatformOptionProps {
     name: string;
@@ -23,7 +24,9 @@ interface PlatformOptionProps {
 
 export const PlatformOption = ({ name, description, icon, features, action, color }: PlatformOptionProps) => {
     const theme = useTheme();
-    return (
+
+    
+return (
         <Card sx={{ height: '100%', border: `1px solid ${theme.palette.divider}` }}>
             <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <Stack direction="row" spacing={2} alignItems="center" mb={2}>

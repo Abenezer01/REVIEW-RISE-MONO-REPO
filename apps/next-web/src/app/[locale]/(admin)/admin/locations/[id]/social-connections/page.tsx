@@ -1,5 +1,6 @@
-import { SocialConnectionList } from './SocialConnectionList.client';
 import { Box, Typography } from '@mui/material';
+
+import { SocialConnectionList } from './SocialConnectionList.client';
 
 // Metadata? 
 // import type { Metadata } from 'next';

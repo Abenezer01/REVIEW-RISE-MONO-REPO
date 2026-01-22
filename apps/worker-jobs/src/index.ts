@@ -103,6 +103,7 @@ app.post('/jobs/review-sync', async (req, res) => {
 });
 
 import { runReviewSentimentJob, reprocessReviews } from './jobs/review-sentiment.job';
+import { refreshSocialTokensJob } from './jobs/refresh-social-tokens.job';
 
 app.post('/jobs/review-sentiment', async (req, res) => {
     const { reprocess = false, batchSize = 50 } = req.body;
@@ -118,6 +119,13 @@ app.post('/jobs/review-sentiment', async (req, res) => {
             .catch(err => console.error('Review sentiment analysis failed:', err));
         res.status(202).json({ message: 'Review sentiment analysis job started' });
     }
+});
+
+app.post('/jobs/refresh-social-tokens', async (req, res) => {
+    refreshSocialTokensJob()
+        .then(() => console.log('Social token refresh job completed'))
+        .catch(err => console.error('Social token refresh job failed:', err));
+    res.status(202).json({ message: 'Social token refresh job started' });
 });
 
 const scheduleDaily = (hour: number = 2) => {
@@ -138,6 +146,17 @@ const scheduleDaily = (hour: number = 2) => {
     }, delay)
 }
 
+// Schedule social token refresh every 6 hours
+const scheduleSocialTokenRefresh = () => {
+    // Run immediately on startup
+    refreshSocialTokensJob().catch(err => console.error('Initial social token refresh failed:', err));
+    
+    // Then run every 6 hours
+    setInterval(() => {
+        refreshSocialTokensJob().catch(err => console.error('Scheduled social token refresh failed:', err));
+    }, 6 * 60 * 60 * 1000); // 6 hours
+}
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     // Create health check file for Docker
@@ -147,5 +166,6 @@ app.listen(PORT, () => {
     } catch (e) {
         console.warn('Could not write health check file:', e);
     }
-    scheduleDaily(2)
+    scheduleDaily(2);
+    scheduleSocialTokenRefresh();
 });

@@ -8,6 +8,7 @@ interface DecodedUser {
 }
 
 declare global {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Express {
         interface Request {
             user?: DecodedUser;
@@ -40,7 +41,8 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
         req.user = decoded;
 
         next();
-    } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_error) {
         return res.status(401).json({ message: 'Invalid or expired token' });
     }
 };

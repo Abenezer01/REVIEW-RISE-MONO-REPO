@@ -1,9 +1,11 @@
 import axios from 'axios'
+
 import { useAuthStore } from '@/store/authStore'
 
 // Normalize base to avoid duplicated `/api` when combining with public endpoints
 const normalizeBase = (val: string | undefined) => {
   const raw = (val ?? '').trim();
+
   if (!raw) return '';
   let url = raw.replace(/\/+$/, '');
 
@@ -22,10 +24,13 @@ apiClient.interceptors.request.use(
   (config) => {
     // Attach token from store if available
     const token = useAuthStore.getState().token;
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    return config
+
+    
+return config
   },
   (error) => {
     return Promise.reject(error)

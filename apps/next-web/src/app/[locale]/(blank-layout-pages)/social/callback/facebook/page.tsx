@@ -1,8 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+
 import { useSearchParams } from 'next/navigation';
+
 import { CircularProgress, Box, Typography, Alert } from '@mui/material';
+
 import apiClient from '@/lib/apiClient';
 import { SERVICES } from '@/configs/services';
 
@@ -21,13 +24,15 @@ export default function FacebookCallbackPage() {
             if (error) {
                 setStatus('error');
                 setErrorMessage(errorDesc || 'Facebook declined the authorization.');
-                return;
+                
+return;
             }
 
             if (!code || !state) {
                 setStatus('error');
                 setErrorMessage('Missing code or state parameter.');
-                return;
+                
+return;
             }
 
             try {

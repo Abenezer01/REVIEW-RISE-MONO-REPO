@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
+
 import {
     Box,
     Button,
@@ -32,12 +33,13 @@ import {
     Public as PublicIcon,
     People as PeopleIcon
 } from '@mui/icons-material';
+
 import apiClient from '@/lib/apiClient';
 import { SERVICES } from '@/configs/services';
 
 
 // Imported Components & Types
-import { SocialConnection, LinkedInOrg, FacebookPage, InstagramAccount, SocialConnectionListProps } from './types';
+import type { SocialConnection, LinkedInOrg, FacebookPage, InstagramAccount, SocialConnectionListProps } from './types';
 import { StatCard } from './StatCard';
 import { ConnectionCard } from './ConnectionCard';
 import { PlatformOption } from './PlatformOption';
@@ -59,7 +61,6 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
 
     const [tempToken, setTempToken] = useState<string | null>(null);
     const [tempTokenData, setTempTokenData] = useState<any>(null);
-    const [connectingFb, setConnectingFb] = useState(false);
     const [connectingIg, setConnectingIg] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -75,6 +76,7 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
             const res = await apiClient.get(`${SERVICES.social.url}/connections`, {
                 params: { businessId, locationId }
             });
+
             setConnections(res.data.connections);
         } catch (err) {
             console.error(err);
@@ -97,11 +99,14 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
         const handleMessage = async (event: MessageEvent) => {
             if (event.data?.type === 'FACEBOOK_AUTH_SUCCESS') {
                 const { accessToken } = event.data;
+
                 setTempToken(accessToken);
+
                 try {
                     const res = await apiClient.get(`${SERVICES.social.url}/facebook/pages`, {
                         headers: { 'x-fb-access-token': accessToken }
                     });
+
                     setFbPages(res.data.pages);
                     setShowFbModal(true);
                 } catch (err) {
@@ -114,12 +119,15 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
                     expires_in: event.data.expiresIn,
                     refresh_token: event.data.refreshToken
                 };
+
                 setTempToken(event.data.accessToken);
                 setTempTokenData(tokenData);
+
                 try {
                     const res = await apiClient.get(`${SERVICES.social.url}/linkedin/organizations`, {
                         headers: { 'x-li-access-token': event.data.accessToken }
                     });
+
                     setLiOrgs(res.data.organizations);
                     setShowLiModal(true);
                 } catch (err) {
@@ -128,8 +136,10 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
                 }
             }
         };
+
         window.addEventListener('message', handleMessage);
-        return () => window.removeEventListener('message', handleMessage);
+        
+return () => window.removeEventListener('message', handleMessage);
     }, [businessId, locationId]);
 
     // Handlers
@@ -139,9 +149,11 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
             const res = await apiClient.get(`${SERVICES.social.url}/facebook/auth-url`, {
                 params: { businessId, locationId }
             });
+
             const width = 600, height = 700;
             const left = window.screen.width / 2 - width / 2;
             const top = window.screen.height / 2 - height / 2;
+
             window.open(res.data.url, 'FacebookAuth', `width=${width},height=${height},left=${left},top=${top}`);
         } catch (err) {
             console.error(err);
@@ -153,9 +165,11 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
             const res = await apiClient.get(`${SERVICES.social.url}/linkedin/auth-url`, {
                 params: { businessId, locationId }
             });
+
             const width = 600, height = 700;
             const left = window.screen.width / 2 - width / 2;
             const top = window.screen.height / 2 - height / 2;
+
             window.open(res.data.url, 'LinkedInAuth', `width=${width},height=${height},left=${left},top=${top}`);
         } catch (err) {
             console.error(err);
@@ -168,16 +182,19 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
 
         if (!fbConn) {
             alert('Please connect your Facebook Page first. Instagram Business accounts must be connected via their linked Facebook Page.');
-            return;
+            
+return;
         }
 
         if (!fbConn.accessToken) {
             alert('Facebook connection is missing access token. Please reconnect Facebook.');
-            return;
+            
+return;
         }
 
         try {
             setLoading(true); // Re-use main loading or add specific one
+
             // 2. Fetch IG accounts linked to this page
             // We use the page ID and the PAGE access token stored in the connection
             const res = await apiClient.get(`${SERVICES.social.url}/facebook/pages/${fbConn.pageId}/instagram-accounts`, {
@@ -239,6 +256,7 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
 
         try {
             setConnectingIg(true);
+
             // We use the connection's refreshToken as the userAccessToken fallback if needed, 
             // though strict IG connect might need a fresh user token. 
             // For now, we attempt to use what we have (Page Token or Refresh Token).
@@ -266,6 +284,7 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to disconnect?')) return;
+
         try {
             await apiClient.delete(`${SERVICES.social.url}/connections/${id}`);
             fetchConnections();

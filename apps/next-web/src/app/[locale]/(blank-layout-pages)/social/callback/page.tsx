@@ -1,18 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+
 import { useSearchParams } from 'next/navigation';
+
 import { CircularProgress, Box, Typography, Alert } from '@mui/material';
-import apiClient from '@/lib/apiClient';
-import { SERVICES } from '@/configs/services';
 
 const SocialCallbackPage = () => {
     const searchParams = useSearchParams();
-    const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const code = searchParams.get('code');
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const state = searchParams.get('state');
 
         // Identify provider from state or URL path? 
@@ -41,24 +41,13 @@ const SocialCallbackPage = () => {
 
     return (
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="100vh" p={4}>
-            {status === 'loading' && (
-                <>
-                    <CircularProgress size={60} thickness={4} />
-                    <Typography variant="h6" sx={{ mt: 3 }}>
-                        Finalizing connection...
-                    </Typography>
-                </>
-            )}
-            {status === 'success' && (
-                <Alert severity="success" sx={{ mt: 2 }}>
-                    Connection successful! You can close this window.
-                </Alert>
-            )}
-            {status === 'error' && (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                    {errorMessage || 'Authentication failed'}
-                </Alert>
-            )}
+            <CircularProgress size={60} thickness={4} />
+            <Typography variant="h6" sx={{ mt: 3 }}>
+                Finalizing connection...
+            </Typography>
+            <Alert severity="info" sx={{ mt: 2, maxWidth: 500 }}>
+                This page handles OAuth callbacks. The connection process is managed via popup windows.
+            </Alert>
         </Box>
     );
 };

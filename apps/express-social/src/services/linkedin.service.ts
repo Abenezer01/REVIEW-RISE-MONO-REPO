@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { socialConnectionRepository } from '@platform/db';
-import { encrypt, decrypt } from '@platform/contracts';
+import { LINKEDIN_API } from '../config/external-apis.config';
 
 // Defined based on LinkedIn API docs
 interface LinkedInTokenResponse {
@@ -17,12 +17,6 @@ interface LinkedInOrganization {
     vanityName: string;
     logoV2?: any;
     // ...
-}
-
-interface OrganizationRole {
-    organization: string; // urn
-    role: string;
-    state: string;
 }
 
 export class LinkedInService {
@@ -54,7 +48,7 @@ export class LinkedInService {
             // 'rw_organization_admin' // Admin
         ];
 
-        return `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${this.clientId}&redirect_uri=${encodeURIComponent(this.redirectUri)}&state=${state}&scope=${scopes.join(' ')}`;
+        return `${LINKEDIN_API.AUTHORIZATION_URL}?response_type=code&client_id=${this.clientId}&redirect_uri=${encodeURIComponent(this.redirectUri)}&state=${state}&scope=${scopes.join(' ')}`;
     }
 
     /**
@@ -69,7 +63,7 @@ export class LinkedInService {
             params.append('client_id', this.clientId);
             params.append('client_secret', this.clientSecret);
 
-            const response = await axios.post('https://www.linkedin.com/oauth/v2/accessToken', params, {
+            const response = await axios.post(LINKEDIN_API.ACCESS_TOKEN_URL, params, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
@@ -88,7 +82,7 @@ export class LinkedInService {
     async listOrganizations(accessToken: string): Promise<LinkedInOrganization[]> {
         try {
             // First get the user's organizational entity acls to find orgs they manage
-            const aclsResponse = await axios.get('https://api.linkedin.com/v2/organizationalEntityAcls', {
+            const aclsResponse = await axios.get(`${LINKEDIN_API.API_BASE_URL}/organizationalEntityAcls`, {
                 headers: { Authorization: `Bearer ${accessToken}` },
                 params: {
                     q: 'roleAssignee',
@@ -102,7 +96,7 @@ export class LinkedInService {
             const orgs = aclsResponse.data.elements.map((el: any) => {
                 const org = el.organization;
                 // org ID comes as "urn:li:organization:12345"
-                const id = el.organizationUrn || `urn:li:organization:${el.organization.id}`; // It varies based on projection
+                // const id = el.organizationUrn || `urn:li:organization:${el.organization.id}`; // It varies based on projection
                 // Actually with projection `organization~` the object inside is the org details.
                 // The URN is commonly in `organizationUrn` field of the element if not projected.
 
@@ -165,6 +159,31 @@ export class LinkedInService {
             });
         } else {
             return await socialConnectionRepository.createWithEncryption(data);
+        }
+    }
+    /**
+     * Refresh Access Token
+     * Note: LinkedIn v2 OAuth may not always provide refresh tokens.
+     * This method attempts to use a refresh token if available.
+     */
+    async refreshAccessToken(refreshToken: string): Promise<LinkedInTokenResponse> {
+        try {
+            const params = new URLSearchParams();
+            params.append('grant_type', 'refresh_token');
+            params.append('refresh_token', refreshToken);
+            params.append('client_id', this.clientId);
+            params.append('client_secret', this.clientSecret);
+
+            const response = await axios.post(LINKEDIN_API.ACCESS_TOKEN_URL, params, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+
+            return response.data;
+        } catch (error: any) {
+            console.error('Error refreshing LinkedIn token:', error.response?.data || error.message);
+            throw new Error('Failed to refresh LinkedIn access token');
         }
     }
 }

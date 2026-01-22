@@ -30,6 +30,9 @@ export * from './ai/prompts/recommendations.prompts';
 export * from './ai/prompts/review-sentiment.prompts';
 export * from './ai/prompts/review-reply.prompts';
 
+// Social Media Integration Schemas
+export * from './social';
+
 // Re-export commonly used types from requests
 export type {
     ApiRequest,

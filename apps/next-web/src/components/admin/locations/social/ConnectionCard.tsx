@@ -16,7 +16,8 @@ import {
     Error as ErrorIcon,
     Warning as WarningIcon
 } from '@mui/icons-material';
-import { SocialConnection } from './types';
+
+import type { SocialConnection } from './types';
 import { PlatformAvatar } from './SocialIcons';
 
 interface ConnectionCardProps {
@@ -31,9 +32,11 @@ export const ConnectionCard = ({ connection, onRefresh, onDisconnect }: Connecti
     // Mock Data generators - In real app, these should be props or fetched
     const followers = connection.followers || Math.floor(Math.random() * 50000) + 1000;
     const posts = connection.postsCount || Math.floor(Math.random() * 500) + 10;
+
     const daysConnected = connection.createdAt
         ? Math.floor((new Date().getTime() - new Date(connection.createdAt).getTime()) / (1000 * 3600 * 24))
         : 0;
+
     const hoursSynced = connection.lastSyncAt
         ? Math.floor((new Date().getTime() - new Date(connection.lastSyncAt).getTime()) / (1000 * 3600))
         : 2;

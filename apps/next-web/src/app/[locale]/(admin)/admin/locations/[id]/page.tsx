@@ -23,6 +23,8 @@ import LinkIcon from '@mui/icons-material/Link'
 import StarIcon from '@mui/icons-material/Star'
 
 // Core Components
+import ShareIcon from '@mui/icons-material/Share'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTabList from '@core/components/mui/TabList'
 
@@ -33,7 +35,6 @@ import { SERVICES } from '@/configs/services'
 
 import LocationReviews from '@/components/admin/locations/review-sync/LocationReviews'
 import { SocialConnectionList } from '@/components/admin/locations/social/SocialConnectionList'
-import ShareIcon from '@mui/icons-material/Share'
 
 
 // Placeholder Components for new tabs
