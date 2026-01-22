@@ -15,6 +15,9 @@ app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 
+// Mount routes at root to align with Nginx proxy behavior (which strips /api/seo/ but doesn't rewrite to /api/v1)
+app.use('/', v1Routes);
+// Also keep /api/v1 for internal consistency/direct access
 app.use('/api/v1', v1Routes);
 
 app.get('/', (req, res) => {

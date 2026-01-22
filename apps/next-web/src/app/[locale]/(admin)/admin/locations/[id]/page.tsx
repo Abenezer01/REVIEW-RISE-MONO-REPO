@@ -29,6 +29,7 @@ import CustomTabList from '@core/components/mui/TabList'
 import ReviewSourcesDashboard from '@/components/admin/locations/review-sync/ReviewSourcesDashboard'
 import { useTranslation } from '@/hooks/useTranslation'
 import apiClient from '@/lib/apiClient'
+import { SERVICES } from '@/configs/services'
 
 import LocationReviews from '@/components/admin/locations/review-sync/LocationReviews'
 import { SocialConnectionList } from '@/components/admin/locations/social/SocialConnectionList'
@@ -73,9 +74,11 @@ const LocationDetailsPage = () => {
     const fetchLocation = useCallback(async () => {
         if (!id) return
 
+
+
         try {
             setLoading(true)
-            const res = await apiClient.get(`/admin/locations/${id}`)
+            const res = await apiClient.get(`${SERVICES.admin.url}/locations/${id}`)
 
             setLocation(res.data)
         } catch (error) {
@@ -169,6 +172,12 @@ const LocationDetailsPage = () => {
                             <ReviewSourcesDashboard />
                         </TabPanel>
                         <TabPanel value='social' sx={{ p: 0 }}>
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="h4">Social Integrations</Typography>
+                                <Typography color="textSecondary">
+                                    Connect your social media accounts to sync posts and reviews.
+                                </Typography>
+                            </Box>
                             <SocialConnectionList businessId={location.businessId} locationId={id as string} />
                         </TabPanel>
                     </Box>

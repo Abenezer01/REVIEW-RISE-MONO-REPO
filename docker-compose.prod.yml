@@ -455,6 +455,11 @@ services:
       - NEXT_PUBLIC_SEO_HEALTH_API_URL=${NEXT_PUBLIC_SEO_HEALTH_API_URL:-https://app.vyntrise.com/api/seo/v1}
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://app.vyntrise.com}
       - NEXT_PUBLIC_LLM_COST_WARNING=${NEXT_PUBLIC_LLM_COST_WARNING:-true}
+      - AUTH_SERVICE_URL=http://express-auth:3010/api
+      - EXPRESS_REVIEWS_URL=http://express-reviews:3006/api/v1
+      - EXPRESS_AI_URL=http://express-ai:3002
+      - NEXT_PUBLIC_SEO_HEALTH_API_URL=${NEXT_PUBLIC_SEO_HEALTH_API_URL:-https://app.vyntrise.com/api/seo}
+      - NEXT_PUBLIC_REVIEWS_API_URL=${NEXT_PUBLIC_REVIEWS_API_URL:-https://app.vyntrise.com/api/reviews}
     depends_on:
       postgres:
         condition: service_healthy

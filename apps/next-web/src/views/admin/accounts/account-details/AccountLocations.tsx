@@ -20,6 +20,7 @@ import RowOptions from '@/components/shared/listing/row-options'
 import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 import { usePaginatedList } from '@/hooks/usePaginatedList'
 import useTranslation from '@/hooks/useTranslation'
+import { SERVICES } from '@/configs/services'
 
 const AccountLocations = () => {
   const t = useTranslation('dashboard')
@@ -60,7 +61,7 @@ const AccountLocations = () => {
     refetch
   } = usePaginatedList(
     ['admin', 'locations', 'list', search, status],
-    '/admin/locations',
+    `${SERVICES.admin.url}/locations`,
     {
       search: search || undefined,
       status: status === 'all' ? undefined : status,

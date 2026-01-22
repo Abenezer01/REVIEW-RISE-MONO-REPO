@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useSearchParams } from 'next/navigation'
+
 import ReviewsIcon from '@mui/icons-material/RateReview'
 import ReplyIcon from '@mui/icons-material/Reply'
 import StarIcon from '@mui/icons-material/Star'
@@ -32,6 +34,9 @@ const ReviewsDashboard = () => {
   const [period, setPeriod] = useState<number>(30)
   const { businessId, loading: businessLoading } = useBusinessId()
 
+  const searchParams = useSearchParams()
+  const locationId = searchParams.get('locationId') || 'all'
+
   const {
     ratingTrend,
     volumeData,
@@ -41,7 +46,7 @@ const ReviewsDashboard = () => {
     competitorData,
     dashboardMetrics,
     isLoading: analyticsLoading
-  } = useReviewAnalytics(businessId || '', 'all', period)
+  } = useReviewAnalytics(businessId || '', locationId, period)
 
   const handlePeriodChange = (event: SelectChangeEvent<number>) => {
     setPeriod(event.target.value as number)
