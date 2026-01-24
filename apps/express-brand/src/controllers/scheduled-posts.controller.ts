@@ -26,6 +26,7 @@ const formatPostResponse = (post: any) => {
     try {
       content = JSON.parse(content);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error('Failed to parse post content:', e);
     }
   }
@@ -57,7 +58,6 @@ export const list = async (req: Request, res: Response) => {
 
 export const get = async (req: Request, res: Response) => {
   const requestId = (req as any).id || crypto.randomUUID();
-  console.log(`[ScheduledPostsController] get post: ${req.params.postId} for business ${req.params.id}`);
   try {
     const businessId = req.params.id;
     const postId = req.params.postId;
@@ -145,7 +145,7 @@ export const getLogs = async (req: Request, res: Response) => {
       locationId: locationId as string,
     });
 
-    const formattedLogs = logs.map(log => ({
+    const formattedLogs = logs.map((log: any) => ({
       ...log,
       scheduledPost: formatPostResponse(log.scheduledPost),
     }));

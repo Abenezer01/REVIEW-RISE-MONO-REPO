@@ -14,6 +14,7 @@ export interface GenerateScriptRequest {
   videoGoal?: string;
   targetAudience?: string;
   tone?: string;
+  platform?: string;
   duration?: number;
   includeSceneDescriptions?: boolean;
   includeVisualSuggestions?: boolean;

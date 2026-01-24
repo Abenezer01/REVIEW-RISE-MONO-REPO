@@ -29,7 +29,6 @@ export const generateReport = async (businessId: string) => {
     // if (competitors.length === 0) {
     //     throw new Error('No competitors found. Discover competitors first.');
     // }
-    console.log(`Generating report with ${competitors.length} competitors`);
 
     // 2. Prepare Data for AI
     const analysisData = competitors.map(c => {
@@ -68,7 +67,9 @@ export const generateReport = async (businessId: string) => {
             };
         }
     } catch (e: any) {
+        // eslint-disable-next-line no-console
         console.error('AI Report Gen Failed:', e.message);
+        // eslint-disable-next-line no-console
         console.warn('Using fallback mock data for demonstration purposes');
         
         // Fallback mock data when AI service is unavailable

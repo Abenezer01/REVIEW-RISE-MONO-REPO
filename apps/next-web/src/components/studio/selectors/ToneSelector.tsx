@@ -11,12 +11,14 @@ interface ToneSelectorProps {
 }
 
 const TONES = [
-    { value: 'Friendly', icon: 'tabler-mood-smile', color: '#9C27B0' },
-    { value: 'Professional', icon: 'tabler-briefcase', color: '#2196F3' },
-    { value: 'Luxury', icon: 'tabler-diamond', color: '#E91E63' },
-    { value: 'Casual', icon: 'tabler-coffee', color: '#FF9800' },
-    { value: 'Inspiring', icon: 'tabler-flame', color: '#F44336' },
-    { value: 'Humorous', icon: 'tabler-mood-happy', color: '#4CAF50' }
+    { value: 'friendly', label: 'Friendly', icon: 'tabler-mood-smile', color: '#9C27B0' },
+    { value: 'professional', label: 'Professional', icon: 'tabler-briefcase', color: '#2196F3' },
+    { value: 'luxury', label: 'Luxury', icon: 'tabler-diamond', color: '#E91E63' },
+    { value: 'casual', label: 'Casual', icon: 'tabler-coffee', color: '#FF9800' },
+    { value: 'inspiring', label: 'Inspiring', icon: 'tabler-flame', color: '#F44336' },
+    { value: 'humorous', label: 'Humorous', icon: 'tabler-mood-happy', color: '#4CAF50' },
+    { value: 'energetic', label: 'Energetic', icon: 'tabler-bolt', color: '#FFC107' },
+    { value: 'educational', label: 'Educational', icon: 'tabler-school', color: '#3F51B5' }
 ]
 
 export default function ToneSelector({ value, onChange }: ToneSelectorProps) {
@@ -58,7 +60,7 @@ export default function ToneSelector({ value, onChange }: ToneSelectorProps) {
                                     color={value === tone.value ? tone.color : 'text.secondary'}
                                     sx={{ fontSize: '0.7rem' }}
                                 >
-                                    {tone.value}
+                                    {tone.label}
                                 </Typography>
                             </CardActionArea>
                         </Card>

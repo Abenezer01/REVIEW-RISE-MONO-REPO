@@ -51,11 +51,13 @@ export class ContentStudioController {
         try {
             const schema = z.object({
                 businessType: z.string(),
-                goal: z.string()
+                goal: z.string(),
+                tone: z.string().optional().default('professional'),
+                platform: z.string().optional().default('Instagram')
             });
-            const { businessType, goal } = schema.parse(req.body);
+            const { businessType, goal, tone, platform } = schema.parse(req.body);
 
-            const result = await contentStudioService.generatePostIdeas(businessType, goal);
+            const result = await contentStudioService.generatePostIdeas(businessType, goal, tone, platform);
             res.json(result);
         } catch (error) {
             console.error('Error generating ideas:', error);
@@ -140,11 +142,13 @@ export class ContentStudioController {
     async generateCarousel(req: Request, res: Response) {
         try {
             const schema = z.object({
-                topic: z.string()
+                topic: z.string(),
+                tone: z.string().optional().default('professional'),
+                platform: z.string().optional().default('Instagram')
             });
-            const { topic } = schema.parse(req.body);
+            const { topic, tone, platform } = schema.parse(req.body);
 
-            const result = await contentStudioService.generateCarousel(topic);
+            const result = await contentStudioService.generateCarousel(topic, tone, platform);
             res.json(result);
         } catch (error) {
             console.error('Error generating carousel:', error);
@@ -160,6 +164,7 @@ export class ContentStudioController {
                 videoGoal: z.string().optional(),
                 targetAudience: z.string().optional(),
                 tone: z.string().optional().default('professional'),
+                platform: z.string().optional().default('Instagram'),
                 duration: z.number().optional().default(30),
                 includeSceneDescriptions: z.boolean().optional().default(true),
                 includeVisualSuggestions: z.boolean().optional().default(true),

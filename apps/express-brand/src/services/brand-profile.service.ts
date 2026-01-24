@@ -225,8 +225,6 @@ export const onboardBrandProfile = async (businessId: string, websiteUrl: string
         // We store it as JSON compat object
         const dataToStore = extractedData as unknown as Prisma.JsonObject;
 
-        console.log('Final Data to Store:', JSON.stringify(dataToStore, null, 2));
-
         const finalData = {
           ...dataToStore,
           title: extractedData.title

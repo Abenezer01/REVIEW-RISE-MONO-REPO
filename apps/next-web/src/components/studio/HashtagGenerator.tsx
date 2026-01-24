@@ -5,7 +5,6 @@ import React, { useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
 
 import { toast } from 'react-toastify'
 
@@ -66,15 +65,6 @@ return
 
     return (
         <Box>
-            {/* Page Header */}
-            <Box sx={{ mb: 4 }}>
-                <Typography variant="h4" fontWeight="bold" gutterBottom>
-                    Hashtag Generator
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                    Generate targeted hashtags for maximum reach
-                </Typography>
-            </Box>
 
             <Grid container spacing={4}>
                 {/* Main Content Area */}
