@@ -154,6 +154,12 @@ const AppFullCalendar = styled('div')(({ theme }: { theme: Theme }) => ({
       '& .fc-event-title-container, .fc-event-main-frame': {
         lineHeight: 1
       },
+      cursor: 'pointer',
+      transition: 'all 0.2s ease-in-out',
+      '&:hover': {
+        transform: 'scale(1.02)',
+        filter: 'brightness(0.95)'
+      },
       '&:not(.fc-list-event)': {
         '&.event-bg-primary': {
           border: 0,

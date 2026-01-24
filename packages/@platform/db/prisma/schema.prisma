@@ -97,6 +97,11 @@ model Business {
   userBusinessRoles    UserBusinessRole[]
   visibilityMetrics    VisibilityMetric[]
   visibilitySnapshots  VisibilitySnapshot[]
+  posts                Post[]
+  captionDrafts        CaptionDraft[]
+  imagePrompts         ImagePrompt[]
+  scriptDrafts         ScriptDraft[]
+  carouselDrafts       CarouselDraft[]
 
   @@index([name])
   @@index([status])
@@ -648,9 +653,11 @@ model ContentIdea {
   title       String
   description String?
   platform    String
+  category    String?
   status      String   @default("draft")
   createdAt   DateTime @default(now())
   business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  posts       Post[]
 
   @@index([businessId])
 }
@@ -863,4 +870,84 @@ model PublishingJob {
   @@index([scheduledPostId])
   @@index([platform])
   @@index([status])
+}
+
+model Post {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @db.Uuid
+  content     String?
+  mediaUrls   String[]
+  platform    String   // 'facebook', 'instagram', 'linkedin', etc.
+  scheduledAt DateTime?
+  status      String   @default("draft") // draft, scheduled, published
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  idea        ContentIdea? @relation(fields: [ideaId], references: [id])
+  ideaId      String? @db.Uuid
+  
+  @@index([businessId])
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+model CaptionDraft {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @db.Uuid
+  content     String
+  platform    String
+  tone        String?
+  status      String   @default("generated") // generated, saved
+  createdAt   DateTime @default(now())
+  
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+model ImagePrompt {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @db.Uuid
+  prompt      String
+  style       String?
+  aspectRatio String?
+  createdAt   DateTime @default(now())
+  
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  images      GeneratedImage[]
+}
+
+model GeneratedImage {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  promptId    String   @db.Uuid
+  url         String
+  storagePath String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  
+  prompt      ImagePrompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+}
+
+model ScriptDraft {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @db.Uuid
+  title       String?
+  platform    String
+  hook        String?
+  body        String?
+  cta         String?
+  duration    String?
+  createdAt   DateTime @default(now())
+  
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+model CarouselDraft {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @db.Uuid
+  topic       String
+  slides      Json     // Array of { title, content, imagePrompt }
+  status      String   @default("draft")
+  createdAt   DateTime @default(now())
+
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 }

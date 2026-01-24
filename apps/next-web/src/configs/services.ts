@@ -74,7 +74,7 @@ export const SERVICES_CONFIG = {
         get url() {
             if (typeof window === 'undefined') {
                 // Server-side
-                return process.env.EXPRESS_AI_URL || 'http://localhost:3002';
+                return process.env.EXPRESS_AI_URL || 'http://localhost:3002/api/v1/ai';
             }
 
             // Client-side: AI is server-side only
@@ -84,7 +84,7 @@ export const SERVICES_CONFIG = {
     social: {
         get url() {
             if (typeof window === 'undefined') {
-                return process.env.EXPRESS_SOCIAL_URL || 'http://localhost:3003';
+                return process.env.EXPRESS_SOCIAL_URL || 'http://localhost:3003/api/v1';
             }
 
             if (isProduction()) {

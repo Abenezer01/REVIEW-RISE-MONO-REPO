@@ -53,6 +53,12 @@ const menuData: MenuItem[] = [
     ]
   },
   {
+    title: 'navigation.ai-studio',
+    href: '/admin/studio',
+    icon: 'tabler-wand',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
     title: 'navigation.social-rise',
     href: '/admin/social-rise',
     icon: 'tabler-brand-twitter',
