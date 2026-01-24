@@ -6,10 +6,8 @@ import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
-import CircularProgress from '@mui/material/CircularProgress'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 
@@ -17,6 +15,7 @@ import { toast } from 'react-toastify'
 
 import { SERVICES } from '@/configs/services'
 import apiClient from '@/lib/apiClient'
+import StudioGenerateButton from '../shared/StudioGenerateButton'
 
 const CATEGORIES = [
     { value: 'portrait', label: '👤 Portrait', icon: 'tabler-user' },
@@ -153,27 +152,14 @@ return
             </Box>
 
             {/* Generate Button */}
-            <Button
-                variant="contained"
-                color="primary"
+            <StudioGenerateButton
                 onClick={handleGenerate}
-                disabled={loading || !topic.trim()}
+                loading={loading}
+                disabled={!topic.trim()}
+                label="✨ Generate Prompt Ideas"
+                loadingLabel="Generating Ideas..."
                 fullWidth
-                sx={{ 
-                    borderRadius: 2,
-                    py: 1.5,
-                    fontWeight: 'bold'
-                }}
-            >
-                {loading ? (
-                    <>
-                        <CircularProgress size={20} sx={{ mr: 1 }} color="inherit" />
-                        Generating Ideas...
-                    </>
-                ) : (
-                    '✨ Generate Prompt Ideas'
-                )}
-            </Button>
+            />
 
             {/* Generated Prompts */}
             {promptIdeas.length > 0 && (

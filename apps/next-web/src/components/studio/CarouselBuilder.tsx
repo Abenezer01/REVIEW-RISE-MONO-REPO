@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
@@ -17,23 +17,63 @@ import IconButton from '@mui/material/IconButton'
 
 import { toast } from 'react-toastify'
 
+import { useBusinessId } from '@/hooks/useBusinessId'
 import { SERVICES } from '@/configs/services'
 import apiClient from '@/lib/apiClient'
 import LayoutTemplateSelector from './carousel/LayoutTemplateSelector'
 import ColorSchemePicker from './carousel/ColorSchemePicker'
+import StudioGenerateButton from './shared/StudioGenerateButton'
+import ToneSelector from './selectors/ToneSelector'
+import PlatformSelector from './selectors/PlatformSelector'
 
 export default function CarouselBuilder() {
+    const { businessId } = useBusinessId()
     const [loading, setLoading] = useState(false)
     const [topic, setTopic] = useState('')
     const [additionalContext, setAdditionalContext] = useState('')
     const [slideCount, setSlideCount] = useState(7)
     const [layoutTemplate, setLayoutTemplate] = useState('modern')
     const [colorScheme, setColorScheme] = useState('orange')
+    const [tone, setTone] = useState('professional')
+    const [platform, setPlatform] = useState('Instagram')
     const [autoGenerateImages, setAutoGenerateImages] = useState(true)
     const [includeStatistics, setIncludeStatistics] = useState(true)
     const [addCallToAction, setAddCallToAction] = useState(false)
     const [slides, setSlides] = useState<any[]>([])
     const [currentSlide, setCurrentSlide] = useState(0)
+    
+    // History State
+    const [viewMode, setViewMode] = useState<'generator' | 'history'>('generator')
+    const [history, setHistory] = useState<any[]>([])
+    const [historyLoading, setHistoryLoading] = useState(false)
+
+    const fetchHistory = useCallback(async () => {
+        if (!businessId) return
+        setHistoryLoading(true)
+
+        try {
+            const response = await apiClient.get(`${SERVICES.brand.url}/${businessId}/carousel-drafts`)
+
+            setHistory(response.data.drafts || [])
+        } catch (error) {
+            console.error('Failed to fetch carousel history:', error)
+        } finally {
+            setHistoryLoading(false)
+        }
+    }, [businessId])
+
+    useEffect(() => {
+        if (viewMode === 'history') {
+            fetchHistory()
+        }
+    }, [viewMode, fetchHistory])
+
+    const loadDraft = (draft: any) => {
+        setTopic(draft.topic || '')
+        setSlides(draft.slides || [])
+        setViewMode('generator')
+        toast.info('Draft loaded')
+    }
 
     const handleGenerate = async () => {
         if (!topic) {
@@ -48,7 +88,8 @@ return
             const response = await apiClient.post(`${SERVICES.ai.url}/studio/carousels`, { 
                 topic,
                 additionalContext,
-                count: slideCount,
+                slideCount,
+                tone,
                 layoutTemplate,
                 colorScheme,
                 autoGenerateImages,
@@ -77,28 +118,63 @@ return
         setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
     }
 
+    const handleSaveDraft = async () => {
+        if (!businessId || !topic || slides.length === 0) {
+            toast.error('No carousel to save')
+            
+return
+        }
+
+        try {
+            await apiClient.post(`${SERVICES.brand.url}/${businessId}/carousel-drafts`, {
+                businessId,
+                topic,
+                slides: slides.map(slide => ({
+                    title: slide.title,
+                    content: slide.text || slide.content,
+                    imagePrompt: slide.visualDescription
+                }))
+            })
+            toast.success('Carousel draft saved successfully!')
+        } catch (error) {
+            console.error('Error saving carousel draft:', error)
+            toast.error('Failed to save carousel draft')
+        }
+    }
+
     return (
         <Box>
-            {/* Page Header */}
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box>
-                    <Typography variant="h4" fontWeight="bold" gutterBottom>
-                        AI Carousel Generator
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary">
-                        Create engaging multi-slide carousels
-                    </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button variant="outlined" startIcon={<i className="tabler-device-floppy" />}>
-                        Save Draft
-                    </Button>
-                    <Button variant="contained" startIcon={<i className="tabler-download" />}>
-                        Export
-                    </Button>
-                </Box>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+                <Button 
+                    onClick={() => setViewMode('generator')}
+                    sx={{ 
+                        borderBottom: viewMode === 'generator' ? 2 : 0, 
+                        borderColor: 'primary.main',
+                        borderRadius: 0,
+                        mr: 2,
+                        pb: 1,
+                        color: viewMode === 'generator' ? 'primary.main' : 'text.secondary',
+                        textTransform: 'none', px: 2
+                    }}
+                >
+                    Generator
+                </Button>
+                <Button 
+                    onClick={() => setViewMode('history')}
+                    sx={{ 
+                        borderBottom: viewMode === 'history' ? 2 : 0, 
+                        borderColor: 'primary.main',
+                        borderRadius: 0,
+                        pb: 1,
+                        color: viewMode === 'history' ? 'primary.main' : 'text.secondary',
+                        textTransform: 'none', px: 2
+                    }}
+                >
+                    History ({history.length})
+                </Button>
             </Box>
 
+            {viewMode === 'generator' ? (
             <Grid container spacing={4}>
                 {/* Left Panel - Input & Settings */}
                 <Grid size={{ xs: 12, lg: 6 }}>
@@ -156,13 +232,21 @@ return
                             </CardContent>
                         </Card>
 
-                        {/* Design Style */}
+                        {/* Style & Tone */}
                         <Card variant="outlined" sx={{ borderRadius: 2 }}>
                             <CardContent sx={{ p: 3 }}>
                                 <Typography variant="h6" fontWeight="bold" mb={2}>
-                                    Design Style
+                                    Style & Tone
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                                    <PlatformSelector 
+                                        value={platform} 
+                                        onChange={setPlatform} 
+                                    />
+                                    <ToneSelector 
+                                        value={tone} 
+                                        onChange={setTone} 
+                                    />
                                     <LayoutTemplateSelector 
                                         selected={layoutTemplate} 
                                         onChange={setLayoutTemplate} 
@@ -229,24 +313,16 @@ return
                                     15 Credits
                                 </Typography>
                             </Box>
-                            <Button
-                                variant="contained"
-                                size="large"
-                                fullWidth
+                            <StudioGenerateButton
                                 onClick={handleGenerate}
-                                disabled={loading}
-                                startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <i className='tabler-sparkles' />}
+                                loading={loading}
+                                label="✨ Generate Carousel"
+                                loadingLabel="Generating..."
+                                fullWidth
                                 sx={{ 
-                                    borderRadius: 2, 
-                                    py: 1.5,
-                                    bgcolor: 'primary.main',
-                                    '&:hover': { bgcolor: 'primary.dark' },
                                     fontSize: '1rem',
-                                    fontWeight: 'bold'
                                 }}
-                            >
-                                {loading ? 'Generating...' : '✨ Generate Carousel'}
-                            </Button>
+                            />
                         </Box>
                     </Box>
                 </Grid>
@@ -383,6 +459,23 @@ return
                                         </Box>
                                     </Box>
                                 )}
+                                {slides.length > 0 && (
+                                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                                        <Button 
+                                            variant="contained" 
+                                            onClick={handleSaveDraft}
+                                            startIcon={<i className="tabler-device-floppy" />}
+                                            sx={{ 
+                                                borderRadius: 2, 
+                                                px: 3,
+                                                bgcolor: 'secondary.main',
+                                                '&:hover': { bgcolor: 'secondary.dark' }
+                                            }}
+                                        >
+                                            Save Draft
+                                        </Button>
+                                    </Box>
+                                )}
                             </CardContent>
                         </Card>
 
@@ -423,6 +516,60 @@ return
                     </Box>
                 </Grid>
             </Grid>
+            ) : (
+                <Box>
+                    {historyLoading ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                            <CircularProgress />
+                        </Box>
+                    ) : history.length === 0 ? (
+                        <Box sx={{ py: 8, textAlign: 'center' }}>
+                            <i className="tabler-history" style={{ fontSize: 48, opacity: 0.2, marginBottom: 16 }} />
+                            <Typography color="text.secondary">No carousel drafts found</Typography>
+                        </Box>
+                    ) : (
+                        <Grid container spacing={3}>
+                            {history.map((draft: any) => (
+                                <Grid key={draft.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                                    <Card variant="outlined" sx={{ 
+                                        height: '100%', 
+                                        cursor: 'pointer', 
+                                        transition: 'all 0.2s',
+                                        '&:hover': { boxShadow: 4, transform: 'translateY(-2px)', borderColor: 'primary.main' }
+                                    }} onClick={() => loadDraft(draft)}>
+                                        <CardContent>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                <Typography variant="caption" color="text.secondary">
+                                                    {new Date(draft.createdAt).toLocaleDateString()}
+                                                </Typography>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                    <i className="tabler-slideshow" style={{ fontSize: 14, opacity: 0.6 }} />
+                                                    <Typography variant="caption" fontWeight="bold">
+                                                        {draft.slides?.length || 0}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                            <Typography variant="subtitle1" fontWeight="bold" gutterBottom sx={{ 
+                                                overflow: 'hidden', 
+                                                textOverflow: 'ellipsis', 
+                                                display: '-webkit-box', 
+                                                WebkitLineClamp: 2, 
+                                                WebkitBoxOrient: 'vertical',
+                                                height: 48
+                                            }}>
+                                                {draft.topic}
+                                            </Typography>
+                                            <Button size="small" variant="outlined" fullWidth sx={{ mt: 2 }}>
+                                                Load Draft
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    )}
+                </Box>
+            )}
         </Box>
     )
 }

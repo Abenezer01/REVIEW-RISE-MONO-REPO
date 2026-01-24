@@ -2,7 +2,7 @@
 
 import React from 'react'
 
-import { Box, Typography, Card, CardContent, IconButton } from '@mui/material'
+import { Box, Typography, Card, CardContent, IconButton, Button } from '@mui/material'
 import { toast } from 'react-toastify'
 
 interface ResultCardProps {
@@ -44,9 +44,21 @@ export default function ResultCard({ index, text, onSave }: ResultCardProps) {
                     </Box>
                     <Box sx={{ flexGrow: 1 }}>
                          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1, gap: 1 }}>
-                             <IconButton size="small" onClick={copyToClipboard}><i className="tabler-copy" style={{ fontSize: 18 }} /></IconButton>
-                             <IconButton size="small" onClick={() => onSave?.(text)}><i className="tabler-file-plus" style={{ fontSize: 18 }} /></IconButton>
-                             <IconButton size="small"><i className="tabler-share" style={{ fontSize: 18 }} /></IconButton>
+                             <IconButton size="small" onClick={copyToClipboard}>
+                                 <i className="tabler-copy" style={{ fontSize: 18 }} />
+                             </IconButton>
+                             <IconButton size="small">
+                                 <i className="tabler-share" style={{ fontSize: 18 }} />
+                             </IconButton>
+                             <Button 
+                                 size="small" 
+                                 variant="outlined" 
+                                 onClick={() => onSave?.(text)}
+                                 startIcon={<i className="tabler-device-floppy" />}
+                                 sx={{ ml: 1 }}
+                             >
+                                 Save
+                             </Button>
                          </Box>
                         <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, color: 'text.primary' }}>
                             {text}

@@ -42,9 +42,10 @@ export class ContentStudioService {
         return llmService.generateJSON(prompt);
     }
 
-    async generatePostIdeas(businessType: string, goal: string) {
-        const prompt = `Generate 10 social media post ideas for a ${businessType} with the goal of "${goal}".
-        Return JSON with an "ideas" array. Each idea should have: "title", "description", "platform" (suggested).`;
+    async generatePostIdeas(businessType: string, goal: string, tone?: string, platform?: string) {
+        const prompt = `Generate 10 social media post ideas for a ${businessType} on ${platform || 'social media'} with the goal of "${goal}".
+        ${tone ? `Tone: ${tone}` : ''}
+        Return JSON with an "ideas" array. Each idea should have: "title", "description", "platform" (suggested), "tone" (suggested tone).`;
 
         return llmService.generateJSON(prompt);
     }
@@ -146,8 +147,9 @@ Example format:
         };
     }
 
-    async generateCarousel(topic: string) {
-        const prompt = `Create a 5-8 slide carousel outline for "${topic}".
+    async generateCarousel(topic: string, tone?: string, platform?: string) {
+        const prompt = `Create a 5-8 slide carousel outline for "${topic}" on ${platform || 'Instagram'}.
+        ${tone ? `Tone: ${tone}` : ''}
         Return JSON with "slides" array. Each slide: "slideNumber", "title", "text", "visualDescription".`;
 
         return llmService.generateJSON(prompt);
@@ -159,13 +161,14 @@ Example format:
             videoGoal, 
             targetAudience, 
             tone = 'professional', 
+            platform = 'Instagram',
             duration = 30,
             includeCallToAction
         } = params;
 
         const numScenes = duration <= 15 ? 2 : duration <= 30 ? 3 : duration <= 60 ? 4 : Math.min(Math.ceil(duration / 20), 10);
 
-        const prompt = `Create a ${duration}-second video script about: ${videoTopic}
+        const prompt = `Create a ${duration}-second video script (e.g. for ${platform} Reels) about: ${videoTopic}
 
 ${videoGoal ? `Goal: ${videoGoal}` : ''}
 ${targetAudience ? `Audience: ${targetAudience}` : ''}

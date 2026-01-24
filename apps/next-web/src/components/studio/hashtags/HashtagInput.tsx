@@ -7,11 +7,10 @@ import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import CircularProgress from '@mui/material/CircularProgress'
 
 import PlatformSelector from '../selectors/PlatformSelector'
+import StudioGenerateButton from '../shared/StudioGenerateButton'
 
 interface HashtagInputProps {
     niche: string
@@ -94,16 +93,12 @@ export default function HashtagInput({
                 </Grid>
                 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-                    <Button 
-                        variant="contained" 
-                        size="large" 
+                    <StudioGenerateButton
                         onClick={onGenerate}
-                        disabled={loading}
-                        startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <i className='tabler-sparkles' />}
-                        sx={{ borderRadius: 2, px: 4, bgcolor: 'secondary.main', '&:hover': { bgcolor: 'secondary.dark' } }}
-                    >
-                        {loading ? 'Generating...' : 'Generate'}
-                    </Button>
+                        loading={loading}
+                        label="Generate"
+                        loadingLabel="Generating..."
+                    />
                 </Box>
             </CardContent>
         </Card>
