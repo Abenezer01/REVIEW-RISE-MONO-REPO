@@ -12,6 +12,10 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', service: 'express-ai' });
+});
+
 import aiRoutes from './routes/ai.routes';
 import contentStudioRoutes from './routes/content-studio.routes';
 
@@ -20,10 +24,6 @@ app.use('/api/v1/ai/studio', contentStudioRoutes);
 
 app.get('/', (req, res) => {
     res.json({ message: 'Express AI Service is running' });
-});
-
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok', service: 'express-ai' });
 });
 
 app.listen(PORT, () => {
