@@ -264,6 +264,93 @@ export class FacebookService {
             throw new Error('Failed to refresh Facebook page token');
         }
     }
+
+    /**
+     * Publish post to a Facebook Page
+     */
+    async publishPagePost(pageId: string, pageAccessToken: string, content: { text: string; media?: any }) {
+        try {
+            const { text, media } = content;
+            let response;
+
+            if (media && media.length > 0) {
+                // Simplified: for multiple images, FB uses a different flow (upload each, then create post with attached_media)
+                // For now, let's implement single image/video or text only.
+                const firstMedia = media[0];
+                const endpoint = firstMedia.type === 'video' ? 'videos' : 'photos';
+                const field = firstMedia.type === 'video' ? 'description' : 'caption';
+
+                response = await axios.post(`${FACEBOOK_API.GRAPH_API_URL}/${pageId}/${endpoint}`, {
+                    url: firstMedia.url,
+                    [field]: text,
+                    access_token: pageAccessToken
+                });
+            } else {
+                response = await axios.post(`${FACEBOOK_API.GRAPH_API_URL}/${pageId}/feed`, {
+                    message: text,
+                    access_token: pageAccessToken
+                });
+            }
+
+            return response.data; // { id: "..." }
+        } catch (error: any) {
+            console.error(`Error publishing to FB Page ${pageId}:`, error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * Publish post to an Instagram Business Account
+     */
+    async publishInstagramPost(igAccountId: string, userAccessToken: string, content: { text: string; media: any }) {
+        try {
+            const { text, media } = content;
+            if (!media || media.length === 0) {
+                throw new Error('Instagram requires media (image/video) to post.');
+            }
+
+            const firstMedia = media[0];
+            const isVideo = firstMedia.type === 'video';
+
+            // 1. Create media container
+            const containerParams: any = {
+                access_token: userAccessToken,
+                caption: text,
+            };
+
+            if (isVideo) {
+                containerParams.video_url = firstMedia.url;
+                containerParams.media_type = 'VIDEO';
+            } else {
+                containerParams.image_url = firstMedia.url;
+            }
+
+            const containerRes = await axios.post(`${FACEBOOK_API.GRAPH_API_URL}/${igAccountId}/media`, null, {
+                params: containerParams
+            });
+
+            const creationId = containerRes.data.id;
+
+            // 2. Poll for container status if it's a video (simplified here, in real world use a worker)
+            if (isVideo) {
+                // Wait a bit for video processing
+                await new Promise(resolve => setTimeout(resolve, 10000));
+            }
+
+            // 3. Publish container
+            const publishRes = await axios.post(`${FACEBOOK_API.GRAPH_API_URL}/${igAccountId}/media_publish`, null, {
+                params: {
+                    creation_id: creationId,
+                    access_token: userAccessToken
+                }
+            });
+
+            return publishRes.data; // { id: "..." }
+        } catch (error: any) {
+            console.error(`Error publishing to IG Account ${igAccountId}:`, error.response?.data || error.message);
+            throw error;
+        }
+    }
 }
 
 export const facebookService = new FacebookService();

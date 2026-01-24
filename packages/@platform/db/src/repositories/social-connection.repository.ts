@@ -195,11 +195,22 @@ export class SocialConnectionRepository extends BaseRepository<
     }
 
     /**
-     * Get connection with encrypted tokens (for external API calls)
+     * Find a single record by ID with decryption
      */
     async findByIdWithDecryption(id: string): Promise<SocialConnection | null> {
-        const connection = await this.findById(id);
+        const connection = await super.findById(id);
         return connection ? this.decryptConnection(connection) : null;
+    }
+
+    override async findById(id: string): Promise<SocialConnection | null> {
+        return this.findByIdWithDecryption(id);
+    }
+
+    /**
+     * Get connection with encrypted tokens (for external API calls)
+     */
+    async findByIdRaw(id: string): Promise<SocialConnection | null> {
+        return super.findById(id);
     }
 }
 

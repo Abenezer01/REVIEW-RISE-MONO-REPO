@@ -231,9 +231,11 @@
       "sentiment": "Sentiment Distribution"
     },
     "content": {
+      "title": "Content Management",
       "calendar": "Content Calendar",
       "add": "Add Content",
-      "ideas": "Content Ideas"
+      "ideas": "Content Ideas",
+      "logs": "Publishing Logs"
     },
     "dna": {
       "summary": "Brand Identity Summary",
