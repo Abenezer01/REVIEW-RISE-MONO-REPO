@@ -1,6 +1,8 @@
 import { llmService } from './llm.service';
 import OpenAI from 'openai'; // Still needed for DALL-E direct call if kept here
 
+import { GenerateScriptRequest, GenerateScriptResponse } from '@platform/contracts';
+
 export class ContentStudioService {
     // Kept for DALL-E specific logic
     private getOpenAI() {
@@ -151,17 +153,7 @@ Example format:
         return llmService.generateJSON(prompt);
     }
 
-    async generateScript(params: {
-        videoTopic: string;
-        videoGoal?: string;
-        targetAudience?: string;
-        tone?: string;
-        duration?: number;
-        includeSceneDescriptions?: boolean;
-        includeVisualSuggestions?: boolean;
-        includeBRollRecommendations?: boolean;
-        includeCallToAction?: boolean;
-    }) {
+    async generateScript(params: GenerateScriptRequest): Promise<GenerateScriptResponse> {
         const { 
             videoTopic, 
             videoGoal, 

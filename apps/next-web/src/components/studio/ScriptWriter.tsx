@@ -17,6 +17,8 @@ import IconButton from '@mui/material/IconButton'
 
 import { toast } from 'react-toastify'
 
+import type { GenerateScriptRequest, GenerateScriptResponse, ScriptData } from '@platform/contracts'
+
 import { SERVICES } from '@/configs/services'
 import apiClient from '@/lib/apiClient'
 import ToneVoiceSelector from './scripts/ToneVoiceSelector'
@@ -33,7 +35,7 @@ export default function ScriptWriter() {
     const [includeVisualSuggestions, setIncludeVisualSuggestions] = useState(true)
     const [includeBRollRecommendations, setIncludeBRollRecommendations] = useState(false)
     const [includeCallToAction, setIncludeCallToAction] = useState(true)
-    const [script, setScript] = useState<any>(null)
+    const [script, setScript] = useState<ScriptData | null>(null)
 
     const handleGenerate = async () => {
         if (!videoTopic) {
@@ -45,7 +47,7 @@ return
         setLoading(true)
 
         try {
-            const response = await apiClient.post(`${SERVICES.ai.url}/studio/scripts`, { 
+            const requestBody: GenerateScriptRequest = { 
                 videoTopic,
                 videoGoal,
                 targetAudience,
@@ -55,7 +57,9 @@ return
                 includeVisualSuggestions,
                 includeBRollRecommendations,
                 includeCallToAction
-            })
+            }
+
+            const response = await apiClient.post<GenerateScriptResponse>(`${SERVICES.ai.url}/studio/scripts`, requestBody)
 
             const data = response.data
 

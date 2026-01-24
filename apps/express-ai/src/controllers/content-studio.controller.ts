@@ -168,6 +168,7 @@ export class ContentStudioController {
             });
             const params = schema.parse(req.body);
 
+            // Cast to strictly typed request for service
             const result = await contentStudioService.generateScript(params);
             res.json(result);
         } catch (error) {

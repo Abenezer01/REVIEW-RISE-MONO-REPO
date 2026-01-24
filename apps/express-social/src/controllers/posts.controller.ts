@@ -1,24 +1,32 @@
 
 import { Request, Response } from 'express';
 import { prisma } from '@platform/db';
-import { z } from 'zod';
+import {
+    CreatePostRequestSchema,
+    CreateBatchPostsRequestSchema,
+    ListPostsQuerySchema,
+    createSuccessResponse,
+    createErrorResponse,
+    ErrorCode
+} from '@platform/contracts';
 
 export class PostsController {
     
     // Create a new post (e.g. from Draft)
     async create(req: Request, res: Response) {
         try {
-            const schema = z.object({
-                businessId: z.string().uuid(),
-                content: z.string().optional(),
-                platform: z.string(), // 'facebook', 'instagram', 'linkedin'
-                status: z.enum(['draft', 'scheduled', 'published']).default('draft'),
-                scheduledAt: z.string().datetime().optional(), // ISO String
-                mediaUrls: z.array(z.string()).optional(),
-                ideaId: z.string().uuid().optional().nullable()
-            });
+            const parseResult = CreatePostRequestSchema.safeParse(req.body);
+            if (!parseResult.success) {
+                const response = createErrorResponse(
+                    'Invalid request body',
+                    ErrorCode.VALIDATION_ERROR,
+                    400,
+                    parseResult.error.issues
+                );
+                return res.status(400).json(response);
+            }
 
-            const data = schema.parse(req.body);
+            const data = parseResult.data;
 
             const post = await prisma.post.create({
                 data: {
@@ -32,32 +40,38 @@ export class PostsController {
                 }
             });
 
-            res.status(201).json(post);
+            const response = createSuccessResponse(
+                post,
+                'Post created successfully',
+                201
+            );
+            res.status(201).json(response);
         } catch (error: any) {
             console.error('Error creating post:', error);
-            if (error instanceof z.ZodError) {
-                res.status(400).json({ error: 'Validation failed', details: error.errors });
-            } else {
-                res.status(500).json({ error: 'Failed to create post' });
-            }
+            const response = createErrorResponse(
+                'Failed to create post',
+                ErrorCode.INTERNAL_SERVER_ERROR,
+                500
+            );
+            res.status(500).json(response);
         }
     }
 
     // Batch create posts (e.g. for Plans)
     async createBatch(req: Request, res: Response) {
         try {
-            const schema = z.object({
-                businessId: z.string().uuid(),
-                posts: z.array(z.object({
-                    content: z.string().optional(),
-                    platform: z.string(),
-                    status: z.enum(['draft', 'scheduled', 'published']).default('draft'),
-                    scheduledAt: z.string().datetime().optional(),
-                    mediaUrls: z.array(z.string()).optional()
-                }))
-            });
+            const parseResult = CreateBatchPostsRequestSchema.safeParse(req.body);
+            if (!parseResult.success) {
+                const response = createErrorResponse(
+                    'Invalid request body',
+                    ErrorCode.VALIDATION_ERROR,
+                    400,
+                    parseResult.error.issues
+                );
+                return res.status(400).json(response);
+            }
 
-            const { businessId, posts } = schema.parse(req.body);
+            const { businessId, posts } = parseResult.data;
 
             // Use transaction to create all
             const result = await prisma.$transaction(
@@ -73,28 +87,38 @@ export class PostsController {
                 }))
             );
 
-            res.status(201).json({ count: result.length, posts: result });
+            const response = createSuccessResponse(
+                { count: result.length, posts: result },
+                'Posts created successfully',
+                201
+            );
+            res.status(201).json(response);
         } catch (error: any) {
             console.error('Error creating batch posts:', error);
-            if (error instanceof z.ZodError) {
-                res.status(400).json({ error: 'Validation failed', details: error.errors });
-            } else {
-                res.status(500).json({ error: 'Failed to create batch posts' });
-            }
+            const response = createErrorResponse(
+                'Failed to create batch posts',
+                ErrorCode.INTERNAL_SERVER_ERROR,
+                500
+            );
+            res.status(500).json(response);
         }
     }
 
     // List posts with optional filters
     async list(req: Request, res: Response) {
         try {
-            const schema = z.object({
-                businessId: z.string().uuid(),
-                startDate: z.string().datetime().optional(),
-                endDate: z.string().datetime().optional(),
-                status: z.enum(['draft', 'scheduled', 'published']).optional()
-            });
+            const parseResult = ListPostsQuerySchema.safeParse(req.query);
+            if (!parseResult.success) {
+                const response = createErrorResponse(
+                    'Invalid query parameters',
+                    ErrorCode.VALIDATION_ERROR,
+                    400,
+                    parseResult.error.issues
+                );
+                return res.status(400).json(response);
+            }
 
-            const query = schema.parse(req.query);
+            const query = parseResult.data;
 
             const where: any = {
                 businessId: query.businessId
@@ -115,14 +139,19 @@ export class PostsController {
                 orderBy: { scheduledAt: 'asc' }
             });
 
-            res.json(posts);
+            const response = createSuccessResponse(
+                { posts },
+                'Posts retrieved successfully'
+            );
+            res.json(response);
         } catch (error: any) {
             console.error('Error listing posts:', error);
-            if (error instanceof z.ZodError) {
-                res.status(400).json({ error: 'Validation failed', details: error.errors });
-            } else {
-                res.status(500).json({ error: 'Failed to list posts' });
-            }
+            const response = createErrorResponse(
+                'Failed to list posts',
+                ErrorCode.INTERNAL_SERVER_ERROR,
+                500
+            );
+            res.status(500).json(response);
         }
     }
 }
