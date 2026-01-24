@@ -10,7 +10,6 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { format } from 'date-fns';
 import type { GridColDef } from '@mui/x-data-grid';
 
 import { BrandService, type PublishingLog } from '@/services/brand.service';
@@ -102,7 +101,17 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
       headerName: 'Time',
       flex: 1,
       minWidth: 160,
-      renderCell: (params) => format(new Date(params.row.updatedAt), 'MMM d, yyyy HH:mm'),
+      renderCell: (params) => {
+        const date = new Date(params.row.updatedAt);
+        const options: Intl.DateTimeFormatOptions = { 
+          month: 'short', 
+          day: 'numeric', 
+          year: 'numeric', 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        };
+        return date.toLocaleDateString(undefined, options);
+      },
     },
     {
       field: 'platform',
