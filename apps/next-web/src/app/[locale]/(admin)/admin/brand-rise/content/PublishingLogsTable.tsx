@@ -103,6 +103,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
       minWidth: 160,
       renderCell: (params) => {
         const date = new Date(params.row.updatedAt);
+
         const options: Intl.DateTimeFormatOptions = { 
           month: 'short', 
           day: 'numeric', 
@@ -110,6 +111,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
           hour: '2-digit', 
           minute: '2-digit' 
         };
+
         return date.toLocaleDateString(undefined, options);
       },
     },
