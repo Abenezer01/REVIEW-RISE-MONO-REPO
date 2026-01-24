@@ -1,6 +1,7 @@
 {
   "navigation": {
     "dashboard": "Dashboard",
+    "ai-studio": "AI Content Studio",
     "reviews": "Reviews",
     "reviews-dashboard": "Reviews Dashboard",
     "reviews-list": "All Reviews",

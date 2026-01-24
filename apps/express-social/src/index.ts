@@ -14,8 +14,10 @@ app.use(express.json());
 
 // Routes
 import socialRoutes from './routes/v1/social.routes';
+import postsRoutes from './routes/v1/posts.routes';
 
 app.use('/', socialRoutes);
+app.use('/api/v1/posts', postsRoutes);
 
 app.get('/', (req, res) => {
     res.json({ message: 'Express Social Service is running' });

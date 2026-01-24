@@ -1,5 +1,4 @@
-import OpenAI from 'openai';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { llmService } from './llm.service';
 import {
     RECOMMENDATION_PROMPTS,
     VISIBILITY_PLAN_PROMPT,
@@ -7,52 +6,9 @@ import {
     VisibilityPlanSchema
 } from '@platform/contracts';
 
-// AI Provider selection from environment
-const AI_PROVIDER = process.env.AI_PROVIDER || 'gemini';
-
 export class BrandStrategistService {
-    private async callAI(prompt: string, useJsonFormat: boolean = true): Promise<string | null> {
-        console.log(`[BrandStrategist] Calling AI with provider: ${AI_PROVIDER}`);
-        try {
-            if (AI_PROVIDER === 'gemini') {
-                const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-                const model = gemini.getGenerativeModel({
-                    model: 'gemini-3-flash-preview',
-                    generationConfig: {
-                        temperature: 0.7,
-                        ...(useJsonFormat && { responseMimeType: 'application/json' })
-                    }
-                });
-                const result = await model.generateContent(prompt);
-                return result.response.text();
-            } else {
-                // OpenAI
-                const apiKey = process.env.OPENAI_API_KEY;
-                if (!apiKey) {
-                     console.warn('[BrandStrategist] OPENAI_API_KEY not set.');
-                }
-                
-                const openai = new OpenAI({
-                    apiKey: apiKey,
-                });
-                const completion = await openai.chat.completions.create({
-                    messages: [{ role: "user", content: prompt }],
-                    model: "gpt-3.5-turbo-0125",
-                    ...(useJsonFormat && { response_format: { type: "json_object" } }),
-                    temperature: 0.7,
-                });
-                
-                const choice = completion.choices?.[0];
-                if (!choice?.message) {
-                    throw new Error('Invalid response from OpenAI: No message found');
-                }
-                
-                return choice.message.content;
-            }
-        } catch (error) {
-            console.error(`AI call failed (${AI_PROVIDER}):`, error);
-            throw error;
-        }
+    private async callAI(prompt: string): Promise<string> {
+        return llmService.generateText(prompt, { jsonMode: true });
     }
 
     async generateRecommendations(
