@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -24,6 +25,7 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
     'dna',
     'content',
     'reviews',
+    'scheduling',
     'visibility-plan',
     'scores'
   ];

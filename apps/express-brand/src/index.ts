@@ -13,6 +13,8 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 import v1Routes from './routes/v1';
+import { publishingWorker } from './services/publishing-worker.service';
+
 app.use('/api/v1', v1Routes);
 
 app.get('/', (req, res) => {
@@ -26,4 +28,7 @@ app.get('/health', (req, res) => {
 app.listen(PORT, () => {
     // eslint-disable-next-line no-console
     console.log(`Server is running on port ${PORT}`);
+    
+    // Start background publishing worker
+    publishingWorker.start();
 });

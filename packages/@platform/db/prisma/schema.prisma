@@ -91,6 +91,7 @@ model Business {
   reports              Report[]
   reviews              Review[]
   reviewSyncLogs       ReviewSyncLog[]
+  scheduledPosts       ScheduledPost[]
   socialConnections    SocialConnection[]
   subscriptions        Subscription[]
   userBusinessRoles    UserBusinessRole[]
@@ -127,6 +128,7 @@ model Location {
   reviews             Review[]
   reviewSources       ReviewSource[]
   reviewSyncLogs      ReviewSyncLog[]
+  scheduledPosts      ScheduledPost[]
   socialConnections   SocialConnection[]
   userBusinessRoles   UserBusinessRole[]
   visibilityMetrics   VisibilityMetric[]
@@ -821,6 +823,53 @@ enum CompetitorType {
   CONTENT
   AGGREGATOR
   UNKNOWN
+}
+
+model ScheduledPost {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId     String          @db.Uuid
+  locationId     String?         @db.Uuid
+  platforms      String[]        // e.g., ['facebook', 'instagram', 'linkedin']
+  content        String?
+  media          Json?           // { images: string[], videos: string[], carousel: any }
+  scheduledAt    DateTime
+  timezone       String          @default("UTC")
+  status         String          @default("draft") // draft, scheduled, publishing, published, failed, canceled
+  isRecurring    Boolean         @default(false)
+  recurrenceRule String?         // RRULE string for future option
+  parentPostId   String?         @db.Uuid
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  business       Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location       Location?       @relation(fields: [locationId], references: [id])
+  parentPost     ScheduledPost?  @relation("RecurringPosts", fields: [parentPostId], references: [id])
+  childPosts     ScheduledPost[] @relation("RecurringPosts")
+  publishingJobs PublishingJob[]
+
+  @@index([businessId])
+  @@index([locationId])
+  @@index([scheduledAt])
+  @@index([status])
+}
+
+model PublishingJob {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  scheduledPostId String        @db.Uuid
+  platform        String
+  status          String        @default("pending") // pending, processing, completed, failed
+  externalId      String?       // Platform-specific post ID
+  error           String?
+  attemptCount    Int           @default(0)
+  lastAttemptAt   DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  scheduledPost   ScheduledPost @relation(fields: [scheduledPostId], references: [id], onDelete: Cascade)
+
+  @@index([scheduledPostId])
+  @@index([platform])
+  @@index([status])
 }
 
 model Post {

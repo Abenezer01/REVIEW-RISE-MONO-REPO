@@ -1,15 +1,16 @@
 import { Router } from 'express';
 import { facebookController } from '../../controllers/facebook.controller';
 import { linkedInController } from '../../controllers/linkedin.controller';
+import { socialController } from '../../controllers/social.controller';
 import { socialConnectionController } from '../../controllers/social-connection.controller';
 import { authenticate } from '../../middleware/auth.middleware';
 
 const router = Router();
 
-// Public routes (Auth flow starts here, usually public or guarded by minimal token)
-// For auth-url, we probably want the user to be authenticated in the frontend
-// We'll apply authenticate middleware to all routes for now.
+// Unified Publishing (Internal)
+router.post('/publish', socialController.publish);
 
+// Public routes (Auth flow starts here, usually public or guarded by minimal token)
 router.use(authenticate);
 
 // Facebook Routes

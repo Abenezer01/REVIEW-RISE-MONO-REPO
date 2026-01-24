@@ -6,11 +6,16 @@ import type { Theme } from '@mui/material/styles'
 
 // Styled Components
 const AppFullCalendar = styled('div')(({ theme }: { theme: Theme }) => ({
-  display: 'block',
-  position: 'relative',
-  borderRadius: 'var(--mui-shape-borderRadius)',
+  display: 'flex',
+  flexDirection: 'column',
   width: '100%',
+  flexGrow: 1,
+  position: 'relative',
+  padding: theme.spacing(4),
+  borderRadius: 'var(--mui-shape-borderRadius)',
   '& .fc': {
+    width: '100%',
+    height: '100%',
     zIndex: 1,
 
     '.fc-col-header, .fc-daygrid-body, .fc-scrollgrid-sync-table, .fc-timegrid-body, .fc-timegrid-body table': {
@@ -265,7 +270,7 @@ const AppFullCalendar = styled('div')(({ theme }: { theme: Theme }) => ({
 
     '& .fc-view-harness': {
       minHeight: '650px',
-      margin: theme.spacing(0, -6)
+      margin: 0
     },
 
     // Calendar Head

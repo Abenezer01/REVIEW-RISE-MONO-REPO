@@ -186,6 +186,56 @@ export class LinkedInService {
             throw new Error('Failed to refresh LinkedIn access token');
         }
     }
+
+    /**
+     * Publish post to LinkedIn Organization
+     */
+    async publishOrganizationPost(orgUrn: string, accessToken: string, content: { text: string; media?: any }) {
+        try {
+            const { text, media } = content;
+
+            const postBody: any = {
+                author: orgUrn,
+                commentary: text,
+                visibility: 'PUBLIC',
+                distribution: {
+                    feedDistribution: 'MAIN_FEED',
+                    targetEntities: [],
+                    thirdPartyDistributionChannels: []
+                },
+                lifecycleState: 'PUBLISHED',
+                isReshareDisabledByAuthor: false
+            };
+
+            if (media && media.length > 0) {
+                // LinkedIn media publishing is complex (register upload, upload binary, then use asset ID)
+                // For now, let's implement as an article with a link if it's just a URL, 
+                // or just text if it's too complex for this simplified adapter.
+                postBody.content = {
+                    article: {
+                        source: media[0].url,
+                        title: 'Post Media',
+                        description: text
+                    }
+                };
+            }
+
+            const response = await axios.post(`${LINKEDIN_API.API_BASE_URL}/posts`, postBody, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    'X-Restli-Protocol-Version': '2.0.0',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            // LinkedIn returns 201 Created with x-linkedin-id header
+            const postId = response.headers['x-restli-id'];
+            return { id: postId };
+        } catch (error: any) {
+            console.error(`Error publishing to LinkedIn Org ${orgUrn}:`, error.response?.data || error.message);
+            throw error;
+        }
+    }
 }
 
 export const linkedInService = new LinkedInService();

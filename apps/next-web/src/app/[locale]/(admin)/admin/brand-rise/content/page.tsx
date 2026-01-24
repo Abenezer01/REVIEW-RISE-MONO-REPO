@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
@@ -6,232 +7,330 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import Chip from '@mui/material/Chip';
-import CircularProgress from '@mui/material/CircularProgress';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-import { useTheme } from '@mui/material/styles';
 import { useTranslations } from 'next-intl';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusinessId } from '@/hooks/useBusinessId';
-import type { ContentIdea } from '@/services/brand.service';
+import { useLocationFilter } from '@/hooks/useLocationFilter';
+import type { ScheduledPost } from '@/services/brand.service';
 import { BrandService } from '@/services/brand.service';
 import ContentCalendar from './ContentCalendar';
+import PostEditorDialog from './PostEditorDialog';
+import PublishingLogsTable from '@/app/[locale]/(admin)/admin/brand-rise/content/PublishingLogsTable';
 
 const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [key: string]: any }) => {
-  return <i className={icon} style={{ fontSize }} {...rest} />
+    return <i className={icon} style={{ fontSize }} {...rest} />
 }
 
 const ContentPage = () => {
-  const theme = useTheme();
-  const t = useTranslations('dashboard');
-  const { businessId } = useBusinessId();
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [ideas, setIdeas] = useState<ContentIdea[]>([]);
-  const [openAddDialog, setOpenAddDialog] = useState(false);
-  const [newIdea, setNewIdea] = useState({ title: '', description: '', platform: 'BLOG POST' });
+    const t = useTranslations('dashboard');
+    const { businessId } = useBusinessId();
+    const { locationId } = useLocationFilter();
+    const { user } = useAuth();
+    const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
+    const [filteredPosts, setFilteredPosts] = useState<ScheduledPost[]>([]);
+    const [selectedPost, setSelectedPost] = useState<ScheduledPost | null>(null);
+    const [initialDate, setInitialDate] = useState<Date | undefined>(undefined);
 
-  const canAdd = user?.role === 'ADMIN' || user?.role === 'MANAGER';
+    const [platformFilter, setPlatformFilter] = useState<string>('ALL');
+    const [openAddDialog, setOpenAddDialog] = useState(false);
+    const [activeTab, setActiveTab] = useState('calendar');
 
-  const fetchIdeas = useCallback(async () => {
-    if (!businessId) return;
-    setLoading(true);
+    const canAdd = user?.role === 'ADMIN' || user?.role === 'MANAGER';
 
-    try {
-        const data = await BrandService.listContent(businessId);
+    const fetchData = useCallback(async () => {
+        if (!businessId) return;
 
-        setIdeas(data);
-    } catch (error) {
-        console.error('Failed to fetch content ideas', error);
-    } finally {
-        setLoading(false);
-    }
-  }, [businessId]);
+        try {
+            const postsData = await BrandService.listScheduledPosts(businessId);
 
-  useEffect(() => {
-    if (businessId) {
-        fetchIdeas();
-    }
-  }, [businessId, fetchIdeas]);
+            // If locationId is present, filter posts by locationId
+            const filteredByLocation = locationId 
+                ? postsData.filter(p => p.locationId === locationId)
+                : postsData;
 
-  const handleAddIdea = async () => {
-      if (!businessId) return;
+            setScheduledPosts(filteredByLocation);
+        } catch (error) {
+            console.error('Failed to fetch scheduled posts', error);
+        }
+    }, [businessId, locationId]);
 
-      try {
-          await BrandService.createContent(businessId, newIdea);
-          setOpenAddDialog(false);
-          setNewIdea({ title: '', description: '', platform: 'BLOG POST' });
-          fetchIdeas();
-      } catch (error) {
-          console.error('Failed to add idea', error);
-      }
-  };
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
-  const handleDeleteIdea = async (id: string) => {
-      if (!businessId) return;
-      if (!confirm('Are you sure you want to delete this idea?')) return;
+    useEffect(() => {
+        if (platformFilter === 'ALL') {
+            setFilteredPosts(scheduledPosts);
+        } else {
+            setFilteredPosts(scheduledPosts.filter(post => post.platforms.includes(platformFilter)));
+        }
+    }, [platformFilter, scheduledPosts]);
 
-      try {
-          await BrandService.deleteContent(businessId, id);
-          fetchIdeas();
-      } catch (error) {
-          console.error('Failed to delete idea', error);
-      }
-  };
+    const handleSavePost = async (data: Partial<ScheduledPost>) => {
+        if (!businessId) return;
 
-  const getTypeColor = (type: string) => {
-      switch(type) {
-          case 'BLOG POST': return { color: '#7367F0', bg: '#E8EAF6' };
-          case 'SOCIAL POST': return { color: '#28C76F', bg: '#E8F8F0' };
-          case 'VIDEO': return { color: '#FF9F43', bg: '#FFF5EB' };
-          case 'EMAIL': return { color: '#7367F0', bg: '#E8EAF6' };
-          default: return { color: '#7367F0', bg: '#E8EAF6' };
-      }
-  };
+        try {
+            if (selectedPost) {
+                await BrandService.updateScheduledPost(businessId, selectedPost.id, data);
+            } else {
+                // Include locationId if present when creating new post
+                const postData = {
+                    ...data,
+                    locationId: locationId || undefined
+                };
 
-  return (
-    <Grid container spacing={4}>
-      {/* Content Calendar Section */}
-      <Grid size={{ xs: 12, md: 8 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-           <Typography variant="h6">{t('brandRise.content.calendar')}</Typography>
-           {canAdd && (
-             <Button 
-               variant="contained" 
-               startIcon={<Icon icon="tabler-plus" />}
-               sx={{ bgcolor: '#7367F0', '&:hover': { bgcolor: '#665BE0' } }}
-               onClick={() => setOpenAddDialog(true)}
-             >
-               {t('brandRise.content.add')}
-             </Button>
-           )}
-        </Box>
+                await BrandService.createScheduledPost(businessId, postData);
+            }
 
-        <Card sx={{ display: 'flex', flexDirection: 'column', border: `1px solid ${theme.palette.divider}`, boxShadow: 'none' }}>
-           <CardContent>
-              <ContentCalendar ideas={ideas} />
-           </CardContent>
-        </Card>
-      </Grid>
+            fetchData();
+        } catch (error) {
+            console.error('Failed to save post', error);
+        }
+    };
 
-      {/* Content Ideas Section */}
-      <Grid size={{ xs: 12, md: 4 }}>
-        <Box sx={{ mb: 3 }}>
-           <Typography variant="h6">{t('brandRise.content.ideas')}</Typography>
-        </Box>
+    const handleDeletePost = async (postId: string) => {
+        if (!businessId) return;
 
-        {loading ? (
-             <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                 <CircularProgress />
-             </Box>
-        ) : (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            {(ideas || []).map((idea, index) => {
-                const colors = getTypeColor(idea.platform);
+        try {
+            await BrandService.deleteScheduledPost(businessId, postId);
 
-                
-return (
-                    <Card key={index} sx={{ border: `1px solid ${theme.palette.divider}`, boxShadow: 'none' }}>
-                        <CardContent>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <Chip 
-                                    label={idea.platform} 
-                                    size="small"
-                                    sx={{ 
-                                    bgcolor: colors.bg, 
-                                    color: colors.color,
-                                    fontWeight: 'bold',
-                                    fontSize: '0.7rem',
-                                    height: 24
-                                    }} 
-                                />
-                            </Box>
-                            {canAdd && (
-                                <IconButton size="small" onClick={() => handleDeleteIdea(idea.id)}>
-                                    <Icon icon="tabler-trash" fontSize={16} />
-                                </IconButton>
-                            )}
-                        </Box>
-                        
-                        <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1, textAlign: 'left' }}>
-                            {idea.title}
-                        </Typography>
-                        
-                        <Typography variant="body2" color="text.secondary" paragraph sx={{ textAlign: 'left', mb: 3 }}>
-                            {idea.description}
-                        </Typography>
+            fetchData();
+        } catch (error) {
+            console.error('Failed to delete post', error);
+        }
+    };
 
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
-                                    <Icon icon='tabler-clock' fontSize={16} />
-                                    <Typography variant="caption">{new Date(idea.createdAt).toLocaleDateString()}</Typography>
-                                </Box>
-                            </Box>
-                            <IconButton size="small">
-                                <Icon icon="tabler-bookmark" fontSize={20} />
-                            </IconButton>
-                        </Box>
-                        </CardContent>
-                    </Card>
-                );
-            })}
+    const handleDuplicatePost = async (postId: string) => {
+        if (!businessId) return;
+
+        try {
+            await BrandService.duplicateScheduledPost(businessId, postId);
+            fetchData();
+        } catch (error) {
+            console.error('Failed to duplicate post', error);
+        }
+    };
+
+    const handleEventDrop = async (postId: string, newDate: Date) => {
+        if (!businessId) return;
+
+        try {
+            await BrandService.updateScheduledPost(businessId, postId, {
+                scheduledAt: newDate.toISOString()
+            });
+
+            fetchData();
+        } catch (error) {
+            console.error('Failed to update post date', error);
+            fetchData(); // Revert UI
+        }
+    };
+
+    const handleDateClick = (date: Date) => {
+        setInitialDate(date);
+        setSelectedPost(null);
+        setOpenAddDialog(true);
+    };
+
+    const handleEventClick = (postId: string) => {
+        const post = scheduledPosts.find(p => p.id === postId);
+
+        if (post) {
+            setSelectedPost(post);
+            setInitialDate(undefined);
+            setOpenAddDialog(true);
+        }
+    };
+
+
+
+    return (
+        <Box sx={{ width: '100%', p: { xs: 2, sm: 4, md: 6 } }}>
+            {/* Header Section */}
+            <Box sx={{ 
+                display: 'flex', 
+                flexDirection: { xs: 'column', sm: 'row' },
+                justifyContent: 'space-between', 
+                alignItems: { xs: 'flex-start', sm: 'center' }, 
+                mb: 6,
+                gap: 4
+            }}>
+                <Box>
+                    <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
+                        {t('brandRise.content.title', { defaultValue: 'Content Management' })}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Plan, schedule, and monitor your social media content across platforms.
+                    </Typography>
+                </Box>
+
+                {canAdd && activeTab === 'calendar' && (
+                    <Button
+                        variant="contained"
+                        startIcon={<Icon icon="tabler-plus" />}
+                        sx={{ 
+                            bgcolor: '#7367F0', 
+                            '&:hover': { bgcolor: '#665BE0' }, 
+                            px: 6, 
+                            py: 2,
+                            borderRadius: 1.5,
+                            boxShadow: '0 4px 14px 0 rgba(115, 103, 240, 0.39)'
+                        }}
+                        onClick={() => {
+                            setInitialDate(new Date());
+                            setSelectedPost(null);
+                            setOpenAddDialog(true);
+                        }}
+                    >
+                        {t('brandRise.content.add')}
+                    </Button>
+                )}
             </Box>
-        )}
-      </Grid>
 
-      <Dialog open={openAddDialog} onClose={() => setOpenAddDialog(false)}>
-        <DialogTitle>Add Content Idea</DialogTitle>
-        <DialogContent>
-            <TextField
-                autoFocus
-                margin="dense"
-                label="Title"
-                fullWidth
-                value={newIdea.title}
-                onChange={(e) => setNewIdea({ ...newIdea, title: e.target.value })}
+            {/* Tabs & Filters Section */}
+            <Card sx={{ 
+                mb: 6, 
+                boxShadow: '0 2px 10px 0 rgba(0, 0, 0, 0.05)',
+                border: (theme) => `1px solid ${theme.palette.divider}`,
+                borderRadius: 2
+            }}>
+                <Box sx={{ 
+                    px: 6, 
+                    pt: 2, 
+                    display: 'flex', 
+                    flexDirection: { xs: 'column', md: 'row' },
+                    alignItems: { xs: 'stretch', md: 'center' },
+                    justifyContent: 'space-between',
+                    gap: 4,
+                    borderBottom: 1, 
+                    borderColor: 'divider' 
+                }}>
+                    <Tabs 
+                        value={activeTab} 
+                        onChange={(_, newValue) => setActiveTab(newValue)} 
+                        aria-label="content management tabs"
+                        sx={{
+                            '& .MuiTab-root': {
+                                py: 4,
+                                minHeight: 'auto',
+                                fontWeight: 600,
+                                fontSize: '0.9375rem',
+                                color: 'text.secondary',
+                                '&.Mui-selected': {
+                                    color: 'primary.main',
+                                }
+                            }
+                        }}
+                    >
+                        <Tab 
+                            icon={<Icon icon="tabler-calendar" fontSize={20} />} 
+                            iconPosition="start"
+                            label={t('brandRise.content.calendar', { defaultValue: 'Content Calendar' })} 
+                            value="calendar" 
+                        />
+                        <Tab 
+                            icon={<Icon icon="tabler-list-details" fontSize={20} />} 
+                            iconPosition="start"
+                            label={t('brandRise.content.logs', { defaultValue: 'Publishing Logs' })} 
+                            value="logs" 
+                        />
+                    </Tabs>
+
+                    {activeTab === 'calendar' && (
+                        <Box sx={{ pb: 2, minWidth: 220 }}>
+                            <TextField
+                                id="platform-filter-select"
+                                select
+                                fullWidth
+                                size="small"
+                                label="Platform Filter"
+                                value={platformFilter}
+                                onChange={(e) => setPlatformFilter(e.target.value)}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: 1.5,
+                                        bgcolor: (theme) => theme.palette.mode === 'light' ? 'grey.50' : 'background.default'
+                                    }
+                                }}
+                            >
+                                <MenuItem value="ALL">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                        <Icon icon="tabler-world" fontSize={18} />
+                                        <span>All Platforms</span>
+                                    </Box>
+                                </MenuItem>
+                                <MenuItem value="INSTAGRAM">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                        <Icon icon="tabler-brand-instagram" fontSize={18} style={{ color: '#E4405F' }} />
+                                        <span>Instagram</span>
+                                    </Box>
+                                </MenuItem>
+                                <MenuItem value="FACEBOOK">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                        <Icon icon="tabler-brand-facebook" fontSize={18} style={{ color: '#1877F2' }} />
+                                        <span>Facebook</span>
+                                    </Box>
+                                </MenuItem>
+                                <MenuItem value="LINKEDIN">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                        <Icon icon="tabler-brand-linkedin" fontSize={18} style={{ color: '#0A66C2' }} />
+                                        <span>LinkedIn</span>
+                                    </Box>
+                                </MenuItem>
+                                <MenuItem value="TWITTER">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                        <Icon icon="tabler-brand-x" fontSize={18} />
+                                        <span>Twitter (X)</span>
+                                    </Box>
+                                </MenuItem>
+                                <MenuItem value="GOOGLE_BUSINESS">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                        <Icon icon="tabler-brand-google" fontSize={18} style={{ color: '#4285F4' }} />
+                                        <span>Google Business</span>
+                                    </Box>
+                                </MenuItem>
+                            </TextField>
+                        </Box>
+                    )}
+                </Box>
+
+                <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+                    {activeTab === 'calendar' ? (
+                        <ContentCalendar
+                            scheduledPosts={filteredPosts}
+                            onEventDrop={handleEventDrop}
+                            onDateClick={handleDateClick}
+                            onEventClick={handleEventClick}
+                        />
+                    ) : (
+                        <Box sx={{ p: 6 }}>
+                            <PublishingLogsTable 
+                                businessId={businessId || ''} 
+                                onViewPost={handleEventClick}
+                            />
+                        </Box>
+                    )}
+                </CardContent>
+            </Card>
+
+            <PostEditorDialog
+                open={openAddDialog}
+                onClose={() => setOpenAddDialog(false)}
+                post={selectedPost}
+                initialDate={initialDate}
+                onSave={handleSavePost}
+                onDelete={handleDeletePost}
+                onDuplicate={handleDuplicatePost}
             />
-            <TextField
-                margin="dense"
-                label="Description"
-                fullWidth
-                multiline
-                rows={4}
-                value={newIdea.description}
-                onChange={(e) => setNewIdea({ ...newIdea, description: e.target.value })}
-            />
-            <TextField
-                select
-                margin="dense"
-                label="Platform"
-                fullWidth
-                value={newIdea.platform}
-                onChange={(e) => setNewIdea({ ...newIdea, platform: e.target.value })}
-            >
-                <MenuItem value="BLOG POST">Blog Post</MenuItem>
-                <MenuItem value="SOCIAL POST">Social Post</MenuItem>
-                <MenuItem value="VIDEO">Video</MenuItem>
-                <MenuItem value="EMAIL">Email</MenuItem>
-            </TextField>
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={() => setOpenAddDialog(false)}>Cancel</Button>
-            <Button onClick={handleAddIdea} variant="contained">Add</Button>
-        </DialogActions>
-      </Dialog>
-    </Grid>
-  );
+        </Box>
+    );
 };
 
 export default ContentPage;
