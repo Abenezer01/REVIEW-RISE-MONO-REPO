@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { llmService } from './llm.service';
 import { 
     ReviewReplyVariationsSchema, 
     REVIEW_REPLY_PROMPT,
@@ -7,14 +7,8 @@ import {
 import { repositories } from '@platform/db';
 
 export class ReviewReplyGeneratorService {
-    private genAI: GoogleGenerativeAI;
-
-    constructor() {
-        this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-    }
-
     /**
-     * Generates multiple review reply variations using Gemini AI
+     * Generates multiple review reply variations using shared LLM Service
      */
     async generateReplyVariations(
         reviewId: string,
@@ -55,22 +49,11 @@ export class ReviewReplyGeneratorService {
         // 5. Call AI
         console.log(`[ReviewReplyGenerator] Generating replies for review ${reviewId} with tone: ${inputs.tone}`);
         
-        const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-        const result = await model.generateContent({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: {
-                temperature: 0.8,
-                responseMimeType: 'application/json',
-            },
-        });
-
-        const responseText = result.response.text();
-        
         try {
-            const parsed = JSON.parse(responseText);
-            return ReviewReplyVariationsSchema.parse(parsed);
+            const variations = await llmService.generateJSON<ReviewReplyVariations>(prompt, { temperature: 0.8 });
+            return ReviewReplyVariationsSchema.parse(variations);
         } catch (error) {
-            console.error('[ReviewReplyGenerator] Failed to parse AI response:', responseText, error);
+            console.error('[ReviewReplyGenerator] Failed to generate reply variations:', error);
             throw new Error('Failed to generate valid reply variations');
         }
     }

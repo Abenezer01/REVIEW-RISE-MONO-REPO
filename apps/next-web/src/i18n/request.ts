@@ -17,7 +17,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
             common: (await import(`../../messages/${locale}/common.json`)).default,
             auth: (await import(`../../messages/${locale}/auth.json`)).default,
             dashboard: (await import(`../../messages/${locale}/dashboard.json`)).default,
-            BrandProfiles: (await import(`../../messages/${locale}/BrandProfiles.json`)).default
+            BrandProfiles: (await import(`../../messages/${locale}/BrandProfiles.json`)).default,
+            studio: (await import(`../../messages/${locale}/studio.json`)).default
         }
     }
 })

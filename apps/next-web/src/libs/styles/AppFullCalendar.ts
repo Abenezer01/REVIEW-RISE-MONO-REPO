@@ -6,9 +6,10 @@ import type { Theme } from '@mui/material/styles'
 
 // Styled Components
 const AppFullCalendar = styled('div')(({ theme }: { theme: Theme }) => ({
-  display: 'flex',
+  display: 'block',
   position: 'relative',
   borderRadius: 'var(--mui-shape-borderRadius)',
+  width: '100%',
   '& .fc': {
     zIndex: 1,
 
@@ -147,6 +148,12 @@ const AppFullCalendar = styled('div')(({ theme }: { theme: Theme }) => ({
     '& .fc-event': {
       '& .fc-event-title-container, .fc-event-main-frame': {
         lineHeight: 1
+      },
+      cursor: 'pointer',
+      transition: 'all 0.2s ease-in-out',
+      '&:hover': {
+        transform: 'scale(1.02)',
+        filter: 'brightness(0.95)'
       },
       '&:not(.fc-list-event)': {
         '&.event-bg-primary': {
