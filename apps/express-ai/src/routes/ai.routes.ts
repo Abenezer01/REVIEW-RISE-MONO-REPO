@@ -100,6 +100,20 @@ router.post('/generate-visibility-plan', async (req, res) => {
     }
 });
 
+router.post('/generate-tone', async (req, res) => {
+    try {
+        const { businessName, industry, location, extractedData } = req.body;
+        if (!businessName) {
+            return res.status(400).json({ error: 'Missing businessName' });
+        }
+        const result = await brandStrategist.generateTone({ businessName, industry, location, extractedData });
+        res.json(result);
+    } catch (error: any) {
+        console.error('Tone Generation Error:', error);
+        res.status(500).json({ error: error.message || 'Internal Server Error' });
+    }
+});
+
 router.post('/adapt-content', async (req, res) => {
     try {
         const { template, context } = req.body;

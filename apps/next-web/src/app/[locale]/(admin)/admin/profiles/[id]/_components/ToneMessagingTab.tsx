@@ -219,17 +219,67 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
               <CardContent sx={{ p: 3 }}>
                 {renderSectionHeader('Messaging Pillars', 'messagingPillars')}
                 <Stack spacing={3}>
-                  {editedTone.messagingPillars.map((pillar, i) => (
-                    <Box key={i} sx={{ p: 2, bgcolor: alpha(theme.palette.primary.main, 0.03), borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
-                      <Typography variant="subtitle1" fontWeight="700" gutterBottom>{pillar.pillar}</Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{pillar.description}</Typography>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {pillar.ctas.map((cta, ci) => (
-                          <Chip key={ci} label={cta} size="small" variant="outlined" sx={{ borderRadius: 1 }} />
-                        ))}
+                  {editingSection === 'messagingPillars' ? (
+                    editedTone.messagingPillars.map((pillar, i) => (
+                      <Box key={i} sx={{ p: 2, bgcolor: alpha(theme.palette.primary.main, 0.03), borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
+                        <TextField
+                          fullWidth
+                          label="Pillar Title"
+                          variant="outlined"
+                          size="small"
+                          sx={{ mb: 2 }}
+                          value={pillar.pillar}
+                          onChange={(e) => {
+                            const newPillars = [...editedTone.messagingPillars];
+
+                            newPillars[i] = { ...pillar, pillar: e.target.value };
+                            updateToneField('messagingPillars', newPillars);
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="Description"
+                          variant="outlined"
+                          size="small"
+                          multiline
+                          rows={2}
+                          sx={{ mb: 2 }}
+                          value={pillar.description}
+                          onChange={(e) => {
+                            const newPillars = [...editedTone.messagingPillars];
+
+                            newPillars[i] = { ...pillar, description: e.target.value };
+                            updateToneField('messagingPillars', newPillars);
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="CTAs (comma separated)"
+                          variant="outlined"
+                          size="small"
+                          value={pillar.ctas.join(', ')}
+                          onChange={(e) => {
+                            const newPillars = [...editedTone.messagingPillars];
+
+                            newPillars[i] = { ...pillar, ctas: e.target.value.split(',').map(s => s.trim()) };
+                            updateToneField('messagingPillars', newPillars);
+                          }}
+                        />
                       </Box>
-                    </Box>
-                  ))}
+                    ))
+                  ) : (
+                    editedTone.messagingPillars.map((pillar, i) => (
+                      <Box key={i} sx={{ p: 2, bgcolor: alpha(theme.palette.primary.main, 0.03), borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
+                        <Typography variant="subtitle1" fontWeight="700" gutterBottom>{pillar.pillar}</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{pillar.description}</Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                          {pillar.ctas.map((cta, ci) => (
+                            <Chip key={ci} label={cta} size="small" variant="outlined" sx={{ borderRadius: 1 }} />
+                          ))}
+                        </Box>
+                      </Box>
+                    ))
+                  )}
                 </Stack>
               </CardContent>
             </Card>

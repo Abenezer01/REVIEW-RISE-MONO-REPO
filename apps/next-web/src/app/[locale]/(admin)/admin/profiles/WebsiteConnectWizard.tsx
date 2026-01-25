@@ -95,7 +95,7 @@ const WebsiteConnectWizard = ({ onSuccess }: WebsiteConnectWizardProps = {}) => 
       setError(null);
       
       try {
-        const response = await apiClient.get<PaginatedResponse<BusinessDto>>('/admin/businesses', {
+        const response = await apiClient.get<PaginatedResponse<BusinessDto>>('/api/admin/businesses', {
           params: { limit: 100 }
         });
         
