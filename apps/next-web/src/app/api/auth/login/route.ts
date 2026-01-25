@@ -1,33 +1,22 @@
 /* eslint-disable import/no-unresolved */
 import { type NextRequest, NextResponse } from 'next/server'
-
-import { z } from 'zod'
-
+import { createSuccessResponse, createErrorResponse, ErrorCode, LoginRequestSchema } from '@platform/contracts'
 import { backendClient } from '@/utils/backendClient'
-
 import { SERVICES_CONFIG } from '@/configs/services'
-
-// Define validation schema
-const loginSchema = z.object({
-  email: z.email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-})
 
 export async function POST(request: NextRequest) {
   const AUTH_SERVICE_URL = SERVICES_CONFIG.auth.url
+  const requestId = request.headers.get('x-request-id') || crypto.randomUUID()
 
   try {
     const body = await request.json()
 
-    // Validate input
-    const validationResult = loginSchema.safeParse(body)
+    // Validate input using shared schema
+    const validationResult = LoginRequestSchema.safeParse(body)
 
     if (!validationResult.success) {
       return NextResponse.json(
-        {
-          message: 'Validation failed',
-          errors: validationResult.error.flatten().fieldErrors
-        },
+        createErrorResponse('Validation failed', ErrorCode.VALIDATION_ERROR, 400, validationResult.error.flatten().fieldErrors, requestId),
         { status: 400 }
       )
     }
@@ -47,18 +36,15 @@ export async function POST(request: NextRequest) {
       data = apiResponse
     }
 
-    const response = NextResponse.json({
+    return NextResponse.json(createSuccessResponse({
       user: data?.user,
       accessToken: data?.accessToken,
       refreshToken: data?.refreshToken,
-      message: 'Login successful'
-    })
+    }, 'Login successful', 200, { requestId }))
 
-    return response
   } catch (error: any) {
-    // Handle specific error cases if needed, otherwise fallback to generic error
     return NextResponse.json(
-      { message: error.message || 'Internal Server Error' },
+      createErrorResponse(error.message || 'Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, error.status || 500, undefined, requestId),
       { status: error.status || 500 }
     )
   }

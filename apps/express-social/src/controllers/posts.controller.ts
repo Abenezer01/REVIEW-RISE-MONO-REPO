@@ -14,6 +14,7 @@ export class PostsController {
     
     // Create a new post (e.g. from Draft)
     async create(req: Request, res: Response) {
+        const requestId = req.id;
         try {
             const parseResult = CreatePostRequestSchema.safeParse(req.body);
             if (!parseResult.success) {
@@ -21,7 +22,8 @@ export class PostsController {
                     'Invalid request body',
                     ErrorCode.VALIDATION_ERROR,
                     400,
-                    parseResult.error.issues
+                    parseResult.error.issues,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -43,7 +45,8 @@ export class PostsController {
             const response = createSuccessResponse(
                 post,
                 'Post created successfully',
-                201
+                201,
+                { requestId }
             );
             res.status(201).json(response);
         } catch (error: any) {
@@ -51,7 +54,9 @@ export class PostsController {
             const response = createErrorResponse(
                 'Failed to create post',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                requestId
             );
             res.status(500).json(response);
         }
@@ -59,6 +64,7 @@ export class PostsController {
 
     // Batch create posts (e.g. for Plans)
     async createBatch(req: Request, res: Response) {
+        const requestId = req.id;
         try {
             const parseResult = CreateBatchPostsRequestSchema.safeParse(req.body);
             if (!parseResult.success) {
@@ -66,7 +72,8 @@ export class PostsController {
                     'Invalid request body',
                     ErrorCode.VALIDATION_ERROR,
                     400,
-                    parseResult.error.issues
+                    parseResult.error.issues,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -90,7 +97,8 @@ export class PostsController {
             const response = createSuccessResponse(
                 { count: result.length, posts: result },
                 'Posts created successfully',
-                201
+                201,
+                { requestId }
             );
             res.status(201).json(response);
         } catch (error: any) {
@@ -98,7 +106,9 @@ export class PostsController {
             const response = createErrorResponse(
                 'Failed to create batch posts',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                requestId
             );
             res.status(500).json(response);
         }
@@ -106,6 +116,7 @@ export class PostsController {
 
     // List posts with optional filters
     async list(req: Request, res: Response) {
+        const requestId = req.id;
         try {
             const parseResult = ListPostsQuerySchema.safeParse(req.query);
             if (!parseResult.success) {
@@ -113,7 +124,8 @@ export class PostsController {
                     'Invalid query parameters',
                     ErrorCode.VALIDATION_ERROR,
                     400,
-                    parseResult.error.issues
+                    parseResult.error.issues,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -141,7 +153,9 @@ export class PostsController {
 
             const response = createSuccessResponse(
                 { posts },
-                'Posts retrieved successfully'
+                'Posts retrieved successfully',
+                200,
+                { requestId }
             );
             res.json(response);
         } catch (error: any) {
@@ -149,7 +163,9 @@ export class PostsController {
             const response = createErrorResponse(
                 'Failed to list posts',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                requestId
             );
             res.status(500).json(response);
         }

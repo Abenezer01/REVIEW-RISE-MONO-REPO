@@ -6,6 +6,9 @@
 // Request types
 export * from './requests';
 
+// Auth types
+export * from './auth.schema';
+
 // Response types
 // Response types
 export * from './responses';
@@ -21,6 +24,9 @@ export * from './dtos/business.dto';
 export * from './utils/encryption.util';
 export * from './dtos/keyword.dto';
 export * from './dtos/visibility.dto';
+
+// Brand Schemas
+export * from './brand';
 
 // AI Schemas and Prompts
 export * from './ai/recommendation.schema';

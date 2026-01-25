@@ -3,6 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
+import { requestIdMiddleware } from './middleware/request-id';
 
 // Load environment variables
 dotenv.config();
@@ -15,15 +17,16 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(morgan('combined'));
+app.use(requestIdMiddleware);
 
 // Health Check
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'healthy', service: 'express-admin-portal' });
+  res.status(200).json(createSuccessResponse({ status: 'healthy', service: 'express-admin-portal' }, 'Service is healthy', 200, { requestId: req.id }));
 });
 
 // Basic Route
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Review Rise Admin Portal API' });
+  res.json(createSuccessResponse(null, 'Welcome to Review Rise Admin Portal API', 200, { requestId: req.id }));
 });
 
 import locationsRoutes from './routes/locations.routes';
@@ -36,7 +39,7 @@ app.use('/users', usersRoutes);
 // Error Handling
 app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err.stack);
-  res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+  res.status(500).json(createErrorResponse(err.message || 'Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
 });
 
 // Start Server

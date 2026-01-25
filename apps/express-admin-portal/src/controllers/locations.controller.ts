@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import { prisma } from '@platform/db';
+import { createSuccessResponse, createErrorResponse, ErrorCode, createPaginatedResponse } from '@platform/contracts';
 
 export const getLocations = async (req: Request, res: Response) => {
+  const requestId = req.id;
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
@@ -18,7 +20,7 @@ export const getLocations = async (req: Request, res: Response) => {
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
-        { address: { contains: search, mode: 'insensitive' } }, // Assuming address field exists
+        { address: { contains: search, mode: 'insensitive' } },
       ];
     }
     
@@ -37,21 +39,21 @@ export const getLocations = async (req: Request, res: Response) => {
       prisma.location.count({ where }),
     ]);
 
-    res.json({
-      data: locations,
-      meta: {
-        total,
-        page,
-        limit,
-      },
-    });
-  } catch (error) {
+    res.json(createPaginatedResponse(
+      locations,
+      { page, limit, total },
+      'Locations fetched successfully',
+      200,
+      { requestId }
+    ));
+  } catch (error: any) {
     console.error('Error fetching locations:', error);
-    res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+    res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
   }
 };
 
 export const getLocation = async (req: Request, res: Response) => {
+  const requestId = req.id;
   try {
     const { id } = req.params;
     const location = await prisma.location.findUnique({
@@ -60,22 +62,23 @@ export const getLocation = async (req: Request, res: Response) => {
     });
 
     if (!location) {
-      return res.status(404).json({ status: 'error', message: 'Location not found' });
+      return res.status(404).json(createErrorResponse('Location not found', ErrorCode.NOT_FOUND, 404, undefined, requestId));
     }
 
-    res.json(location);
-  } catch (error) {
+    res.json(createSuccessResponse(location, 'Location fetched successfully', 200, { requestId }));
+  } catch (error: any) {
     console.error('Error fetching location:', error);
-    res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+    res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
   }
 };
 
 export const createLocation = async (req: Request, res: Response) => {
+  const requestId = req.id;
   try {
     const { name, address, timezone, tags, businessId, platformIds, status } = req.body;
 
     if (!businessId) {
-        return res.status(400).json({ status: 'error', message: 'Business ID is required' });
+        return res.status(400).json(createErrorResponse('Business ID is required', ErrorCode.VALIDATION_ERROR, 400, undefined, requestId));
     }
 
     const location = await prisma.location.create({
@@ -91,14 +94,15 @@ export const createLocation = async (req: Request, res: Response) => {
       include: { business: true }
     });
 
-    res.status(201).json(location);
-  } catch (error) {
+    res.status(201).json(createSuccessResponse(location, 'Location created successfully', 201, { requestId }));
+  } catch (error: any) {
     console.error('Error creating location:', error);
-    res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+    res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
   }
 };
 
 export const updateLocation = async (req: Request, res: Response) => {
+  const requestId = req.id;
   try {
     const { id } = req.params;
     const { name, address, timezone, tags, businessId, platformIds, status } = req.body;
@@ -117,24 +121,24 @@ export const updateLocation = async (req: Request, res: Response) => {
       include: { business: true }
     });
 
-    res.json(location);
-  } catch (error) {
+    res.json(createSuccessResponse(location, 'Location updated successfully', 200, { requestId }));
+  } catch (error: any) {
     console.error('Error updating location:', error);
-    // Handle Prisma record not found error potentially
-    res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+    res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
   }
 };
 
 export const deleteLocation = async (req: Request, res: Response) => {
+  const requestId = req.id;
   try {
     const { id } = req.params;
     await prisma.location.delete({
       where: { id }
     });
 
-    res.json({ status: 'success', message: 'Location deleted successfully' });
-  } catch (error) {
+    res.json(createSuccessResponse(null, 'Location deleted successfully', 200, { requestId }));
+  } catch (error: any) {
     console.error('Error deleting location:', error);
-    res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+    res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
   }
 };
