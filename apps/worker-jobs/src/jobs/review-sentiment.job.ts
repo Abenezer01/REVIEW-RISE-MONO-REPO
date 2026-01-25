@@ -44,7 +44,7 @@ export const runReviewSentimentJob = async () => {
 
                 // Call the AI service to analyze the review
                 const response = await axios.post<ReviewAnalysisResult>(
-                    `${expressAiUrl}/api/v1/ai/reviews/analyze`,
+                    `${expressAiUrl}/api/v1/reviews/analyze`,
                     {
                         content: review.content || '',
                         rating: review.rating

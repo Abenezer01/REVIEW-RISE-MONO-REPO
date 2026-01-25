@@ -71,15 +71,7 @@ export const SERVICES_CONFIG = {
         },
     },
     ai: {
-        get url() {
-            if (typeof window === 'undefined') {
-                // Server-side
-                return process.env.EXPRESS_AI_URL || 'http://localhost:3002/api/v1/ai';
-            }
-
-            // Client-side: AI is server-side only
-            return '/api/ai';
-        },
+        url: process.env.EXPRESS_AI_URL || 'http://localhost:3002/api/v1',
     },
     social: {
         get url() {
