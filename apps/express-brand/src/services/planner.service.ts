@@ -1,7 +1,7 @@
 import { prisma } from '@platform/db';
 import axios from 'axios';
 
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:3002';
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:3003';
 
 export const generateMonthlyPlan = async (businessId: string, options: {
   month: number;
@@ -52,7 +52,10 @@ export const generateMonthlyPlan = async (businessId: string, options: {
     if (day % interval === 0) {
       // Find if there's an event for this day
       const dayDate = new Date(year, month - 1, day);
-      const dayEvent = events.find((e: any) => e.date.toDateString() === dayDate.toDateString());
+      const dayEvent = events.find((e: any) => {
+        const eventDate = new Date(e.date);
+        return eventDate.toDateString() === dayDate.toDateString();
+      });
 
       // Pick a template randomly
       const template = templates[Math.floor(Math.random() * templates.length)];
@@ -71,7 +74,7 @@ export const generateMonthlyPlan = async (businessId: string, options: {
             seasonalDescription: dayEvent ? dayEvent.description : undefined,
           };
 
-          const response = await axios.post(`${AI_SERVICE_URL}/api/v1/ai/adapt-content`, {
+          const response = await axios.post(`${AI_SERVICE_URL}/api/v1/adapt-content`, {
             template: template.content,
             context
           });
