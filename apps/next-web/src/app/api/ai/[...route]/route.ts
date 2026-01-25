@@ -1,36 +1,32 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-
+import { createErrorResponse, ErrorCode } from '@platform/contracts';
 import { SERVICES_CONFIG } from '@/configs/services';
 
-// On server side, this returns the internal URL (localhost:3002 or env var)
 const SERVICE_URL = SERVICES_CONFIG.ai.url;
 
 async function proxy(req: NextRequest, { params }: { params: Promise<{ route: string[] }> }) {
     const { route } = await params;
     const path = route.join('/');
     const query = req.nextUrl.search;
-    const url = `${SERVICE_URL}/${path}${query}`; // e.g. http://localhost:3002/studio/ideas
+    const url = `${SERVICE_URL}/${path}${query}`;
+    const requestId = req.headers.get('x-request-id') || crypto.randomUUID();
 
     try {
         const headers = new Headers();
 
-        // Copy Content-Type
         const contentType = req.headers.get('content-type');
-
         if (contentType) headers.set('content-type', contentType);
 
-        // Inject Authorization from Cookie
         const accessToken = req.cookies.get('accessToken')?.value;
-
         if (accessToken) {
             headers.set('Authorization', `Bearer ${accessToken}`);
         } else {
-            // Fallback to existing header if present
             const authHeader = req.headers.get('authorization');
-
             if (authHeader) headers.set('Authorization', authHeader);
         }
+
+        headers.set('x-request-id', requestId);
 
         const body = req.method !== 'GET' && req.method !== 'HEAD' ? await req.text() : undefined;
 
@@ -40,7 +36,6 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ route: st
             body,
         });
 
-        // Handle response
         const text = await response.text();
         let data;
 
@@ -54,8 +49,10 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ route: st
 
     } catch (error) {
         console.error('AI Proxy error:', error);
-        
-return NextResponse.json({ error: 'Proxy error', details: String(error) }, { status: 500 });
+        return NextResponse.json(
+            createErrorResponse('Proxy error', ErrorCode.INTERNAL_SERVER_ERROR, 500, String(error), requestId),
+            { status: 500 }
+        );
     }
 }
 
