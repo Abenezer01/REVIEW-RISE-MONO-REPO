@@ -27,7 +27,8 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
     'reviews',
     'scheduling',
     'visibility-plan',
-    'scores'
+    'scores',
+    'planner'
   ];
 
   if (path.length === 0) {
@@ -69,6 +70,10 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
     });
 
     // Handle 204 No Content or empty responses
+    if (response.status === 204) {
+      return new NextResponse(null, { status: 204 });
+    }
+
     const text = await response.text();
     let data;
 

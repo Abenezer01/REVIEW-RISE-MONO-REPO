@@ -115,6 +115,18 @@ const menuData: MenuItem[] = [
         title: 'navigation.brand-profiles',
         href: '/admin/profiles',
         allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.content-templates',
+        href: '/admin/brand-rise/content-templates',
+        icon: 'tabler-file-text',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.seasonal-events',
+        href: '/admin/brand-rise/seasonal-events',
+        icon: 'tabler-calendar',
+        allowedRoles: [ROLES.ADMIN]
       }
     ]
   },

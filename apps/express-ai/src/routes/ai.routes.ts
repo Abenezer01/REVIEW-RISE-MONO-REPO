@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { competitorClassifier } from '../services/competitor-classifier.service';
+import { llmService } from '../services/llm.service';
 
 const router = Router();
 
@@ -95,6 +96,37 @@ router.post('/generate-visibility-plan', async (req, res) => {
         res.json(result);
     } catch (error: any) {
         console.error('Visibility Plan Generation Error:', error);
+        res.status(500).json({ error: error.message || 'Internal Server Error' });
+    }
+});
+
+router.post('/adapt-content', async (req, res) => {
+    try {
+        const { template, context } = req.body;
+        if (!template || !context) {
+            return res.status(400).json({ error: 'Missing template or context' });
+        }
+
+        const prompt = `Adapt the following content template for a specific brand.
+        
+        Template: "${template}"
+        
+        Brand Context:
+        - Business Name: ${context.businessName}
+        - Industry: ${context.industry}
+        - Target Audience: ${context.audience || 'General'}
+        - Brand Voice: ${context.voice || 'Professional'}
+        - Mission/Values: ${context.mission || ''}
+        ${context.seasonalHook ? `- Seasonal Event: ${context.seasonalHook} (${context.seasonalDescription || ''})` : ''}
+        
+        Adapt the copy to be engaging and specific to this brand while keeping the original intent of the template.
+        ${context.seasonalHook ? 'Incorporate a natural hook for the seasonal event mentioned above.' : ''}
+        Return ONLY the adapted text.`;
+
+        const adaptedText = await llmService.generateText(prompt);
+        res.json({ adaptedText });
+    } catch (error: any) {
+        console.error('Content Adaptation Error:', error);
         res.status(500).json({ error: error.message || 'Internal Server Error' });
     }
 });

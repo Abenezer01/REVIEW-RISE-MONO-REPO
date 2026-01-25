@@ -23,6 +23,8 @@
     "gbp-rocket": "GBPRocket",
     "ad-rise": "AdRise",
     "brand-rise": "BrandRise",
+    "content-templates": "Content Templates",
+    "seasonal-events": "Seasonal Events",
     "settings": "Settings",
     "system-settings": "System Settings",
     "feature-flags": "Feature Flags",
@@ -196,6 +198,7 @@
       "recommendations": "Recommendations",
       "dna": "Brand DNA",
       "competitors": "Competitors",
+      "planner": "Monthly Planner",
       "content": "Content & Messaging",
       "reviews": "Reviews & Reputation",
       "reports": "Reports"
