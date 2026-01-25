@@ -6,7 +6,7 @@ import { linkedInService } from '../services/linkedin.service';
 
 export class SocialController {
   async publish(req: Request, res: Response) {
-    const requestId = (req as any).id || crypto.randomUUID();
+    const requestId = req.id;
     try {
       const { platform, connectionId, content } = req.body;
 

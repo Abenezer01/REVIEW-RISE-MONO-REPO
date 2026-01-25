@@ -14,6 +14,7 @@ export class SocialConnectionController {
      * GET /api/v1/social/connections
      */
     async listConnections(req: Request, res: Response) {
+        const requestId = req.id;
         try {
             // Validate query parameters
             const parseResult = ListConnectionsQuerySchema.safeParse(req.query);
@@ -22,7 +23,8 @@ export class SocialConnectionController {
                     'Invalid query parameters',
                     ErrorCode.VALIDATION_ERROR,
                     400,
-                    parseResult.error.issues
+                    parseResult.error.issues,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -45,7 +47,9 @@ export class SocialConnectionController {
 
             const response = createSuccessResponse(
                 { connections: sanitized },
-                'Connections retrieved successfully'
+                'Connections retrieved successfully',
+                200,
+                { requestId }
             );
             res.json(response);
 
@@ -54,7 +58,9 @@ export class SocialConnectionController {
             const response = createErrorResponse(
                 'Failed to list connections',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                requestId
             );
             res.status(500).json(response);
         }
@@ -65,6 +71,7 @@ export class SocialConnectionController {
      * GET /api/v1/social/connections/:id
      */
     async getConnection(req: Request, res: Response) {
+        const requestId = req.id;
         try {
             // Validate path parameters
             const parseResult = ConnectionIdParamSchema.safeParse(req.params);
@@ -73,7 +80,8 @@ export class SocialConnectionController {
                     'Invalid connection ID',
                     ErrorCode.VALIDATION_ERROR,
                     400,
-                    parseResult.error.issues
+                    parseResult.error.issues,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -85,7 +93,9 @@ export class SocialConnectionController {
                 const response = createErrorResponse(
                     'Connection not found',
                     ErrorCode.NOT_FOUND,
-                    404
+                    404,
+                    undefined,
+                    requestId
                 );
                 return res.status(404).json(response);
             }
@@ -96,7 +106,9 @@ export class SocialConnectionController {
             
             const response = createSuccessResponse(
                 { connection: rest },
-                'Connection retrieved successfully'
+                'Connection retrieved successfully',
+                200,
+                { requestId }
             );
             res.json(response);
 
@@ -105,7 +117,9 @@ export class SocialConnectionController {
             const response = createErrorResponse(
                 'Failed to get connection',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                requestId
             );
             res.status(500).json(response);
         }
@@ -116,6 +130,7 @@ export class SocialConnectionController {
      * DELETE /api/v1/social/connections/:id
      */
     async disconnect(req: Request, res: Response) {
+        const requestId = req.id;
         try {
             // Validate path parameters
             const parseResult = ConnectionIdParamSchema.safeParse(req.params);
@@ -124,7 +139,8 @@ export class SocialConnectionController {
                     'Invalid connection ID',
                     ErrorCode.VALIDATION_ERROR,
                     400,
-                    parseResult.error.issues
+                    parseResult.error.issues,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -135,7 +151,9 @@ export class SocialConnectionController {
             
             const response = createSuccessResponse(
                 { success: true, message: 'Connection removed' },
-                'Connection deleted successfully'
+                'Connection deleted successfully',
+                200,
+                { requestId }
             );
             res.json(response);
 
@@ -144,7 +162,9 @@ export class SocialConnectionController {
             const response = createErrorResponse(
                 'Failed to disconnect',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                requestId
             );
             res.status(500).json(response);
         }
@@ -155,6 +175,7 @@ export class SocialConnectionController {
      * POST /api/v1/social/connections/:id/refresh
      */
     async refreshConnection(req: Request, res: Response) {
+        const requestId = req.id;
         try {
             // Validate path parameters
             const parseResult = ConnectionIdParamSchema.safeParse(req.params);
@@ -163,7 +184,8 @@ export class SocialConnectionController {
                     'Invalid connection ID',
                     ErrorCode.VALIDATION_ERROR,
                     400,
-                    parseResult.error.issues
+                    parseResult.error.issues,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -177,7 +199,9 @@ export class SocialConnectionController {
                 const response = createErrorResponse(
                     'Connection not found',
                     ErrorCode.NOT_FOUND,
-                    404
+                    404,
+                    undefined,
+                    requestId
                 );
                 return res.status(404).json(response);
             }
@@ -187,7 +211,9 @@ export class SocialConnectionController {
                 const response = createErrorResponse(
                     'No refresh token available. Please reconnect the account.',
                     ErrorCode.BAD_REQUEST,
-                    400
+                    400,
+                    undefined,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -207,7 +233,9 @@ export class SocialConnectionController {
                         const response = createErrorResponse(
                             'Missing required data for Facebook refresh',
                             ErrorCode.BAD_REQUEST,
-                            400
+                            400,
+                            undefined,
+                            requestId
                         );
                         return res.status(400).json(response);
                     }
@@ -228,7 +256,9 @@ export class SocialConnectionController {
                         const response = createErrorResponse(
                             'No refresh token available for LinkedIn. Please reconnect.',
                             ErrorCode.BAD_REQUEST,
-                            400
+                            400,
+                            undefined,
+                            requestId
                         );
                         return res.status(400).json(response);
                     }
@@ -244,7 +274,9 @@ export class SocialConnectionController {
                     const response = createErrorResponse(
                         `Token refresh not supported for platform: ${connection.platform}`,
                         ErrorCode.BAD_REQUEST,
-                        400
+                        400,
+                        undefined,
+                        requestId
                     );
                     return res.status(400).json(response);
                 }
@@ -268,7 +300,9 @@ export class SocialConnectionController {
                         tokenExpiry: updated.tokenExpiry
                     }
                 },
-                'Token refreshed successfully'
+                'Token refreshed successfully',
+                200,
+                { requestId }
             );
             res.json(response);
 
@@ -288,7 +322,8 @@ export class SocialConnectionController {
                 'Failed to refresh connection',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
-                { error: error.message }
+                { error: error.message },
+                requestId
             );
             res.status(500).json(response);
         }
