@@ -8,6 +8,7 @@ export const requestIdMiddleware = (req: Request, res: Response, next: NextFunct
 };
 
 declare global {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Express {
         interface Request {
             id: string;

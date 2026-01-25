@@ -1,6 +1,7 @@
 /* eslint-disable import/no-unresolved */
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+
 import { createSuccessResponse } from '@platform/contracts'
 
 export async function POST() {

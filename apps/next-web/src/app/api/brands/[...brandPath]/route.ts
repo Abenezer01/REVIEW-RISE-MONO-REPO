@@ -1,7 +1,9 @@
 /* eslint-disable import/no-unresolved */
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+
 import { createErrorResponse, ErrorCode } from '@platform/contracts';
+
 import { SERVICES_CONFIG } from '@/configs/services';
 
 const SERVICE_URL = SERVICES_CONFIG.brand.url;
@@ -51,9 +53,11 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
     const headers = new Headers();
 
     const contentType = req.headers.get('content-type');
+
     if (contentType) headers.set('content-type', contentType);
 
     const auth = req.headers.get('authorization');
+
     if (auth) headers.set('authorization', auth);
 
     headers.set('x-request-id', requestId);
@@ -78,7 +82,8 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error('Proxy error:', error);
-    return NextResponse.json(
+
+return NextResponse.json(
       createErrorResponse('Proxy error', ErrorCode.INTERNAL_SERVER_ERROR, 500, String(error), requestId),
       { status: 500 }
     );
