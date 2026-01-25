@@ -17,10 +17,12 @@ import Collapse from '@mui/material/Collapse'
 
 import { toast } from 'react-toastify'
 
+import { useBusinessId } from '@/hooks/useBusinessId'
 import { SERVICES } from '@/configs/services'
 import apiClient from '@/lib/apiClient'
 import ArtStyleSelector from './images/ArtStyleSelector'
 import PromptGenerator from './images/PromptGenerator'
+import StudioGenerateButton from './shared/StudioGenerateButton'
 
 const QUICK_PROMPTS = [
     'Professional headshot',
@@ -37,6 +39,7 @@ const ASPECT_RATIOS = [
 ]
 
 export default function ImageStudio() {
+    const { businessId } = useBusinessId()
     const [loading, setLoading] = useState(false)
     const [prompt, setPrompt] = useState('')
     const [style, setStyle] = useState('Photorealistic')
@@ -86,22 +89,30 @@ return
         }
     }
 
+    const handleSavePrompt = async () => {
+        if (!businessId || !prompt || !generatedImage) {
+            toast.error('No image to save')
+            
+return
+        }
+
+        try {
+            await apiClient.post(`${SERVICES.brand.url}/${businessId}/image-prompts`, {
+                businessId,
+                prompt,
+                style,
+                aspectRatio,
+                imageUrls: [generatedImage]
+            })
+            toast.success('Prompt saved successfully!')
+        } catch (error) {
+            console.error('Error saving prompt:', error)
+            toast.error('Failed to save prompt')
+        }
+    }
+
     return (
         <Box>
-            {/* Page Header */}
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box>
-                    <Typography variant="h4" fontWeight="bold" gutterBottom>
-                        AI Image Studio
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary">
-                        Create stunning visuals with AI-powered generation
-                    </Typography>
-                </Box>
-                <Button variant="outlined" startIcon={<i className="tabler-photo" />}>
-                    My Gallery
-                </Button>
-            </Box>
 
             <Grid container spacing={4}>
                 {/* Left Panel - Input */}
@@ -253,24 +264,16 @@ return
                         </Card>
 
                         {/* Generate Button */}
-                        <Button
-                            variant="contained"
-                            size="large"
-                            fullWidth
+                        <StudioGenerateButton
                             onClick={handleGenerate}
-                            disabled={loading}
-                            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <i className='tabler-sparkles' />}
+                            loading={loading}
+                            label="✨ Generate Images"
+                            loadingLabel="Generating..."
+                            fullWidth
                             sx={{ 
-                                borderRadius: 2, 
-                                py: 1.5,
-                                bgcolor: 'secondary.main', 
-                                '&:hover': { bgcolor: 'secondary.dark' },
                                 fontSize: '1rem',
-                                fontWeight: 'bold'
                             }}
-                        >
-                            {loading ? 'Generating...' : '✨ Generate Images'}
-                        </Button>
+                        />
                     </Box>
                 </Grid>
 
@@ -327,6 +330,14 @@ return
                                             <IconButton sx={{ bgcolor: 'action.hover' }}>
                                                 <i className="tabler-edit" />
                                             </IconButton>
+                                            <Button
+                                                variant="outlined"
+                                                onClick={handleSavePrompt}
+                                                sx={{ borderRadius: 2, mr: 1 }}
+                                                startIcon={<i className="tabler-device-floppy" />}
+                                            >
+                                                Save Prompt
+                                            </Button>
                                             <Button variant="contained" fullWidth sx={{ borderRadius: 2 }}>
                                                 <i className="tabler-check" style={{ marginRight: 8 }} />
                                                 Approve

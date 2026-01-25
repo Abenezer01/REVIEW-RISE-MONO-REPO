@@ -1,27 +1,28 @@
 'use client'
 
-import React, { useState, useMemo, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
-import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
-import TextField from '@mui/material/TextField'
+import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
-import { toast } from 'react-toastify'
-import { useTranslations } from 'next-intl'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import { formatDate } from '@platform/utils'
+import { useTranslations } from 'next-intl'
+import { toast } from 'react-toastify'
 
-import { useBusinessId } from '@/hooks/useBusinessId'
 import { SERVICES } from '@/configs/services'
+import { useBusinessId } from '@/hooks/useBusinessId'
 import apiClient from '@/lib/apiClient'
+import StudioGenerateButton from './shared/StudioGenerateButton'
 
 import CalendarGrid from './planner/CalendarGrid'
-import ScheduledPostList from './planner/ScheduledPostList'
 import PlanSidebar from './planner/PlanSidebar'
+import ScheduledPostList from './planner/ScheduledPostList'
 
 const TOPICS = [
     'Product Launch',
@@ -203,14 +204,10 @@ return {
                     >
                         {t('savePlan')}
                     </Button>
-                    <Button 
-                        startIcon={<i className="tabler-sparkles" />} 
-                        variant="contained" 
-                        color="secondary"
+                    <StudioGenerateButton 
                         onClick={() => setDialogOpen(true)}
-                    >
-                        Generate New Plan
-                    </Button>
+                        label="Generate New Plan"
+                    />
                 </Box>
             </Box>
 
@@ -229,15 +226,12 @@ return {
                     <Typography color="text.secondary" sx={{ mb: 4, maxWidth: 400, mx: 'auto' }}>
                         Start by generating a comprehensive content strategy tailored to your niche.
                     </Typography>
-                    <Button 
+                    <StudioGenerateButton 
                         variant="contained" 
                         size="large"
-                        startIcon={<i className="tabler-sparkles" />}
                         onClick={() => setDialogOpen(true)}
-                        color="secondary"
-                    >
-                        Generate 30-Day Plan
-                    </Button>
+                        label="Generate 30-Day Plan"
+                    />
                 </Box>
             ) : (
                 <Grid container spacing={4}>
@@ -301,17 +295,13 @@ return {
                             ))}
                         </TextField>
                         
-                        <Button 
-                            variant="contained" 
-                            size="large" 
+                        <StudioGenerateButton 
                             onClick={handleGenerate}
-                            disabled={loading}
-                            startIcon={<i className='tabler-sparkles' />}
-                            color="secondary"
+                            loading={loading}
+                            label={t('submitButton')}
+                            loadingLabel="Generating..."
                             sx={{ mt: 2 }}
-                        >
-                            {t('submitButton')}
-                        </Button>
+                        />
                     </Box>
                 </DialogContent>
             </Dialog>

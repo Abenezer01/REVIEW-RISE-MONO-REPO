@@ -7,9 +7,7 @@ import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import CircularProgress from '@mui/material/CircularProgress'
 import Checkbox from '@mui/material/Checkbox'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Chip from '@mui/material/Chip'
@@ -21,8 +19,10 @@ import type { GenerateScriptRequest, GenerateScriptResponse, ScriptData } from '
 
 import { SERVICES } from '@/configs/services'
 import apiClient from '@/lib/apiClient'
-import ToneVoiceSelector from './scripts/ToneVoiceSelector'
+import ToneSelector from './selectors/ToneSelector'
+import PlatformSelector from './selectors/PlatformSelector'
 import VideoDurationSelector from './scripts/VideoDurationSelector'
+import StudioGenerateButton from './shared/StudioGenerateButton'
 
 export default function ScriptWriter() {
     const [loading, setLoading] = useState(false)
@@ -30,6 +30,7 @@ export default function ScriptWriter() {
     const [videoGoal, setVideoGoal] = useState('')
     const [targetAudience, setTargetAudience] = useState('')
     const [tone, setTone] = useState('professional')
+    const [platform, setPlatform] = useState('Instagram')
     const [duration, setDuration] = useState(15)
     const [includeSceneDescriptions, setIncludeSceneDescriptions] = useState(true)
     const [includeVisualSuggestions, setIncludeVisualSuggestions] = useState(true)
@@ -52,6 +53,7 @@ return
                 videoGoal,
                 targetAudience,
                 tone,
+                platform,
                 duration,
                 includeSceneDescriptions,
                 includeVisualSuggestions,
@@ -130,7 +132,8 @@ return
                                     Script Style
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                                    <ToneVoiceSelector selected={tone} onChange={setTone} />
+                                    <PlatformSelector value={platform} onChange={setPlatform} />
+                                    <ToneSelector value={tone} onChange={setTone} />
                                     <VideoDurationSelector selected={duration} onChange={setDuration} />
                                 </Box>
                             </CardContent>
@@ -200,24 +203,16 @@ return
                                     10 Credits
                                 </Typography>
                             </Box>
-                            <Button
-                                variant="contained"
-                                size="large"
-                                fullWidth
+                            <StudioGenerateButton
                                 onClick={handleGenerate}
-                                disabled={loading}
-                                startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <i className='tabler-sparkles' />}
+                                loading={loading}
+                                label="✨ Generate Script"
+                                loadingLabel="Generating..."
+                                fullWidth
                                 sx={{ 
-                                    borderRadius: 2, 
-                                    py: 1.5,
-                                    bgcolor: 'primary.main',
-                                    '&:hover': { bgcolor: 'primary.dark' },
                                     fontSize: '1rem',
-                                    fontWeight: 'bold'
                                 }}
-                            >
-                                {loading ? 'Generating...' : '✨ Generate Script'}
-                            </Button>
+                            />
                         </Box>
                     </Box>
                 </Grid>

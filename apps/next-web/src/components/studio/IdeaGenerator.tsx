@@ -1,7 +1,9 @@
 
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
+
+import { useTranslations } from 'next-intl'
 
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -18,6 +20,9 @@ import { toast } from 'react-toastify'
 import { useBusinessId } from '@/hooks/useBusinessId'
 import { SERVICES } from '@/configs/services'
 import apiClient from '@/lib/apiClient'
+import StudioGenerateButton from './shared/StudioGenerateButton'
+import ToneSelector from './selectors/ToneSelector'
+import PlatformSelector from './selectors/PlatformSelector'
 import IdeaCard from './ideas/IdeaCard'
 
 const BUSINESS_TYPES = [
@@ -45,16 +50,23 @@ const TONES = ['Professional', 'Casual', 'Tutorial', 'Storytelling']
 type FilterTab = 'all' | 'blog' | 'social' | 'video'
 
 export default function IdeaGenerator() {
+    const t = useTranslations('studio.ideas')
     const { businessId } = useBusinessId()
     const [loading, setLoading] = useState(false)
     const [businessType, setBusinessType] = useState('Local Business')
-    const [goal, setGoal] = useState('Boost Engagement')
+    const [goal, setGoal] = useState('')
     const [topic, setTopic] = useState('')
+    const [platform, setPlatform] = useState('Instagram')
     const [contentType, setContentType] = useState('Blog Post')
-    const [tone, setTone] = useState('Professional')
+    const [tone, setTone] = useState('professional')
     const [numberOfIdeas, setNumberOfIdeas] = useState(10)
-    const [results, setResults] = useState<any[]>([])
+    const [ideas, setIdeas] = useState<any[]>([])
     const [activeFilter, setActiveFilter] = useState<FilterTab>('all')
+    const [history, setHistory] = useState<any[]>([])
+    const [showHistory, setShowHistory] = useState(false)
+    const [historyOffset, setHistoryOffset] = useState(0)
+    const [hasMoreHistory, setHasMoreHistory] = useState(true)
+    const [loadingHistory, setLoadingHistory] = useState(false)
 
     const handleGenerate = async () => {
         setLoading(true)
@@ -66,6 +78,7 @@ export default function IdeaGenerator() {
                 topic,
                 contentType,
                 tone,
+                platform,
                 numberOfIdeas
             })
 
@@ -78,10 +91,28 @@ export default function IdeaGenerator() {
                 engagement: ['high', 'medium', 'low'][idx % 3] as 'high' | 'medium' | 'low',
                 readingTime: Math.floor(Math.random() * 10) + 3,
                 category: CONTENT_TYPES[idx % CONTENT_TYPES.length],
+                platform: idea.platform || platform,
                 tone: TONES[idx % TONES.length]
             }))
 
-            setResults(enhancedIdeas)
+            setIdeas(enhancedIdeas)
+            setActiveFilter('all')
+            
+            // Auto-save all ideas to ContentIdea table
+            if (businessId && enhancedIdeas.length > 0) {
+                try {
+                    await apiClient.post(`${SERVICES.brand.url}/${businessId}/content-ideas`, {
+                        businessId,
+                        ideas: enhancedIdeas
+                    })
+
+                    // Silent success - background logging
+                    fetchHistory(true) // Refresh history
+                } catch (error) {
+                    console.error('Failed to save idea history:', error)
+                }
+            }
+            
             toast.success(`${enhancedIdeas.length} ideas generated!`)
         } catch (error) {
             console.error(error)
@@ -113,31 +144,92 @@ return
         }
     }
 
-    const handleCopyIdea = (idea: any) => {
-        navigator.clipboard.writeText(`${idea.title}\n\n${idea.description}`)
+    const handleCopy = (text: string) => {
+        navigator.clipboard.writeText(text)
         toast.success('Copied to clipboard')
     }
 
-    const filteredResults = results.filter(idea => {
-        if (activeFilter === 'all') return true
-        if (activeFilter === 'blog') return idea.category?.toLowerCase().includes('blog')
-        if (activeFilter === 'social') return idea.category?.toLowerCase().includes('social')
-        if (activeFilter === 'video') return idea.category?.toLowerCase().includes('video')
-        
+    // Filter ideas
+    const filteredIdeas = activeFilter === 'all' 
+        ? ideas
+        : ideas.filter((idea: any) => {
+            if (activeFilter === 'blog') return idea.category?.toLowerCase().includes('blog')
+            if (activeFilter === 'social') return idea.category?.toLowerCase().includes('social')
+            if (activeFilter === 'video') return idea.category?.toLowerCase().includes('video')
+            
 return true
-    })
+        })
+
+    // Fetches history with optional reset
+    const fetchHistory = useCallback(async (reset = false) => {
+        if (!businessId) return
+        
+        setLoadingHistory(true)
+
+        try {
+            const offset = reset ? 0 : historyOffset
+            const response = await apiClient.get(`${SERVICES.brand.url}/${businessId}/content-ideas?limit=10&offset=${offset}`)
+            const fetchedIdeas = response.data.ideas || []
+            
+            if (reset) {
+                setHistory(fetchedIdeas)
+                setHistoryOffset(10)
+                setHasMoreHistory(fetchedIdeas.length === 10)
+            } else {
+                setHistory(prev => [...prev, ...fetchedIdeas])
+                setHistoryOffset(prev => prev + 10)
+                setHasMoreHistory(fetchedIdeas.length === 10)
+            }
+        } catch (error) {
+            console.error('Failed to fetch idea history:', error)
+        } finally {
+            setLoadingHistory(false)
+        }
+    }, [businessId, historyOffset])
+
+    // Initial load
+    useEffect(() => {
+        if (businessId) {
+            fetchHistory(true)
+        }
+    }, [businessId, fetchHistory])
+
+    // Load more history
+    const loadMoreHistory = () => fetchHistory(false)
+
+    // Helper to categorize dates
+    const getCategoryFromDate = (date: Date) => {
+        const now = new Date()
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+        const yesterday = new Date(today)
+
+        yesterday.setDate(yesterday.getDate() - 1)
+        const lastWeek = new Date(today)
+
+        lastWeek.setDate(lastWeek.getDate() - 7)
+
+        const itemDate = new Date(date)
+        const itemDay = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate())
+
+        if (itemDay.getTime() === today.getTime()) return 'Today'
+        if (itemDay.getTime() === yesterday.getTime()) return 'Yesterday'
+        if (itemDay >= lastWeek) return 'This Week'
+        
+return 'Older'
+    }
+
+    // Group history by date
+    const groupedHistory = history.reduce((acc, idea) => {
+        const category = getCategoryFromDate(new Date(idea.createdAt))
+
+        if (!acc[category]) acc[category] = []
+        acc[category].push(idea)
+        
+return acc
+    }, {} as Record<string, any[]>)
 
     return (
         <Box>
-            {/* Page Header */}
-            <Box sx={{ mb: 4 }}>
-                <Typography variant="h4" fontWeight="bold" gutterBottom>
-                    AI Content Ideas Generator
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                    Generate unlimited content ideas powered by AI
-                </Typography>
-            </Box>
 
             {/* Input Section */}
             <Card variant="outlined" sx={{ mb: 4, borderRadius: 2 }}>
@@ -183,7 +275,9 @@ return true
                             helperText="Be specific for better results. The AI will generate tailored ideas."
                         />
 
-                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2 }}>
+                        <PlatformSelector value={platform} onChange={setPlatform} />
+
+                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
                             <TextField
                                 select
                                 label="Content Type"
@@ -197,18 +291,6 @@ return true
                             </TextField>
 
                             <TextField
-                                select
-                                label="Tone"
-                                value={tone}
-                                onChange={(e) => setTone(e.target.value)}
-                                fullWidth
-                            >
-                                {TONES.map((t) => (
-                                    <MenuItem key={t} value={t}>{t}</MenuItem>
-                                ))}
-                            </TextField>
-
-                            <TextField
                                 type="number"
                                 label="Number of Ideas"
                                 value={numberOfIdeas}
@@ -218,17 +300,15 @@ return true
                             />
                         </Box>
 
+                        <ToneSelector value={tone} onChange={setTone} />
+
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Button 
-                                variant="contained" 
-                                size="large" 
+                            <StudioGenerateButton
                                 onClick={handleGenerate}
-                                disabled={loading}
-                                startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <i className='tabler-sparkles' />}
-                                sx={{ borderRadius: 2, px: 4, bgcolor: 'secondary.main', '&:hover': { bgcolor: 'secondary.dark' } }}
-                            >
-                                {loading ? 'Generating...' : 'Generate Ideas'}
-                            </Button>
+                                loading={loading}
+                                label="Generate Ideas"
+                                loadingLabel="Generating..."
+                            />
                         </Box>
                     </Box>
                 </CardContent>
@@ -237,57 +317,121 @@ return true
             {/* Results Section */}
             <Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                    <Typography variant="h6" fontWeight="bold">
-                        Generated Ideas ({filteredResults.length})
-                    </Typography>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Chip 
-                            label="All" 
-                            onClick={() => setActiveFilter('all')}
-                            color={activeFilter === 'all' ? 'primary' : 'default'}
-                            sx={{ fontWeight: activeFilter === 'all' ? 'bold' : 'normal' }}
-                        />
-                        <Chip 
-                            label="Blog" 
-                            onClick={() => setActiveFilter('blog')}
-                            variant={activeFilter === 'blog' ? 'filled' : 'outlined'}
-                            color={activeFilter === 'blog' ? 'primary' : 'default'}
-                        />
-                        <Chip 
-                            label="Social" 
-                            onClick={() => setActiveFilter('social')}
-                            variant={activeFilter === 'social' ? 'filled' : 'outlined'}
-                            color={activeFilter === 'social' ? 'primary' : 'default'}
-                        />
-                        <Chip 
-                            label="Video" 
-                            onClick={() => setActiveFilter('video')}
-                            variant={activeFilter === 'video' ? 'filled' : 'outlined'}
-                            color={activeFilter === 'video' ? 'primary' : 'default'}
-                        />
+                        <Button 
+                            variant={!showHistory ? 'contained' : 'outlined'} 
+                            onClick={() => setShowHistory(false)}
+                            size="small"
+                        >
+                            Generated ({ideas.length})
+                        </Button>
+                        <Button 
+                            variant={showHistory ? 'contained' : 'outlined'} 
+                            onClick={() => setShowHistory(true)}
+                            size="small"
+                        >
+                            History ({history.length})
+                        </Button>
                     </Box>
-                </Box>
 
-                {filteredResults.length === 0 && !loading && (
-                    <Box sx={{ p: 6, textAlign: 'center', color: 'text.secondary', border: '1px dashed', borderColor: 'divider', borderRadius: 2 }}>
-                        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center', opacity: 0.5 }}>
-                            <i className="tabler-bulb" style={{ fontSize: 48 }} />
+                    {!showHistory && (
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Chip 
+                                label="All" 
+                                onClick={() => setActiveFilter('all')}
+                                color={activeFilter === 'all' ? 'primary' : 'default'}
+                                sx={{ fontWeight: activeFilter === 'all' ? 'bold' : 'normal' }}
+                            />
+                            <Chip 
+                                label="Blog" 
+                                onClick={() => setActiveFilter('blog')}
+                                color={activeFilter === 'blog' ? 'primary' : 'default'}
+                                sx={{ fontWeight: activeFilter === 'blog' ? 'bold' : 'normal' }}
+                            />
+                            <Chip 
+                                label="Social" 
+                                onClick={() => setActiveFilter('social')}
+                                color={activeFilter === 'social' ? 'primary' : 'default'}
+                                sx={{ fontWeight: activeFilter === 'social' ? 'bold' : 'normal' }}
+                            />
+                            <Chip 
+                                label="Video" 
+                                onClick={() => setActiveFilter('video')}
+                                color={activeFilter === 'video' ? 'primary' : 'default'}
+                                sx={{ fontWeight: activeFilter === 'video' ? 'bold' : 'normal' }}
+                            />
                         </Box>
-                        <Typography variant="h6" gutterBottom>No ideas generated yet</Typography>
-                        <Typography variant="body2">Fill in the details above and click generate to get AI-powered content ideas.</Typography>
-                    </Box>
-                )}
-
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {filteredResults.map((idea, idx) => (
-                        <IdeaCard
-                            key={idx}
-                            idea={idea}
-                            onUse={() => handleSaveDraft(idea)}
-                            onCopy={() => handleCopyIdea(idea)}
-                        />
-                    ))}
+                    )}
                 </Box>
+
+                {!showHistory ? (
+                    <>
+                        {filteredIdeas.length === 0 && !loading && (
+                            <Box sx={{ p: 6, textAlign: 'center', color: 'text.secondary', border: '1px dashed', borderColor: 'divider', borderRadius: 2 }}>
+                                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center', opacity: 0.5 }}>
+                                    <i className="tabler-bulb" style={{ fontSize: 48 }} />
+                                </Box>
+                                <Typography>{t('emptyState')}</Typography>
+                            </Box>
+                        )}
+
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {filteredIdeas.map((idea: any, idx: number) => (
+                                <IdeaCard
+                                    key={idx}
+                                    idea={idea}
+                                    onUse={() => handleSaveDraft(idea)}
+                                    onCopy={() => handleCopy(`${idea.title}\n\n${idea.description}`)}
+                                />
+                            ))}
+                        </Box>
+                    </>
+                ) : (
+                    <>
+                        {history.length === 0 ? (
+                            <Box sx={{ p: 6, textAlign: 'center', color: 'text.secondary', border: '1px dashed', borderColor: 'divider', borderRadius: 2 }}>
+                                <i className="tabler-clock" style={{ fontSize: 32, opacity: 0.5, marginBottom: 8 }} />
+                                <Typography>No idea history yet</Typography>
+                            </Box>
+                        ) : (
+                            <>
+                                {['Today', 'Yesterday', 'This Week', 'Older'].map(category => (
+                                    groupedHistory[category] && groupedHistory[category].length > 0 && (
+                                        <Box key={category} sx={{ mb: 3 }}>
+                                            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2, color: 'text.secondary' }}>
+                                                {category}
+                                            </Typography>
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                                {groupedHistory[category].map((idea: any) => (
+                                                    <IdeaCard
+                                                        key={idea.id}
+                                                        idea={idea}
+                                                        onUse={() => handleSaveDraft(idea)}
+                                                        onCopy={() => handleCopy(`${idea.title}\n\n${idea.description}`)}
+                                                    />
+                                                ))}
+                                            </Box>
+                                        </Box>
+                                    )
+                                ))}
+
+                                {/* Load More Button */}
+                                {history.length > 0 && hasMoreHistory && (
+                                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                                        <Button 
+                                            variant="outlined" 
+                                            onClick={loadMoreHistory}
+                                            disabled={loadingHistory}
+                                            startIcon={loadingHistory ? <CircularProgress size={16} /> : <i className="tabler-chevron-down" />}
+                                        >
+                                            {loadingHistory ? 'Loading...' : 'Load More'}
+                                        </Button>
+                                    </Box>
+                                )}
+                            </>
+                        )}
+                    </>
+                )}
             </Box>
         </Box>
     )

@@ -28,7 +28,12 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
     'scheduling',
     'visibility-plan',
     'scores',
-    'planner'
+    'planner',
+    'caption-drafts',
+    'content-ideas',
+    'image-prompts',
+    'carousel-drafts',
+    'script-drafts'
   ];
 
   if (path.length === 0) {
