@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -22,7 +22,9 @@ import {
   Divider,
   CircularProgress,
   Alert,
-  Stack
+  Stack,
+  useTheme,
+  alpha
 } from '@mui/material';
 
 import { 
@@ -62,6 +64,8 @@ const PLATFORM_ICONS: Record<string, { icon: string, color: string }> = {
 };
 
 export default function PlannerPage() {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const { businessId } = useBusinessId();
   const { locationId } = useLocationFilter();
   const { locale } = useParams();
@@ -182,7 +186,7 @@ export default function PlannerPage() {
             Content Planner
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
-            <Icon icon="tabler-sparkles" fontSize={16} color="#7367F0" />
+            <Icon icon="tabler-sparkles" fontSize={16} color={theme.palette.primary.main} />
             <Typography variant="body2" color="text.secondary" fontWeight="500">
               AI Strategy for your Brand DNA
             </Typography>
@@ -192,7 +196,7 @@ export default function PlannerPage() {
           {plan && plan.status === 'converted' && (
             <Button
               component={Link}
-              href={`/${locale}/admin/brand-rise/content`}
+              href={`/${locale}/admin/social-rise`}
               variant="outlined"
               color="success"
               startIcon={<CheckCircleIcon />}
@@ -246,7 +250,7 @@ export default function PlannerPage() {
                 color="inherit" 
                 size="small" 
                 component={Link} 
-                href={`/${locale}/admin/brand-rise/content`}
+                href={`/${locale}/admin/social-rise`}
                 sx={{ fontWeight: 'bold' }}
               >
                 GO TO SCHEDULER
@@ -262,9 +266,15 @@ export default function PlannerPage() {
         {/* Sidebar Configuration */}
         <Grid size={{ xs: 12, md: 3 }}>
           <Stack spacing={3}>
-            <Paper sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+            <Paper sx={{ 
+              p: 3, 
+              borderRadius: '20px', 
+              border: `1px solid ${isDark ? theme.palette.divider : alpha(theme.palette.divider, 0.5)}`,
+              boxShadow: isDark ? 'none' : '0 10px 30px 0 rgba(0,0,0,0.04)',
+              bgcolor: isDark ? alpha(theme.palette.background.paper, 0.5) : theme.palette.background.paper
+            }}>
               <Typography variant="subtitle1" fontWeight="800" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Icon icon="tabler-calendar-event" fontSize={20} />
+                <Icon icon="tabler-calendar-event" fontSize={20} color={theme.palette.primary.main} />
                 Timeline
               </Typography>
               <Divider sx={{ mb: 2.5, opacity: 0.6 }} />
@@ -276,7 +286,10 @@ export default function PlannerPage() {
                     value={month} 
                     label="Month" 
                     onChange={(e) => setMonth(Number(e.target.value))}
-                    sx={{ borderRadius: 2 }}
+                    sx={{ 
+                      borderRadius: '12px',
+                      bgcolor: isDark ? alpha(theme.palette.common.white, 0.02) : alpha(theme.palette.primary.main, 0.02)
+                    }}
                   >
                     {monthNames.map((name, i) => (
                       <MenuItem key={i + 1} value={i + 1}>{name}</MenuItem>
@@ -290,7 +303,10 @@ export default function PlannerPage() {
                     value={year} 
                     label="Year" 
                     onChange={(e) => setYear(Number(e.target.value))}
-                    sx={{ borderRadius: 2 }}
+                    sx={{ 
+                      borderRadius: '12px',
+                      bgcolor: isDark ? alpha(theme.palette.common.white, 0.02) : alpha(theme.palette.primary.main, 0.02)
+                    }}
                   >
                     {[2025, 2026].map(y => (
                       <MenuItem key={y} value={y}>{y}</MenuItem>
@@ -300,9 +316,15 @@ export default function PlannerPage() {
               </Stack>
             </Paper>
 
-            <Paper sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+            <Paper sx={{ 
+              p: 3, 
+              borderRadius: '20px', 
+              border: `1px solid ${isDark ? theme.palette.divider : alpha(theme.palette.divider, 0.5)}`,
+              boxShadow: isDark ? 'none' : '0 10px 30px 0 rgba(0,0,0,0.04)',
+              bgcolor: isDark ? alpha(theme.palette.background.paper, 0.5) : theme.palette.background.paper
+            }}>
               <Typography variant="subtitle1" fontWeight="800" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Psychology sx={{ fontSize: 20 }} />
+                <Psychology sx={{ fontSize: 20, color: theme.palette.primary.main }} />
                 Brand Strategy
               </Typography>
               <Divider sx={{ mb: 2.5, opacity: 0.6 }} />
@@ -314,7 +336,10 @@ export default function PlannerPage() {
                     value={industry} 
                     label="Industry" 
                     onChange={(e) => setIndustry(e.target.value)}
-                    sx={{ borderRadius: 2 }}
+                    sx={{ 
+                      borderRadius: '12px',
+                      bgcolor: isDark ? alpha(theme.palette.common.white, 0.02) : alpha(theme.palette.primary.main, 0.02)
+                    }}
                   >
                     {industries.map(ind => (
                       <MenuItem key={ind} value={ind}>{ind}</MenuItem>
@@ -328,7 +353,10 @@ export default function PlannerPage() {
                     value={frequency} 
                     label="Frequency" 
                     onChange={(e) => setFrequency(e.target.value)}
-                    sx={{ borderRadius: 2 }}
+                    sx={{ 
+                      borderRadius: '12px',
+                      bgcolor: isDark ? alpha(theme.palette.common.white, 0.02) : alpha(theme.palette.primary.main, 0.02)
+                    }}
                   >
                     {frequencies.map(f => (
                       <MenuItem key={f.value} value={f.value}>
@@ -348,7 +376,10 @@ export default function PlannerPage() {
                     value={selectedPlatforms} 
                     label="Platforms" 
                     onChange={(e) => setSelectedPlatforms(typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value)}
-                    sx={{ borderRadius: 2 }}
+                    sx={{ 
+                      borderRadius: '12px',
+                      bgcolor: isDark ? alpha(theme.palette.common.white, 0.02) : alpha(theme.palette.primary.main, 0.02)
+                    }}
                     renderValue={(selected) => (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                         {selected.map((value) => (
@@ -356,7 +387,14 @@ export default function PlannerPage() {
                             key={value} 
                             label={value} 
                             size="small" 
-                            sx={{ height: 20, fontSize: '0.65rem', fontWeight: 600 }}
+                            sx={{ 
+                              height: 20, 
+                              fontSize: '0.65rem', 
+                              fontWeight: 600,
+                              borderRadius: '6px',
+                              bgcolor: isDark ? alpha(PLATFORM_ICONS[value]?.color || '#7367F0', 0.2) : alpha(PLATFORM_ICONS[value]?.color || '#7367F0', 0.1),
+                              color: PLATFORM_ICONS[value]?.color || 'inherit'
+                            }}
                           />
                         ))}
                       </Box>
@@ -381,10 +419,9 @@ export default function PlannerPage() {
 
             <Box sx={{ 
               p: 2.5, 
-              borderRadius: 4, 
-              bgcolor: 'rgba(115, 103, 240, 0.08)', 
-              border: '1px dashed', 
-              borderColor: 'primary.main',
+              borderRadius: '20px', 
+              bgcolor: isDark ? alpha(theme.palette.primary.main, 0.08) : alpha(theme.palette.primary.main, 0.04), 
+              border: `1px dashed ${alpha(theme.palette.primary.main, 0.3)}`, 
               position: 'relative',
               overflow: 'hidden'
             }}>
@@ -419,13 +456,16 @@ export default function PlannerPage() {
               <Paper sx={{ 
                 p: 2.5, 
                 mb: 4, 
-                borderRadius: 4, 
+                borderRadius: '20px', 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'space-between', 
-                background: 'linear-gradient(135deg, #7367F0 0%, #9E95F5 100%)', 
+                background: isDark 
+                  ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.8)} 0%, ${alpha(theme.palette.primary.dark, 0.9)} 100%)`
+                  : `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`, 
                 color: 'white',
-                boxShadow: '0 4px 20px 0 rgba(115, 103, 240, 0.2)'
+                boxShadow: isDark ? 'none' : `0 10px 30px 0 ${alpha(theme.palette.primary.main, 0.3)}`,
+                border: isDark ? `1px solid ${alpha(theme.palette.common.white, 0.1)}` : 'none'
               }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <Box sx={{ 
@@ -468,14 +508,15 @@ export default function PlannerPage() {
                     {groupedDays[week].map((day: any) => (
                       <Grid key={day.day} size={{ xs: 12 }}>
                         <Card variant="outlined" sx={{ 
-                          borderRadius: 3, 
+                          borderRadius: '16px', 
                           transition: 'all 0.2s ease-in-out',
-                          border: '1px solid',
-                          borderColor: 'divider',
+                          border: `1px solid ${isDark ? theme.palette.divider : alpha(theme.palette.divider, 0.5)}`,
+                          bgcolor: isDark ? alpha(theme.palette.background.paper, 0.5) : theme.palette.background.paper,
                           '&:hover': { 
-                            boxShadow: '0 8px 24px 0 rgba(0,0,0,0.05)',
-                            borderColor: 'primary.main',
-                            transform: 'translateY(-2px)'
+                            boxShadow: isDark ? 'none' : '0 12px 40px 0 rgba(0,0,0,0.06)',
+                            borderColor: theme.palette.primary.main,
+                            transform: 'translateY(-2px)',
+                            bgcolor: isDark ? alpha(theme.palette.background.paper, 0.8) : theme.palette.background.paper
                           },
                           position: 'relative',
                           overflow: 'visible'
@@ -485,111 +526,92 @@ export default function PlannerPage() {
                               position: 'absolute', 
                               top: -10, 
                               right: 20, 
-                              bgcolor: 'secondary.main', 
+                              bgcolor: theme.palette.secondary.main, 
                               color: 'white',
-                              px: 1.5,
+                              px: 2,
                               py: 0.5,
-                              borderRadius: 1,
+                              borderRadius: '8px',
                               fontSize: '0.65rem',
                               fontWeight: '800',
                               display: 'flex',
                               alignItems: 'center',
-                              gap: 0.5,
-                              boxShadow: '0 4px 10px 0 rgba(233, 30, 99, 0.3)',
+                              gap: 1,
+                              boxShadow: `0 4px 12px 0 ${alpha(theme.palette.secondary.main, 0.4)}`,
                               zIndex: 1
                             }}>
-                              <EventNoteIcon sx={{ fontSize: 12 }} />
+                              <EventNoteIcon sx={{ fontSize: 14 }} />
                               {day.seasonalHook.toUpperCase()}
                             </Box>
                           )}
                           
-                          <CardContent sx={{ display: 'flex', gap: { xs: 2, md: 3 }, p: '20px !important' }}>
+                          <CardContent sx={{ display: 'flex', gap: { xs: 3, md: 4 }, p: '24px !important' }}>
                             <Box sx={{ 
-                              minWidth: 54, 
-                              height: 54, 
-                              bgcolor: 'action.hover', 
+                              minWidth: 64, 
+                              height: 64, 
+                              bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : alpha(theme.palette.primary.main, 0.03), 
                               display: 'flex',
                               flexDirection: 'column',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              borderRadius: 2.5,
-                              border: '1px solid',
-                              borderColor: 'divider'
+                              borderRadius: '12px',
+                              border: `1px solid ${isDark ? theme.palette.divider : alpha(theme.palette.primary.main, 0.1)}`
                             }}>
-                              <Typography variant="caption" sx={{ fontSize: '0.6rem', fontWeight: '800', opacity: 0.5, mb: -0.5 }}>DAY</Typography>
-                              <Typography variant="h5" fontWeight="900" sx={{ color: 'text.primary' }}>{day.day}</Typography>
+                              <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: '800', color: theme.palette.primary.main, opacity: 0.8, mb: -0.5 }}>DAY</Typography>
+                              <Typography variant="h4" fontWeight="900" sx={{ color: theme.palette.primary.main }}>{day.day}</Typography>
                             </Box>
 
                             <Box sx={{ flexGrow: 1 }}>
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1, gap: 2 }}>
-                                <Typography variant="subtitle1" fontWeight="800" color="text.primary" sx={{ lineHeight: 1.3 }}>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2, gap: 3 }}>
+                                <Typography variant="h6" fontWeight="700" color="text.primary" sx={{ lineHeight: 1.3, letterSpacing: '-0.2px' }}>
                                   {day.contentIdea}
                                 </Typography>
                                 <Chip 
                                   label={day.contentType.toUpperCase()} 
                                   size="small" 
                                   sx={{ 
-                                    borderRadius: 1, 
-                                    fontSize: '0.6rem', 
+                                    borderRadius: '6px', 
+                                    fontSize: '0.65rem', 
                                     fontWeight: '800',
-                                    bgcolor: 'action.selected',
-                                    color: 'text.secondary',
-                                    height: 20
+                                    bgcolor: isDark ? alpha(theme.palette.secondary.main, 0.2) : alpha(theme.palette.secondary.main, 0.1),
+                                    color: theme.palette.secondary.main,
+                                    border: 'none'
                                   }} 
                                 />
                               </Box>
-                              
-                              <Typography variant="body2" color="text.secondary" sx={{ 
-                                mb: 2, 
-                                lineHeight: 1.6,
-                                fontStyle: day.suggestedCopy ? 'normal' : 'italic',
-                                display: '-webkit-box',
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: 'vertical',
-                                overflow: 'hidden'
-                              }}>
-                                {day.suggestedCopy || "Generating creative adaptation..."}
+
+                              <Typography variant="body2" color="text.secondary" sx={{ mb: 4, lineHeight: 1.6, opacity: 0.9 }}>
+                                {day.suggestedCopy || day.caption || "Generating creative adaptation..."}
                               </Typography>
 
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Stack direction="row" spacing={0.5}>
-                                  {day.platforms.map((p: string) => (
-                                    <Box 
-                                      key={p} 
-                                      sx={{ 
-                                        width: 24, 
-                                        height: 24, 
-                                        borderRadius: 1, 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
-                                        justifyContent: 'center',
-                                        bgcolor: 'action.hover',
-                                        color: 'primary.main',
-                                        border: '1px solid',
-                                        borderColor: 'divider'
-                                      }}
-                                      title={p}
-                                    >
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', justifyContent: 'space-between' }}>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+                                  <Typography variant="caption" fontWeight="800" sx={{ color: 'text.disabled', mr: 1, letterSpacing: '0.5px' }}>
+                                    PLATFORMS:
+                                  </Typography>
+                                  {(day.platforms || []).map((p: string) => (
+                                    <Box key={p} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                       <Icon 
-                                        icon={PLATFORM_ICONS[p].icon} 
-                                        fontSize={14} 
-                                        color={PLATFORM_ICONS[p].color} 
+                                        icon={PLATFORM_ICONS[p]?.icon || 'tabler-world'} 
+                                        fontSize={16} 
+                                        color={PLATFORM_ICONS[p]?.color || theme.palette.text.secondary} 
                                       />
+                                      <Typography variant="caption" fontWeight="700" sx={{ color: 'text.secondary' }}>{p}</Typography>
                                     </Box>
                                   ))}
-                                </Stack>
+                                </Box>
+                                
                                 {plan.status === 'converted' && (
                                   <Box sx={{ 
                                     display: 'flex', 
                                     alignItems: 'center', 
-                                    gap: 0.5,
-                                    bgcolor: 'rgba(40, 199, 111, 0.12)',
-                                    px: 1,
-                                    py: 0.25,
-                                    borderRadius: 1
+                                    gap: 1.5,
+                                    bgcolor: isDark ? alpha(theme.palette.success.main, 0.15) : alpha(theme.palette.success.main, 0.1),
+                                    px: 2,
+                                    py: 0.5,
+                                    borderRadius: '6px'
                                   }}>
-                                    <CheckCircleIcon sx={{ fontSize: 12, color: 'success.main' }} />
-                                    <Typography variant="caption" sx={{ color: 'success.main', fontWeight: '800', fontSize: '0.65rem' }}>
+                                    <CheckCircleIcon sx={{ fontSize: 14, color: theme.palette.success.main }} />
+                                    <Typography variant="caption" sx={{ color: theme.palette.success.main, fontWeight: '800', fontSize: '0.65rem' }}>
                                       SCHEDULED
                                     </Typography>
                                   </Box>

@@ -32,9 +32,7 @@ const BrandingRiseLayout = ({ children }: { children: React.ReactNode }) => {
     if (pathname.includes('/competitors')) return 'competitors';
     if (pathname.includes('/reports')) return 'reports';
     if (pathname.includes('/reviews')) return 'reviews';
-    if (pathname.includes('/content')) return 'content';
     if (pathname.includes('/dna')) return 'dna';
-    if (pathname.includes('/planner')) return 'planner';
 
     return 'overview';
   };
@@ -116,9 +114,7 @@ const BrandingRiseLayout = ({ children }: { children: React.ReactNode }) => {
             <Tab label={t('brandRise.tabs.recommendations')} value="recommendations" />
             <Tab label={t('brandRise.tabs.visibility')} value="visibility" />
             <Tab label={t('brandRise.tabs.dna')} value="dna" />
-            <Tab label={t('brandRise.tabs.planner')} value="planner" />
             <Tab label={t('brandRise.tabs.competitors')} value="competitors" />
-            <Tab label={t('brandRise.tabs.content')} value="content" />
             <Tab label={t('brandRise.tabs.reviews')} value="reviews" />
             <Tab label={t('brandRise.tabs.reports')} value="reports" />
           </TabList>

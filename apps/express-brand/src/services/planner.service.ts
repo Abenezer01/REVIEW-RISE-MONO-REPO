@@ -1,7 +1,7 @@
 import { prisma } from '@platform/db';
 import axios from 'axios';
 
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:3003';
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:3002';
 
 export const generateMonthlyPlan = async (businessId: string, options: {
   month: number;
@@ -11,18 +11,9 @@ export const generateMonthlyPlan = async (businessId: string, options: {
   frequency: 'low' | 'medium' | 'high';
   businessType?: string;
 }) => {
-  const { month, year, industry, platforms, frequency } = options;
+  const { month, year, industry, frequency } = options;
 
-  // 1. Get templates for this industry
-  const templates = await prisma.contentTemplate.findMany({
-    where: { industry }
-  });
-
-  if (templates.length === 0) {
-    throw new Error(`No templates found for industry: ${industry}`);
-  }
-
-  // 2. Get seasonal events for this month/year
+  // 1. Get seasonal events for this month/year
   const startDate = new Date(year, month - 1, 1);
   const endDate = new Date(year, month, 0);
 
@@ -41,93 +32,63 @@ export const generateMonthlyPlan = async (businessId: string, options: {
     include: { dna: true }
   });
 
-  // 4. Generate the 30-day plan
-  const daysInMonth = endDate.getDate();
-  const planDays = [];
-  
-  // Determine posting frequency (e.g., high = daily, medium = every 2 days, low = twice a week)
-  const interval = frequency === 'high' ? 1 : frequency === 'medium' ? 2 : 3;
+  // 4. Generate the 30-day plan using AI
+  try {
+    const aiContext = {
+      brandDNA: business?.dna || {},
+      seasonalEvents: events.map(e => ({ name: e.name, date: e.date, description: e.description })),
+      requestedPlatforms: options.platforms
+    };
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    if (day % interval === 0) {
-      // Find if there's an event for this day
-      const dayDate = new Date(year, month - 1, day);
-      const dayEvent = events.find((e: any) => {
-        const eventDate = new Date(e.date);
-        return eventDate.toDateString() === dayDate.toDateString();
-      });
+    const aiResponse = await axios.post(`${AI_SERVICE_URL}/api/v1/studio/plan`, {
+      topic: `${monthNames[month - 1]} ${year} ${industry} Content Strategy`,
+      businessType: industry,
+      context: aiContext
+    });
 
-      // Pick a template randomly
-      const template = templates[Math.floor(Math.random() * templates.length)];
+    if (aiResponse.data?.days && Array.isArray(aiResponse.data.days)) {
+      // Filter days based on frequency
+      const interval = frequency === 'high' ? 1 : frequency === 'medium' ? 2 : 3;
+      const requestedPlatforms = options.platforms || ['Instagram', 'Facebook'];
 
-      // Adapt copy using AI if possible
-      let suggestedCopy = template.content;
-      if (business) {
-        try {
-          const context = {
-            businessName: business.name,
-            industry: industry,
-            audience: (business as any).dna?.audience,
-            voice: (business as any).dna?.voice,
-            mission: (business as any).dna?.mission,
-            seasonalHook: dayEvent ? dayEvent.name : undefined,
-            seasonalDescription: dayEvent ? dayEvent.description : undefined,
-          };
-
-          const response = await axios.post(`${AI_SERVICE_URL}/api/v1/adapt-content`, {
-            template: template.content,
-            context
-          });
-
-          if (response.data?.adaptedText) {
-            suggestedCopy = response.data.adaptedText;
-          }
-        } catch (error) {
-          console.error('Failed to adapt content with AI:', error);
-          // Fallback to template content
+      const filteredDays = aiResponse.data.days.filter((d: any) => d.day % interval === 0).map((d: any) => {
+        // Normalize platform(s) to array
+        let dayPlatforms: string[] = [];
+        
+        if (d.platform && typeof d.platform === 'string') {
+          dayPlatforms = [d.platform];
+        } else if (d.platforms && Array.isArray(d.platforms) && d.platforms.length > 0) {
+          dayPlatforms = d.platforms;
+        } else {
+          // If AI didn't specify, default to the first requested platform or all
+          dayPlatforms = requestedPlatforms.length > 0 ? [requestedPlatforms[0]] : ['Instagram'];
         }
-      }
 
-      planDays.push({
-        day,
-        contentIdea: template.title,
-        contentType: template.contentType,
-        platforms: platforms,
-        seasonalHook: dayEvent ? dayEvent.name : undefined,
-        templateId: template.id,
-        suggestedCopy,
+        return {
+          ...d,
+          platforms: dayPlatforms,
+          suggestedCopy: d.suggestedCopy || d.caption || d.contentIdea, // Ensure we have something to show
+        };
       });
+      
+      return await (prisma as any).monthlyPlannerPlan.upsert({
+        where: { businessId_month_year: { businessId, month, year } },
+        update: { industry, config: options as any, days: filteredDays, status: 'generated' },
+        create: { businessId, month, year, industry, config: options as any, days: filteredDays, status: 'generated' }
+      });
+    } else {
+      throw new Error('AI returned an invalid response format');
     }
+  } catch (error) {
+    console.error('AI Generation Error:', error);
+    throw new Error('AI is not working. Please try again later.');
   }
-
-  // 5. Save or update the plan
-  const plan = await (prisma as any).monthlyPlannerPlan.upsert({
-    where: {
-      businessId_month_year: {
-        businessId,
-        month,
-        year
-      }
-    },
-    update: {
-      industry,
-      config: options as any,
-      days: planDays as any,
-      status: 'generated'
-    },
-    create: {
-      businessId,
-      month,
-      year,
-      industry,
-      config: options as any,
-      days: planDays as any,
-      status: 'generated'
-    }
-  });
-
-  return plan;
 };
+
+const monthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
 
 export const getPlan = async (businessId: string, month: number, year: number) => {
   return (prisma as any).monthlyPlannerPlan.findUnique({
