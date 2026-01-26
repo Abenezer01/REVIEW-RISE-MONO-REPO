@@ -198,7 +198,12 @@ export async function analyzeSingleReview(reviewId: string) {
       throw new Error(`AI Service returned ${response.status}`)
     }
 
-    const analysis = await response.json()
+    const envelope = await response.json()
+    const analysis = envelope.data
+
+    if (!analysis) {
+        throw new Error('AI Service returned empty data')
+    }
 
     // Update review with analysis results
     const tags = [
@@ -271,8 +276,9 @@ export async function updateReviewReply(
 
       if (!response_post.ok) {
         const errorData = await response_post.json()
+        const errorMessage = errorData.error?.message || errorData.message || 'Failed to post reply to platform'
 
-        throw new Error(errorData.error || 'Failed to post reply to platform')
+        throw new Error(errorMessage)
       }
 
       // If successful, the backend already updated the status to 'posted'

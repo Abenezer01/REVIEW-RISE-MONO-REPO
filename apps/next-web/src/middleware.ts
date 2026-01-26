@@ -1,11 +1,8 @@
 /* eslint-disable import/no-unresolved */
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-
 import createMiddleware from 'next-intl/middleware'
-
 import { locales, defaultLocale } from '@platform/i18n'
-
 import menuData from '@/configs/menu'
 import { ROLES } from '@/configs/roles'
 
@@ -127,7 +124,8 @@ export async function middleware(request: NextRequest) {
       })
 
       if (res.ok) {
-        const data = await res.json()
+        const envelope = await res.json()
+        const data = envelope.data || envelope
 
         if (data?.accessToken) {
           accessTokenValue = data.accessToken as string
