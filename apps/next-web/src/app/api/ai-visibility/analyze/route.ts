@@ -1,8 +1,6 @@
 /* eslint-disable import/no-unresolved */
 import { type NextRequest, NextResponse } from 'next/server'
-
-import { createErrorResponse, ErrorCode } from '@platform/contracts'
-
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts'
 import { backendClient } from '@/utils/backendClient'
 import { getServerAuthHeaders } from '@/utils/getServerAuthHeaders'
 import { SERVICES_CONFIG } from '@/configs/services'
@@ -25,11 +23,11 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json(data)
+    // backendClient unwraps the response data, so we re-wrap it for consistent API output
+    return NextResponse.json(createSuccessResponse(data, 'Analysis completed', 200, { requestId }))
   } catch (error: any) {
     console.error('Error in AI Visibility API proxy:', error)
-
-return NextResponse.json(
+    return NextResponse.json(
       createErrorResponse(error.message || 'Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, error.status || 500, undefined, requestId),
       { status: error.status || 500 }
     )
