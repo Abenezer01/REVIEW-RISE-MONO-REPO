@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import { visibilityMetricRepository, visibilityComputationService } from '@platform/db';
-import { createSuccessResponse, createErrorResponse } from '@platform/contracts';
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 
 export class VisibilityController {
   /**
    * GET /api/visibility/metrics - Get visibility metrics
    */
   async getMetrics(req: Request, res: Response): Promise<void> {
+    const requestId = req.id;
     try {
       const {
         businessId,
@@ -19,7 +20,7 @@ export class VisibilityController {
       } = req.query;
 
       if (!businessId) {
-        res.status(400).json(createErrorResponse('businessId is required', 'BAD_REQUEST', 400));
+        res.status(400).json(createErrorResponse('businessId is required', ErrorCode.BAD_REQUEST, 400, undefined, requestId));
         return;
       }
 
@@ -55,12 +56,15 @@ export class VisibilityController {
             localPackCount: m.localPackCount,
             computedAt: m.computedAt.toISOString(),
             createdAt: m.createdAt.toISOString(),
-          }))
+          })),
+          'Visibility metrics fetched successfully',
+          200,
+          { requestId }
         )
       );
     } catch (error) {
       console.error('Error fetching visibility metrics:', error);
-      res.status(500).json(createErrorResponse('Failed to fetch visibility metrics', 'INTERNAL_SERVER_ERROR', 500));
+      res.status(500).json(createErrorResponse('Failed to fetch visibility metrics', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
     }
   }
 
@@ -68,13 +72,14 @@ export class VisibilityController {
    * GET /api/visibility/share-of-voice - Get Share of Voice data with breakdown
    */
   async getShareOfVoice(req: Request, res: Response): Promise<void> {
+    const requestId = req.id;
     try {
       const { businessId, locationId, startDate, endDate } = req.query;
 
       if (!businessId || !startDate || !endDate) {
         res
           .status(400)
-          .json(createErrorResponse('businessId, startDate, and endDate are required', 'BAD_REQUEST', 400));
+          .json(createErrorResponse('businessId, startDate, and endDate are required', ErrorCode.BAD_REQUEST, 400, undefined, requestId));
         return;
       }
 
@@ -93,11 +98,11 @@ export class VisibilityController {
           breakdown: sovData.breakdown,
           periodStart: (startDate as string),
           periodEnd: (endDate as string),
-        })
+        }, 'Share of voice computed successfully', 200, { requestId })
       );
     } catch (error) {
       console.error('Error computing Share of Voice:', error);
-      res.status(500).json(createErrorResponse('Failed to compute Share of Voice', 'INTERNAL_SERVER_ERROR', 500));
+      res.status(500).json(createErrorResponse('Failed to compute Share of Voice', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
     }
   }
 
@@ -105,13 +110,14 @@ export class VisibilityController {
    * GET /api/visibility/serp-features - Get SERP feature presence data
    */
   async getSerpFeatures(req: Request, res: Response): Promise<void> {
+    const requestId = req.id;
     try {
       const { businessId, locationId, startDate, endDate } = req.query;
 
       if (!businessId || !startDate || !endDate) {
         res
           .status(400)
-          .json(createErrorResponse('businessId, startDate, and endDate are required', 'BAD_REQUEST', 400));
+          .json(createErrorResponse('businessId, startDate, and endDate are required', ErrorCode.BAD_REQUEST, 400, undefined, requestId));
         return;
       }
 
@@ -131,13 +137,12 @@ export class VisibilityController {
           features: {
             featuredSnippet: serpData.featuredSnippetCount,
             localPack: serpData.localPackCount,
-            // Add other SERP features if needed
           },
-        })
+        }, 'SERP features tracked successfully', 200, { requestId })
       );
     } catch (error) {
       console.error('Error fetching SERP features:', error);
-      res.status(500).json(createErrorResponse('Failed to track SERP features', 'INTERNAL_SERVER_ERROR', 500));
+      res.status(500).json(createErrorResponse('Failed to track SERP features', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
     }
   }
 
@@ -145,13 +150,14 @@ export class VisibilityController {
    * GET /api/visibility/heatmap - Get heatmap data
    */
   async getHeatmapData(req: Request, res: Response): Promise<void> {
+    const requestId = req.id;
     try {
       const { businessId, locationId, startDate, endDate, metric = 'rank' } = req.query;
 
       if (!businessId || !startDate || !endDate) {
         res
           .status(400)
-          .json(createErrorResponse('businessId, startDate, and endDate are required', 'BAD_REQUEST', 400));
+          .json(createErrorResponse('businessId, startDate, and endDate are required', ErrorCode.BAD_REQUEST, 400, undefined, requestId));
         return;
       }
 
@@ -159,7 +165,7 @@ export class VisibilityController {
       const { keywordRepository, keywordRankRepository } = await import('@platform/db');
 
       const keywords = await keywordRepository.findByBusiness(businessId as string, {
-        limit: 50 // Limit to top 50 keywords for heatmap to avoid overload
+        limit: 50
       });
 
       if (keywords.length === 0) {
@@ -168,7 +174,7 @@ export class VisibilityController {
           periods: [],
           data: [],
           metric: metric as string
-        }));
+        }, 'No keywords found', 200, { requestId }));
         return;
       }
 
@@ -176,10 +182,8 @@ export class VisibilityController {
       const start = new Date(startDate as string);
       const end = new Date(endDate as string);
 
-      // Fetch all ranks for these keywords in the period
       const ranks = await keywordRankRepository.findRanksForKeywords(keywordIds, start, end);
 
-      // Generate dates array (daily steps)
       const periods: string[] = [];
       const current = new Date(start);
       while (current <= end) {
@@ -187,18 +191,10 @@ export class VisibilityController {
         current.setDate(current.getDate() + 1);
       }
 
-      // Build data matrix
-      // periods x keywords? Or keywords x periods. 
-      // DTO says data: number[][] - usually rows x cols.
-      // Heatmap component expects: keywords rows, dates columns.
-      // So data[keywordIndex][dateIndex]
-
       const data: (number | null)[][] = keywords.map(k => {
         const keywordRanks = ranks.filter(r => r.keywordId === k.id);
 
         return periods.map(dateStr => {
-          // Find rank for this date
-          // capturedAt might include time, so match just date part
           const rank = keywordRanks.find(r => r.capturedAt.toISOString().startsWith(dateStr));
           return rank?.rankPosition ?? null;
         });
@@ -208,18 +204,15 @@ export class VisibilityController {
         createSuccessResponse({
           businessId,
           locationId: locationId || undefined,
-          keywords: keywords.map(k => k.keyword), // Names
+          keywords: keywords.map(k => k.keyword),
           periods,
-          data: data as number[][], // Cast to number[][] (nulls handled by frontend usually or need 0?)
-          // Wait, DTO allows nulls? Interface says number[][]. Ideally null for no rank.
-          // Let's assume frontend handles null or we pass 0. 
-          // My generic heatmap component handles null.
+          data: data as number[][],
           metric: metric as string,
-        })
+        }, 'Heatmap data fetched successfully', 200, { requestId })
       );
     } catch (error) {
       console.error('Error generating heatmap data:', error);
-      res.status(500).json(createErrorResponse('Failed to fetch heatmap data', 'INTERNAL_SERVER_ERROR', 500));
+      res.status(500).json(createErrorResponse('Failed to fetch heatmap data', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
     }
   }
 
@@ -227,6 +220,7 @@ export class VisibilityController {
    * POST /api/visibility/compute - Manually trigger metric computation
    */
   async computeMetrics(req: Request, res: Response): Promise<void> {
+    const requestId = req.id;
     try {
       const { businessId, locationId, periodType, periodStart, periodEnd } = req.body;
 
@@ -236,8 +230,10 @@ export class VisibilityController {
           .json(
             createErrorResponse(
               'businessId, periodType, periodStart, and periodEnd are required',
-              'BAD_REQUEST',
-              400
+              ErrorCode.BAD_REQUEST,
+              400,
+              undefined,
+              requestId
             )
           );
         return;
@@ -256,11 +252,11 @@ export class VisibilityController {
           message: 'Metrics computed successfully',
           businessId,
           periodType,
-        })
+        }, 'Computation triggered', 200, { requestId })
       );
     } catch (error) {
       console.error('Error computing metrics:', error);
-      res.status(500).json(createErrorResponse('Failed to trigger computation', 'INTERNAL_SERVER_ERROR', 500));
+      res.status(500).json(createErrorResponse('Failed to trigger computation', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
     }
   }
 }

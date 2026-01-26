@@ -2,6 +2,8 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { createErrorResponse, ErrorCode } from '@platform/contracts';
+
 import { SERVICES_CONFIG } from '@/configs/services';
 
 const SERVICE_URL = SERVICES_CONFIG.brand.url;
@@ -9,14 +11,10 @@ const SERVICE_URL = SERVICES_CONFIG.brand.url;
 async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath?: string[] }> }) {
   const { brandPath: path = [] } = await params;
   const query = req.nextUrl.search;
-
-  // Smart Routing Logic:
-  // Distinguishes between "Brand Features" (recommendations, dashboards, etc.)
-  // and "Brand Profile Actions" (CRUD, onboard, etc.)
+  const requestId = req.headers.get('x-request-id') || crypto.randomUUID();
 
   let targetPath = '';
 
-  // Sub-resources mapping to /brands/:id/...
   const BRANDS_FEATURES = [
     'recommendations',
     'dashboards',
@@ -43,10 +41,8 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
     const subResource = path[1];
 
     if (subResource && BRANDS_FEATURES.includes(subResource)) {
-      // It's a feature -> /brands/:id/resource
       targetPath = `brands/${path.join('/')}`;
     } else {
-      // It's a profile action or simple GET -> /brand-profiles/:id...
       targetPath = `brand-profiles/${path.join('/')}`;
     }
   }
@@ -56,7 +52,6 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
   try {
     const headers = new Headers();
 
-    // Copy necessary headers
     const contentType = req.headers.get('content-type');
 
     if (contentType) headers.set('content-type', contentType);
@@ -64,6 +59,8 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
     const auth = req.headers.get('authorization');
 
     if (auth) headers.set('authorization', auth);
+
+    headers.set('x-request-id', requestId);
 
     const body = req.method !== 'GET' && req.method !== 'HEAD' ? await req.text() : undefined;
 
@@ -73,7 +70,6 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
       body,
     });
 
-    // Handle 204 No Content or empty responses
     const text = await response.text();
     let data;
 
@@ -87,7 +83,10 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
   } catch (error) {
     console.error('Proxy error:', error);
 
-    return NextResponse.json({ error: 'Proxy error', details: String(error) }, { status: 500 });
+return NextResponse.json(
+      createErrorResponse('Proxy error', ErrorCode.INTERNAL_SERVER_ERROR, 500, String(error), requestId),
+      { status: 500 }
+    );
   }
 }
 

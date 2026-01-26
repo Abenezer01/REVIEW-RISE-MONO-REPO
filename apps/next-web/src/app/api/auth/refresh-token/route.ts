@@ -1,30 +1,23 @@
 import { type NextRequest, NextResponse } from 'next/server'
 
-import { z } from 'zod'
+import { createSuccessResponse, createErrorResponse, ErrorCode, RefreshTokenRequestSchema } from '@platform/contracts'
 
 import { backendClient } from '@/utils/backendClient'
-
 import { SERVICES_CONFIG } from '@/configs/services'
-
-const refreshTokenSchema = z.object({
-  refreshToken: z.string().min(1, 'Refresh token is required'),
-})
 
 export async function POST(request: NextRequest) {
   const AUTH_SERVICE_URL = SERVICES_CONFIG.auth.url
+  const requestId = request.headers.get('x-request-id') || crypto.randomUUID()
 
   try {
     const body = await request.json()
 
-    // Validate input
-    const validationResult = refreshTokenSchema.safeParse(body)
+    // Validate input using shared schema
+    const validationResult = RefreshTokenRequestSchema.safeParse(body)
 
     if (!validationResult.success) {
       return NextResponse.json(
-        {
-          message: 'Validation failed',
-          errors: validationResult.error.flatten().fieldErrors
-        },
+        createErrorResponse('Validation failed', ErrorCode.VALIDATION_ERROR, 400, validationResult.error.flatten().fieldErrors, requestId),
         { status: 400 }
       )
     }
@@ -38,14 +31,12 @@ export async function POST(request: NextRequest) {
 
     const data = apiResponse?.data ?? apiResponse
 
-    return NextResponse.json({
+    return NextResponse.json(createSuccessResponse({
       accessToken: data?.accessToken,
-      message: 'Token refreshed successfully'
-    })
+    }, 'Token refreshed successfully', 200, { requestId }))
   } catch (error: any) {
-    // Propagate the error status from the backend
     return NextResponse.json(
-      { message: error.message || 'Internal Server Error' },
+      createErrorResponse(error.message || 'Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, error.status || 500, undefined, requestId),
       { status: error.status || 500 }
     )
   }

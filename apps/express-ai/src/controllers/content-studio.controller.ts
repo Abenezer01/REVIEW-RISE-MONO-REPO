@@ -1,184 +1,176 @@
-
 import { Request, Response } from 'express';
 import { contentStudioService } from '../services/content-studio.service';
-import { z } from 'zod';
+import {
+    createSuccessResponse,
+    createErrorResponse,
+    ErrorCode,
+    GenerateCaptionsRequestSchema,
+    GenerateHashtagsRequestSchema,
+    GenerateIdeasRequestSchema,
+    GeneratePlanRequestSchema,
+    GenerateImagePromptRequestSchema,
+    GeneratePromptIdeasRequestSchema,
+    GenerateImageRequestSchema,
+    GenerateCarouselRequestSchema,
+    GenerateScriptRequestSchema
+} from '@platform/contracts';
 
 export class ContentStudioController {
 
     // Task 2.2: AI Caption Generator
     async generateCaptions(req: Request, res: Response) {
         try {
-            const schema = z.object({
-                platform: z.string(),
-                description: z.string(),
-                tone: z.string()
-            });
-            const { platform, description, tone } = schema.parse(req.body);
+            const parseResult = GenerateCaptionsRequestSchema.safeParse(req.body);
+            if (!parseResult.success) {
+                return res.status(400).json(createErrorResponse('Invalid request body', ErrorCode.VALIDATION_ERROR, 400, parseResult.error.issues, req.id));
+            }
+            const { platform, description, tone } = parseResult.data;
 
             const result = await contentStudioService.generateCaptions(platform, description, tone);
-            res.json(result);
+            res.json(createSuccessResponse(result, 'Captions generated successfully', 200, { requestId: req.id }));
         } catch (error) {
             console.error('Error generating captions:', error);
-            res.status(500).json({ error: 'Failed to generate captions' });
+            res.status(500).json(createErrorResponse('Failed to generate captions', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
         }
     }
 
     // Task 2.3: Hashtag Generator
     async generateHashtags(req: Request, res: Response) {
         try {
-            const schema = z.object({
-                niche: z.string().optional(),
-                audience: z.string().optional(),
-                description: z.string().optional(),
-                platform: z.string().optional()
-            });
-            const { niche, audience, description, platform } = schema.parse(req.body);
+            const parseResult = GenerateHashtagsRequestSchema.safeParse(req.body);
+            if (!parseResult.success) {
+                return res.status(400).json(createErrorResponse('Invalid request body', ErrorCode.VALIDATION_ERROR, 400, parseResult.error.issues, req.id));
+            }
+            const { niche, audience, description, platform } = parseResult.data;
 
             // Maintain retro-compatibility or defaults
             const topic = description || niche || 'General';
-            const location = 'Global'; // Removing explicit location field for now, or inferring it if needed
+            const location = 'Global';
 
             const result = await contentStudioService.generateHashtags(topic, location, platform || 'Instagram', niche, audience);
-            res.json(result);
+            res.json(createSuccessResponse(result, 'Hashtags generated successfully', 200, { requestId: req.id }));
         } catch (error) {
             console.error('Error generating hashtags:', error);
-            res.status(500).json({ error: 'Failed to generate hashtags' });
+            res.status(500).json(createErrorResponse('Failed to generate hashtags', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
         }
     }
 
     // Task 2.4: Post Idea Generator
     async generateIdeas(req: Request, res: Response) {
         try {
-            const schema = z.object({
-                businessType: z.string(),
-                goal: z.string(),
-                tone: z.string().optional().default('professional'),
-                platform: z.string().optional().default('Instagram')
-            });
-            const { businessType, goal, tone, platform } = schema.parse(req.body);
+            const parseResult = GenerateIdeasRequestSchema.safeParse(req.body);
+            if (!parseResult.success) {
+                return res.status(400).json(createErrorResponse('Invalid request body', ErrorCode.VALIDATION_ERROR, 400, parseResult.error.issues, req.id));
+            }
+            const { businessType, goal, tone, platform } = parseResult.data;
 
             const result = await contentStudioService.generatePostIdeas(businessType, goal, tone, platform);
-            res.json(result);
+            res.json(createSuccessResponse(result, 'Post ideas generated successfully', 200, { requestId: req.id }));
         } catch (error) {
             console.error('Error generating ideas:', error);
-            res.status(500).json({ error: 'Failed to generate ideas' });
+            res.status(500).json(createErrorResponse('Failed to generate ideas', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
         }
     }
 
     // Task 2.5: 30-day Plan Generator
     async generatePlan(req: Request, res: Response) {
         try {
-            const schema = z.object({
-                topic: z.string(),
-                businessType: z.string()
-            });
-            const { topic, businessType } = schema.parse(req.body);
+            const parseResult = GeneratePlanRequestSchema.safeParse(req.body);
+            if (!parseResult.success) {
+                return res.status(400).json(createErrorResponse('Invalid request body', ErrorCode.VALIDATION_ERROR, 400, parseResult.error.issues, req.id));
+            }
+            const { topic, businessType } = parseResult.data;
 
             const result = await contentStudioService.generate30DayPlan(topic, businessType);
-            res.json(result);
+            res.json(createSuccessResponse(result, '30-day plan generated successfully', 200, { requestId: req.id }));
         } catch (error) {
             console.error('Error generating plan:', error);
-            res.status(500).json({ error: 'Failed to generate plan' });
+            res.status(500).json(createErrorResponse('Failed to generate plan', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
         }
     }
 
     // Task 2.6: Image Prompt Generator
     async generateImagePrompt(req: Request, res: Response) {
         try {
-            const schema = z.object({
-                postIdea: z.string()
-            });
-            const { postIdea } = schema.parse(req.body);
+            const parseResult = GenerateImagePromptRequestSchema.safeParse(req.body);
+            if (!parseResult.success) {
+                return res.status(400).json(createErrorResponse('Invalid request body', ErrorCode.VALIDATION_ERROR, 400, parseResult.error.issues, req.id));
+            }
+            const { postIdea } = parseResult.data;
 
             const result = await contentStudioService.generateImagePrompt(postIdea);
-            res.json(result);
+            res.json(createSuccessResponse(result, 'Image prompt generated successfully', 200, { requestId: req.id }));
         } catch (error) {
             console.error('Error generating image prompt:', error);
-            res.status(500).json({ error: 'Failed to generate image prompt' });
+            res.status(500).json(createErrorResponse('Failed to generate image prompt', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
         }
     }
 
     // NEW: AI Prompt Ideas Generator (for Image Studio)
     async generatePromptIdeas(req: Request, res: Response) {
         try {
-            const schema = z.object({
-                topic: z.string(),
-                category: z.string().optional(),
-                mood: z.string().optional(),
-                style: z.string().optional()
-            });
-            const { topic, category, mood, style } = schema.parse(req.body);
+            const parseResult = GeneratePromptIdeasRequestSchema.safeParse(req.body);
+            if (!parseResult.success) {
+                return res.status(400).json(createErrorResponse('Invalid request body', ErrorCode.VALIDATION_ERROR, 400, parseResult.error.issues, req.id));
+            }
+            const { topic, category, mood, style } = parseResult.data;
 
             const result = await contentStudioService.generatePromptIdeas(topic, category, mood, style);
-            res.json(result);
+            res.json(createSuccessResponse(result, 'Prompt ideas generated successfully', 200, { requestId: req.id }));
         } catch (error) {
             console.error('Error generating prompt ideas:', error);
-            res.status(500).json({ error: 'Failed to generate prompt ideas' });
+            res.status(500).json(createErrorResponse('Failed to generate prompt ideas', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
         }
     }
 
     // Task 2.7: AI Image Creation
     async generateImage(req: Request, res: Response) {
         try {
-            const schema = z.object({
-                prompt: z.string(),
-                style: z.string().optional().default('Photorealistic'),
-                quality: z.string().optional().default('high'),
-                aspectRatio: z.string().optional().default('16:9'),
-                variations: z.number().optional().default(1)
-            });
-            const { prompt, style, quality, aspectRatio, variations } = schema.parse(req.body);
+            const parseResult = GenerateImageRequestSchema.safeParse(req.body);
+            if (!parseResult.success) {
+                return res.status(400).json(createErrorResponse('Invalid request body', ErrorCode.VALIDATION_ERROR, 400, parseResult.error.issues, req.id));
+            }
+            const { prompt, style, quality, aspectRatio, variations } = parseResult.data;
 
-            // Note: This endpoint actually calls DALL-E and costs money/credits
             const result = await contentStudioService.generateImage(prompt, style, quality, aspectRatio, variations);
-            res.json(result);
+            res.json(createSuccessResponse(result, 'Image generated successfully', 200, { requestId: req.id }));
         } catch (error) {
             console.error('Error generating image:', error);
-            res.status(500).json({ error: 'Failed to generate image' });
+            res.status(500).json(createErrorResponse('Failed to generate image', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
         }
     }
 
     // Task 2.8: Carousel Generator
     async generateCarousel(req: Request, res: Response) {
         try {
-            const schema = z.object({
-                topic: z.string(),
-                tone: z.string().optional().default('professional'),
-                platform: z.string().optional().default('Instagram')
-            });
-            const { topic, tone, platform } = schema.parse(req.body);
+            const parseResult = GenerateCarouselRequestSchema.safeParse(req.body);
+            if (!parseResult.success) {
+                return res.status(400).json(createErrorResponse('Invalid request body', ErrorCode.VALIDATION_ERROR, 400, parseResult.error.issues, req.id));
+            }
+            const { topic, tone, platform } = parseResult.data;
 
             const result = await contentStudioService.generateCarousel(topic, tone, platform);
-            res.json(result);
+            res.json(createSuccessResponse(result, 'Carousel generated successfully', 200, { requestId: req.id }));
         } catch (error) {
             console.error('Error generating carousel:', error);
-            res.status(500).json({ error: 'Failed to generate carousel' });
+            res.status(500).json(createErrorResponse('Failed to generate carousel', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
         }
     }
 
     // Task 2.9: Script Generator
     async generateScript(req: Request, res: Response) {
         try {
-            const schema = z.object({
-                videoTopic: z.string(),
-                videoGoal: z.string().optional(),
-                targetAudience: z.string().optional(),
-                tone: z.string().optional().default('professional'),
-                platform: z.string().optional().default('Instagram'),
-                duration: z.number().optional().default(30),
-                includeSceneDescriptions: z.boolean().optional().default(true),
-                includeVisualSuggestions: z.boolean().optional().default(true),
-                includeBRollRecommendations: z.boolean().optional().default(false),
-                includeCallToAction: z.boolean().optional().default(true)
-            });
-            const params = schema.parse(req.body);
+            const parseResult = GenerateScriptRequestSchema.safeParse(req.body);
+            if (!parseResult.success) {
+                return res.status(400).json(createErrorResponse('Invalid request body', ErrorCode.VALIDATION_ERROR, 400, parseResult.error.issues, req.id));
+            }
+            const params = parseResult.data;
 
-            // Cast to strictly typed request for service
             const result = await contentStudioService.generateScript(params);
-            res.json(result);
+            res.json(createSuccessResponse(result, 'Script generated successfully', 200, { requestId: req.id }));
         } catch (error) {
             console.error('Error generating script:', error);
-            res.status(500).json({ error: 'Failed to generate script' });
+            res.status(500).json(createErrorResponse('Failed to generate script', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
         }
     }
 }

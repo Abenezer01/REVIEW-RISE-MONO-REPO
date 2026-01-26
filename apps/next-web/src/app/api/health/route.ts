@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 
+import { createSuccessResponse } from '@platform/contracts';
+
 export async function GET() {
-  return NextResponse.json({ 
+  return NextResponse.json(createSuccessResponse({
     status: 'healthy', 
-    service: 'next-web',
-    timestamp: new Date().toISOString()
-  });
+    service: 'next-web'
+  }, 'Service is healthy'));
 }

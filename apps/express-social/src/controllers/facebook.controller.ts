@@ -17,6 +17,7 @@ export class FacebookController {
      * GET /api/v1/social/facebook/auth-url
      */
     async getAuthUrl(req: Request, res: Response) {
+        const requestId = req.id;
         try {
             // Validate query parameters
             const parseResult = FacebookAuthUrlQuerySchema.safeParse(req.query);
@@ -25,7 +26,8 @@ export class FacebookController {
                     'Invalid query parameters',
                     ErrorCode.VALIDATION_ERROR,
                     400,
-                    parseResult.error.issues
+                    parseResult.error.issues,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -42,7 +44,9 @@ export class FacebookController {
             
             const response = createSuccessResponse(
                 { url },
-                'Facebook OAuth URL generated successfully'
+                'Facebook OAuth URL generated successfully',
+                200,
+                { requestId }
             );
             res.json(response);
         } catch (error: any) {
@@ -50,7 +54,9 @@ export class FacebookController {
             const response = createErrorResponse(
                 'Failed to generate OAuth URL',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                requestId
             );
             res.status(500).json(response);
         }
@@ -61,6 +67,7 @@ export class FacebookController {
      * POST /api/v1/social/facebook/callback
      */
     async handleCallback(req: Request, res: Response) {
+        const requestId = req.id;
         try {
             const parseResult = FacebookCallbackBodySchema.safeParse(req.body);
             if (!parseResult.success) {
@@ -68,7 +75,8 @@ export class FacebookController {
                     'Invalid request body',
                     ErrorCode.VALIDATION_ERROR,
                     400,
-                    parseResult.error.issues
+                    parseResult.error.issues,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -87,7 +95,9 @@ export class FacebookController {
                     expiresIn: longLivedToken.expires_in,
                     state
                 },
-                'Facebook authentication successful'
+                'Facebook authentication successful',
+                200,
+                { requestId }
             );
             res.json(response);
 
@@ -96,7 +106,9 @@ export class FacebookController {
             const response = createErrorResponse(
                 'Failed to authenticate with Facebook',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                requestId
             );
             res.status(500).json(response);
         }
@@ -107,6 +119,7 @@ export class FacebookController {
      * GET /api/v1/social/facebook/pages
      */
     async listPages(req: Request, res: Response) {
+        const requestId = req.id;
         try {
             const accessToken = req.headers['x-fb-access-token'] as string;
 
@@ -114,7 +127,9 @@ export class FacebookController {
                 const response = createErrorResponse(
                     'x-fb-access-token header is required',
                     ErrorCode.BAD_REQUEST,
-                    400
+                    400,
+                    undefined,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -123,7 +138,9 @@ export class FacebookController {
             
             const response = createSuccessResponse(
                 { pages },
-                'Facebook pages retrieved successfully'
+                'Facebook pages retrieved successfully',
+                200,
+                { requestId }
             );
             res.json(response);
         } catch (error: any) {
@@ -131,7 +148,9 @@ export class FacebookController {
             const response = createErrorResponse(
                 'Failed to list Facebook pages',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                requestId
             );
             res.status(500).json(response);
         }
@@ -142,6 +161,7 @@ export class FacebookController {
      * POST /api/v1/social/facebook/connect
      */
     async connectPage(req: Request, res: Response) {
+        const requestId = req.id;
         try {
             const parseResult = FacebookConnectPageBodySchema.safeParse(req.body);
             if (!parseResult.success) {
@@ -149,7 +169,8 @@ export class FacebookController {
                     'Invalid request body',
                     ErrorCode.VALIDATION_ERROR,
                     400,
-                    parseResult.error.issues
+                    parseResult.error.issues,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -170,7 +191,8 @@ export class FacebookController {
             const response = createSuccessResponse(
                 { connection: sanitized },
                 'Facebook page connected successfully',
-                201
+                201,
+                { requestId }
             );
             res.status(201).json(response);
         } catch (error: any) {
@@ -178,7 +200,9 @@ export class FacebookController {
             const response = createErrorResponse(
                 'Failed to connect Facebook page',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                requestId
             );
             res.status(500).json(response);
         }
@@ -189,6 +213,7 @@ export class FacebookController {
      * GET /api/v1/social/facebook/pages/:pageId/instagram-accounts
      */
     async getInstagramAccounts(req: Request, res: Response) {
+        const requestId = req.id;
         try {
             const paramResult = FacebookPageIdParamSchema.safeParse(req.params);
             if (!paramResult.success) {
@@ -196,7 +221,8 @@ export class FacebookController {
                     'Invalid page ID',
                     ErrorCode.VALIDATION_ERROR,
                     400,
-                    paramResult.error.issues
+                    paramResult.error.issues,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -208,7 +234,9 @@ export class FacebookController {
                 const response = createErrorResponse(
                     'x-fb-page-access-token header is required',
                     ErrorCode.BAD_REQUEST,
-                    400
+                    400,
+                    undefined,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -217,7 +245,9 @@ export class FacebookController {
 
             const response = createSuccessResponse(
                 { instagramAccount: igAccount },
-                'Instagram accounts retrieved successfully'
+                'Instagram accounts retrieved successfully',
+                200,
+                { requestId }
             );
             res.json(response);
         } catch (error: any) {
@@ -225,7 +255,9 @@ export class FacebookController {
             const response = createErrorResponse(
                 'Failed to get Instagram accounts',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                requestId
             );
             res.status(500).json(response);
         }
@@ -236,6 +268,7 @@ export class FacebookController {
      * POST /api/v1/social/instagram/connect
      */
     async connectInstagram(req: Request, res: Response) {
+        const requestId = req.id;
         try {
             const parseResult = FacebookInstagramConnectBodySchema.safeParse(req.body);
             if (!parseResult.success) {
@@ -243,7 +276,8 @@ export class FacebookController {
                     'Invalid request body',
                     ErrorCode.VALIDATION_ERROR,
                     400,
-                    parseResult.error.issues
+                    parseResult.error.issues,
+                    requestId
                 );
                 return res.status(400).json(response);
             }
@@ -265,7 +299,8 @@ export class FacebookController {
             const response = createSuccessResponse(
                 { connection: sanitized },
                 'Instagram account connected successfully',
-                201
+                201,
+                { requestId }
             );
             res.status(201).json(response);
 
@@ -274,7 +309,9 @@ export class FacebookController {
             const response = createErrorResponse(
                 'Failed to connect Instagram account',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                requestId
             );
             res.status(500).json(response);
         }

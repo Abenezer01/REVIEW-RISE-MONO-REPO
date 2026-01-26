@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import { createSuccessResponse } from '@platform/contracts';
+import { requestIdMiddleware } from './middleware/request-id';
 
 dotenv.config();
 
@@ -11,6 +13,7 @@ const PORT = process.env.PORT || 3007;
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(requestIdMiddleware);
 
 import v1Routes from './routes/v1';
 import { publishingWorker } from './services/publishing-worker.service';
@@ -18,11 +21,11 @@ import { publishingWorker } from './services/publishing-worker.service';
 app.use('/api/v1', v1Routes);
 
 app.get('/', (req, res) => {
-    res.json({ message: 'Express Brand Service is running' });
+    res.json(createSuccessResponse(null, 'Express Brand Service is running', 200, { requestId: req.id }));
 });
 
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', service: 'express-brand' });
+    res.json(createSuccessResponse({ status: 'ok', service: 'express-brand' }, 'Service is healthy', 200, { requestId: req.id }));
 });
 
 app.listen(PORT, () => {

@@ -1,16 +1,16 @@
 import { Request, Response } from 'express';
 import { prisma } from '@platform/db';
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 
 export const getUserBusinesses = async (req: Request, res: Response) => {
+  const requestId = req.id;
   try {
     const userId = req.params.userId;
 
     if (!userId) {
-        return res.status(400).json({ status: 'error', message: 'User ID is required' });
+        return res.status(400).json(createErrorResponse('User ID is required', ErrorCode.VALIDATION_ERROR, 400, undefined, requestId));
     }
 
-    // Find businesses where the user has a role via UserBusinessRole
-    // Simplified: Find all businesses associated with the user
     const userRoles = await prisma.userBusinessRole.findMany({
         where: { userId },
         include: {
@@ -19,7 +19,6 @@ export const getUserBusinesses = async (req: Request, res: Response) => {
         }
     });
 
-    // Map to a cleaner format if needed, but for now return as is or flattened
     const businesses = userRoles.map(ur => ({
         ...ur.business,
         role: ur.role?.name,
@@ -27,17 +26,12 @@ export const getUserBusinesses = async (req: Request, res: Response) => {
         locationId: ur.locationId
     }));
 
-    // Dedup businesses if a user has multiple roles in the same business (e.g. across locations)
-    // The frontend likely expects a list of unique businesses
     const uniqueBusinesses = Array.from(new Map(businesses.map(b => [b.id, b])).values());
 
-    res.json({
-      status: 'success',
-      data: uniqueBusinesses
-    });
+    res.json(createSuccessResponse(uniqueBusinesses, 'User businesses fetched successfully', 200, { requestId }));
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching user businesses:', error);
-    res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+    res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
   }
 };

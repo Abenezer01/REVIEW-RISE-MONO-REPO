@@ -4,6 +4,8 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import routes from './routes/v1';
+import { createSuccessResponse } from '@platform/contracts';
+import { requestIdMiddleware } from './middleware/request-id';
 
 dotenv.config();
 
@@ -15,16 +17,17 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(requestIdMiddleware);
 
 // Routes
 app.use('/api/v1', routes);
 
 app.get('/', (req, res) => {
-    res.json({ message: 'Express Reviews Service is running' });
+    res.json(createSuccessResponse(null, 'Express Reviews Service is running', 200, { requestId: req.id }));
 });
 
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', service: 'express-reviews' });
+    res.json(createSuccessResponse({ status: 'ok', service: 'express-reviews' }, 'Service is healthy', 200, { requestId: req.id }));
 });
 
 app.listen(PORT, () => {
