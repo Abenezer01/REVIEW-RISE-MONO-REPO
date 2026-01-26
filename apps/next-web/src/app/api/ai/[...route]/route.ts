@@ -1,6 +1,8 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+
 import { createErrorResponse, ErrorCode } from '@platform/contracts';
+
 import { SERVICES_CONFIG } from '@/configs/services';
 
 const SERVICE_URL = SERVICES_CONFIG.ai.url;
@@ -16,13 +18,16 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ route: st
         const headers = new Headers();
 
         const contentType = req.headers.get('content-type');
+
         if (contentType) headers.set('content-type', contentType);
 
         const accessToken = req.cookies.get('accessToken')?.value;
+
         if (accessToken) {
             headers.set('Authorization', `Bearer ${accessToken}`);
         } else {
             const authHeader = req.headers.get('authorization');
+
             if (authHeader) headers.set('Authorization', authHeader);
         }
 
@@ -49,7 +54,8 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ route: st
 
     } catch (error) {
         console.error('AI Proxy error:', error);
-        return NextResponse.json(
+
+return NextResponse.json(
             createErrorResponse('Proxy error', ErrorCode.INTERNAL_SERVER_ERROR, 500, String(error), requestId),
             { status: 500 }
         );

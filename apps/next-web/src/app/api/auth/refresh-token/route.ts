@@ -1,5 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
+
 import { createSuccessResponse, createErrorResponse, ErrorCode, RefreshTokenRequestSchema } from '@platform/contracts'
+
 import { backendClient } from '@/utils/backendClient'
 import { SERVICES_CONFIG } from '@/configs/services'
 

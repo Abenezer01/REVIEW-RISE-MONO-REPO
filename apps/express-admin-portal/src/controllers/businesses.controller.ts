@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '@platform/db';
-import { createSuccessResponse, createErrorResponse, ErrorCode, createPaginatedResponse } from '@platform/contracts';
+import { createErrorResponse, ErrorCode, createPaginatedResponse } from '@platform/contracts';
 
 export const getBusinesses = async (req: Request, res: Response) => {
   const requestId = req.id;
