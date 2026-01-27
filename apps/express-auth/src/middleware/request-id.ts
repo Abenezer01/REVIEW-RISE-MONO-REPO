@@ -7,11 +7,8 @@ export const requestIdMiddleware = (req: Request, res: Response, next: NextFunct
     next();
 };
 
-declare global {
-    // eslint-disable-next-line @typescript-eslint/no-namespace
-    namespace Express {
-        interface Request {
-            id: string;
-        }
+declare module 'express-serve-static-core' {
+    interface Request {
+        id: string;
     }
 }

@@ -1,6 +1,7 @@
  
 
 export const computeDailyVisibilityMetrics = async () => {
+    // eslint-disable-next-line no-console
     console.log('Starting daily visibility metric computation...');
     const now = new Date();
     const yesterday = new Date(now);
@@ -64,6 +65,7 @@ export const computeDailyVisibilityMetrics = async () => {
  
 
 export const runVisibilityJob = async () => {
+  // eslint-disable-next-line no-console
   console.log('--- Job Start: Visibility Metrics ---');
   
   // We need to access prisma to find all businesses efficiently
@@ -102,6 +104,7 @@ export const runVisibilityJob = async () => {
   const end = new Date(start);
   end.setHours(23,59,59,999);
 
+  // eslint-disable-next-line no-console
   console.log(`Processing ${businesses.length} businesses for date: ${start.toISOString().split('T')[0]}`);
 
   for (const bus of businesses) {
@@ -115,9 +118,11 @@ export const runVisibilityJob = async () => {
           );
           process.stdout.write('.');
       } catch (err) {
+          // eslint-disable-next-line no-console
           console.error(`\nFailed for business ${bus.id}:`, err);
       }
   }
   
+  // eslint-disable-next-line no-console
   console.log('\n--- Job Complete ---');
 };

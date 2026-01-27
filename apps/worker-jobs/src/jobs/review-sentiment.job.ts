@@ -12,6 +12,7 @@ interface ReviewAnalysisResult {
 }
 
 export const runReviewSentimentJob = async () => {
+    // eslint-disable-next-line no-console
     console.log('Starting review sentiment analysis job...');
     try {
         // Fetch reviews that haven't been analyzed yet (sentiment is null)
@@ -25,9 +26,11 @@ export const runReviewSentimentJob = async () => {
             }
         });
 
+        // eslint-disable-next-line no-console
         console.log(`Found ${unanalyzedReviews.length} unanalyzed reviews to process.`);
 
         if (unanalyzedReviews.length === 0) {
+            // eslint-disable-next-line no-console
             console.log('No reviews to analyze. Job completed.');
             return { processed: 0, failed: 0 };
         }
@@ -40,6 +43,7 @@ export const runReviewSentimentJob = async () => {
         // Process reviews one at a time to avoid overwhelming the AI service
         for (const review of unanalyzedReviews) {
             try {
+                // eslint-disable-next-line no-console
                 console.log(`Analyzing review ${review.id}...`);
 
                 // Call the AI service to analyze the review
@@ -76,6 +80,7 @@ export const runReviewSentimentJob = async () => {
                 });
 
                 processed++;
+                // eslint-disable-next-line no-console
                 console.log(`✓ Review ${review.id} analyzed: ${analysis.sentiment} (${analysis.confidence}% confidence)`);
 
                 // Small delay to avoid rate limiting
@@ -84,6 +89,7 @@ export const runReviewSentimentJob = async () => {
             } catch (error) {
                 failed++;
                 const message = error instanceof Error ? error.message : String(error);
+                // eslint-disable-next-line no-console
                 console.error(`✗ Failed to analyze review ${review.id}:`, message);
 
                 // Continue processing other reviews even if one fails
@@ -91,10 +97,12 @@ export const runReviewSentimentJob = async () => {
             }
         }
 
+        // eslint-disable-next-line no-console
         console.log(`Review sentiment analysis job completed. Processed: ${processed}, Failed: ${failed}`);
         return { processed, failed };
 
     } catch (e) {
+        // eslint-disable-next-line no-console
         console.error('Error in review sentiment analysis job:', e);
         throw e;
     }
@@ -105,6 +113,7 @@ export const runReviewSentimentJob = async () => {
  * @param batchSize - Number of reviews to process per run
  */
 export const reprocessReviews = async (batchSize: number = 50) => {
+    // eslint-disable-next-line no-console
     console.log(`Starting review re-processing job (batch size: ${batchSize})...`);
     
     try {
@@ -123,9 +132,11 @@ export const reprocessReviews = async (batchSize: number = 50) => {
             }
         });
 
+        // eslint-disable-next-line no-console
         console.log(`Found ${reviewsToReprocess.length} reviews to re-process.`);
 
         if (reviewsToReprocess.length === 0) {
+            // eslint-disable-next-line no-console
             console.log('No reviews to re-process. Job completed.');
             return { processed: 0, failed: 0 };
         }
@@ -139,6 +150,7 @@ export const reprocessReviews = async (batchSize: number = 50) => {
         return await runReviewSentimentJob();
 
     } catch (e) {
+        // eslint-disable-next-line no-console
         console.error('Error in review re-processing job:', e);
         throw e;
     }

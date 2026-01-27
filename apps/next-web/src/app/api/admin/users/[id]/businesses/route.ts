@@ -1,5 +1,6 @@
 
 import { NextResponse } from 'next/server';
+
 import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 import { businessRepository } from '@platform/db';
 
@@ -8,7 +9,9 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const requestId = crypto.randomUUID();
+
     try {
+
         const { id } = await params;
 
         const businesses = await businessRepository.findByUser(id);
@@ -22,6 +25,7 @@ export async function GET(
 
         return NextResponse.json(createSuccessResponse(businessDtos, 'User businesses fetched', 200, { requestId }));
     } catch (error: any) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching user businesses:', error);
         
         return NextResponse.json(

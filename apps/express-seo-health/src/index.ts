@@ -37,5 +37,6 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
     // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console
     console.log(`SEO Health Checker Service running on port ${PORT}`);
 });

@@ -29,5 +29,6 @@ app.use('/api/email', emailRoutes);
 
 app.listen(PORT, () => {
     // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console
     console.log(`Notifications Service is running on port ${PORT}`);
 });
