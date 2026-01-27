@@ -44,6 +44,7 @@ export const visibilityPlanJob = async (jobId: string, payload: { businessId: st
             throw new Error('No data returned from AI');
         }
 
+        // eslint-disable-next-line no-console
         console.log(`[Job] Saving visibility plan for business ${businessId}`);
 
         await repositories.report.create({
@@ -73,6 +74,7 @@ export const visibilityPlanJob = async (jobId: string, payload: { businessId: st
         });
 
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Job failed:', error);
         await repositories.job.updateStatus(jobId, 'failed', {
             failedAt: new Date(),

@@ -8,12 +8,14 @@ const SOCIAL_SERVICE_URL = process.env.SOCIAL_SERVICE_URL || 'http://localhost:3
  * Runs periodically to refresh expiring social connection tokens
  */
 export async function refreshSocialTokensJob() {
+    // eslint-disable-next-line no-console
     console.log('[RefreshTokens] Starting social token refresh job...');
 
     try {
         // Find connections with tokens expiring in the next 48 hours
         const expiringConnections = await socialConnectionRepository.findExpiringTokens(48);
 
+        // eslint-disable-next-line no-console
         console.log(`[RefreshTokens] Found ${expiringConnections.length} connections with expiring tokens`);
 
         let successCount = 0;
@@ -21,6 +23,7 @@ export async function refreshSocialTokensJob() {
 
         for (const connection of expiringConnections) {
             try {
+                // eslint-disable-next-line no-console
                 console.log(`[RefreshTokens] Refreshing ${connection.platform} connection ${connection.id}`);
 
                 // Call the express-social API to refresh the connection
@@ -31,19 +34,23 @@ export async function refreshSocialTokensJob() {
                 });
 
                 successCount++;
+                // eslint-disable-next-line no-console
                 console.log(`[RefreshTokens] ✓ Successfully refreshed ${connection.platform} connection ${connection.id}`);
 
             } catch (error: any) {
                 errorCount++;
+                // eslint-disable-next-line no-console
                 console.error(`[RefreshTokens] ✗ Failed to refresh connection ${connection.id}:`, error.message);
 
                 // The API endpoint already updates the status to error, so we don't need to do it here
             }
         }
 
+        // eslint-disable-next-line no-console
         console.log(`[RefreshTokens] Job completed. Success: ${successCount}, Errors: ${errorCount}`);
 
     } catch (error: any) {
+        // eslint-disable-next-line no-console
         console.error('[RefreshTokens] Job failed:', error);
     }
 }

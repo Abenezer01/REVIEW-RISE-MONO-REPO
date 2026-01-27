@@ -70,6 +70,7 @@ export const brandRecommendationsJob = async (jobId: string, payload: { business
                 }
 
             } catch (err) {
+                // eslint-disable-next-line no-console
                 console.error(`Error generating recommendations for category ${category}:`, err);
                 // Continue with other categories
             }
@@ -82,6 +83,7 @@ export const brandRecommendationsJob = async (jobId: string, payload: { business
         });
 
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Job failed:', error);
         await repositories.job.updateStatus(jobId, 'failed', {
             failedAt: new Date(),

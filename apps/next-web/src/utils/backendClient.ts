@@ -71,8 +71,10 @@ export async function backendClient<T = any>(
         return responseData.data as T
       } else {
         // Standard API error
+
         const message = responseData.error?.message || responseData.message || 'API Error'
         const apiError: any = new Error(message)
+
         apiError.status = responseData.statusCode
         apiError.code = responseData.error?.code
         apiError.details = responseData.error?.details
@@ -87,6 +89,7 @@ export async function backendClient<T = any>(
       const responseData = error.response.data as ApiResponseEnvelope
 
       // Try to extract message from standard error envelope
+
       const message = responseData?.error?.message || responseData?.message || error.message
 
       const apiError: any = new Error(message)
@@ -101,6 +104,7 @@ export async function backendClient<T = any>(
     if (process.env.NODE_ENV === 'development') {
       console.error('Backend client error:', error)
     }
+
     throw error
   }
 }

@@ -131,6 +131,7 @@ export const computeBrandScoresJob = async (jobId: string, payload: { businessId
         });
 
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Failed to compute brand scores:', error);
         await repositories.job.updateStatus(jobId, 'failed', {
             failedAt: new Date(),

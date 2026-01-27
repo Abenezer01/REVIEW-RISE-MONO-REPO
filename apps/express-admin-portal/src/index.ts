@@ -38,11 +38,13 @@ app.use('/users', usersRoutes);
 
 // Error Handling
 app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  // eslint-disable-next-line no-console
   console.error(err.stack);
   res.status(500).json(createErrorResponse(err.message || 'Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
 });
 
 // Start Server
 app.listen(port, () => {
+  // eslint-disable-next-line no-console
   console.info(`🚀 Admin Portal Service running on port ${port}`);
 });

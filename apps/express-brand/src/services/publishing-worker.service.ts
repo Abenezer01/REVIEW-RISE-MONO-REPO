@@ -9,6 +9,7 @@ export class PublishingWorker {
   start() {
     if (this.interval) return;
 
+    // eslint-disable-next-line no-console
     console.log('Starting Publishing Worker...');
     this.interval = setInterval(() => this.tick(), POLL_INTERVAL);
     
@@ -80,6 +81,7 @@ export class PublishingWorker {
       const allJobsToProcess = [...pendingJobs.map(j => j.id), ...retryableJobs.map(j => j.id)];
 
       if (allJobsToProcess.length > 0) {
+        // eslint-disable-next-line no-console
         console.log(`Publishing Worker: Processing ${allJobsToProcess.length} jobs (${pendingJobs.length} new, ${retryableJobs.length} retries)`);
         
         for (const jobId of allJobsToProcess) {
@@ -87,6 +89,7 @@ export class PublishingWorker {
         }
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Publishing Worker Error:', error);
     }
   }

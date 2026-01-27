@@ -11,6 +11,7 @@ const EXPRESS_REVIEWS_URL = process.env.EXPRESS_REVIEWS_URL || 'http://localhost
  * based on business-specific auto-reply settings.
  */
 export const runAutoReplyJob = async () => {
+    // eslint-disable-next-line no-console
     console.log('[AutoReplyJob] Starting auto-reply processing...');
     
     try {
@@ -25,12 +26,14 @@ export const runAutoReplyJob = async () => {
             take: 50 // Process in batches
         });
 
+        // eslint-disable-next-line no-console
         console.log(`[AutoReplyJob] Found ${pendingProcessing.length} reviews to process.`);
 
         for (const review of pendingProcessing) {
             try {
                 await processReviewAutoReply(review);
             } catch (err) {
+                // eslint-disable-next-line no-console
                 console.error(`[AutoReplyJob] Failed to process review ${review.id}:`, err);
             }
         }
@@ -44,28 +47,34 @@ export const runAutoReplyJob = async () => {
             take: 50
         });
 
+        // eslint-disable-next-line no-console
         console.log(`[AutoReplyJob] Found ${approvedReviews.length} approved reviews to post.`);
 
         for (const review of approvedReviews) {
             try {
                 await postApprovedReply(review);
             } catch (err) {
+                // eslint-disable-next-line no-console
                 console.error(`[AutoReplyJob] Failed to post approved reply for review ${review.id}:`, err);
             }
         }
 
+        // eslint-disable-next-line no-console
         console.log('[AutoReplyJob] Auto-reply job completed.');
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('[AutoReplyJob] Job failed:', error);
     }
 };
 
 async function postApprovedReply(review: any) {
     if (!review.response) {
+        // eslint-disable-next-line no-console
         console.error(`[AutoReplyJob] Cannot post approved reply for review ${review.id} - no response text.`);
         return;
     }
 
+    // eslint-disable-next-line no-console
     console.log(`[AutoReplyJob] Posting approved reply for review ${review.id}...`);
 
     try {
@@ -75,8 +84,10 @@ async function postApprovedReply(review: any) {
             authorType: 'auto',
             sourceType: 'ai'
         });
+        // eslint-disable-next-line no-console
         console.log(`[AutoReplyJob] Successfully posted reply for review ${review.id}.`);
     } catch (err: any) {
+        // eslint-disable-next-line no-console
         console.error(`[AutoReplyJob] Failed to post reply for review ${review.id}:`, err.response?.data || err.message);
         await repositories.review.update(review.id, {
             replyError: `Posting failed: ${err.response?.data?.error || err.message}`
@@ -118,6 +129,7 @@ async function processReviewAutoReply(review: any) {
     const hoursSincePublished = (now.getTime() - publishedAt.getTime()) / (1000 * 60 * 60);
 
     if (hoursSincePublished < delayHours) {
+        // eslint-disable-next-line no-console
         console.log(`[AutoReplyJob] Skipping review ${review.id} - waiting for ${delayHours}h delay (${hoursSincePublished.toFixed(1)}h elapsed)`);
         return; // Don't mark as skipped, let it be picked up in next run
     }
@@ -169,6 +181,7 @@ async function processReviewAutoReply(review: any) {
     }
 
     // 3. Generate AI Reply
+    // eslint-disable-next-line no-console
     console.log(`[AutoReplyJob] Generating AI reply for review ${review.id} (Rating: ${rating})`);
     
     try {
@@ -217,9 +230,11 @@ async function processReviewAutoReply(review: any) {
             });
         }
 
+        // eslint-disable-next-line no-console
         console.log(`[AutoReplyJob] Review ${review.id} processed. Status: ${finalStatus}`);
 
     } catch (err: any) {
+        // eslint-disable-next-line no-console
         console.error(`[AutoReplyJob] AI Generation failed for review ${review.id}:`, err.message);
         await repositories.review.update(review.id, {
             replyStatus: 'failed',

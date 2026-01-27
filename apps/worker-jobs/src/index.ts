@@ -153,11 +153,13 @@ const scheduleSocialTokenRefresh = () => {
 }
 
 app.listen(PORT, () => {
+    // eslint-disable-next-line no-console
     console.log(`Server is running on port ${PORT}`);
     try {
         const healthFile = path.join(os.tmpdir(), 'worker-healthy');
         fs.writeFileSync(healthFile, 'ok');
     } catch (e) {
+        // eslint-disable-next-line no-console
         console.warn('Could not write health check file:', e);
     }
     scheduleDaily(2);
