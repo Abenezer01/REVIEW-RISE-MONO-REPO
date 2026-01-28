@@ -17,25 +17,34 @@ interface TableListingProps<T> {
 }
 
 const TableListing = memo(<T,>({ columns, items, pagination, onPagination, isLoading, getRowClassName, onRowClick }: TableListingProps<T>) => {
+  const [isMounted, setIsMounted] = useState(false);
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: (pagination?.page || 1) - 1,
     pageSize: pagination?.pageSize || 10
   });
 
+  useEffect(() => {
+    setIsMounted(true);
+
+    return () => setIsMounted(false);
+  }, []);
+
   // Sync paginationModel when pagination prop changes (important for server-side)
   useEffect(() => {
-    if (pagination) {
+    if (isMounted && pagination) {
       setPaginationModel({
         page: (pagination.page || 1) - 1,
         pageSize: pagination.pageSize || 10
       });
     }
-  }, [pagination]);
+  }, [pagination, isMounted]);
 
   const handlePaginationModelChange = (newPaginationModel: GridPaginationModel) => {
-    setPaginationModel(newPaginationModel); // Update model unconditionally
-    onPagination && onPagination(newPaginationModel.pageSize, newPaginationModel.page + 1);
+    if (isMounted) {
+      setPaginationModel(newPaginationModel);
+      onPagination && onPagination(newPaginationModel.pageSize, newPaginationModel.page + 1);
+    }
   };
 
   // Memoize index column to prevent recreation
@@ -59,6 +68,17 @@ const TableListing = memo(<T,>({ columns, items, pagination, onPagination, isLoa
   const allColumns = useMemo(() => [indexColumn, ...columns], [indexColumn, columns]);
 
   const isServerSide = !!pagination;
+
+  if (!isMounted) {
+    return (
+      <Box sx={{ width: '100%', mb: 6 }}>
+        <Card sx={{ height: 400, borderRadius: 2, border: (theme) => `1px solid ${theme.palette.divider}`, boxShadow: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {/* Skeleton or loading indicator while mounting */}
+          <Box sx={{ color: 'text.secondary' }}>Loading...</Box>
+        </Card>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ width: '100%', mb: 6 }}>

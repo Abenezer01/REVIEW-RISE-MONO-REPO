@@ -91,7 +91,7 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
 
     const fetchBusinesses = async () => {
         try {
-            const response = await apiClient.get<{ data: BusinessDto[] }>('/admin/businesses', {
+            const response = await apiClient.get<{ data: BusinessDto[] }>('/api/admin/businesses', {
                 params: { limit: 100 },
             });
 

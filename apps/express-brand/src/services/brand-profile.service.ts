@@ -13,6 +13,8 @@ interface ExtractedBrandData {
   pages: Array<{ type: string; url: string; summary?: string }>
 }
 
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:3002';
+
 const extractBrandData = async (websiteUrl: string): Promise<ExtractedBrandData> => {
   try {
     const response = await axios.get(websiteUrl, {
@@ -564,60 +566,80 @@ export const generateBrandTone = async (id: string, industry?: string, location?
 
   if (!brandProfile) throw new Error('Brand profile not found')
 
-  // In a real scenario, we would call an AI service (OpenAI/Gemini)
-  // For now, we simulate a sophisticated tone generation based on industry and location
   const businessName = brandProfile.business.name
   const targetIndustry = industry || 'Professional Services'
   const targetLocation = location || 'Global'
 
-  // Mocked AI Output
-  const mockTone = {
-    descriptors: ['Professional', 'Trustworthy', 'Innovative', 'Customer-Centric'],
-    writingRules: {
-      do: [
-        'Use clear and concise language',
-        'Address the customer directly',
-        'Focus on benefits rather than just features',
-        'Maintain a helpful and optimistic tone'
+  try {
+    const response = await axios.post(`${AI_SERVICE_URL}/api/v1/ai/generate-tone`, {
+      businessName,
+      industry: targetIndustry,
+      location: targetLocation,
+      extractedData: brandProfile.currentExtractedData
+    });
+
+    const toneData = response.data;
+
+    // Save to database
+    await prisma.brandProfile.update({
+      where: { id },
+      data: { tone: toneData as any }
+    })
+
+    return toneData;
+  } catch (error: any) {
+    // eslint-disable-next-line no-console
+    console.error('AI Tone Generation Failed:', error.message);
+    
+    // Fallback mock data when AI service is unavailable
+    const mockTone = {
+      descriptors: ['Professional', 'Trustworthy', 'Innovative', 'Customer-Centric'],
+      writingRules: {
+        do: [
+          'Use clear and concise language',
+          'Address the customer directly',
+          'Focus on benefits rather than just features',
+          'Maintain a helpful and optimistic tone'
+        ],
+        dont: [
+          'Avoid overly technical jargon',
+          'Don’t use passive voice',
+          'Never sound dismissive of customer concerns',
+          'Avoid slang or overly casual abbreviations'
+        ]
+      },
+      taglines: [
+        `${businessName}: Your Partner in ${targetIndustry}`,
+        `Innovating for a better ${targetLocation}`,
+        `The Future of ${targetIndustry} is Here`,
+        `Trust. Innovation. ${businessName}.`,
+        `${targetLocation}'s Leading Choice for ${targetIndustry}`
       ],
-      dont: [
-        'Avoid overly technical jargon',
-        'Don’t use passive voice',
-        'Never sound dismissive of customer concerns',
-        'Avoid slang or overly casual abbreviations'
+      messagingPillars: [
+        {
+          pillar: 'Innovation',
+          description: `We lead the ${targetIndustry} market with cutting-edge solutions tailored for ${targetLocation}.`,
+          ctas: ['Explore Our Innovations', 'See What’s New']
+        },
+        {
+          pillar: 'Reliability',
+          description: 'Dependable service that businesses across the globe trust every single day.',
+          ctas: ['Learn More', 'Contact Support']
+        },
+        {
+          pillar: 'Community',
+          description: `Proudly serving and growing with the ${targetLocation} community.`,
+          ctas: ['Join Our Community', 'Get Involved']
+        }
       ]
-    },
-    taglines: [
-      `${businessName}: Your Partner in ${targetIndustry}`,
-      `Innovating for a better ${targetLocation}`,
-      `The Future of ${targetIndustry} is Here`,
-      `Trust. Innovation. ${businessName}.`,
-      `${targetLocation}'s Leading Choice for ${targetIndustry}`
-    ],
-    messagingPillars: [
-      {
-        pillar: 'Innovation',
-        description: `We lead the ${targetIndustry} market with cutting-edge solutions tailored for ${targetLocation}.`,
-        ctas: ['Explore Our Innovations', 'See What’s New']
-      },
-      {
-        pillar: 'Reliability',
-        description: 'Dependable service that businesses across the globe trust every single day.',
-        ctas: ['Learn More', 'Contact Support']
-      },
-      {
-        pillar: 'Community',
-        description: `Proudly serving and growing with the ${targetLocation} community.`,
-        ctas: ['Join Our Community', 'Get Involved']
-      }
-    ]
+    }
+
+    // Save fallback to database
+    await prisma.brandProfile.update({
+      where: { id },
+      data: { tone: mockTone as any }
+    })
+
+    return mockTone;
   }
-
-  // Save to database
-  await prisma.brandProfile.update({
-    where: { id },
-    data: { tone: mockTone as any }
-  })
-
-  return mockTone
 }
