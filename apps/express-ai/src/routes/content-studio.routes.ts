@@ -15,5 +15,6 @@ router.post('/prompts/generate', (req, res) => contentStudioController.generateP
 router.post('/images', (req, res) => contentStudioController.generateImage(req, res));
 router.post('/carousels', (req, res) => contentStudioController.generateCarousel(req, res));
 router.post('/scripts', (req, res) => contentStudioController.generateScript(req, res));
+router.post('/complete-post', (req, res) => contentStudioController.generateCompletePost(req, res));
 
 export default router;
