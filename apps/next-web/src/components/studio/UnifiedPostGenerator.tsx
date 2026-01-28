@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react'
 
-import { Box, Card, CardContent, Grid, TextField, MenuItem, Typography, Button, Chip, Avatar, Tooltip } from '@mui/material'
-import { useTranslations } from 'next-intl'
+import { Box, Card, CardContent, Grid, TextField, MenuItem, Typography, Button } from '@mui/material'
 import { toast } from 'react-toastify'
 import { keyframes } from '@mui/material/styles'
 
@@ -12,14 +11,7 @@ import apiClient from '@/lib/apiClient'
 
 import PlatformSelector from './selectors/PlatformSelector'
 import ToneSelector from './selectors/ToneSelector'
-import StudioGenerateButton from './shared/StudioGenerateButton'
 import UnifiedResults from './unified/UnifiedResults'
-
-const pulse = keyframes`
-  0% { transform: scale(0.95); opacity: 0.5; }
-  50% { transform: scale(1.05); opacity: 0.8; }
-  100% { transform: scale(0.95); opacity: 0.5; }
-`
 
 const float = keyframes`
   0% { transform: translateY(0px); }

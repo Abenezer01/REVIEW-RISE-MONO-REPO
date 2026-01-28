@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 
-import { Box, Card, CardContent, Typography, Chip, Stack, Button, Divider, Grid, IconButton, Paper, Avatar, Tooltip } from '@mui/material'
+import { Box, Card, CardContent, Typography, Chip, Stack, Button, Divider, Grid, IconButton, Avatar, Tooltip } from '@mui/material'
 import { toast } from 'react-toastify'
-import { useTranslations } from 'next-intl'
 
 import SchedulePostDialog from './SchedulePostDialog'
 
@@ -357,7 +356,7 @@ return [...highVolume, ...niche, ...branded].join(' ')
                                         <>
                                             <i className="tabler-photo" style={{ fontSize: 48, opacity: 0.3 }} />
                                             <Typography variant="caption" sx={{ fontStyle: 'italic', opacity: 0.7 }}>
-                                                "{data.imagePrompt.slice(0, 100)}..."
+                                                &ldquo;{data.imagePrompt.slice(0, 100)}...&rdquo;
                                             </Typography>
                                         </>
                                     ) : (
