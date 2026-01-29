@@ -1,6 +1,11 @@
 /* eslint-disable import/no-unresolved */
+import type {
+  PaginatedResponse
+} from '@platform/contracts';
+
 import apiClient from '@/lib/apiClient';
 
+// Re-using local interfaces for now if not in contracts, but ideally they should be moved
 export interface Competitor {
   id: string;
   name: string;
@@ -90,6 +95,58 @@ export interface PublishingLog extends PublishingJob {
   scheduledPost: ScheduledPost;
 }
 
+export interface BrandDNA {
+  values: string[];
+  voice?: string;
+  audience?: string;
+  mission?: string;
+}
+
+export interface ContentIdea {
+  id: string;
+  title: string;
+  description?: string;
+  platform: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface Review {
+  id: string;
+  platform: string;
+  author: string;
+  rating: number;
+  content?: string;
+  publishedAt: string;
+  response?: string;
+  respondedAt?: string;
+}
+
+export interface BrandRecommendation {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  why: string[];
+  steps: string[];
+  impact: 'low' | 'medium' | 'high' | 'critical';
+  effort: 'low' | 'medium' | 'high';
+  confidence: number;
+  priorityScore: number;
+  status: 'open' | 'in_progress' | 'completed' | 'dismissed';
+}
+
+export interface BrandScore {
+  id: string;
+  visibilityScore: number;
+  trustScore: number;
+  consistencyScore: number;
+  visibilityBreakdown: any;
+  trustBreakdown: any;
+  consistencyBreakdown: any;
+  computedAt: string;
+}
+
 export const BrandService = {
   // Competitors
   listCompetitors: async (businessId: string, locationId?: string | number | null) => {
@@ -97,21 +154,24 @@ export const BrandService = {
 
     if (locationId) params.locationId = locationId;
 
-    const response = await apiClient.get<{ data: Competitor[] }>(`/api/brands/${businessId}/competitors`, { params });
+    const response = await apiClient.get<Competitor[]>(`/api/v1/brands/${businessId}/competitors`, { params });
 
-    return response.data.data || [];
+
+return response.data || [];
   },
 
   getCompetitor: async (businessId: string, competitorId: string) => {
-    const response = await apiClient.get<{ data: Competitor }>(`/api/brands/${businessId}/competitors/${competitorId}`);
+    const response = await apiClient.get<Competitor>(`/api/brands/${businessId}/competitors/${competitorId}`);
 
-    return response.data.data;
+
+return response.data;
   },
 
   addCompetitor: async (businessId: string, data: { name: string; website?: string }) => {
-    const response = await apiClient.post<{ data: Competitor }>(`/api/brands/${businessId}/competitors`, data);
+    const response = await apiClient.post<Competitor>(`/api/brands/${businessId}/competitors`, data);
 
-    return response.data.data;
+
+return response.data;
   },
 
   removeCompetitor: async (businessId: string, competitorId: string) => {
@@ -124,9 +184,10 @@ export const BrandService = {
 
     if (locationId) params.locationId = locationId;
 
-    const response = await apiClient.get<{ data: DashboardOverview }>(`/api/brands/${businessId}/dashboards/overview`, { params });
+    const response = await apiClient.get<DashboardOverview>(`/api/brands/${businessId}/dashboards/overview`, { params });
 
-    return response.data.data;
+
+return response.data;
   },
 
   getVisibilityMetrics: async (businessId: string, range: '7d' | '30d' | '90d' = '30d', locationId?: string | number | null) => {
@@ -134,9 +195,10 @@ export const BrandService = {
 
     if (locationId) params.locationId = locationId;
 
-    const response = await apiClient.get<{ data: VisibilityMetric[] }>(`/api/brands/${businessId}/dashboards/visibility`, { params });
+    const response = await apiClient.get<VisibilityMetric[]>(`/api/brands/${businessId}/dashboards/visibility`, { params });
 
-    return response.data.data || [];
+
+return response.data || [];
   },
 
   // Reports
@@ -145,53 +207,61 @@ export const BrandService = {
 
     if (locationId) params.locationId = locationId;
 
-    const response = await apiClient.get<{ data: Report[] }>(`/api/brands/${businessId}/reports`, { params });
+    const response = await apiClient.get<Report[]>(`/api/brands/${businessId}/reports`, { params });
 
-    return response.data.data || [];
+
+return response.data || [];
   },
 
   getReport: async (businessId: string, reportId: string) => {
-    const response = await apiClient.get<{ data: Report & { htmlContent: string } }>(`/api/brands/${businessId}/reports/${reportId}`);
+    const response = await apiClient.get<Report & { htmlContent: string }>(`/api/brands/${businessId}/reports/${reportId}`);
 
-    return response.data.data;
+
+return response.data;
   },
 
   listOpportunitiesReports: async (businessId: string) => {
-    const response = await apiClient.get<{ data: any[] }>(`/api/brands/${businessId}/reports/opportunities`);
+    const response = await apiClient.get<any[]>(`/api/brands/${businessId}/reports/opportunities`);
 
-    return response.data.data || [];
+
+return response.data || [];
   },
 
   generateOpportunitiesReport: async (businessId: string) => {
-    const response = await apiClient.post<{ data: any }>(`/api/brands/${businessId}/reports/opportunities`);
+    const response = await apiClient.post<any>(`/api/brands/${businessId}/reports/opportunities`);
 
-    return response.data.data;
+
+return response.data;
   },
 
   // DNA
   getDNA: async (businessId: string) => {
-    const response = await apiClient.get<{ data: BrandDNA }>(`/api/brands/${businessId}/dna`);
+    const response = await apiClient.get<BrandDNA>(`/api/brands/${businessId}/dna`);
 
-    return response.data.data;
+
+return response.data;
   },
 
   updateDNA: async (businessId: string, data: Partial<BrandDNA>) => {
-    const response = await apiClient.post<{ data: BrandDNA }>(`/api/brands/${businessId}/dna`, data);
+    const response = await apiClient.post<BrandDNA>(`/api/brands/${businessId}/dna`, data);
 
-    return response.data.data;
+
+return response.data;
   },
 
   // Content
   listContent: async (businessId: string) => {
-    const response = await apiClient.get<{ data: ContentIdea[] }>(`/api/brands/${businessId}/content`);
+    const response = await apiClient.get<ContentIdea[]>(`/api/brands/${businessId}/content`);
 
-    return response.data.data || [];
+
+return response.data || [];
   },
 
   createContent: async (businessId: string, data: Partial<ContentIdea>) => {
-    const response = await apiClient.post<{ data: ContentIdea }>(`/api/brands/${businessId}/content`, data);
+    const response = await apiClient.post<ContentIdea>(`/api/brands/${businessId}/content`, data);
 
-    return response.data.data;
+
+return response.data;
   },
 
   deleteContent: async (businessId: string, contentId: string) => {
@@ -204,27 +274,31 @@ export const BrandService = {
 
     if (locationId) params.locationId = locationId;
 
-    const response = await apiClient.get<{ data: ScheduledPost[] }>(`/api/brands/${businessId}/scheduling`, { params });
+    const response = await apiClient.get<ScheduledPost[]>(`/api/brands/${businessId}/scheduling`, { params });
 
-    return response.data.data || [];
+
+return response.data || [];
   },
 
   getScheduledPost: async (businessId: string, postId: string) => {
-    const response = await apiClient.get<{ data: ScheduledPost }>(`/api/brands/${businessId}/scheduling/${postId}`);
+    const response = await apiClient.get<ScheduledPost>(`/api/brands/${businessId}/scheduling/${postId}`);
 
-    return response.data.data;
+
+return response.data;
   },
 
   createScheduledPost: async (businessId: string, data: Partial<ScheduledPost>) => {
-    const response = await apiClient.post<{ data: ScheduledPost }>(`/api/brands/${businessId}/scheduling`, data);
+    const response = await apiClient.post<ScheduledPost>(`/api/brands/${businessId}/scheduling`, data);
 
-    return response.data.data;
+
+return response.data;
   },
 
   updateScheduledPost: async (businessId: string, postId: string, data: Partial<ScheduledPost>) => {
-    const response = await apiClient.patch<{ data: ScheduledPost }>(`/api/brands/${businessId}/scheduling/${postId}`, data);
+    const response = await apiClient.patch<ScheduledPost>(`/api/brands/${businessId}/scheduling/${postId}`, data);
 
-    return response.data.data;
+
+return response.data;
   },
 
   deleteScheduledPost: async (businessId: string, postId: string) => {
@@ -232,9 +306,10 @@ export const BrandService = {
   },
 
   duplicateScheduledPost: async (businessId: string, postId: string, data?: { scheduledAt?: string; status?: string }) => {
-    const response = await apiClient.post<{ data: ScheduledPost }>(`/api/brands/${businessId}/scheduling/${postId}/duplicate`, data);
+    const response = await apiClient.post<ScheduledPost>(`/api/brands/${businessId}/scheduling/${postId}/duplicate`, data);
 
-    return response.data.data;
+
+return response.data;
   },
 
   listPublishingLogs: async (businessId: string, params: {
@@ -244,9 +319,10 @@ export const BrandService = {
     status?: string;
     locationId?: string;
   }) => {
-    const response = await apiClient.get<{ data: PublishingLog[] }>(`/api/brands/${businessId}/scheduling/logs`, { params });
+    const response = await apiClient.get<PublishingLog[]>(`/api/v1/brands/${businessId}/scheduling/logs`, { params });
 
-    return response.data.data || [];
+
+return response.data || [];
   },
 
   // Reviews
@@ -262,23 +338,25 @@ export const BrandService = {
 
     if (locationId) params.locationId = locationId;
 
-    const response = await apiClient.get<{ data: { reviews: Review[], total: number, page: number, totalPages: number } }>(`/api/brands/${businessId}/reviews`, {
+    const response = await apiClient.get<PaginatedResponse<Review>>(`/api/brands/${businessId}/reviews`, {
       params
     });
 
-    return response.data.data || { reviews: [], total: 0, page: 1, totalPages: 1 };
+    return (response.data as any) || { reviews: [], total: 0, page: 1, totalPages: 1 };
   },
 
   postReviewReply: async (businessId: string, reviewId: string, comment: string) => {
-    const response = await apiClient.post<{ data: any }>(`/api/brands/${businessId}/reviews/${reviewId}/reply`, { comment });
+    const response = await apiClient.post<any>(`/api/brands/${businessId}/reviews/${reviewId}/reply`, { comment });
 
-    return response.data;
+
+return response.data;
   },
 
   rejectReviewReply: async (businessId: string, reviewId: string) => {
-    const response = await apiClient.post<{ data: any }>(`/api/brands/${businessId}/reviews/${reviewId}/reject`);
+    const response = await apiClient.post<any>(`/api/brands/${businessId}/reviews/${reviewId}/reject`);
 
-    return response.data;
+
+return response.data;
   },
 
   getReviewStats: async (businessId: string, locationId?: string | number | null) => {
@@ -286,53 +364,61 @@ export const BrandService = {
 
     if (locationId) params.locationId = locationId;
 
-    const response = await apiClient.get<{ data: { totalReviews: number, averageRating: number } }>(`/api/brands/${businessId}/reviews/stats`, { params });
+    const response = await apiClient.get<{ totalReviews: number, averageRating: number }>(`/api/brands/${businessId}/reviews/stats`, { params });
 
-    return response.data.data;
+
+return response.data;
   },
 
   replyReview: async (businessId: string, reviewId: string, responseContent: string) => {
-    const response = await apiClient.post<{ data: Review }>(`/api/brands/${businessId}/reviews/${reviewId}/reply`, { response: responseContent });
+    const response = await apiClient.post<Review>(`/api/brands/${businessId}/reviews/${reviewId}/reply`, { response: responseContent });
 
-    return response.data.data;
+
+return response.data;
   },
 
   // Recommendations & Brand Strategist
   generateRecommendations: async (businessId: string, category: string) => {
     const response = await apiClient.post<{ message: string, jobId: string }>(`/api/brands/${businessId}/recommendations`, { category });
 
-    return response.data;
+
+return response.data;
   },
 
   getRecommendations: async (businessId: string, filters?: { status?: string, category?: string }) => {
     const response = await apiClient.get<BrandRecommendation[]>(`/api/brands/${businessId}/recommendations`, { params: filters });
 
-    return response.data;
+
+return response.data;
   },
 
   updateRecommendationStatus: async (businessId: string, id: string, status: string) => {
-    const response = await apiClient.patch<{ data: BrandRecommendation }>(`/api/brands/${businessId}/recommendations/${id}`, { status });
+    const response = await apiClient.patch<BrandRecommendation>(`/api/brands/${businessId}/recommendations/${id}`, { status });
 
-    return response.data.data;
+
+return response.data;
   },
 
   getBrandScores: async (businessId: string) => {
     const response = await apiClient.get<BrandScore>(`/api/brands/${businessId}/scores`);
 
-    return response.data;
+
+return response.data;
   },
 
   // Visibility Plan
   generateVisibilityPlan: async (businessId: string) => {
     const response = await apiClient.post<{ message: string, jobId: string }>(`/api/brands/${businessId}/visibility-plan`);
 
-    return response.data;
+
+return response.data;
   },
 
   getVisibilityPlan: async (businessId: string) => {
     const response = await apiClient.get<any>(`/api/brands/${businessId}/visibility-plan`);
 
-    return response.data;
+
+return response.data;
   },
 
   // Jobs
@@ -341,9 +427,10 @@ export const BrandService = {
 
     if (locationId) params.locationId = locationId;
 
-    const response = await apiClient.get<{ data: any[] }>(`/api/brands/${businessId}/jobs`, { params });
+    const response = await apiClient.get<Job[]>(`/api/brands/${businessId}/jobs`, { params });
 
-    return response.data.data || [];
+
+return response.data || [];
   },
 
   // Planner
@@ -414,55 +501,3 @@ export const BrandService = {
     await apiClient.delete(`/api/brands/${businessId}/planner/events/${eventId}`);
   },
 };
-
-export interface BrandRecommendation {
-  id: string;
-  category: string;
-  title: string;
-  description: string;
-  why: string[];
-  steps: string[];
-  impact: 'low' | 'medium' | 'high' | 'critical';
-  effort: 'low' | 'medium' | 'high';
-  confidence: number;
-  priorityScore: number;
-  status: 'open' | 'in_progress' | 'completed' | 'dismissed';
-}
-
-export interface BrandScore {
-  id: string;
-  visibilityScore: number;
-  trustScore: number;
-  consistencyScore: number;
-  visibilityBreakdown: any;
-  trustBreakdown: any;
-  consistencyBreakdown: any;
-  computedAt: string;
-}
-
-export interface BrandDNA {
-  values: string[];
-  voice?: string;
-  audience?: string;
-  mission?: string;
-}
-
-export interface ContentIdea {
-  id: string;
-  title: string;
-  description?: string;
-  platform: string;
-  status: string;
-  createdAt: string;
-}
-
-export interface Review {
-  id: string;
-  platform: string;
-  author: string;
-  rating: number;
-  content?: string;
-  publishedAt: string;
-  response?: string;
-  respondedAt?: string;
-}

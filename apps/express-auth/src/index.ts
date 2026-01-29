@@ -7,7 +7,7 @@ import { prisma } from '@platform/db';
 import { generateToken } from '@platform/auth';
 import v1Routes from './routes/v1';
 import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
-import { requestIdMiddleware } from './middleware/request-id';
+import { requestIdMiddleware } from '@platform/middleware';
 
 dotenv.config();
 

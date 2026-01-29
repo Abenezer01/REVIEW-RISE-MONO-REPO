@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import { requestIdMiddleware } from '@platform/middleware';
 
 // Load environment variables
 dotenv.config();
@@ -14,6 +15,7 @@ const port = process.env.PORT || 3012;
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+app.use(requestIdMiddleware);
 app.use(morgan('combined'));
 
 // Health Check

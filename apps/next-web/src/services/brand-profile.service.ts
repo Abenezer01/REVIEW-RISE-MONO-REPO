@@ -1,4 +1,6 @@
 /* eslint-disable import/no-unresolved */
+import type { ApiMeta } from '@platform/contracts';
+
 import { backendClient } from '@/utils/backendClient';
 
 export interface BrandProfile {
@@ -42,12 +44,7 @@ export interface BrandProfile {
 
 interface PaginatedBrandProfiles {
   data: BrandProfile[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
+  meta: ApiMeta;
 }
 
 export const BrandProfileService = {
@@ -70,6 +67,8 @@ export const BrandProfileService = {
       method: 'GET',
     });
 
+    // backendClient already unwraps standardized ApiResponse.
+    // For paginated responses, it returns { data, meta }
     return response;
   },
 

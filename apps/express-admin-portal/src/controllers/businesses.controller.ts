@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 import { prisma } from '@platform/db';
+import { createPaginatedResponse, createErrorResponse } from '@platform/contracts';
 
 export const getBusinesses = async (req: Request, res: Response) => {
   try {
-    const search = (req.query.search as string) || '';
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
+    const { search = '', page = 1, limit = 20 } = req.query as any;
     const skip = (page - 1) * limit;
 
     const where: any = {
@@ -30,16 +29,15 @@ export const getBusinesses = async (req: Request, res: Response) => {
       prisma.business.count({ where }),
     ]);
 
-    res.json({
-      data: businesses,
-      meta: {
-        total,
-        page,
-        limit,
-      },
-    });
+    res.json(createPaginatedResponse(
+      businesses,
+      { total, page, limit },
+      'Businesses fetched successfully',
+      200,
+      { requestId: req.id }
+    ));
   } catch (error) {
     console.error('Error fetching businesses:', error);
-    res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+    res.status(500).json(createErrorResponse('Internal Server Error', 'INTERNAL_SERVER_ERROR', 500, undefined, req.id));
   }
 };

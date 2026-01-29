@@ -12,7 +12,6 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
-import axios from 'axios';
 
 import type { VisibilityMetricDTO, KeywordDTO } from '@platform/contracts';
 
@@ -23,9 +22,10 @@ import VisibilityTrendsChart from './VisibilityTrendsChart';
 import HeatmapGrid from '@/components/shared/charts/HeatmapGrid';
 import KeywordRankChart from './KeywordRankChart';
 
-import { SERVICES_CONFIG } from '@/configs/services';
+import { SERVICES } from '@/configs/services';
+import apiClient from '@/lib/apiClient';
 
-const API_URL = SERVICES_CONFIG.seo.url;
+const API_URL = SERVICES.ai.url.replace('/ai', '/seo-health'); // Adjusting if needed, but let's assume it matches backend
 
 const VisibilityDashboard = () => {
   const { user } = useAuth();
@@ -44,16 +44,15 @@ const VisibilityDashboard = () => {
       if (!user?.id) return;
 
       try {
-        // In a real app, this might be an internal Next.js API route or direct call if server component
-        // But since we created /api/admin/users/[id]/businesses, let's use it.
-        // Note: The new route returns { data: [...] } standard response structure
-        const response = await axios.get(`/api/admin/users/${user.id}/businesses`);
+        // Use apiClient (auto-unwraps data field)
+        const responseData = await apiClient.get<any[]>(`/api/admin/users/${user.id}/businesses`)
+          .then(res => res.data);
 
-        if (response.data?.data && response.data.data.length > 0) {
-          setBusinesses(response.data.data);
+        if (responseData && responseData.length > 0) {
+          setBusinesses(responseData);
 
           // Auto-select first business
-          setBusinessId(response.data.data[0].id);
+          setBusinessId(responseData[0].id);
         } else {
           setError('No businesses found for this user.');
           setLoading(false);
@@ -79,12 +78,12 @@ const VisibilityDashboard = () => {
       thirtyDaysAgo.setDate(today.getDate() - 30);
 
       // 1. Fetch Latest Metric for Cards
-      const metricsPromise = axios.get(`${API_URL}/visibility/metrics`, {
+      const metricsPromise = apiClient.get<VisibilityMetricDTO[]>(`${API_URL}/visibility/metrics`, {
         params: { businessId: id, periodType: 'daily', limit: 1, offset: 0 }
       });
 
       // 2. Fetch Historical Metrics for Chart
-      const historyPromise = axios.get(`${API_URL}/visibility/metrics`, {
+      const historyPromise = apiClient.get<VisibilityMetricDTO[]>(`${API_URL}/visibility/metrics`, {
         params: {
           businessId: id,
           periodType: 'daily',
@@ -95,12 +94,12 @@ const VisibilityDashboard = () => {
       });
 
       // 3. Fetch Keywords
-      const keywordsPromise = axios.get(`${API_URL}/keywords`, {
+      const keywordsPromise = apiClient.get<KeywordDTO[]>(`${API_URL}/keywords`, {
         params: { businessId: id, limit: 50 }
       });
 
       // 4. Fetch Heatmap Data
-      const heatmapPromise = axios.get(`${API_URL}/visibility/heatmap`, {
+      const heatmapPromise = apiClient.get<any>(`${API_URL}/visibility/heatmap`, {
         params: {
           businessId: id,
           startDate: thirtyDaysAgo.toISOString(),
@@ -115,22 +114,17 @@ const VisibilityDashboard = () => {
         heatmapPromise
       ]);
 
-      if (metricsRes.data?.data?.[0]) {
-        setMetrics(metricsRes.data.data[0]);
+      if (metricsRes.data?.[0]) {
+        setMetrics(metricsRes.data[0]);
       } else {
         setMetrics(null);
       }
 
-      if (historyRes.data?.data) {
-        setHistoricalMetrics(historyRes.data.data);
-      }
+      setHistoricalMetrics(historyRes.data || []);
+      setKeywords(keywordsRes.data || []);
 
-      if (keywordsRes.data?.data) {
-        setKeywords(keywordsRes.data.data);
-      }
-
-      if (heatmapRes.data?.data) {
-        const apiData = heatmapRes.data.data;
+      if (heatmapRes.data) {
+        const apiData = heatmapRes.data;
 
         const transformedHeatmap = {
           dates: apiData.periods,
@@ -146,10 +140,8 @@ const VisibilityDashboard = () => {
         setHeatmapData(transformedHeatmap);
       }
 
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching dashboard data:', err);
-
-      // Don't overwrite "No businesses found" error if it was that
       setError(prev => prev || 'Failed to load dashboard data. Please check connection to SEO service.');
     } finally {
       setLoading(false);

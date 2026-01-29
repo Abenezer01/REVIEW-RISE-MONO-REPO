@@ -4,18 +4,16 @@ import { useEffect, useState, useCallback } from 'react'
 
 import dynamic from 'next/dynamic'
 
-import axios from 'axios'
-
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 
 import type { KeywordDTO } from '@platform/contracts'
 
 import { useAuth } from '@/contexts/AuthContext'
+import apiClient from '@/lib/apiClient'
+import { SERVICES_CONFIG } from '@/configs/services';
 
 const KeywordListing = dynamic(() => import('@/components/admin/seo/KeywordListing'), { ssr: false })
-
-import { SERVICES_CONFIG } from '@/configs/services';
 
 const API_URL = SERVICES_CONFIG.seo.url;
 
@@ -32,8 +30,8 @@ export default function KeywordManager() {
 
   useEffect(() => {
     if (!user?.id) return
-    axios.get(`/api/admin/users/${user.id}/businesses`).then(res => {
-      const items = res.data?.data || []
+    apiClient.get(`/api/admin/users/${user.id}/businesses`).then(res => {
+      const items = res.data || []
 
       if (items.length) {
         setBusinessId(items[0].id)
@@ -47,20 +45,23 @@ export default function KeywordManager() {
     if (!businessId) return
     setLoading(true)
 
-    const res = await axios.get(`${API_URL}/keywords`, {
-      params: {
-        businessId,
-        locationId,
-        limit: 200,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-        tags: tagFilter || undefined
-      }
-    })
+    try {
+      const res = await apiClient.get<KeywordDTO[]>(`${API_URL}/keywords`, {
+        params: {
+          businessId,
+          locationId,
+          limit: 200,
+          status: statusFilter !== 'all' ? statusFilter : undefined,
+          tags: tagFilter || undefined
+        }
+      })
 
-    const items = (res.data?.data || []) as KeywordDTO[]
-
-    setKeywords(items)
-    setLoading(false)
+      setKeywords(res.data || [])
+    } catch (error) {
+      console.error('Failed to fetch keywords', error)
+    } finally {
+      setLoading(false)
+    }
   }, [businessId, locationId, statusFilter, tagFilter])
 
   useEffect(() => {
@@ -68,8 +69,12 @@ export default function KeywordManager() {
   }, [fetchKeywords])
 
   const handleDeleteKeyword = async (id: string) => {
-    await axios.delete(`${API_URL}/keywords/${id}`)
-    await fetchKeywords()
+    try {
+      await apiClient.delete(`${API_URL}/keywords/${id}`)
+      await fetchKeywords()
+    } catch (error) {
+      console.error('Failed to delete keyword', error)
+    }
   }
 
   const filteredRows = keywords.filter(k => {
@@ -106,10 +111,6 @@ export default function KeywordManager() {
         onTagFilter={setTagFilter}
         onApplyFilter={() => fetchKeywords()}
       />
-
-      {/* Drawer and form are handled inside KeywordListing */}
-
-      {/* Listing table rendered above via ItemsListing */}
     </Container>
   )
 }
