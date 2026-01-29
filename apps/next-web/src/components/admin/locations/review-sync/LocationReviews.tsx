@@ -3,19 +3,15 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 
 import GoogleIcon from '@mui/icons-material/Google';
-
 import StarIcon from '@mui/icons-material/Star';
 import { Avatar, Box, Button, Card, CardContent, CircularProgress, Grid, Rating, Typography } from '@mui/material';
 
 import apiClient from '@/lib/apiClient';
 
-
-
-
 interface Review {
     id: string;
     platform: string;
-    author: string; // Prisma schema says String
+    author: string;
     rating: number;
     content: string;
     publishedAt: string;
@@ -42,13 +38,11 @@ const LocationReviews = () => {
 
         const fetchReviews = async () => {
             try {
-                // Adjust endpoint based on API structure. 
-                // Assuming routed via /api/v1/locations/:id/reviews or similar.
-                // Using generic path for now - might need adjustment if gateway prefix differs.
-                const res = await apiClient.get(`/locations/${locationId}/reviews`);
+                // Use apiClient (auto-unwraps data field)
+                const res = await apiClient.get<Review[]>(`/locations/${locationId}/reviews`);
 
-                if (res.data && res.data.data) {
-                     setReviews(res.data.data);
+                if (res.data) {
+                     setReviews(res.data);
                 }
             } catch (error) {
                 console.error('Failed to fetch reviews', error);

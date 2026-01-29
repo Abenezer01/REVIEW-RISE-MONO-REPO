@@ -35,9 +35,6 @@ interface Location {
 const LocationDropdown = () => {
   // States
   const [open, setOpen] = useState(false)
-
-  // Removed local selectedLocation state in favor of URL param lookup
-  // const [selectedLocation, setSelectedLocation] = useState<Location | null>(null) 
   const [locations, setLocations] = useState<Location[]>([])
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -56,15 +53,10 @@ const LocationDropdown = () => {
   const { user } = useAuth()
 
   useEffect(() => {
-    // console.log('LocationDropdown Debug:', { locationId, userLocationId: user?.locationId, user })
     if (!locationId) {
       if (user?.locationId) {
-        // Case 1: Use cached location from session
-        // console.log('Setting default location from User Session:', user.locationId)
         setLocationId(user.locationId)
       } else if (locations.length > 0) {
-        // Case 2: User has no locationId in session, but we have fetched locations. Select the first one.
-        // console.log('Setting default location from First Available:', locations[0].id)
         setLocationId(locations[0].id)
       }
     }
@@ -74,9 +66,8 @@ const LocationDropdown = () => {
     try {
       setLoading(true)
 
-
-
-      const response = await apiClient.get(`${SERVICES.admin.url}/locations`, {
+      // Use apiClient (auto-unwraps data field)
+      const response = await apiClient.get<Location[]>(`${SERVICES.admin.url}/locations`, {
         params: {
           limit: 10,
           status: 'active',
@@ -84,27 +75,15 @@ const LocationDropdown = () => {
         }
       })
 
-      if (response.data && response.data.data) {
-        const fetchedLocations = response.data.data
-
-        setLocations(fetchedLocations)
-
-        // If no location is selected in URL, and we have locations, select the first one by default?
-        // OR just leave it empty. The original code had commented out default selection.
-        // Let's respect the "global" nature: if URL has ID, we use it. 
-        // If not, we could arguably default to the first one, but let's stick to explicit selection for now unless requested.
-
-        // However, we need to ensure the selected location from URL is actually in the list 
-        // if we want to display its name correctly. 
-        // If the list is paginated/searched, we might not have the selected location in the initial list.
-        // For now, assuming the initial list contains the selected one or we just show "Select Location".
+      if (response.data) {
+        setLocations(response.data)
       }
     } catch (error) {
       console.error('Failed to fetch locations', error)
     } finally {
       setLoading(false)
     }
-  }, []) // Removed dependency on selectedLocation to avoid loops
+  }, [])
 
   // Fetch initial locations
   useEffect(() => {
@@ -205,12 +184,6 @@ const LocationDropdown = () => {
                       }}
                     />
                   </Box>
-
-                  {/* Fixed "Use Current Location" Option - functionality to be implemented */}
-                  {/* <MenuItem onClick={() => handleLocationSelect({ id: 'current', name: 'Use Current Location', address: '' })} sx={{ gap: 2, color: 'primary.main' }}>
-                        <i className='tabler-current-location' />
-                        <Typography color='inherit'>Use Current Location</Typography>
-                    </MenuItem> */}
 
                   {locations.length === 0 && !loading ? (
                     <Box sx={{ p: 2, textAlign: 'center' }}>

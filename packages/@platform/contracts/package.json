@@ -16,6 +16,6 @@
     "test": "exit 0"
   },
   "dependencies": {
-    "zod": "^4.3.5"
+    "zod": "^4.3.6"
   }
 }

@@ -26,7 +26,23 @@ export async function backendClient<T = any>(
       ...rest,
     })
 
-    return response.data
+    const data = response.data as any
+
+    // Unwrap standardized ApiResponse
+    // We check for 'success' or 'status' (legacy) and 'data'
+    if (data && typeof data === 'object' && ('success' in data || 'status' in data) && 'data' in data) {
+      // If it has pagination metadata, return both data and meta
+      if (data.meta && (data.meta.total !== undefined || data.meta.page !== undefined)) {
+        return {
+          data: data.data,
+          meta: data.meta
+        } as unknown as T
+      }
+
+      return data.data as T
+    }
+
+    return response.data as T
   } catch (error: any) {
     if (isAxiosError(error) && error.response) {
       // Propagate the error message from backend if available
