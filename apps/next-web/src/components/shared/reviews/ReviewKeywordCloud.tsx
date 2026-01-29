@@ -10,8 +10,8 @@ import CircularProgress from '@mui/material/CircularProgress'
 import FormControl from '@mui/material/FormControl'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
-import axios from 'axios'
 
+import apiClient from '@/lib/apiClient'
 import KeywordCloud from '../dashboard/KeywordCloud'; // Reusing existing component
 
 interface ReviewKeywordCloudProps {
@@ -28,12 +28,13 @@ const ReviewKeywordCloud = ({ locationId }: ReviewKeywordCloudProps) => {
       setLoading(true)
 
       try {
-        const res = await axios.get(`/api/v1/reviews/locations/${locationId}/keywords`, {
+        // Use apiClient (auto-unwraps data field)
+        const res = await apiClient.get<any>(`/reviews/api/v1/locations/${locationId}/keywords`, {
             params: { timeRange }
         })
         
-        if (res.data.success) {
-            setKeywords(res.data.data.keywords)
+        if (res.data?.keywords) {
+            setKeywords(res.data.keywords)
         }
       } catch (error) {
         console.error('Failed to fetch review keywords:', error)

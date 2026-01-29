@@ -1,4 +1,7 @@
+import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios'
+
+import type { ApiMeta } from '@platform/contracts'
 
 import { useAuthStore } from '@/store/authStore'
 
@@ -29,23 +32,45 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    
-return config
+    return config
   },
   (error) => {
     return Promise.reject(error)
   }
 )
 
-// Add response interceptor
+// Add response interceptor to automatically unwrap standardized ApiResponse
 apiClient.interceptors.response.use(
   (response) => {
+    const data = response.data as any;
+
+    // Check if it matches our standard ApiResponse structure (from @platform/contracts)
+    // We check for 'success' or 'status' (legacy) and 'data'
+    if (data && typeof data === 'object' && ('success' in data || 'status' in data) && 'data' in data) {
+      // If it has pagination metadata in meta, we return the data and meta together
+      if (data.meta && (data.meta.total !== undefined || data.meta.page !== undefined)) {
+        return {
+          ...response,
+          data: {
+            data: data.data,
+            meta: data.meta
+          }
+        };
+      }
+
+      // Otherwise return only the inner data payload
+      return {
+        ...response,
+        data: data.data
+      };
+    }
+
     return response
   },
   (error) => {
     // Handle global errors (e.g., 401 Unauthorized)
     if (error.response && error.response.status === 401) {
-      // Redirect to login or clear auth state
+      // Could trigger logout or refresh token logic here
     }
 
     return Promise.reject(error)
@@ -53,3 +78,30 @@ apiClient.interceptors.response.use(
 )
 
 export default apiClient
+
+/**
+ * Type helper for paginated responses when unwrapped by the interceptor
+ */
+export interface UnwrappedPaginatedResponse<T> {
+  data: T[];
+  meta: ApiMeta & {
+    page: number;
+    limit: number;
+    total: number;
+    lastPage?: number;
+  };
+}
+
+// Type helper for unwrapped responses in AxiosInstance
+declare module 'axios' {
+  export interface AxiosInstance {
+    request<T = any, R = AxiosResponse<T>, D = any>(config: AxiosRequestConfig<D>): Promise<R>;
+    get<T = any, R = AxiosResponse<T>, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+    delete<T = any, R = AxiosResponse<T>, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+    head<T = any, R = AxiosResponse<T>, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+    options<T = any, R = AxiosResponse<T>, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+    post<T = any, R = AxiosResponse<T>, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
+    put<T = any, R = AxiosResponse<T>, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
+    patch<T = any, R = AxiosResponse<T>, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
+  }
+}

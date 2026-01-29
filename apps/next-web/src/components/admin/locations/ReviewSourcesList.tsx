@@ -22,15 +22,13 @@ const ReviewSourcesList = ({ locationId }: { locationId: string }) => {
     const t = useTranslation('dashboard');
     const [sources, setSources] = useState<ReviewSource[]>([]);
 
-    // const [loading, setLoading] = useState(false);
-
     const fetchSources = useCallback(async () => {
         try {
-            // Path: via Nginx /api/reviews -> express-reviews
-            const res = await apiClient.get(`/reviews/api/v1/locations/${locationId}/sources`);
+            // Use apiClient (auto-unwraps data field)
+            const res = await apiClient.get<ReviewSource[]>(`/reviews/api/v1/locations/${locationId}/sources`);
 
-            if (res.data?.data) {
-                setSources(res.data.data);
+            if (res.data) {
+                setSources(res.data);
             }
         } catch (error) {
             console.error('Failed to fetch sources', error);
@@ -44,12 +42,12 @@ const ReviewSourcesList = ({ locationId }: { locationId: string }) => {
     const handleConnectGoogle = async () => {
         try {
             // Get auth URL
-            const res = await apiClient.get('/reviews/api/v1/auth/google/connect', {
+            const res = await apiClient.get<{ url: string }>('/reviews/api/v1/auth/google/connect', {
                 params: { locationId }
             });
 
-            if (res.data?.data?.url) {
-                window.location.href = res.data.data.url;
+            if (res.data?.url) {
+                window.location.href = res.data.url;
             }
         } catch (error) {
             console.error('Failed to get connect URL', error);

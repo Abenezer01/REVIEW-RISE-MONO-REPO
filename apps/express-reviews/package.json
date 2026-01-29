@@ -12,6 +12,8 @@
   "dependencies": {
     "@platform/auth": "workspace:*",
     "@platform/contracts": "workspace:*",
+    "@platform/middleware": "workspace:*",
+    "zod": "^4.3.6",
     "@platform/db": "workspace:*",
     "@platform/types": "workspace:*",
     "@platform/utils": "workspace:*",

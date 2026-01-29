@@ -74,8 +74,9 @@ const BackendAutocomplete: React.FC<BackendAutocompleteProps> = ({
             })
 
 
-            // Support both data.data (paginated) and direct data (list)
-            const items = response.data?.data || response.data || []
+            // apiClient already unwraps data. For paginated response, response.data is { data, meta }
+            const responseData = response.data as any
+            const items = responseData?.data || responseData || []
 
             setOptions(items)
         } catch (error) {

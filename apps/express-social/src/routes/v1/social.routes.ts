@@ -4,6 +4,19 @@ import { linkedInController } from '../../controllers/linkedin.controller';
 import { socialController } from '../../controllers/social.controller';
 import { socialConnectionController } from '../../controllers/social-connection.controller';
 import { authenticate } from '../../middleware/auth.middleware';
+import { validateRequest } from '@platform/middleware';
+import {
+    ListConnectionsQuerySchema,
+    ConnectionIdParamSchema,
+    FacebookAuthUrlQuerySchema,
+    FacebookCallbackBodySchema,
+    FacebookConnectPageBodySchema,
+    FacebookPageIdParamSchema,
+    FacebookInstagramConnectBodySchema,
+    LinkedInAuthUrlQuerySchema,
+    LinkedInCallbackBodySchema,
+    LinkedInConnectOrgBodySchema
+} from '@platform/contracts';
 
 const router = Router();
 
@@ -14,23 +27,23 @@ router.post('/publish', socialController.publish);
 router.use(authenticate);
 
 // Facebook Routes
-router.get('/facebook/auth-url', facebookController.getAuthUrl);
-router.post('/facebook/callback', facebookController.handleCallback); // Called by frontend with code
-router.get('/facebook/pages', facebookController.listPages);
-router.post('/facebook/connect', facebookController.connectPage);
-router.get('/facebook/pages/:pageId/instagram-accounts', facebookController.getInstagramAccounts);
-router.post('/instagram/connect', facebookController.connectInstagram);
+router.get('/facebook/auth-url', validateRequest(FacebookAuthUrlQuerySchema, 'query'), (req, res) => facebookController.getAuthUrl(req, res));
+router.post('/facebook/callback', validateRequest(FacebookCallbackBodySchema), (req, res) => facebookController.handleCallback(req, res)); // Called by frontend with code
+router.get('/facebook/pages', (req, res) => facebookController.listPages(req, res));
+router.post('/facebook/connect', validateRequest(FacebookConnectPageBodySchema), (req, res) => facebookController.connectPage(req, res));
+router.get('/facebook/pages/:pageId/instagram-accounts', validateRequest(FacebookPageIdParamSchema, 'params'), (req, res) => facebookController.getInstagramAccounts(req, res));
+router.post('/instagram/connect', validateRequest(FacebookInstagramConnectBodySchema), (req, res) => facebookController.connectInstagram(req, res));
 
 // LinkedIn Routes
-router.get('/linkedin/auth-url', linkedInController.getAuthUrl);
-router.post('/linkedin/callback', linkedInController.handleCallback);
-router.get('/linkedin/organizations', linkedInController.listOrganizations);
-router.post('/linkedin/connect', linkedInController.connectOrganization);
+router.get('/linkedin/auth-url', validateRequest(LinkedInAuthUrlQuerySchema, 'query'), (req, res) => linkedInController.getAuthUrl(req, res));
+router.post('/linkedin/callback', validateRequest(LinkedInCallbackBodySchema), (req, res) => linkedInController.handleCallback(req, res));
+router.get('/linkedin/organizations', (req, res) => linkedInController.listOrganizations(req, res));
+router.post('/linkedin/connect', validateRequest(LinkedInConnectOrgBodySchema), (req, res) => linkedInController.connectOrganization(req, res));
 
 // Connection Management Routes
-router.get('/connections', socialConnectionController.listConnections);
-router.get('/connections/:id', socialConnectionController.getConnection);
-router.delete('/connections/:id', socialConnectionController.disconnect);
-router.post('/connections/:id/refresh', socialConnectionController.refreshConnection);
+router.get('/connections', validateRequest(ListConnectionsQuerySchema, 'query'), (req, res) => socialConnectionController.listConnections(req, res));
+router.get('/connections/:id', validateRequest(ConnectionIdParamSchema, 'params'), (req, res) => socialConnectionController.getConnection(req, res));
+router.delete('/connections/:id', validateRequest(ConnectionIdParamSchema, 'params'), (req, res) => socialConnectionController.disconnect(req, res));
+router.post('/connections/:id/refresh', validateRequest(ConnectionIdParamSchema, 'params'), (req, res) => socialConnectionController.refreshConnection(req, res));
 
 export default router;

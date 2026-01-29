@@ -2,9 +2,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '@platform/db';
 import {
-    CreatePostRequestSchema,
-    CreateBatchPostsRequestSchema,
-    ListPostsQuerySchema,
     createSuccessResponse,
     createErrorResponse,
     ErrorCode
@@ -15,18 +12,7 @@ export class PostsController {
     // Create a new post (e.g. from Draft)
     async create(req: Request, res: Response) {
         try {
-            const parseResult = CreatePostRequestSchema.safeParse(req.body);
-            if (!parseResult.success) {
-                const response = createErrorResponse(
-                    'Invalid request body',
-                    ErrorCode.VALIDATION_ERROR,
-                    400,
-                    parseResult.error.issues
-                );
-                return res.status(400).json(response);
-            }
-
-            const data = parseResult.data;
+            const data = req.body;
 
             const post = await prisma.post.create({
                 data: {
@@ -40,42 +26,32 @@ export class PostsController {
                 }
             });
 
-            const response = createSuccessResponse(
+            res.status(201).json(createSuccessResponse(
                 post,
                 'Post created successfully',
-                201
-            );
-            res.status(201).json(response);
+                201,
+                { requestId: req.id }
+            ));
         } catch (error: any) {
             console.error('Error creating post:', error);
-            const response = createErrorResponse(
+            res.status(500).json(createErrorResponse(
                 'Failed to create post',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
-            );
-            res.status(500).json(response);
+                500,
+                undefined,
+                req.id
+            ));
         }
     }
 
     // Batch create posts (e.g. for Plans)
     async createBatch(req: Request, res: Response) {
         try {
-            const parseResult = CreateBatchPostsRequestSchema.safeParse(req.body);
-            if (!parseResult.success) {
-                const response = createErrorResponse(
-                    'Invalid request body',
-                    ErrorCode.VALIDATION_ERROR,
-                    400,
-                    parseResult.error.issues
-                );
-                return res.status(400).json(response);
-            }
-
-            const { businessId, posts } = parseResult.data;
+            const { businessId, posts } = req.body;
 
             // Use transaction to create all
             const result = await prisma.$transaction(
-                posts.map(post => prisma.post.create({
+                posts.map((post: any) => prisma.post.create({
                     data: {
                         businessId,
                         content: post.content,
@@ -87,38 +63,28 @@ export class PostsController {
                 }))
             );
 
-            const response = createSuccessResponse(
+            res.status(201).json(createSuccessResponse(
                 { count: result.length, posts: result },
                 'Posts created successfully',
-                201
-            );
-            res.status(201).json(response);
+                201,
+                { requestId: req.id }
+            ));
         } catch (error: any) {
             console.error('Error creating batch posts:', error);
-            const response = createErrorResponse(
+            res.status(500).json(createErrorResponse(
                 'Failed to create batch posts',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
-            );
-            res.status(500).json(response);
+                500,
+                undefined,
+                req.id
+            ));
         }
     }
 
     // List posts with optional filters
     async list(req: Request, res: Response) {
         try {
-            const parseResult = ListPostsQuerySchema.safeParse(req.query);
-            if (!parseResult.success) {
-                const response = createErrorResponse(
-                    'Invalid query parameters',
-                    ErrorCode.VALIDATION_ERROR,
-                    400,
-                    parseResult.error.issues
-                );
-                return res.status(400).json(response);
-            }
-
-            const query = parseResult.data;
+            const query = req.query as any;
 
             const where: any = {
                 businessId: query.businessId
@@ -139,19 +105,21 @@ export class PostsController {
                 orderBy: { scheduledAt: 'asc' }
             });
 
-            const response = createSuccessResponse(
+            res.json(createSuccessResponse(
                 { posts },
-                'Posts retrieved successfully'
-            );
-            res.json(response);
+                'Posts retrieved successfully',
+                200,
+                { requestId: req.id }
+            ));
         } catch (error: any) {
             console.error('Error listing posts:', error);
-            const response = createErrorResponse(
+            res.status(500).json(createErrorResponse(
                 'Failed to list posts',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
-            );
-            res.status(500).json(response);
+                500,
+                undefined,
+                req.id
+            ));
         }
     }
 }

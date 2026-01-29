@@ -95,14 +95,17 @@ const WebsiteConnectWizard = ({ onSuccess }: WebsiteConnectWizardProps = {}) => 
       setError(null);
       
       try {
-        const response = await apiClient.get<PaginatedResponse<BusinessDto>>('/admin/businesses', {
+        // apiClient returns { data: BusinessDto[], meta: ... } for paginated responses
+        const responseData = await apiClient.get<PaginatedResponse<BusinessDto>>('/admin/businesses', {
           params: { limit: 100 }
-        });
+        }).then(res => res.data);
         
-        setBusinesses(response.data.data || []);
+        const items = (responseData as any).data || [];
+
+        setBusinesses(items);
         
-        if (response.data.data && response.data.data.length > 0) {
-          setSelectedBusinessId(response.data.data[0].id);
+        if (items.length > 0) {
+          setSelectedBusinessId(items[0].id);
         }
       } catch (err: any) {
         setError(err.message || 'Failed to fetch businesses.');
