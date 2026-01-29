@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -146,7 +147,6 @@ const OverviewPage = () => {
         <InsightsCard
           insights={[
             { id: '1', title: 'Your local visibility has increased by 18% this month', description: 'Consider investing more in local SEO strategies.', severity: 'success', icon: <Icon icon="tabler-bulb" fontSize={20} /> },
-            { id: '2', title: 'Content activity is below average for your industry', description: 'Recommended: Publish 2-3 more pieces per week.', severity: 'warning', icon: <Icon icon="tabler-alert-triangle" fontSize={20} /> },
             { id: '3', title: 'Review sentiment is trending positively', description: 'Great job! Keep up the customer engagement.', severity: 'success', icon: <Icon icon="tabler-star" fontSize={20} /> },
           ]}
         />
@@ -155,7 +155,6 @@ const OverviewPage = () => {
         <ActivityFeed
           activities={[
             { id: '1', title: 'New review received', timeAgo: '2 hours ago', type: 'review', tag: '+5 stars', tagColor: 'primary' },
-            { id: '2', title: 'Content published', timeAgo: '5 hours ago', type: 'content', tag: 'Blog', tagColor: 'info' },
             { id: '3', title: 'Competitor added', timeAgo: '1 day ago', type: 'competitor', tag: 'New', tagColor: 'default' },
             { id: '4', title: 'Visibility score updated', timeAgo: '1 day ago', type: 'system', tag: '+12%', tagColor: 'primary' },
           ]}

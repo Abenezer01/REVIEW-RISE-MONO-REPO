@@ -50,9 +50,33 @@ export class ContentStudioService {
         return llmService.generateJSON(prompt);
     }
 
-    async generate30DayPlan(topic: string, businessType: string) {
-        const prompt = `Create a 30-day social media content calendar for a ${businessType} focusing on "${topic}".
-        Return JSON with a "days" array. Each day should have: "day" (1-30), "topic", "contentType" (Reel, Post, Carousel, etc.), "platform".`;
+    async generate30DayPlan(topic: string, businessType: string, context?: any) {
+        const brandDNA = context?.brandDNA || {};
+        const audience = brandDNA.audience || 'General Public';
+        const voice = brandDNA.voice || 'Professional and engaging';
+        const mission = brandDNA.mission || '';
+
+        const prompt = `You are a world-class social media strategist. Create a high-converting 30-day social media content calendar for a ${businessType} focusing on the theme: "${topic}".
+        
+        Brand Context:
+        - Target Audience: ${audience}
+        - Brand Voice/Tone: ${voice}
+        ${mission ? `- Brand Mission: ${mission}` : ''}
+        
+        Strategic Guidelines:
+        - Mix content types (Educational, Entertaining, Inspirational, Promotional).
+        - Ensure a logical flow that builds trust and authority over the 30 days.
+        - Each post should feel authentic to the brand voice.
+        - Use hooks that stop the scroll for the specific target audience.
+
+        Return JSON with a "days" array. Each day should have:
+        - "day": (integer 1-30)
+        - "topic": (A catchy title for the post)
+        - "contentType": (e.g., "Reel", "Carousel", "Single Post", "Story", "Educational Thread")
+        - "platform": (e.g., "Instagram", "Facebook", "LinkedIn", "X")
+        - "contentIdea": (A detailed description of the post concept)
+        - "suggestedCopy": (A draft of the actual caption or script including emojis and relevant hooks)
+        `;
 
         return llmService.generateJSON(prompt);
     }
@@ -97,6 +121,33 @@ Example format:
     }
   ]
 }`;
+
+        return llmService.generateJSON(prompt);
+    }
+
+    async adaptContent(template: string, context: any) {
+        const { businessName, industry, audience, voice, mission, seasonalHook, seasonalDescription } = context;
+
+        const prompt = `You are a social media copywriter. Adapt the following content template for a specific brand.
+
+Brand: ${businessName}
+Industry: ${industry}
+Target Audience: ${audience || 'General'}
+Brand Voice: ${voice || 'Professional'}
+Brand Mission: ${mission || ''}
+${seasonalHook ? `Seasonal Event: ${seasonalHook} (${seasonalDescription || ''})` : ''}
+
+Template: "${template}"
+
+Guidelines:
+- Maintain the core message of the template.
+- Inject the brand's personality and voice.
+- Make it highly relevant to the target audience.
+- If there is a seasonal hook, integrate it naturally.
+- Keep the length appropriate for social media.
+- Include 1-3 relevant emojis.
+
+Return a JSON object: { "adaptedText": "Your adapted caption here" }`;
 
         return llmService.generateJSON(prompt);
     }
