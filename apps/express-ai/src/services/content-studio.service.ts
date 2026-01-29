@@ -10,17 +10,23 @@ export class ContentStudioService {
     private async getBrandContext(businessId?: string) {
         if (!businessId) return null;
 
-        const brandDNA = await prisma.brandDNA.findUnique({
-            where: { businessId }
-        });
-
-        if (!brandDNA) return null;
+        // Fetch both business info and brand DNA
+        const [business, brandDNA] = await Promise.all([
+            prisma.business.findUnique({
+                where: { id: businessId },
+                select: { name: true }
+            }),
+            prisma.brandDNA.findUnique({
+                where: { businessId }
+            })
+        ]);
 
         return {
-            voice: brandDNA.voice,
-            values: brandDNA.values,
-            mission: brandDNA.mission,
-            audience: brandDNA.audience
+            businessName: business?.name || null,
+            voice: brandDNA?.voice || null,
+            values: brandDNA?.values || null,
+            mission: brandDNA?.mission || null,
+            audience: brandDNA?.audience || null
         };
     }
 
@@ -29,6 +35,7 @@ export class ContentStudioService {
         if (!brandContext) return '';
 
         const parts = [];
+        if (brandContext.businessName) parts.push(`- Business Name: ${brandContext.businessName}`);
         if (brandContext.voice) parts.push(`- Brand Voice: ${brandContext.voice}`);
         if (brandContext.values?.length) parts.push(`- Core Values: ${brandContext.values.join(', ')}`);
         if (brandContext.mission) parts.push(`- Mission: ${brandContext.mission}`);
@@ -63,8 +70,9 @@ export class ContentStudioService {
         return llmService.generateJSON(prompt);
     }
 
-    async generate30DayPlan(topic: string, businessType: string) {
-        const prompt = PROMPTS.PLAN.GENERATE_30DAY(topic, businessType);
+    async generate30DayPlan(topic: string, businessType: string, context?: any) {
+        const prompt = PROMPTS.PLAN.GENERATE_30DAY(topic, businessType, context);
+
         return llmService.generateJSON(prompt);
     }
 
@@ -75,6 +83,33 @@ export class ContentStudioService {
 
     async generatePromptIdeas(topic: string, category?: string, mood?: string, style?: string) {
         const prompt = PROMPTS.IMAGE.GENERATE_IDEAS(topic, category, mood, style);
+        return llmService.generateJSON(prompt);
+    }
+
+    async adaptContent(template: string, context: any) {
+        const { businessName, industry, audience, voice, mission, seasonalHook, seasonalDescription } = context;
+
+        const prompt = `You are a social media copywriter. Adapt the following content template for a specific brand.
+
+Brand: ${businessName}
+Industry: ${industry}
+Target Audience: ${audience || 'General'}
+Brand Voice: ${voice || 'Professional'}
+Brand Mission: ${mission || ''}
+${seasonalHook ? `Seasonal Event: ${seasonalHook} (${seasonalDescription || ''})` : ''}
+
+Template: "${template}"
+
+Guidelines:
+- Maintain the core message of the template.
+- Inject the brand's personality and voice.
+- Make it highly relevant to the target audience.
+- If there is a seasonal hook, integrate it naturally.
+- Keep the length appropriate for social media.
+- Include 1-3 relevant emojis.
+
+Return a JSON object: { "adaptedText": "Your adapted caption here" }`;
+
         return llmService.generateJSON(prompt);
     }
 

@@ -67,6 +67,46 @@ export class BrandStrategistService {
         const parsed = JSON.parse(content);
         return VisibilityPlanSchema.parse(parsed);
     }
+
+    async generateTone(context: {
+        businessName: string,
+        industry?: string,
+        location?: string,
+        extractedData?: any
+    }) {
+        const prompt = `
+        You are a world-class brand strategist. Based on the following information, generate a comprehensive brand tone of voice and messaging strategy.
+        
+        Business Name: ${context.businessName}
+        Industry: ${context.industry || 'Not specified'}
+        Location: ${context.location || 'Not specified'}
+        Extracted Data: ${JSON.stringify(context.extractedData || {})}
+        
+        Please provide the following in JSON format:
+        1. descriptors: An array of 4-5 adjectives describing the brand's tone (e.g., "Professional", "Friendly").
+        2. writingRules: An object with "do" and "dont" arrays, each containing 4 specific writing guidelines.
+        3. taglines: An array of 5 creative taglines for the brand.
+        4. messagingPillars: An array of 3 objects, each with "pillar" (title), "description" (1-2 sentences), and "ctas" (array of 2 call-to-actions).
+        
+        Return ONLY the JSON object.
+        `;
+
+        const content = await this.callAI(prompt);
+        if (!content) throw new Error('No response from AI');
+
+        try {
+            return JSON.parse(content);
+        } catch {
+            console.error('Failed to parse AI response:', content);
+            // Attempt to clean markdown if LLM failed to return pure JSON
+            const cleaned = content.replace(/```json\n?|\n?```/g, '').trim();
+            try {
+                return JSON.parse(cleaned);
+            } catch {
+                throw new Error('Invalid JSON response from AI');
+            }
+        }
+    }
 }
 
 export const brandStrategist = new BrandStrategistService();

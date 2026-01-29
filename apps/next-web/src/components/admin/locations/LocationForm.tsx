@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 'use client'
 
 import { useMemo } from 'react'
@@ -88,12 +89,12 @@ const LocationForm = ({ initialData, isEdit = false, onCancel, onSuccess }: Loca
         const { data } = payload
 
         if (isEdit && initialData?.id) {
-            const res = await apiClient.patch(`/admin/locations/${initialData.id}`, data)
+            const res = await apiClient.patch(`/api/admin/locations/${initialData.id}`, data)
 
 
             return res.data
         } else {
-            const res = await apiClient.post('/admin/locations', data)
+            const res = await apiClient.post('/api/admin/locations', data)
 
 
             return res.data
@@ -139,7 +140,7 @@ const LocationForm = ({ initialData, isEdit = false, onCancel, onSuccess }: Loca
                         <FormBackendAutocomplete
                             label={t('locations.form.businessId')}
                             name='businessId'
-                            endpoint='/admin/businesses'
+                            endpoint='/api/admin/businesses'
                             placeholder={t('locations.form.businessId')}
                             disabled={isEdit}
                             initialObject={initialData ? (initialData as any).business : null}

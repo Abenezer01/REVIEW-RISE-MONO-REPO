@@ -7,6 +7,7 @@ import contentRoutes from './content.routes';
 import scheduledPostsRoutes from './scheduled-posts.routes';
 import reviewRoutes from './review.routes';
 import brandProfileRoutes from './brand-profile.routes';
+import plannerRoutes from './planner.routes';
 import studioDraftsRoutes from './studio-drafts.routes';
 
 import recommendationsRoutes from './recommendations.routes';
@@ -23,6 +24,7 @@ router.use('/brands/:id/dna', dnaRoutes);
 router.use('/brands/:id/content', contentRoutes);
 router.use('/brands/:id/scheduling', scheduledPostsRoutes);
 router.use('/brands/:id/reviews', reviewRoutes);
+router.use('/brands/:id/planner', plannerRoutes);
 router.use('/brands/:id', studioDraftsRoutes); // studio drafts
 router.use('/brand-profiles', brandProfileRoutes);
 

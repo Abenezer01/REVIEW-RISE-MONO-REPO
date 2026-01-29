@@ -46,7 +46,11 @@ const TEMPLATES = [
     { label: 'Educational Tips', sub: 'Share valuable insights', icon: 'tabler-school' },
 ]
 
-export default function UnifiedPostGenerator() {
+interface UnifiedPostGeneratorProps {
+    initialDate?: string | null
+}
+
+export default function UnifiedPostGenerator({ initialDate }: UnifiedPostGeneratorProps) {
     const [loading, setLoading] = useState(false)
     
     // Inputs
@@ -106,7 +110,7 @@ return
                 >
                     Back to Studio
                 </Button>
-                <UnifiedResults data={result} />
+                <UnifiedResults data={result} initialDate={initialDate} />
             </Box>
         )
     }

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 'use client'
 
 import React from 'react'
@@ -11,7 +12,7 @@ interface LocationListSearchProps {
 const LocationListSearch: React.FC<LocationListSearchProps> = ({ onSearch }) => {
     return (
         <BackendAutocomplete
-            endpoint='/admin/locations'
+            endpoint='/api/admin/locations'
             label=''
             placeholder='Search Location'
             optionLabel='name'

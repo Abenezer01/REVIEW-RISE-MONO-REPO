@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
@@ -34,7 +35,7 @@ const BusinessAutocomplete: React.FC<BusinessAutocompleteProps> = ({ name, label
                 setLoading(true)
 
                 try {
-                    const response = await apiClient.get<PaginatedResponse<BusinessDto>>('/admin/businesses', {
+                    const response = await apiClient.get<PaginatedResponse<BusinessDto>>('/api/admin/businesses', {
                         params: { search, limit: 20 }
                     })
 

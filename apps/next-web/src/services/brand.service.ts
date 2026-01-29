@@ -97,7 +97,7 @@ export const BrandService = {
 
     if (locationId) params.locationId = locationId;
 
-    const response = await apiClient.get<{ data: Competitor[] }>(`/api/v1/brands/${businessId}/competitors`, { params });
+    const response = await apiClient.get<{ data: Competitor[] }>(`/api/brands/${businessId}/competitors`, { params });
 
     return response.data.data || [];
   },
@@ -204,9 +204,16 @@ export const BrandService = {
 
     if (locationId) params.locationId = locationId;
 
-    const response = await apiClient.get<{ data: ScheduledPost[] }>(`/api/brands/${businessId}/scheduling`, { params });
+    const response = await apiClient.get<{ data: any[] }>(`/api/brands/${businessId}/scheduling`, { params });
 
-    return response.data.data || [];
+    // Normalize data structure to match ScheduledPost interface
+    return (response.data.data || []).map(post => ({
+        ...post,
+        // Ensure platforms is an array, defaulting to [platform] if platforms is missing
+        platforms: post.platforms || (post.platform ? [post.platform.toUpperCase()] : []),
+        // Ensure legacy platform field is also uppercase if needed
+        platform: post.platform ? post.platform.toUpperCase() : undefined
+    })) as ScheduledPost[];
   },
 
   getScheduledPost: async (businessId: string, postId: string) => {
@@ -244,7 +251,7 @@ export const BrandService = {
     status?: string;
     locationId?: string;
   }) => {
-    const response = await apiClient.get<{ data: PublishingLog[] }>(`/api/v1/brands/${businessId}/scheduling/logs`, { params });
+    const response = await apiClient.get<{ data: PublishingLog[] }>(`/api/brands/${businessId}/scheduling/logs`, { params });
 
     return response.data.data || [];
   },
@@ -341,9 +348,77 @@ export const BrandService = {
 
     if (locationId) params.locationId = locationId;
 
-    const response = await apiClient.get<{ data: Job[] }>(`/api/brands/${businessId}/jobs`, { params });
+    const response = await apiClient.get<{ data: any[] }>(`/api/brands/${businessId}/jobs`, { params });
 
     return response.data.data || [];
+  },
+
+  // Planner
+  getMonthlyPlan: async (businessId: string, month: number, year: number, locationId?: string | null) => {
+    const params: any = { month, year };
+
+    if (locationId) params.locationId = locationId;
+
+    const response = await apiClient.get<{ data: any }>(`/api/brands/${businessId}/planner/plan`, { params });
+
+    return response.data.data;
+  },
+
+  generateMonthlyPlan: async (businessId: string, data: any) => {
+    const response = await apiClient.post<{ data: any }>(`/api/brands/${businessId}/planner/generate`, data);
+
+    return response.data.data;
+  },
+
+  convertPlanToDrafts: async (businessId: string, planId: string, locationId?: string | null) => {
+    const params = locationId ? { locationId } : {};
+    const response = await apiClient.post<{ data: any }>(`/api/brands/${businessId}/planner/convert/${planId}`, {}, { params });
+
+    return response.data.data;
+  },
+
+  listPlannerTemplates: async (businessId: string, industry?: string) => {
+    const response = await apiClient.get<{ data: any[] }>(`/api/brands/${businessId}/planner/templates`, { params: { industry } });
+
+    return response.data.data;
+  },
+
+  createPlannerTemplate: async (businessId: string, data: any) => {
+    const response = await apiClient.post<{ data: any }>(`/api/brands/${businessId}/planner/templates`, data);
+
+    return response.data.data;
+  },
+
+  updatePlannerTemplate: async (businessId: string, templateId: string, data: any) => {
+    const response = await apiClient.patch<{ data: any }>(`/api/brands/${businessId}/planner/templates/${templateId}`, data);
+
+    return response.data.data;
+  },
+
+  deletePlannerTemplate: async (businessId: string, templateId: string) => {
+    await apiClient.delete(`/api/brands/${businessId}/planner/templates/${templateId}`);
+  },
+
+  listPlannerEvents: async (businessId: string, month?: number, year?: number) => {
+    const response = await apiClient.get<{ data: any[] }>(`/api/brands/${businessId}/planner/events`, { params: { month, year } });
+
+    return response.data.data;
+  },
+
+  createPlannerEvent: async (businessId: string, data: any) => {
+    const response = await apiClient.post<{ data: any }>(`/api/brands/${businessId}/planner/events`, data);
+
+    return response.data.data;
+  },
+
+  updatePlannerEvent: async (businessId: string, eventId: string, data: any) => {
+    const response = await apiClient.patch<{ data: any }>(`/api/brands/${businessId}/planner/events/${eventId}`, data);
+
+    return response.data.data;
+  },
+
+  deletePlannerEvent: async (businessId: string, eventId: string) => {
+    await apiClient.delete(`/api/brands/${businessId}/planner/events/${eventId}`);
   },
 };
 

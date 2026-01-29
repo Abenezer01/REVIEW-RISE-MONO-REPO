@@ -9,9 +9,29 @@ import { useTranslations } from 'next-intl'
 
 import UnifiedPostGenerator from '@/components/studio/UnifiedPostGenerator'
 
+import { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+
+function SmartCreateContent() {
+    const t = useTranslations('studio')
+    
+    // Read query params safely inside client component
+    const searchParams = useSearchParams()
+    const dateParam = searchParams.get('date')
+
+    return (
+        <Box>
+            <Typography variant="h4" mb={1}>{t('tabs.magic')}</Typography>
+            <Typography variant="body1" color="text.secondary" mb={4}>
+                {t('magic.subtitle')}
+            </Typography>
+            <UnifiedPostGenerator initialDate={dateParam} />
+        </Box>
+    )
+}
+
 export default function SmartCreatePage() {
     const router = useRouter()
-    const t = useTranslations('studio')
 
     return (
         <Grid container spacing={4}>
@@ -24,13 +44,9 @@ export default function SmartCreatePage() {
                     Back to Studio
                 </Button>
                 
-                <Box>
-                    <Typography variant="h4" mb={1}>{t('tabs.magic')}</Typography>
-                    <Typography variant="body1" color="text.secondary" mb={4}>
-                        {t('magic.subtitle')}
-                    </Typography>
-                    <UnifiedPostGenerator />
-                </Box>
+                <Suspense fallback={<Box>Loading...</Box>}>
+                    <SmartCreateContent />
+                </Suspense>
             </Grid>
         </Grid>
     )

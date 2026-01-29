@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -41,6 +42,10 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ route: st
         });
 
         // Handle response
+        if (response.status === 204) {
+            return new NextResponse(null, { status: 204 });
+        }
+
         const text = await response.text();
         let data;
 

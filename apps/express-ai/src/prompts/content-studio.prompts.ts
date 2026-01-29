@@ -87,34 +87,34 @@ Return valid JSON with this structure:
     },
 
     PLAN: {
-        GENERATE_30DAY: (topic: string, businessType: string) => `You are a social media content strategist.
+    GENERATE_30DAY: (topic: string, businessType: string, context?: any) => {
+            const brandDNA = context?.brandDNA || {};
+            const audience = brandDNA.audience || 'General Public';
+            const voice = brandDNA.voice || 'Professional and engaging';
+            const mission = brandDNA.mission || '';
 
-TASK: Create a comprehensive 30-day content calendar.
+            return `You are a world-class social media strategist. Create a high-converting 30-day social media content calendar for a ${businessType} focusing on the theme: "${topic}".
+        
+        Brand Context:
+        - Target Audience: ${audience}
+        - Brand Voice/Tone: ${voice}
+        ${mission ? `- Brand Mission: ${mission}` : ''}
+        
+        Strategic Guidelines:
+        - Mix content types (Educational, Entertaining, Inspirational, Promotional).
+        - Ensure a logical flow that builds trust and authority over the 30 days.
+        - Each post should feel authentic to the brand voice.
+        - Use hooks that stop the scroll for the specific target audience.
 
-CONTEXT:
-- Business Type: ${businessType}
-- Focus Topic: "${topic}"
-
-REQUIREMENTS:
-- Plan exactly 30 days of content
-- Vary content types (Reels, Posts, Carousels, Stories, etc.)
-- Ensure strategic distribution across platforms
-- Create a cohesive narrative throughout the month
-- Balance educational, entertaining, and promotional content
-
-OUTPUT FORMAT:
-Return valid JSON with this structure:
-{
-  "days": [
-    {
-      "day": 1,
-      "topic": "Post topic",
-      "contentType": "Reel/Post/Carousel/etc.",
-      "platform": "Platform name"
+        Return JSON with a "days" array. Each day should have:
+        - "day": (integer 1-30)
+        - "topic": (A catchy title for the post)
+        - "contentType": (e.g., "Reel", "Carousel", "Single Post", "Story", "Educational Thread")
+        - "platform": (e.g., "Instagram", "Facebook", "LinkedIn", "X")
+        - "contentIdea": (A detailed description of the post concept)
+        - "suggestedCopy": (A draft of the actual caption or script including emojis and relevant hooks)
+        `;
     },
-    ...
-  ]
-}`
     },
 
     IMAGE: {

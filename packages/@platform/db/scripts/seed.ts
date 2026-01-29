@@ -781,6 +781,89 @@ async function main() {
     });
 
     console.log(`✅ Created 2 sample reviews\n`);
+    
+    // 12. Create Content Templates (Task 4.1)
+    console.log('📝 Creating content templates...');
+    const industries = ['Local Restaurant', 'Salon', 'Agency', 'Real Estate'];
+    
+    const templates = [
+        // Local Restaurant
+        { industry: 'Local Restaurant', title: 'Menu Spotlight', contentType: 'image', content: 'Check out our delicious [Dish Name]! Made fresh daily with local ingredients. #LocalEats #Foodie' },
+        { industry: 'Local Restaurant', title: 'Behind the Scenes', contentType: 'video', content: 'Meet our chef and see how we prepare your favorite dishes! #KitchenLife #ChefSpotlight' },
+        { industry: 'Local Restaurant', title: 'Customer Favorite', contentType: 'image', content: 'Our customers can\'t get enough of [Popular Dish]. Come try it today! #CustomerLove #TopPick' },
+        { industry: 'Local Restaurant', title: 'Special Offer', contentType: 'image', content: 'Limited time offer! Get 20% off your next meal when you mention this post. #DiningDeal #LocalBiz' },
+        
+        // Salon
+        { industry: 'Salon', title: 'Transformation Tuesday', contentType: 'image', content: 'Check out this amazing hair transformation! Book your appointment today. #HairGoals #SalonLife' },
+        { industry: 'Salon', title: 'Product Recommendation', contentType: 'image', content: 'Keep your hair looking fresh with [Product Name]. Now available in-store! #HairCare #BeautyTips' },
+        { industry: 'Salon', title: 'Stylist Spotlight', contentType: 'video', content: 'Meet [Stylist Name], our expert in [Specialty]. #StylistLife #ExpertAdvice' },
+        { industry: 'Salon', title: 'New Service Alert', contentType: 'image', content: 'We are now offering [New Service]! Treat yourself to some pampering. #NewService #PamperDay' },
+        
+        // Agency
+        { industry: 'Agency', title: 'Case Study', contentType: 'carousel', content: 'How we helped [Client Name] achieve [Result]. Swipe to see the details! #SuccessStory #MarketingAgency' },
+        { industry: 'Agency', title: 'Expert Tip', contentType: 'image', content: 'Want to improve your [Metric]? Here is a quick tip from our experts. #MarketingTips #ExpertAdvice' },
+        { industry: 'Agency', title: 'Industry News', contentType: 'image', content: 'Stay ahead of the curve! Here is what you need to know about [Industry Trend]. #IndustryTrends #AgencyInsights' },
+        { industry: 'Agency', title: 'Meet the Team', contentType: 'video', content: 'Get to know the faces behind the magic at [Agency Name]. #TeamSpotlight #AgencyLife' },
+        
+        // Real Estate
+        { industry: 'Real Estate', title: 'New Listing', contentType: 'carousel', content: 'Check out this stunning new listing in [Neighborhood]! 3 bed, 2 bath, and a beautiful backyard. #NewListing #HomeForSale' },
+        { industry: 'Real Estate', title: 'Open House', contentType: 'image', content: 'Join us this Saturday for an open house at [Address]. See you there! #OpenHouse #RealEstate' },
+        { industry: 'Real Estate', title: 'Market Update', contentType: 'image', content: 'The market in [City] is heating up! Here is the latest update for buyers and sellers. #MarketUpdate #RealEstateNews' },
+        { industry: 'Real Estate', title: 'Home Maintenance Tip', contentType: 'image', content: 'Keep your home in top shape with these quick maintenance tips. #HomeTips #RealEstateExpert' }
+    ];
+
+    for (const t of templates) {
+        const existing = await (prisma as any).contentTemplate.findFirst({
+            where: { 
+                industry: t.industry, 
+                title: t.title 
+            }
+        });
+
+        if (!existing) {
+            await (prisma as any).contentTemplate.create({
+                data: {
+                    industry: t.industry,
+                    title: t.title,
+                    contentType: t.contentType,
+                    content: t.content,
+                    objective: 'Engagement'
+                }
+            });
+        }
+    }
+    console.log(`✅ Created ${templates.length} content templates\n`);
+
+    // 13. Create Seasonal Events (Task 4.1)
+    console.log('📅 Creating seasonal events...');
+    const events = [
+        { name: 'Valentine\'s Day', date: new Date(2026, 1, 14), market: 'Global', description: 'Celebration of love and affection.', tags: ['love', 'romance', 'gifts'] },
+        { name: 'President\'s Day', date: new Date(2026, 1, 16), market: 'US', description: 'Honoring US Presidents.', tags: ['holiday', 'history', 'usa'] },
+        { name: 'St. Patrick\'s Day', date: new Date(2026, 2, 17), market: 'Global', description: 'Celebration of Irish culture.', tags: ['irish', 'green', 'culture'] },
+        { name: 'First Day of Spring', date: new Date(2026, 2, 20), market: 'Northern Hemisphere', description: 'Vernal equinox.', tags: ['spring', 'nature', 'renewal'] }
+    ];
+
+    for (const e of events) {
+        const existing = await (prisma as any).seasonalEvent.findFirst({
+            where: { 
+                name: e.name, 
+                date: e.date 
+            }
+        });
+
+        if (!existing) {
+            await (prisma as any).seasonalEvent.create({
+                data: {
+                    name: e.name,
+                    date: e.date,
+                    market: e.market,
+                    description: e.description,
+                    tags: e.tags
+                }
+            });
+        }
+    }
+    console.log(`✅ Created ${events.length} seasonal events\n`);
 
     console.log('✨ Seed completed successfully!\n');
     console.log('Summary:');
