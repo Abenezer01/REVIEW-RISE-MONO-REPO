@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { Box, Card, CardContent, Typography, IconButton, Tooltip } from '@mui/material'
 
 interface ContentIdeasCardProps {

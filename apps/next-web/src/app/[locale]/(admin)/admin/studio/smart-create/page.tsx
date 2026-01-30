@@ -1,16 +1,14 @@
 'use client'
 
-import React from 'react'
+import React, { Suspense } from 'react'
 
-import { useRouter } from 'next/navigation'
+import { useRouter , useSearchParams } from 'next/navigation'
 
 import { Box, Button, Typography, Grid } from '@mui/material'
 import { useTranslations } from 'next-intl'
 
 import UnifiedPostGenerator from '@/components/studio/UnifiedPostGenerator'
 
-import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
 
 function SmartCreateContent() {
     const t = useTranslations('studio')

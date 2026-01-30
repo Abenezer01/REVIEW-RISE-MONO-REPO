@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import Box from '@mui/material/Box';
@@ -203,6 +204,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
   const handleSmartStudio = () => {
       const date = formData.scheduledAt || new Date();
       const dateStr = date.toISOString().split('T')[0];
+
       router.push(`/admin/studio/smart-create?date=${dateStr}`);
   };
 

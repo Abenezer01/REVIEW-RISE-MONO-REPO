@@ -32,14 +32,19 @@ export default function SchedulePostDialog({ open, onClose, onSchedule, initialD
             
             // datetime-local input expects local time string, but toISOString() is UTC.
             const localIso = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16)
-            return localIso
+
+            
+return localIso
         }
 
         const d = new Date()
+
         d.setDate(d.getDate() + 1)
         d.setHours(9, 0, 0, 0)
         const localIso = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16)
-        return localIso
+
+        
+return localIso
     }
 
     const [scheduleDate, setScheduleDate] = useState(getDefaultDate(initialDate))

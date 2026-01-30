@@ -209,8 +209,10 @@ export const BrandService = {
     // Normalize data structure to match ScheduledPost interface
     return (response.data.data || []).map(post => ({
         ...post,
+
         // Ensure platforms is an array, defaulting to [platform] if platforms is missing
         platforms: post.platforms || (post.platform ? [post.platform.toUpperCase()] : []),
+
         // Ensure legacy platform field is also uppercase if needed
         platform: post.platform ? post.platform.toUpperCase() : undefined
     })) as ScheduledPost[];

@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { Box, Card, CardContent, Typography, Chip, Stack, IconButton, Tooltip } from '@mui/material'
 import { toast } from 'react-toastify'
 
@@ -15,7 +16,9 @@ interface HashtagsCardProps {
 export default function HashtagsCard({ hashtags, onUseHashtags }: HashtagsCardProps) {
     const getAllHashtags = () => {
         const { highVolume = [], niche = [], branded = [] } = hashtags
-        return [...highVolume, ...niche, ...branded].join(' ')
+
+        
+return [...highVolume, ...niche, ...branded].join(' ')
     }
 
     const copyToClipboard = (text: string) => {
