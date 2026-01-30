@@ -25,7 +25,7 @@ import KeywordRankChart from './KeywordRankChart';
 import { SERVICES } from '@/configs/services';
 import apiClient from '@/lib/apiClient';
 
-const API_URL = SERVICES.ai.url.replace('/ai', '/seo-health'); // Adjusting if needed, but let's assume it matches backend
+const API_URL = SERVICES.seo.url;
 
 const VisibilityDashboard = () => {
   const { user } = useAuth();

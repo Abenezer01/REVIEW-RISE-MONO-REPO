@@ -47,7 +47,7 @@ const LocationDropdown = () => {
   const { locationId, setLocationId } = useLocationFilter()
 
   // Derived state for display
-  const selectedLocation = locations.find(l => String(l.id) === locationId) || null
+  const selectedLocation = locationId ? locations.find(l => String(l.id) === locationId) || null : null
 
   // Set default location from user profile if not set in URL
   const { user } = useAuth()
@@ -67,7 +67,7 @@ const LocationDropdown = () => {
       setLoading(true)
 
       // Use apiClient (auto-unwraps data field)
-      const response = await apiClient.get<Location[]>(`${SERVICES.admin.url}/locations`, {
+      const response = await apiClient.get<{ data: Location[] }>(`${SERVICES.admin.url}/locations`, {
         params: {
           limit: 10,
           status: 'active',
@@ -76,7 +76,7 @@ const LocationDropdown = () => {
       })
 
       if (response.data) {
-        setLocations(response.data)
+        setLocations(response.data.data)
       }
     } catch (error) {
       console.error('Failed to fetch locations', error)
