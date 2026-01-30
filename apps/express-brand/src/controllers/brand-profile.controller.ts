@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+import { createSuccessResponse, createPaginatedResponse, createErrorResponse, ErrorCode } from '@platform/contracts'
 import * as brandProfileService from '../services/brand-profile.service'
 
 export const getAllBrandProfiles = async (req: Request, res: Response, next: NextFunction) => {
@@ -13,7 +14,18 @@ export const getAllBrandProfiles = async (req: Request, res: Response, next: Nex
       status: status as string
     })
 
-    res.status(200).json(result)
+    const response = createPaginatedResponse(
+      result.data,
+      {
+        page: result.meta.page,
+        limit: result.meta.limit,
+        total: result.meta.total
+      },
+      'Brand profiles retrieved successfully',
+      200,
+      { requestId: req.id }
+    )
+    res.status(response.statusCode).json(response)
   } catch (error) {
     next(error)
   }
@@ -23,7 +35,13 @@ export const onboardBrandProfile = async (req: Request, res: Response, next: Nex
   try {
     const { websiteUrl, businessId } = req.body
     const brandProfile = await brandProfileService.onboardBrandProfile(businessId, websiteUrl)
-    res.status(202).json({ message: 'Extraction initiated', brandProfileId: brandProfile.id })
+    const response = createSuccessResponse(
+      { brandProfileId: brandProfile.id },
+      'Extraction initiated',
+      202,
+      { requestId: req.id }
+    )
+    res.status(response.statusCode).json(response)
   } catch (error) {
     next(error)
   }
@@ -34,9 +52,11 @@ export const getBrandProfile = async (req: Request, res: Response, next: NextFun
     const { id } = req.params
     const brandProfile = await brandProfileService.getBrandProfile(id)
     if (!brandProfile) {
-      return res.status(404).json({ message: 'Brand profile not found' })
+      const response = createErrorResponse('Brand profile not found', ErrorCode.NOT_FOUND, 404, null, req.id)
+      return res.status(response.statusCode).json(response)
     }
-    res.status(200).json(brandProfile)
+    const response = createSuccessResponse(brandProfile, 'Brand profile retrieved successfully', 200, { requestId: req.id })
+    res.status(response.statusCode).json(response)
   } catch (error) {
     next(error)
   }
@@ -48,9 +68,11 @@ export const updateBrandProfile = async (req: Request, res: Response, next: Next
     const updatedData = req.body
     const brandProfile = await brandProfileService.updateBrandProfile(id, updatedData)
     if (!brandProfile) {
-      return res.status(404).json({ message: 'Brand profile not found' })
+      const response = createErrorResponse('Brand profile not found', ErrorCode.NOT_FOUND, 404, null, req.id)
+      return res.status(response.statusCode).json(response)
     }
-    res.status(200).json(brandProfile)
+    const response = createSuccessResponse(brandProfile, 'Brand profile updated successfully', 200, { requestId: req.id })
+    res.status(response.statusCode).json(response)
   } catch (error) {
     next(error)
   }
@@ -61,9 +83,16 @@ export const reExtractBrandProfile = async (req: Request, res: Response, next: N
     const { id } = req.params
     const brandProfile = await brandProfileService.reExtractBrandProfile(id)
     if (!brandProfile) {
-      return res.status(404).json({ message: 'Brand profile not found' })
+      const response = createErrorResponse('Brand profile not found', ErrorCode.NOT_FOUND, 404, null, req.id)
+      return res.status(response.statusCode).json(response)
     }
-    res.status(202).json({ message: 'Re-extraction initiated', brandProfileId: brandProfile.id })
+    const response = createSuccessResponse(
+      { brandProfileId: brandProfile.id },
+      'Re-extraction initiated',
+      202,
+      { requestId: req.id }
+    )
+    res.status(response.statusCode).json(response)
   } catch (error) {
     next(error)
   }
@@ -74,9 +103,11 @@ export const confirmBrandProfileExtraction = async (req: Request, res: Response,
     const { id } = req.params
     const brandProfile = await brandProfileService.confirmExtraction(id)
     if (!brandProfile) {
-      return res.status(404).json({ message: 'Brand profile not found' })
+      const response = createErrorResponse('Brand profile not found', ErrorCode.NOT_FOUND, 404, null, req.id)
+      return res.status(response.statusCode).json(response)
     }
-    res.status(200).json({ message: 'Extraction confirmed', brandProfile })
+    const response = createSuccessResponse(brandProfile, 'Extraction confirmed', 200, { requestId: req.id })
+    res.status(response.statusCode).json(response)
   } catch (error) {
     next(error)
   }
@@ -87,7 +118,8 @@ export const generateBrandTone = async (req: Request, res: Response, next: NextF
     const { id } = req.params
     const { industry, location } = req.body
     const toneData = await brandProfileService.generateBrandTone(id, industry, location)
-    res.status(200).json(toneData)
+    const response = createSuccessResponse(toneData, 'Brand tone generated successfully', 200, { requestId: req.id })
+    res.status(response.statusCode).json(response)
   } catch (error) {
     next(error)
   }
@@ -97,7 +129,8 @@ export const getAuditLogs = async (req: Request, res: Response, next: NextFuncti
   try {
     const { id } = req.params
     const logs = await brandProfileService.getAuditLogs(id)
-    res.status(200).json(logs)
+    const response = createSuccessResponse(logs, 'Audit logs retrieved successfully', 200, { requestId: req.id })
+    res.status(response.statusCode).json(response)
   } catch (error) {
     next(error)
   }
@@ -107,7 +140,8 @@ export const deleteBrandProfile = async (req: Request, res: Response, next: Next
   try {
     const { id } = req.params
     await brandProfileService.deleteBrandProfile(id)
-    res.status(200).json({ message: 'Brand profile deleted successfully' })
+    const response = createSuccessResponse(null, 'Brand profile deleted successfully', 200, { requestId: req.id })
+    res.status(response.statusCode).json(response)
   } catch (error) {
     next(error)
   }

@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { createErrorResponse, ErrorCode } from '@platform/contracts';
 
 import { SERVICES_CONFIG } from '@/configs/services';
 
@@ -80,7 +81,13 @@ async function proxy(req: NextRequest) {
   } catch (error) {
     console.error('Proxy error:', error);
 
-    return NextResponse.json({ error: 'Proxy error', details: String(error) }, { status: 500 });
+    const response = createErrorResponse(
+      'Proxy error',
+      ErrorCode.INTERNAL_SERVER_ERROR,
+      500,
+      String(error)
+    );
+    return NextResponse.json(response, { status: response.statusCode });
   }
 }
 

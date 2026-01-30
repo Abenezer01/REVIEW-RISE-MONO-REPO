@@ -3,7 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { createSuccessResponse } from '@platform/contracts';
-import { requestIdMiddleware } from '@platform/middleware';
+import { requestIdMiddleware, errorHandler } from '@platform/middleware';
 
 dotenv.config();
 
@@ -16,12 +16,16 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.json(createSuccessResponse(null, 'Express Ad Rise Service is running'));
+    const response = createSuccessResponse(null, 'Express Ad Rise Service is running', 200, { requestId: req.id });
+    res.status(response.statusCode).json(response);
 });
 
 app.get('/health', (req, res) => {
-    res.json(createSuccessResponse({ service: 'express-ad-rise' }, 'ok'));
+    const response = createSuccessResponse({ service: 'express-ad-rise' }, 'Service is healthy', 200, { requestId: req.id });
+    res.status(response.statusCode).json(response);
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
