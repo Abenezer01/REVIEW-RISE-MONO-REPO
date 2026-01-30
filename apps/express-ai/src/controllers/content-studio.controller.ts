@@ -181,6 +181,40 @@ export class ContentStudioController {
             res.status(500).json({ error: 'Failed to generate script' });
         }
     }
+
+    // Task 3.0: Unified Complete Post Generator
+    async generateCompletePost(req: Request, res: Response) {
+        try {
+            const schema = z.object({
+                platform: z.string(),
+                topic: z.string(),
+                tone: z.string().optional().default('professional'),
+                goal: z.string().optional().default('engagement'),
+                audience: z.string().optional().default('general'),
+                language: z.string().optional().default('English'),
+                length: z.string().optional().default('medium')
+            });
+            const { platform, topic, tone, goal, audience, language, length } = schema.parse(req.body);
+
+            // Extract businessId from authenticated request
+            const businessId = (req as any).user?.businessId;
+
+            const result = await contentStudioService.generateCompletePost(
+                platform, 
+                topic, 
+                tone, 
+                goal, 
+                audience, 
+                language, 
+                length,
+                businessId
+            );
+            res.json(result);
+        } catch (error) {
+            console.error('Error generating complete post:', error);
+            res.status(500).json({ error: 'Failed to generate complete post' });
+        }
+    }
 }
 
 export const contentStudioController = new ContentStudioController();

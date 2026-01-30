@@ -3,6 +3,8 @@
 
 import { useEffect, useState, useRef } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -56,6 +58,7 @@ const STATUS_OPTIONS = [
 
 const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, onDuplicate }: PostEditorDialogProps) => {
   const theme = useTheme();
+  const router = useRouter();
   const isDark = theme.palette.mode === 'dark';
   const [loading, setLoading] = useState(false);
 
@@ -198,6 +201,13 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
     }
   };
 
+  const handleSmartStudio = () => {
+      const date = formData.scheduledAt || new Date();
+      const dateStr = date.toISOString().split('T')[0];
+
+      router.push(`/admin/studio/smart-create?date=${dateStr}`);
+  };
+
   return (
     <Dialog 
       open={open} 
@@ -232,22 +242,35 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
             {post ? 'Refining your scheduled content for perfection' : 'Architecting a new piece of social media art'}
           </Typography>
         </Box>
-        <IconButton 
-          size="small" 
-          onClick={onClose} 
-          sx={{ 
-            color: 'text.secondary',
-            bgcolor: isDark ? alpha(theme.palette.common.white, 0.05) : alpha(theme.palette.common.black, 0.04),
-            borderRadius: '12px',
-            '&:hover': {
-              bgcolor: isDark ? alpha(theme.palette.common.white, 0.1) : alpha(theme.palette.common.black, 0.08),
-              transform: 'rotate(90deg)'
-            },
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-        >
-          <Icon icon="tabler-x" fontSize={20} />
-        </IconButton>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+            {!post && (
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<Icon icon="tabler-wand" />}
+                    onClick={handleSmartStudio}
+                    sx={{ borderRadius: '12px', textTransform: 'none', fontWeight: 600 }}
+                >
+                    Use Smart Studio
+                </Button>
+            )}
+            <IconButton 
+            size="small" 
+            onClick={onClose} 
+            sx={{ 
+                color: 'text.secondary',
+                bgcolor: isDark ? alpha(theme.palette.common.white, 0.05) : alpha(theme.palette.common.black, 0.04),
+                borderRadius: '12px',
+                '&:hover': {
+                bgcolor: isDark ? alpha(theme.palette.common.white, 0.1) : alpha(theme.palette.common.black, 0.08),
+                transform: 'rotate(90deg)'
+                },
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}
+            >
+            <Icon icon="tabler-x" fontSize={20} />
+            </IconButton>
+        </Box>
       </DialogTitle>
       
       <DialogContent sx={{ px: { xs: 6, md: 10 }, py: 8 }}>

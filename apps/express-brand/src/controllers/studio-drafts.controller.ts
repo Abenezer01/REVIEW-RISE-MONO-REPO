@@ -3,7 +3,7 @@ import { prisma } from '@platform/db';
 import { z } from 'zod';
 
 export class StudioDraftsController {
-    
+
     // Save Caption Drafts (bulk)
     async saveCaptionDrafts(req: Request, res: Response) {
         try {
@@ -31,14 +31,14 @@ export class StudioDraftsController {
                 )
             );
 
-            res.status(201).json({ 
-                count: drafts.length, 
-                message: 'Caption drafts saved successfully' 
+            res.status(201).json({
+                count: drafts.length,
+                message: 'Caption drafts saved successfully'
             });
         } catch (error: any) {
             console.error('Error saving caption drafts:', error);
             if (error instanceof z.ZodError) {
-                res.status(400).json({ error: 'Validation failed', details: error.errors });
+                res.status(400).json({ error: 'Validation failed', details: error });
             } else {
                 res.status(500).json({ error: 'Failed to save caption drafts' });
             }
@@ -103,7 +103,7 @@ export class StudioDraftsController {
         } catch (error: any) {
             console.error('Error saving content ideas:', error);
             if (error instanceof z.ZodError) {
-                res.status(400).json({ error: 'Validation failed', details: error.errors });
+                res.status(400).json({ error: 'Validation failed', details: error });
             } else {
                 res.status(500).json({ error: 'Failed to save content ideas' });
             }
@@ -176,7 +176,7 @@ export class StudioDraftsController {
         } catch (error: any) {
             console.error('Error saving image prompt:', error);
             if (error instanceof z.ZodError) {
-                res.status(400).json({ error: 'Validation failed', details: error.errors });
+                res.status(400).json({ error: 'Validation failed', details: error });
             } else {
                 res.status(500).json({ error: 'Failed to save image prompt' });
             }
@@ -211,7 +211,7 @@ export class StudioDraftsController {
         } catch (error: any) {
             console.error('Error saving carousel draft:', error);
             if (error instanceof z.ZodError) {
-                res.status(400).json({ error: 'Validation failed', details: error.errors });
+                res.status(400).json({ error: 'Validation failed', details: error });
             } else {
                 res.status(500).json({ error: 'Failed to save carousel draft' });
             }
@@ -278,7 +278,7 @@ export class StudioDraftsController {
         } catch (error: any) {
             console.error('Error saving script draft:', error);
             if (error instanceof z.ZodError) {
-                res.status(400).json({ error: 'Validation failed', details: error.errors });
+                res.status(400).json({ error: 'Validation failed', details: error });
             } else {
                 res.status(500).json({ error: 'Failed to save script draft' });
             }
