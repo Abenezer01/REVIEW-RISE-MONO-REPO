@@ -3,10 +3,10 @@ import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform
 import { reviewRepository, competitorReviewRepository } from '@platform/db';
 
 /**
- * Get sentiment analysis overview
- * @route GET /api/v1/reviews/analytics/sentiment
+ * Get rating trend over time
+ * @route GET /api/v1/reviews/analytics/rating-trend
  */
-export const getSentimentOverview = async (req: Request, res: Response) => {
+export const getRatingTrend = async (req: Request, res: Response) => {
     try {
         const { locationId, businessId, period = '30' } = req.query;
 
@@ -17,28 +17,158 @@ export const getSentimentOverview = async (req: Request, res: Response) => {
 
         const periodDays = parseInt(period as string, 10);
         
-        const sentimentData = await reviewRepository.getSentimentStats({
+        const trendData = await reviewRepository.getRatingTrend({
             businessId,
             locationId: locationId as string | undefined,
             periodDays
         });
 
-        const response = createSuccessResponse(sentimentData, 'Sentiment overview fetched successfully', 200, { requestId: req.id });
-        res.status(response.statusCode).json(response);
+        // Fill in missing dates
+        const filledTrendData: { date: string; averageRating: number }[] = [];
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - (periodDays - 1)); // -1 to include today
+
+        let lastKnownRating = 0;
+
+        // Try to find an initial rating from earlier if possible, otherwise 0
+        // (For now, we start at 0 or the first data point found)
+
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const dateStr = d.toISOString().split('T')[0];
+            const existingData = trendData.find(t => t.date === dateStr);
+
+            if (existingData) {
+                lastKnownRating = existingData.averageRating;
+                filledTrendData.push(existingData);
+            } else {
+                // Carry forward last known rating for proper trend visualization
+                filledTrendData.push({ date: dateStr, averageRating: lastKnownRating });
+            }
+        }
+
+        const successResponse = createSuccessResponse(filledTrendData, 'Rating trend fetched successfully', 200, { requestId: req.id });
+        res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
-        console.error('Get sentiment overview error:', error);
-        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
-        res.status(response.statusCode).json(response);
+        console.error('Get rating trend error:', error);
+        const errorResponse = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
     }
 };
 
 /**
- * Get recent review summary using AI (mocked logic or delegated to AI service)
- * @route GET /api/v1/reviews/analytics/summary
+ * Get review volume by source over time
+ * @route GET /api/v1/reviews/analytics/volume
  */
-export const getRecentSummary = async (req: Request, res: Response) => {
+export const getReviewVolume = async (req: Request, res: Response) => {
     try {
-        const { locationId, businessId, limit = '5' } = req.query;
+        const { locationId, businessId, period = '30' } = req.query;
+
+        // Validation...
+        if (!businessId || typeof businessId !== 'string') {
+            const errorResponse = createErrorResponse('businessId is required', ErrorCode.VALIDATION_ERROR, 400, undefined, req.id);
+            return res.status(errorResponse.statusCode).json(errorResponse);
+        }
+
+        const periodDays = parseInt(period as string, 10);
+
+        const volumeData = await reviewRepository.getVolumeBySource({
+            businessId,
+            locationId: locationId as string | undefined,
+            periodDays
+        });
+
+        // Fill in missing dates
+        const filledVolumeData: { date: string; volumes: Record<string, number> }[] = [];
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - (periodDays - 1));
+
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const dateStr = d.toISOString().split('T')[0];
+            const existingData = volumeData.find(v => v.date === dateStr);
+
+            if (existingData) {
+                filledVolumeData.push(existingData);
+            } else {
+                // Fill with empty volumes
+                filledVolumeData.push({ date: dateStr, volumes: {} });
+            }
+        }
+
+        const successResponse = createSuccessResponse(filledVolumeData, 'Review volume fetched successfully', 200, { requestId: req.id });
+        res.status(successResponse.statusCode).json(successResponse);
+    } catch (error: any) {
+        console.error('Get review volume error:', error);
+        const errorResponse = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
+    }
+};
+
+/**
+ * Get sentiment heatmap data
+ * @route GET /api/v1/reviews/analytics/sentiment
+ */
+export const getSentimentHeatmap = async (req: Request, res: Response) => {
+    try {
+        const { locationId, businessId, period = '30', groupBy = 'day' } = req.query;
+
+        if (!businessId || typeof businessId !== 'string') {
+            const errorResponse = createErrorResponse('businessId is required', ErrorCode.VALIDATION_ERROR, 400, undefined, req.id);
+            return res.status(errorResponse.statusCode).json(errorResponse);
+        }
+
+        if (groupBy !== 'day' && groupBy !== 'week') {
+            const errorResponse = createErrorResponse('groupBy must be either "day" or "week"', ErrorCode.VALIDATION_ERROR, 400, undefined, req.id);
+            return res.status(errorResponse.statusCode).json(errorResponse);
+        }
+
+        const periodDays = parseInt(period as string, 10);
+
+        const sentimentData = await reviewRepository.getSentimentHeatmap({
+            businessId,
+            locationId: locationId as string | undefined,
+            periodDays,
+            groupBy: groupBy as 'day' | 'week'
+        });
+
+        // Fill in missing dates only if grouped by day (weekly is trickier and usually less sparse)
+        let filledSentimentData = sentimentData;
+
+        if (groupBy === 'day') {
+            filledSentimentData = [];
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(endDate.getDate() - (periodDays - 1));
+
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                const existingData = sentimentData.find(s => s.date === dateStr);
+
+                if (existingData) {
+                    filledSentimentData.push(existingData);
+                } else {
+                    filledSentimentData.push({ date: dateStr, positive: 0, neutral: 0, negative: 0 });
+                }
+            }
+        }
+
+        const successResponse = createSuccessResponse(filledSentimentData, 'Sentiment heatmap fetched successfully', 200, { requestId: req.id });
+        res.status(successResponse.statusCode).json(successResponse);
+    } catch (error: any) {
+        console.error('Get sentiment heatmap error:', error);
+        const errorResponse = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
+    }
+};
+
+/**
+ * Get top keywords from reviews
+ * @route GET /api/v1/reviews/analytics/keywords
+ */
+export const getTopKeywords = async (req: Request, res: Response) => {
+    try {
+        const { locationId, businessId, limit = '20' } = req.query;
 
         if (!businessId || typeof businessId !== 'string') {
             const errorResponse = createErrorResponse('businessId is required', ErrorCode.VALIDATION_ERROR, 400, undefined, req.id);
@@ -47,18 +177,48 @@ export const getRecentSummary = async (req: Request, res: Response) => {
 
         const limitNum = parseInt(limit as string, 10);
 
-        const summaryData = await reviewRepository.getReviewSummary({
+        const keywordsData = await reviewRepository.getTopKeywords({
             businessId,
             locationId: locationId as string | undefined,
             limit: limitNum
         });
 
-        const response = createSuccessResponse(summaryData, 'Recent summary fetched successfully', 200, { requestId: req.id });
-        res.status(response.statusCode).json(response);
+        const successResponse = createSuccessResponse(keywordsData, 'Keywords fetched successfully', 200, { requestId: req.id });
+        res.status(successResponse.statusCode).json(successResponse);
+    } catch (error: any) {
+        console.error('Get keywords error:', error);
+        const errorResponse = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
+    }
+};
+
+/**
+ * Get recent reviews summary
+ * @route GET /api/v1/reviews/analytics/summary
+ */
+export const getRecentSummary = async (req: Request, res: Response) => {
+    try {
+        const { locationId, businessId, limit = '10' } = req.query;
+
+        if (!businessId || typeof businessId !== 'string') {
+            const errorResponse = createErrorResponse('businessId is required', ErrorCode.VALIDATION_ERROR, 400, undefined, req.id);
+            return res.status(errorResponse.statusCode).json(errorResponse);
+        }
+
+        const limitNum = parseInt(limit as string, 10);
+
+        const summaryData = await reviewRepository.getRecentSummary({
+            businessId,
+            locationId: locationId as string | undefined,
+            limit: limitNum
+        });
+
+        const successResponse = createSuccessResponse(summaryData, 'Recent summary fetched successfully', 200, { requestId: req.id });
+        res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
         console.error('Get recent summary error:', error);
-        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
-        res.status(response.statusCode).json(response);
+        const errorResponse = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
     }
 };
 
@@ -103,12 +263,12 @@ export const getCompetitorComparison = async (req: Request, res: Response) => {
             }))
         };
 
-        const response = createSuccessResponse(comparisonData, 'Competitor comparison fetched successfully', 200, { requestId: req.id });
-        res.status(response.statusCode).json(response);
+        const successResponse = createSuccessResponse(comparisonData, 'Competitor comparison fetched successfully', 200, { requestId: req.id });
+        res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
         console.error('Get competitor comparison error:', error);
-        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
-        res.status(response.statusCode).json(response);
+        const errorResponse = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
     }
 };
 /**
@@ -133,12 +293,12 @@ export const addCompetitorData = async (req: Request, res: Response) => {
             source
         });
 
-        const response = createSuccessResponse(newCompetitorReview, 'Competitor data added successfully', 201, { requestId: req.id });
-        res.status(response.statusCode).json(response);
+        const successResponse = createSuccessResponse(newCompetitorReview, 'Competitor data added successfully', 201, { requestId: req.id });
+        res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
         console.error('Add competitor data error:', error);
-        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
-        res.status(response.statusCode).json(response);
+        const errorResponse = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
     }
 };
 
@@ -179,11 +339,11 @@ export const getDashboardMetrics = async (req: Request, res: Response) => {
             }
         };
 
-        const response = createSuccessResponse(responseData, 'Dashboard metrics fetched successfully', 200, { requestId: req.id });
-        res.status(response.statusCode).json(response);
+        const successResponse = createSuccessResponse(responseData, 'Dashboard metrics fetched successfully', 200, { requestId: req.id });
+        res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
         console.error('Get dashboard metrics error:', error);
-        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
-        res.status(response.statusCode).json(response);
+        const errorResponse = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
     }
 };

@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import * as PlannerService from '../../services/planner.service';
 import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 
 const router = Router({ mergeParams: true });
 
 // GET /api/v1/brands/:id/planner/plan?month=1&year=2026
-router.get('/plan', async (req: any, res) => {
+router.get('/plan', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { month, year } = req.query;
@@ -23,7 +23,7 @@ router.get('/plan', async (req: any, res) => {
 });
 
 // POST /api/v1/brands/:id/planner/generate
-router.post('/generate', async (req: any, res) => {
+router.post('/generate', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const plan = await PlannerService.generateMonthlyPlan(id, {
@@ -40,7 +40,7 @@ router.post('/generate', async (req: any, res) => {
 });
 
 // POST /api/v1/brands/:id/planner/convert/:planId
-router.post('/convert/:planId', async (req: any, res) => {
+router.post('/convert/:planId', async (req: Request, res: Response) => {
   try {
     const { planId } = req.params;
     const { locationId } = req.query;
@@ -60,7 +60,7 @@ router.post('/convert/:planId', async (req: any, res) => {
 });
 
 // GET /api/v1/brands/:id/planner/templates
-router.get('/templates', async (req: any, res) => {
+router.get('/templates', async (req: Request, res: Response) => {
   try {
     const { industry } = req.query;
     const templates = await PlannerService.listTemplates(industry as string);
@@ -73,7 +73,7 @@ router.get('/templates', async (req: any, res) => {
 });
 
 // POST /api/v1/brands/:id/planner/templates
-router.post('/templates', async (req: any, res) => {
+router.post('/templates', async (req: Request, res: Response) => {
   try {
     const template = await PlannerService.createTemplate(req.body);
     const response = createSuccessResponse(template, 'Template created successfully', 201, { requestId: req.id });
@@ -85,7 +85,7 @@ router.post('/templates', async (req: any, res) => {
 });
 
 // PATCH /api/v1/brands/:id/planner/templates/:templateId
-router.patch('/templates/:templateId', async (req: any, res) => {
+router.patch('/templates/:templateId', async (req: Request, res: Response) => {
   try {
     const { templateId } = req.params;
     const template = await PlannerService.updateTemplate(templateId, req.body);
@@ -98,7 +98,7 @@ router.patch('/templates/:templateId', async (req: any, res) => {
 });
 
 // DELETE /api/v1/brands/:id/planner/templates/:templateId
-router.delete('/templates/:templateId', async (req: any, res) => {
+router.delete('/templates/:templateId', async (req: Request, res: Response) => {
   try {
     const { templateId } = req.params;
     await PlannerService.deleteTemplate(templateId);
@@ -111,7 +111,7 @@ router.delete('/templates/:templateId', async (req: any, res) => {
 });
 
 // GET /api/v1/brands/:id/planner/events
-router.get('/events', async (req: any, res) => {
+router.get('/events', async (req: Request, res: Response) => {
   try {
     const { month, year } = req.query;
     const events = await PlannerService.listSeasonalEvents(
@@ -127,7 +127,7 @@ router.get('/events', async (req: any, res) => {
 });
 
 // POST /api/v1/brands/:id/planner/events
-router.post('/events', async (req: any, res) => {
+router.post('/events', async (req: Request, res: Response) => {
   try {
     const event = await PlannerService.createSeasonalEvent(req.body);
     const response = createSuccessResponse(event, 'Event created successfully', 201, { requestId: req.id });
@@ -139,7 +139,7 @@ router.post('/events', async (req: any, res) => {
 });
 
 // PATCH /api/v1/brands/:id/planner/events/:eventId
-router.patch('/events/:eventId', async (req: any, res) => {
+router.patch('/events/:eventId', async (req: Request, res: Response) => {
   try {
     const { eventId } = req.params;
     const event = await PlannerService.updateSeasonalEvent(eventId, req.body);
@@ -152,7 +152,7 @@ router.patch('/events/:eventId', async (req: any, res) => {
 });
 
 // DELETE /api/v1/brands/:id/planner/events/:eventId
-router.delete('/events/:eventId', async (req: any, res) => {
+router.delete('/events/:eventId', async (req: Request, res: Response) => {
   try {
     const { eventId } = req.params;
     await PlannerService.deleteSeasonalEvent(eventId);

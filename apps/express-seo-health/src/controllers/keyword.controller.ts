@@ -1,39 +1,55 @@
 import { Request, Response } from 'express';
-import { keywordRepository, keywordRankRepository, locationRepository } from '@platform/db';
+import { keywordRepository, keywordRankRepository, locationRepository, rankTrackingService } from '@platform/db';
 import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
-import type { CreateKeywordDTO, UpdateKeywordDTO, HarvestCompetitorDTO } from '@platform/contracts';
+import type {
+  CreateKeywordDTO,
+  HarvestCompetitorDTO,
+  UpdateKeywordDTO,
+} from '@platform/contracts';
 
 export class KeywordController {
   /**
-   * GET /api/keywords - List keywords for a business/location
+   * GET /api/keywords - List keywords for a business
    */
   async listKeywords(req: Request, res: Response): Promise<void> {
     try {
-      const businessId = req.query.businessId as string;
-      const locationId = req.query.locationId as string;
-      const limit = parseInt(req.query.limit as string) || 100;
-      const offset = parseInt(req.query.offset as string) || 0;
+      const { businessId } = req.query;
+      const locationId = typeof req.query.locationId === 'string' ? req.query.locationId : undefined;
+      const status = typeof req.query.status === 'string' ? req.query.status : undefined;
+      const tagsParam = req.query.tags;
+      const limitParam = req.query.limit;
+      const offsetParam = req.query.offset;
 
-      if (!businessId) {
+      if (!businessId || typeof businessId !== 'string') {
         const errorResponse = createErrorResponse('businessId is required', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
         res.status(errorResponse.statusCode).json(errorResponse);
         return;
       }
 
-      const keywords = await keywordRepository.findByBusiness(businessId, {
-        locationId,
-        limit,
-        offset,
-        includeRanks: true,
-      });
+      const keywords = await keywordRepository.findByBusiness(
+        businessId,
+        {
+          locationId,
+          status,
+          tags: Array.isArray(tagsParam)
+            ? tagsParam.filter((t): t is string => typeof t === 'string')
+            : typeof tagsParam === 'string'
+              ? tagsParam.split(',').map((t) => t.trim()).filter(Boolean)
+              : undefined,
+          limit: Number.isFinite(Number(limitParam)) ? Number(limitParam) : 50,
+          offset: Number.isFinite(Number(offsetParam)) ? Number(offsetParam) : 0,
+        }
+      );
 
-      const response = createSuccessResponse(
+      const successResponse = createSuccessResponse(
         await Promise.all(
           keywords.map(async (k) => {
-            const daily = await keywordRepository.getRankChange(k.id, 'daily');
-            const weekly = await keywordRepository.getRankChange(k.id, 'weekly');
+            const daily = await rankTrackingService.computeRankChange(k.id, 'daily')
+            const weekly = await rankTrackingService.computeRankChange(k.id, 'weekly')
             return {
               id: k.id,
+              businessId: k.businessId,
+              locationId: k.locationId || undefined,
               keyword: k.keyword,
               searchVolume: k.searchVolume || undefined,
               difficulty: k.difficulty || undefined,
@@ -54,7 +70,7 @@ export class KeywordController {
         200,
         { requestId: req.id }
       );
-      res.status(response.statusCode).json(response);
+      res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
       console.error('Error listing keywords:', error);
       const errorResponse = createErrorResponse('Failed to list keywords', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
@@ -94,8 +110,8 @@ export class KeywordController {
         tags: computedTags,
       });
 
-      const response = createSuccessResponse(keyword, 'Keyword created successfully', 201, { requestId: req.id });
-      res.status(response.statusCode).json(response);
+      const successResponse = createSuccessResponse(keyword, 'Keyword created successfully', 201, { requestId: req.id });
+      res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
       console.error('Error creating keyword:', error);
       const errorResponse = createErrorResponse('Failed to create keyword', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
@@ -113,8 +129,8 @@ export class KeywordController {
 
       const keyword = await keywordRepository.update(id, data);
 
-      const response = createSuccessResponse(keyword, 'Keyword updated successfully', 200, { requestId: req.id });
-      res.status(response.statusCode).json(response);
+      const successResponse = createSuccessResponse(keyword, 'Keyword updated successfully', 200, { requestId: req.id });
+      res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
       console.error('Error updating keyword:', error);
       const errorResponse = createErrorResponse('Failed to update keyword', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
@@ -131,8 +147,8 @@ export class KeywordController {
 
       await keywordRepository.softDelete(id);
 
-      const response = createSuccessResponse({ message: 'Keyword deleted successfully' }, 'Keyword deleted successfully', 200, { requestId: req.id });
-      res.status(response.statusCode).json(response);
+      const successResponse = createSuccessResponse({ message: 'Keyword deleted successfully' }, 'Keyword deleted successfully', 200, { requestId: req.id });
+      res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
       console.error('Error deleting keyword:', error);
       const errorResponse = createErrorResponse('Failed to delete keyword', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
@@ -162,7 +178,7 @@ export class KeywordController {
         offset: Number.isFinite(Number(offsetParam)) ? Number(offsetParam) : 0,
       });
 
-      const response = createSuccessResponse(
+      const successResponse = createSuccessResponse(
         ranks.map((r) => ({
           id: r.id,
           keywordId: r.keywordId,
@@ -183,7 +199,7 @@ export class KeywordController {
         200,
         { requestId: req.id }
       );
-      res.status(response.statusCode).json(response);
+      res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
       console.error('Error fetching keyword ranks:', error);
       const errorResponse = createErrorResponse('Failed to fetch keyword ranks', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
@@ -223,11 +239,11 @@ export class KeywordController {
         }))
       );
 
-      const response = createSuccessResponse({
+      const successResponse = createSuccessResponse({
         created: result.count,
         message: `${result.count} keywords created successfully`,
-      }, 'Keywords bulk created', 201, { requestId: req.id });
-      res.status(response.statusCode).json(response);
+      }, 'Keywords bulk created successfully', 201, { requestId: req.id });
+      res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
       console.error('Error bulk creating keywords:', error);
       const errorResponse = createErrorResponse('Failed to bulk create keywords', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
@@ -274,8 +290,8 @@ export class KeywordController {
         });
       }
       const limit = Number.isFinite(Number(limitParam)) ? Number(limitParam) : 20;
-      const response = createSuccessResponse({ suggestions: suggestions.slice(0, limit) }, 'Suggestions generated successfully', 200, { requestId: req.id });
-      res.status(response.statusCode).json(response);
+      const successResponse = createSuccessResponse({ suggestions: suggestions.slice(0, limit) }, 'Suggestions generated successfully', 200, { requestId: req.id });
+      res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
       console.error('Error suggesting keywords:', error);
       const errorResponse = createErrorResponse('Failed to suggest keywords', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
@@ -304,8 +320,8 @@ export class KeywordController {
         keyword: `${brand} ${s}`.toLowerCase(),
         tags: [cityTag, 'branded', 'intent:competitor']
       }));
-      const response = createSuccessResponse({ keywords: harvested.slice(0, data.limit || 20) }, 'Competitor keywords harvested successfully', 200, { requestId: req.id });
-      res.status(response.statusCode).json(response);
+      const successResponse = createSuccessResponse({ keywords: harvested.slice(0, data.limit || 20) }, 'Competitor keywords harvested successfully', 200, { requestId: req.id });
+      res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
       console.error('Error harvesting competitor keywords:', error);
       const errorResponse = createErrorResponse('Failed to harvest competitor keywords', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);

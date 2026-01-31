@@ -17,9 +17,9 @@ export const getAllBrandProfiles = async (req: Request, res: Response, next: Nex
     const response = createPaginatedResponse(
       result.data,
       {
-        page: result.meta.page,
-        limit: result.meta.limit,
-        total: result.meta.total
+        page: result.pagination.page,
+        limit: result.pagination.limit,
+        total: result.pagination.total
       },
       'Brand profiles retrieved successfully',
       200,
