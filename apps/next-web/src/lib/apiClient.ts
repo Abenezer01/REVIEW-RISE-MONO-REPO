@@ -45,26 +45,24 @@ apiClient.interceptors.response.use(
     const data = response.data as any;
 
     // Check if it matches our standard ApiResponse structure (from @platform/contracts)
+    // We check for 'success' or 'status' (legacy) and 'data'
     if (data && typeof data === 'object' && ('success' in data || 'status' in data) && 'data' in data) {
-      // If it's a success response, unwrap the data
-      if (data.success !== false) {
-        // If it has pagination metadata in meta, we return the data and meta together
-        if (data.meta && (data.meta.total !== undefined || data.meta.page !== undefined)) {
-          return {
-            ...response,
-            data: {
-              data: data.data,
-              meta: data.meta
-            }
-          };
-        }
-
-        // Otherwise return only the inner data payload
+      // If it has pagination metadata in meta, we return the data and meta together
+      if (data.meta && (data.meta.total !== undefined || data.meta.page !== undefined)) {
         return {
           ...response,
-          data: data.data
+          data: {
+            data: data.data,
+            meta: data.meta
+          }
         };
       }
+
+      // Otherwise return only the inner data payload
+      return {
+        ...response,
+        data: data.data
+      };
     }
 
     return response
@@ -73,17 +71,6 @@ apiClient.interceptors.response.use(
     // Handle global errors (e.g., 401 Unauthorized)
     if (error.response && error.response.status === 401) {
       // Could trigger logout or refresh token logic here
-    }
-
-    // Unwrap standardized error message if available from @platform/contracts structure
-    if (error.response?.data) {
-      const data = error.response.data;
-
-      if (data.error?.message) {
-        error.message = data.error.message;
-      } else if (data.message) {
-        error.message = data.message;
-      }
     }
 
     return Promise.reject(error)

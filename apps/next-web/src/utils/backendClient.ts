@@ -28,34 +28,29 @@ export async function backendClient<T = any>(
 
     const data = response.data as any
 
-    // Unwrap standardized ApiResponse (from @platform/contracts)
+    // Unwrap standardized ApiResponse
+    // We check for 'success' or 'status' (legacy) and 'data'
     if (data && typeof data === 'object' && ('success' in data || 'status' in data) && 'data' in data) {
-      // Only unwrap if it's a success response
-      if (data.success !== false) {
-        // If it has pagination metadata, return both data and meta
-        if (data.meta && (data.meta.total !== undefined || data.meta.page !== undefined)) {
-          return {
-            data: data.data,
-            meta: data.meta
-          } as unknown as T
-        }
-
-        return data.data as T
+      // If it has pagination metadata, return both data and meta
+      if (data.meta && (data.meta.total !== undefined || data.meta.page !== undefined)) {
+        return {
+          data: data.data,
+          meta: data.meta
+        } as unknown as T
       }
+
+      return data.data as T
     }
 
     return response.data as T
   } catch (error: any) {
     if (isAxiosError(error) && error.response) {
-      // Propagate the error message from backend if available using @platform/contracts structure
-      const data = error.response.data;
-      const message = data?.error?.message || data?.message || error.message;
+      // Propagate the error message from backend if available
+      const message = error.response.data?.message || error.response.data?.error?.message || error.response.data?.error || error.message
 
       const apiError: any = new Error(message)
 
       apiError.status = error.response.status
-      apiError.data = data; // Keep original data for further inspection if needed
-
       throw apiError
     }
 

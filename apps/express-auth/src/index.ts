@@ -7,7 +7,7 @@ import { prisma } from '@platform/db';
 import { generateToken } from '@platform/auth';
 import v1Routes from './routes/v1';
 import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
-import { requestIdMiddleware, errorHandler } from '@platform/middleware';
+import { requestIdMiddleware } from '@platform/middleware';
 
 dotenv.config();
 
@@ -34,11 +34,7 @@ app.get('/', (req, res) => {
 
 app.get('/health', (req, res) => {
     const response = createSuccessResponse(
-        {
-            status: 'ok',
-            service: 'express-auth',
-            timestamp: new Date().toISOString()
-        },
+        { service: 'express-auth' },
         'Service is healthy',
         200,
         { requestId: req.id }
@@ -77,6 +73,10 @@ app.get('/rbac-test', async (req, res) => {
         const userId = 'test-user-' + Date.now();
         const email = 'test@example.com';
 
+        // NOTE: In a real flow, we'd ensure User and Business exist first. 
+        // This is just to demonstrate type usage and import success.
+        // We'll catch errors if DB constraints fail.
+
         // Let's just generate a token
         const token = await generateToken({ id: userId, email });
 
@@ -99,19 +99,37 @@ app.get('/rbac-test', async (req, res) => {
     }
 });
 
-app.use((req, res) => {
-    const response = createErrorResponse(
-        'The requested endpoint does not exist. Please check the URL and method.',
-        ErrorCode.NOT_FOUND,
-        404,
-        { requestedEndpoint: req.originalUrl },
-        req.id
-    );
-    res.status(404).json(response);
+// Test RBAC logic
+app.get('/rbac-test', async (req, res) => {
+    try {
+        // Mock data
+        const userId = 'test-user-' + Date.now();
+        const email = 'test@example.com';
+
+        // NOTE: In a real flow, we'd ensure User and Business exist first. 
+        // This is just to demonstrate type usage and import success.
+        // We'll catch errors if DB constraints fail.
+
+        // Let's just generate a token
+        const token = await generateToken({ id: userId, email });
+
+        res.json({
+            status: 'ok',
+            token,
+            info: 'Token generated successfully using @platform/auth'
+        });
+    } catch (error: any) {
+        res.status(500).json({ error: 'RBAC test failed', details: error.message });
+    }
 });
 
-// Use central error handler
-app.use(errorHandler);
+app.use((req, res) => {
+    res.status(404).json({
+        error: "Endpoint not found",
+        message: "The requested endpoint does not exist. Please check the URL and method.",
+        requestedEndpoint: req.originalUrl
+    });
+});
 app.listen(PORT, () => {
     // eslint-disable-next-line no-console
     console.log(`Auth service running on port ${PORT}`);
