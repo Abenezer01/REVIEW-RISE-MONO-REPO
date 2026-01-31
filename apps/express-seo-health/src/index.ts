@@ -4,6 +4,8 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import v1Routes from './routes/v1';
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
+import { requestIdMiddleware, errorHandler } from '@platform/middleware';
 
 dotenv.config();
 
@@ -11,6 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 3011;
 
 app.use(cors());
+app.use(requestIdMiddleware);
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
@@ -21,27 +24,27 @@ app.use('/', v1Routes);
 app.use('/api/v1', v1Routes);
 
 app.get('/', (req, res) => {
-    res.json({ 
-        message: 'SEO Health Checker Service is running',
-        version: '1.0.0'
-    });
+    const response = createSuccessResponse({ version: '1.0.0' }, 'SEO Health Checker Service is running', 200, { requestId: req.id });
+    res.status(response.statusCode).json(response);
 });
 
 app.get('/health', (req, res) => {
-    res.json({ 
-        status: 'ok', 
-        service: 'express-seo-health',
-        timestamp: new Date().toISOString()
-    });
+    const response = createSuccessResponse({ service: 'express-seo-health' }, 'Service is healthy', 200, { requestId: req.id });
+    res.status(response.statusCode).json(response);
 });
 
 app.use((req, res) => {
-    res.status(404).json({
-        error: 'Endpoint not found',
-        message: 'The requested endpoint does not exist. Please check the URL and method.',
-        requestedEndpoint: req.originalUrl
-    });
+    const response = createErrorResponse(
+        'The requested endpoint does not exist. Please check the URL and method.',
+        ErrorCode.NOT_FOUND,
+        404,
+        { requestedEndpoint: req.originalUrl },
+        req.id
+    );
+    res.status(response.statusCode).json(response);
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     // eslint-disable-next-line no-console

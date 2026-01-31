@@ -1,4 +1,3 @@
-
 import { Request, Response } from 'express';
 import { prisma } from '@platform/db';
 import {
@@ -26,21 +25,23 @@ export class PostsController {
                 }
             });
 
-            res.status(201).json(createSuccessResponse(
+            const successResponse = createSuccessResponse(
                 post,
                 'Post created successfully',
                 201,
                 { requestId: req.id }
-            ));
+            );
+            res.status(successResponse.statusCode).json(successResponse);
         } catch (error: any) {
             console.error('Error creating post:', error);
-            res.status(500).json(createErrorResponse(
+            const errorResponse = createErrorResponse(
                 'Failed to create post',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(errorResponse.statusCode).json(errorResponse);
         }
     }
 
@@ -63,21 +64,23 @@ export class PostsController {
                 }))
             );
 
-            res.status(201).json(createSuccessResponse(
+            const successResponse = createSuccessResponse(
                 { count: result.length, posts: result },
                 'Posts created successfully',
                 201,
                 { requestId: req.id }
-            ));
+            );
+            res.status(successResponse.statusCode).json(successResponse);
         } catch (error: any) {
             console.error('Error creating batch posts:', error);
-            res.status(500).json(createErrorResponse(
+            const errorResponse = createErrorResponse(
                 'Failed to create batch posts',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(errorResponse.statusCode).json(errorResponse);
         }
     }
 
@@ -105,21 +108,23 @@ export class PostsController {
                 orderBy: { scheduledAt: 'asc' }
             });
 
-            res.json(createSuccessResponse(
+            const successResponse = createSuccessResponse(
                 { posts },
                 'Posts retrieved successfully',
                 200,
                 { requestId: req.id }
-            ));
+            );
+            res.status(successResponse.statusCode).json(successResponse);
         } catch (error: any) {
             console.error('Error listing posts:', error);
-            res.status(500).json(createErrorResponse(
+            const errorResponse = createErrorResponse(
                 'Failed to list posts',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(errorResponse.statusCode).json(errorResponse);
         }
     }
 }

@@ -156,22 +156,19 @@ export const BrandService = {
 
     const response = await apiClient.get<Competitor[]>(`/api/v1/brands/${businessId}/competitors`, { params });
 
-
-return response.data || [];
+    return response.data || [];
   },
 
   getCompetitor: async (businessId: string, competitorId: string) => {
     const response = await apiClient.get<Competitor>(`/api/brands/${businessId}/competitors/${competitorId}`);
 
-
-return response.data;
+    return response.data;
   },
 
   addCompetitor: async (businessId: string, data: { name: string; website?: string }) => {
     const response = await apiClient.post<Competitor>(`/api/brands/${businessId}/competitors`, data);
 
-
-return response.data;
+    return response.data;
   },
 
   removeCompetitor: async (businessId: string, competitorId: string) => {
@@ -186,8 +183,7 @@ return response.data;
 
     const response = await apiClient.get<DashboardOverview>(`/api/brands/${businessId}/dashboards/overview`, { params });
 
-
-return response.data;
+    return response.data;
   },
 
   getVisibilityMetrics: async (businessId: string, range: '7d' | '30d' | '90d' = '30d', locationId?: string | number | null) => {
@@ -197,8 +193,7 @@ return response.data;
 
     const response = await apiClient.get<VisibilityMetric[]>(`/api/brands/${businessId}/dashboards/visibility`, { params });
 
-
-return response.data || [];
+    return response.data || [];
   },
 
   // Reports
@@ -209,59 +204,51 @@ return response.data || [];
 
     const response = await apiClient.get<Report[]>(`/api/brands/${businessId}/reports`, { params });
 
-
-return response.data || [];
+    return response.data || [];
   },
 
   getReport: async (businessId: string, reportId: string) => {
     const response = await apiClient.get<Report & { htmlContent: string }>(`/api/brands/${businessId}/reports/${reportId}`);
 
-
-return response.data;
+    return response.data;
   },
 
   listOpportunitiesReports: async (businessId: string) => {
     const response = await apiClient.get<any[]>(`/api/brands/${businessId}/reports/opportunities`);
 
-
-return response.data || [];
+    return response.data || [];
   },
 
   generateOpportunitiesReport: async (businessId: string) => {
     const response = await apiClient.post<any>(`/api/brands/${businessId}/reports/opportunities`);
 
-
-return response.data;
+    return response.data;
   },
 
   // DNA
   getDNA: async (businessId: string) => {
     const response = await apiClient.get<BrandDNA>(`/api/brands/${businessId}/dna`);
 
-
-return response.data;
+    return response.data;
   },
 
   updateDNA: async (businessId: string, data: Partial<BrandDNA>) => {
     const response = await apiClient.post<BrandDNA>(`/api/brands/${businessId}/dna`, data);
 
-
-return response.data;
+    return response.data;
   },
 
   // Content
   listContent: async (businessId: string) => {
     const response = await apiClient.get<ContentIdea[]>(`/api/brands/${businessId}/content`);
 
-
-return response.data || [];
+    return response.data || [];
   },
 
   createContent: async (businessId: string, data: Partial<ContentIdea>) => {
     const response = await apiClient.post<ContentIdea>(`/api/brands/${businessId}/content`, data);
 
-
-return response.data;
+    return response.data;
   },
 
   deleteContent: async (businessId: string, contentId: string) => {
@@ -276,29 +263,25 @@ return response.data;
 
     const response = await apiClient.get<ScheduledPost[]>(`/api/brands/${businessId}/scheduling`, { params });
 
-
-return response.data || [];
+    return response.data || [];
   },
 
   getScheduledPost: async (businessId: string, postId: string) => {
     const response = await apiClient.get<ScheduledPost>(`/api/brands/${businessId}/scheduling/${postId}`);
 
-
-return response.data;
+    return response.data;
   },
 
   createScheduledPost: async (businessId: string, data: Partial<ScheduledPost>) => {
     const response = await apiClient.post<ScheduledPost>(`/api/brands/${businessId}/scheduling`, data);
 
-
-return response.data;
+    return response.data;
   },
 
   updateScheduledPost: async (businessId: string, postId: string, data: Partial<ScheduledPost>) => {
     const response = await apiClient.patch<ScheduledPost>(`/api/brands/${businessId}/scheduling/${postId}`, data);
 
-
-return response.data;
+    return response.data;
   },
 
   deleteScheduledPost: async (businessId: string, postId: string) => {
@@ -308,8 +291,7 @@ return response.data;
   duplicateScheduledPost: async (businessId: string, postId: string, data?: { scheduledAt?: string; status?: string }) => {
     const response = await apiClient.post<ScheduledPost>(`/api/brands/${businessId}/scheduling/${postId}/duplicate`, data);
 
-
-return response.data;
+    return response.data;
   },
 
   listPublishingLogs: async (businessId: string, params: {
@@ -321,8 +303,7 @@ return response.data;
   }) => {
     const response = await apiClient.get<PublishingLog[]>(`/api/v1/brands/${businessId}/scheduling/logs`, { params });
 
-
-return response.data || [];
+    return response.data || [];
   },
 
   // Reviews
@@ -348,15 +329,13 @@ return response.data || [];
   postReviewReply: async (businessId: string, reviewId: string, comment: string) => {
     const response = await apiClient.post<any>(`/api/brands/${businessId}/reviews/${reviewId}/reply`, { comment });
 
-
-return response.data;
+    return response.data;
   },
 
   rejectReviewReply: async (businessId: string, reviewId: string) => {
     const response = await apiClient.post<any>(`/api/brands/${businessId}/reviews/${reviewId}/reject`);
 
-
-return response.data;
+    return response.data;
   },
 
   getReviewStats: async (businessId: string, locationId?: string | number | null) => {
@@ -366,59 +345,51 @@ return response.data;
 
     const response = await apiClient.get<{ totalReviews: number, averageRating: number }>(`/api/brands/${businessId}/reviews/stats`, { params });
 
-
-return response.data;
+    return response.data;
   },
 
   replyReview: async (businessId: string, reviewId: string, responseContent: string) => {
     const response = await apiClient.post<Review>(`/api/brands/${businessId}/reviews/${reviewId}/reply`, { response: responseContent });
 
-
-return response.data;
+    return response.data;
   },
 
   // Recommendations & Brand Strategist
   generateRecommendations: async (businessId: string, category: string) => {
     const response = await apiClient.post<{ message: string, jobId: string }>(`/api/brands/${businessId}/recommendations`, { category });
 
-
-return response.data;
+    return response.data;
   },
 
   getRecommendations: async (businessId: string, filters?: { status?: string, category?: string }) => {
     const response = await apiClient.get<BrandRecommendation[]>(`/api/brands/${businessId}/recommendations`, { params: filters });
 
-
-return response.data;
+    return response.data;
   },
 
   updateRecommendationStatus: async (businessId: string, id: string, status: string) => {
     const response = await apiClient.patch<BrandRecommendation>(`/api/brands/${businessId}/recommendations/${id}`, { status });
 
-
-return response.data;
+    return response.data;
   },
 
   getBrandScores: async (businessId: string) => {
     const response = await apiClient.get<BrandScore>(`/api/brands/${businessId}/scores`);
 
-
-return response.data;
+    return response.data;
   },
 
   // Visibility Plan
   generateVisibilityPlan: async (businessId: string) => {
     const response = await apiClient.post<{ message: string, jobId: string }>(`/api/brands/${businessId}/visibility-plan`);
 
-
-return response.data;
+    return response.data;
   },
 
   getVisibilityPlan: async (businessId: string) => {
     const response = await apiClient.get<any>(`/api/brands/${businessId}/visibility-plan`);
 
-
-return response.data;
+    return response.data;
   },
 
   // Jobs
@@ -429,8 +400,7 @@ return response.data;
 
     const response = await apiClient.get<Job[]>(`/api/brands/${businessId}/jobs`, { params });
 
-
-return response.data || [];
+    return response.data || [];
   },
 
   // Planner
@@ -439,40 +409,40 @@ return response.data || [];
 
     if (locationId) params.locationId = locationId;
 
-    const response = await apiClient.get<{ data: any }>(`/api/brands/${businessId}/planner/plan`, { params });
+    const response = await apiClient.get<any>(`/api/brands/${businessId}/planner/plan`, { params });
 
-    return response.data.data;
+    return response.data;
   },
 
   generateMonthlyPlan: async (businessId: string, data: any) => {
-    const response = await apiClient.post<{ data: any }>(`/api/brands/${businessId}/planner/generate`, data);
+    const response = await apiClient.post<any>(`/api/brands/${businessId}/planner/generate`, data);
 
-    return response.data.data;
+    return response.data;
   },
 
   convertPlanToDrafts: async (businessId: string, planId: string, locationId?: string | null) => {
     const params = locationId ? { locationId } : {};
-    const response = await apiClient.post<{ data: any }>(`/api/brands/${businessId}/planner/convert/${planId}`, {}, { params });
+    const response = await apiClient.post<any>(`/api/brands/${businessId}/planner/convert/${planId}`, {}, { params });
 
-    return response.data.data;
+    return response.data;
   },
 
   listPlannerTemplates: async (businessId: string, industry?: string) => {
-    const response = await apiClient.get<{ data: any[] }>(`/api/brands/${businessId}/planner/templates`, { params: { industry } });
+    const response = await apiClient.get<any[]>(`/api/brands/${businessId}/planner/templates`, { params: { industry } });
 
-    return response.data.data;
+    return response.data;
   },
 
   createPlannerTemplate: async (businessId: string, data: any) => {
-    const response = await apiClient.post<{ data: any }>(`/api/brands/${businessId}/planner/templates`, data);
+    const response = await apiClient.post<any>(`/api/brands/${businessId}/planner/templates`, data);
 
-    return response.data.data;
+    return response.data;
   },
 
   updatePlannerTemplate: async (businessId: string, templateId: string, data: any) => {
-    const response = await apiClient.patch<{ data: any }>(`/api/brands/${businessId}/planner/templates/${templateId}`, data);
+    const response = await apiClient.patch<any>(`/api/brands/${businessId}/planner/templates/${templateId}`, data);
 
-    return response.data.data;
+    return response.data;
   },
 
   deletePlannerTemplate: async (businessId: string, templateId: string) => {
@@ -480,21 +450,21 @@ return response.data || [];
   },
 
   listPlannerEvents: async (businessId: string, month?: number, year?: number) => {
-    const response = await apiClient.get<{ data: any[] }>(`/api/brands/${businessId}/planner/events`, { params: { month, year } });
+    const response = await apiClient.get<any[]>(`/api/brands/${businessId}/planner/events`, { params: { month, year } });
 
-    return response.data.data;
+    return response.data;
   },
 
   createPlannerEvent: async (businessId: string, data: any) => {
-    const response = await apiClient.post<{ data: any }>(`/api/brands/${businessId}/planner/events`, data);
+    const response = await apiClient.post<any>(`/api/brands/${businessId}/planner/events`, data);
 
-    return response.data.data;
+    return response.data;
   },
 
   updatePlannerEvent: async (businessId: string, eventId: string, data: any) => {
-    const response = await apiClient.patch<{ data: any }>(`/api/brands/${businessId}/planner/events/${eventId}`, data);
+    const response = await apiClient.patch<any>(`/api/brands/${businessId}/planner/events/${eventId}`, data);
 
-    return response.data.data;
+    return response.data;
   },
 
   deletePlannerEvent: async (businessId: string, eventId: string) => {

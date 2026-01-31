@@ -21,24 +21,21 @@ export const sendVerificationEmailHandler = async (req: Request, res: Response) 
 
         await sendVerificationEmail(email, token);
 
-        res.status(200).json(
-            createSuccessResponse({}, 'Verification email sent successfully')
-        );
-    } catch (error) {
+        const response = createSuccessResponse({}, 'Verification email sent successfully', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
+    } catch (error: any) {
         if (error instanceof z.ZodError) {
             const validationErrors = error.issues.map(issue => ({
                 field: issue.path.join('.'),
                 message: issue.message
             }));
 
-            return res.status(400).json(
-                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
-            );
+            const response = createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         console.error('Error sending verification email:', error);
-        res.status(500).json(
-            createErrorResponse('Failed to send verification email', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Failed to send verification email', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };

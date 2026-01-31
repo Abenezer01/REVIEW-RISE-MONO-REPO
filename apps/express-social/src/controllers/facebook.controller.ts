@@ -23,21 +23,23 @@ export class FacebookController {
 
             const url = facebookService.getAuthUrl(state);
             
-            res.json(createSuccessResponse(
+            const response = createSuccessResponse(
                 { url },
                 'Facebook OAuth URL generated successfully',
                 200,
                 { requestId: req.id }
-            ));
+            );
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error in getAuthUrl:', error);
-            res.status(500).json(createErrorResponse(
+            const response = createErrorResponse(
                 'Failed to generate OAuth URL',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -55,7 +57,7 @@ export class FacebookController {
             // Exchange for long-lived token
             const longLivedToken = await facebookService.getLongLivedUserToken(tokens.access_token);
 
-            res.json(createSuccessResponse(
+            const response = createSuccessResponse(
                 {
                     accessToken: longLivedToken.access_token,
                     expiresIn: longLivedToken.expires_in,
@@ -64,17 +66,19 @@ export class FacebookController {
                 'Facebook authentication successful',
                 200,
                 { requestId: req.id }
-            ));
+            );
+            res.status(response.statusCode).json(response);
 
         } catch (error: any) {
             console.error('Error in handleCallback:', error);
-            res.status(500).json(createErrorResponse(
+            const response = createErrorResponse(
                 'Failed to authenticate with Facebook',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -87,32 +91,35 @@ export class FacebookController {
             const accessToken = req.headers['x-fb-access-token'] as string;
 
             if (!accessToken) {
-                return res.status(400).json(createErrorResponse(
+                const response = createErrorResponse(
                     'x-fb-access-token header is required',
                     ErrorCode.BAD_REQUEST,
                     400,
                     undefined,
                     req.id
-                ));
+                );
+                return res.status(response.statusCode).json(response);
             }
 
             const pages = await facebookService.listPages(accessToken);
             
-            res.json(createSuccessResponse(
+            const response = createSuccessResponse(
                 { pages },
                 'Facebook pages retrieved successfully',
                 200,
                 { requestId: req.id }
-            ));
+            );
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error in listPages:', error);
-            res.status(500).json(createErrorResponse(
+            const response = createErrorResponse(
                 'Failed to list Facebook pages',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -135,21 +142,23 @@ export class FacebookController {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { accessToken, refreshToken, ...sanitized } = connection as any;
 
-            res.status(201).json(createSuccessResponse(
+            const response = createSuccessResponse(
                 { connection: sanitized },
                 'Facebook page connected successfully',
                 201,
                 { requestId: req.id }
-            ));
+            );
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error in connectPage:', error);
-            res.status(500).json(createErrorResponse(
+            const response = createErrorResponse(
                 'Failed to connect Facebook page',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -163,32 +172,35 @@ export class FacebookController {
             const accessToken = req.headers['x-fb-page-access-token'] as string;
 
             if (!accessToken) {
-                return res.status(400).json(createErrorResponse(
+                const response = createErrorResponse(
                     'x-fb-page-access-token header is required',
                     ErrorCode.BAD_REQUEST,
                     400,
                     undefined,
                     req.id
-                ));
+                );
+                return res.status(response.statusCode).json(response);
             }
 
             const igAccount = await facebookService.getInstagramBusinessAccount(pageId, accessToken);
 
-            res.json(createSuccessResponse(
+            const response = createSuccessResponse(
                 { instagramAccount: igAccount },
                 'Instagram accounts retrieved successfully',
                 200,
                 { requestId: req.id }
-            ));
+            );
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error in getInstagramAccounts:', error);
-            res.status(500).json(createErrorResponse(
+            const response = createErrorResponse(
                 'Failed to get Instagram accounts',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -212,22 +224,24 @@ export class FacebookController {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { accessToken, refreshToken, ...sanitized } = connection as any;
 
-            res.status(201).json(createSuccessResponse(
+            const response = createSuccessResponse(
                 { connection: sanitized },
                 'Instagram account connected successfully',
                 201,
                 { requestId: req.id }
-            ));
+            );
+            res.status(response.statusCode).json(response);
 
         } catch (error: any) {
             console.error('Error in connectInstagram:', error);
-            res.status(500).json(createErrorResponse(
+            const response = createErrorResponse(
                 'Failed to connect Instagram account',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(response.statusCode).json(response);
         }
     }
 }

@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { createSuccessResponse, createErrorResponse, createValidationErrorResponse, ErrorCode } from '@platform/contracts';
 import { analyzeSEOHealth } from '../services/seo-analyzer.service';
-// import { verifyToken } from '@platform/auth'; // Uncomment when @platform/auth is ready/linked
 
 const analyzeSchema = z.object({
     url: z.string().url('Invalid URL format'),
@@ -10,7 +9,6 @@ const analyzeSchema = z.object({
 
 export const analyzeSEO = async (req: Request, res: Response) => {
     const startTime = Date.now();
-    const requestId = (req as any).id || crypto.randomUUID();
     
     try {
         // Validate input
@@ -18,7 +16,7 @@ export const analyzeSEO = async (req: Request, res: Response) => {
 
         if (!validationResult.success) {
             const errors = validationResult.error.flatten().fieldErrors;
-            const response = createValidationErrorResponse(errors, requestId);
+            const response = createValidationErrorResponse(errors, req.id);
             return res.status(response.statusCode).json(response);
         }
 
@@ -29,16 +27,6 @@ export const analyzeSEO = async (req: Request, res: Response) => {
 
         // Try to get User ID from header (Basic implementation)
         const userId: string | undefined = undefined;
-        // const authHeader = req.headers.authorization;
-        // if (authHeader && authHeader.startsWith('Bearer ')) {
-        //     const token = authHeader.split(' ')[1];
-        //     try {
-        //         // const payload = verifyToken(token);
-        //         // userId = payload.sub || payload.id;
-        //     } catch (err) {
-        //         console.warn('Invalid auth token provided, proceeding as anonymous');
-        //     }
-        // }
 
         // Perform SEO analysis
         const analysis = await analyzeSEOHealth(url, userId);
@@ -54,7 +42,7 @@ export const analyzeSEO = async (req: Request, res: Response) => {
             analysis,
             'SEO analysis completed successfully',
             200,
-            { requestId, duration }
+            { requestId: req.id, duration }
         );
         
         res.status(response.statusCode).json(response);
@@ -69,7 +57,7 @@ export const analyzeSEO = async (req: Request, res: Response) => {
             ErrorCode.INTERNAL_SERVER_ERROR,
             500,
             process.env.NODE_ENV === 'development' ? error.stack : undefined,
-            requestId
+            req.id
         );
         
         res.status(response.statusCode).json(response);
@@ -80,4 +68,3 @@ function logAnalysis(url: string, score: number, ip: string, userId?: string) {
     // eslint-disable-next-line no-console
     console.log(`[Log] URL: ${url}, Score: ${score}, IP: ${ip}, User: ${userId || 'Anonymous'}, Timestamp: ${new Date().toISOString()}`);
 }
-

@@ -1,12 +1,12 @@
 /* eslint-disable import/no-unresolved */
 import { type NextRequest, NextResponse } from 'next/server'
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts'
 
 import { backendClient } from '@/utils/backendClient'
 import { getServerAuthHeaders } from '@/utils/getServerAuthHeaders'
 import { SERVICES_CONFIG } from '@/configs/services'
 
 export async function POST(request: NextRequest) {
-  // Default to localhost:3012/api if not defined
   const SEO_SERVICE_URL = SERVICES_CONFIG.seo.url
 
   try {
@@ -21,13 +21,16 @@ export async function POST(request: NextRequest) {
       headers: authHeaders
     })
 
-    return NextResponse.json(data)
+    const response = createSuccessResponse(data, 'Validation completed successfully')
+    return NextResponse.json(response, { status: response.statusCode })
   } catch (error: any) {
     console.error('Error in AI Visibility API proxy:', error)
 
-    return NextResponse.json(
-      { message: error.message || 'Internal Server Error' },
-      { status: error.status || 500 }
+    const response = createErrorResponse(
+      error.message || 'Internal Server Error',
+      error.code || ErrorCode.INTERNAL_SERVER_ERROR,
+      error.status || 500
     )
+    return NextResponse.json(response, { status: response.statusCode })
   }
 }

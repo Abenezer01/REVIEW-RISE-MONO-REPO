@@ -2,7 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import { requestIdMiddleware } from '@platform/middleware';
+import { createSuccessResponse } from '@platform/contracts';
+import { requestIdMiddleware, errorHandler } from '@platform/middleware';
 
 dotenv.config();
 
@@ -22,12 +23,16 @@ app.use('/', socialRoutes);
 app.use('/api/v1/posts', postsRoutes);
 
 app.get('/', (req, res) => {
-    res.json({ message: 'Express Social Service is running' });
+    const response = createSuccessResponse(null, 'Express Social Service is running', 200, { requestId: req.id });
+    res.status(response.statusCode).json(response);
 });
 
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', service: 'express-social' });
+    const response = createSuccessResponse({ service: 'express-social' }, 'Service is healthy', 200, { requestId: req.id });
+    res.status(response.statusCode).json(response);
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     // eslint-disable-next-line no-console

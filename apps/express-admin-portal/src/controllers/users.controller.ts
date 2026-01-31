@@ -25,10 +25,12 @@ export const getUserBusinesses = async (req: Request, res: Response) => {
     // Dedup businesses
     const uniqueBusinesses = Array.from(new Map(businesses.map(b => [b.id, b])).values());
 
-    res.json(createSuccessResponse(uniqueBusinesses, 'User businesses fetched successfully', 200, { requestId: req.id }));
+    const response = createSuccessResponse(uniqueBusinesses, 'User businesses fetched successfully', 200, { requestId: req.id });
+    res.status(response.statusCode).json(response);
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching user businesses:', error);
-    res.status(500).json(createErrorResponse('Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
+    const response = createErrorResponse('Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+    res.status(response.statusCode).json(response);
   }
 };

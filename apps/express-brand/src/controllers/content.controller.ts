@@ -11,58 +11,64 @@ const contentSchema = z.object({
 });
 
 export const list = async (req: Request, res: Response) => {
-    const requestId = (req as any).id || crypto.randomUUID();
     try {
         const businessId = req.params.id;
         const content = await ContentService.listContent(businessId);
-        res.json(createSuccessResponse(content, 'Content fetched', 200, { requestId }));
+        const response = createSuccessResponse(content, 'Content fetched', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
     } catch (e: any) {
-        res.status(500).json(createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
+        const response = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
 export const create = async (req: Request, res: Response) => {
-    const requestId = (req as any).id || crypto.randomUUID();
     try {
         const businessId = req.params.id;
         const validation = contentSchema.safeParse(req.body);
         if(!validation.success) {
-            return res.status(400).json(createErrorResponse('Invalid inputs', ErrorCode.VALIDATION_ERROR, 400, undefined, requestId));
+            const errorResponse = createErrorResponse('Invalid inputs', ErrorCode.VALIDATION_ERROR, 400, undefined, req.id);
+            return res.status(errorResponse.statusCode).json(errorResponse);
         }
         
         const result = await ContentService.createContent(businessId, validation.data);
-        res.json(createSuccessResponse(result, 'Content created', 201, { requestId }));
+        const response = createSuccessResponse(result, 'Content created', 201, { requestId: req.id });
+        res.status(response.statusCode).json(response);
     } catch (e: any) {
-        res.status(500).json(createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
+        const response = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
 export const update = async (req: Request, res: Response) => {
-    const requestId = (req as any).id || crypto.randomUUID();
     try {
         const businessId = req.params.id;
         const contentId = req.params.contentId;
         const validation = contentSchema.partial().safeParse(req.body);
         
         if(!validation.success) {
-             return res.status(400).json(createErrorResponse('Invalid inputs', ErrorCode.VALIDATION_ERROR, 400, undefined, requestId));
+             const errorResponse = createErrorResponse('Invalid inputs', ErrorCode.VALIDATION_ERROR, 400, undefined, req.id);
+             return res.status(errorResponse.statusCode).json(errorResponse);
         }
 
         const result = await ContentService.updateContent(contentId, businessId, validation.data);
-        res.json(createSuccessResponse(result, 'Content updated', 200, { requestId }));
+        const response = createSuccessResponse(result, 'Content updated', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
     } catch (e: any) {
-        res.status(500).json(createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
+        const response = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
 export const remove = async (req: Request, res: Response) => {
-    const requestId = (req as any).id || crypto.randomUUID();
     try {
         const businessId = req.params.id;
         const contentId = req.params.contentId;
         await ContentService.deleteContent(contentId, businessId);
-        res.json(createSuccessResponse(null, 'Content removed', 200, { requestId }));
+        const response = createSuccessResponse(null, 'Content removed', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
     } catch (e: any) {
-        res.status(500).json(createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
+        const response = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+        res.status(response.statusCode).json(response);
     }
 };

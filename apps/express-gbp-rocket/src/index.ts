@@ -2,7 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import { requestIdMiddleware } from '@platform/middleware';
+import { createSuccessResponse } from '@platform/contracts';
+import { requestIdMiddleware, errorHandler } from '@platform/middleware';
 
 dotenv.config();
 
@@ -15,12 +16,16 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.json({ message: 'Express GBP Rocket Service is running' });
+    const response = createSuccessResponse(null, 'Express GBP Rocket Service is running', 200, { requestId: req.id });
+    res.status(response.statusCode).json(response);
 });
 
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', service: 'express-gbp-rocket' });
+    const response = createSuccessResponse({ service: 'express-gbp-rocket' }, 'Service is healthy', 200, { requestId: req.id });
+    res.status(response.statusCode).json(response);
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

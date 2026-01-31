@@ -29,23 +29,25 @@ export const getLocations = async (req: Request, res: Response) => {
       prisma.location.findMany({
         where,
         skip,
-        take: limit,
+        take: parseInt(limit as string),
         orderBy: { createdAt: 'desc' },
         include,
       }),
       prisma.location.count({ where }),
     ]);
 
-    res.json(createPaginatedResponse(
+    const response = createPaginatedResponse(
       locations,
-      { total, page, limit },
+      { total, page: parseInt(page as string), limit: parseInt(limit as string) },
       'Locations fetched successfully',
       200,
       { requestId: req.id }
-    ));
-  } catch (error) {
+    );
+    res.status(response.statusCode).json(response);
+  } catch (error: any) {
     console.error('Error fetching locations:', error);
-    res.status(500).json(createErrorResponse('Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
+    const response = createErrorResponse('Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+    res.status(response.statusCode).json(response);
   }
 };
 
@@ -58,13 +60,16 @@ export const getLocation = async (req: Request, res: Response) => {
     });
 
     if (!location) {
-      return res.status(404).json(createErrorResponse('Location not found', ErrorCode.NOT_FOUND, 404, undefined, req.id));
+      const errorResponse = createErrorResponse('Location not found', ErrorCode.NOT_FOUND, 404, undefined, req.id);
+      return res.status(errorResponse.statusCode).json(errorResponse);
     }
 
-    res.json(createSuccessResponse(location, 'Location fetched successfully', 200, { requestId: req.id }));
-  } catch (error) {
+    const response = createSuccessResponse(location, 'Location fetched successfully', 200, { requestId: req.id });
+    res.status(response.statusCode).json(response);
+  } catch (error: any) {
     console.error('Error fetching location:', error);
-    res.status(500).json(createErrorResponse('Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
+    const response = createErrorResponse('Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+    res.status(response.statusCode).json(response);
   }
 };
 
@@ -85,10 +90,12 @@ export const createLocation = async (req: Request, res: Response) => {
       include: { business: true }
     });
 
-    res.status(201).json(createSuccessResponse(location, 'Location created successfully', 201, { requestId: req.id }));
+    const response = createSuccessResponse(location, 'Location created successfully', 201, { requestId: req.id });
+    res.status(response.statusCode).json(response);
   } catch (error: any) {
     console.error('Error creating location:', error);
-    res.status(500).json(createErrorResponse('Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
+    const response = createErrorResponse('Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+    res.status(response.statusCode).json(response);
   }
 };
 
@@ -111,13 +118,16 @@ export const updateLocation = async (req: Request, res: Response) => {
       include: { business: true }
     });
 
-    res.json(createSuccessResponse(location, 'Location updated successfully', 200, { requestId: req.id }));
+    const response = createSuccessResponse(location, 'Location updated successfully', 200, { requestId: req.id });
+    res.status(response.statusCode).json(response);
   } catch (error: any) {
     console.error('Error updating location:', error);
     if (error.code === 'P2025') {
-      return res.status(404).json(createErrorResponse('Location not found', ErrorCode.NOT_FOUND, 404, undefined, req.id));
+      const errorResponse = createErrorResponse('Location not found', ErrorCode.NOT_FOUND, 404, undefined, req.id);
+      return res.status(errorResponse.statusCode).json(errorResponse);
     }
-    res.status(500).json(createErrorResponse('Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
+    const response = createErrorResponse('Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+    res.status(response.statusCode).json(response);
   }
 };
 
@@ -128,12 +138,15 @@ export const deleteLocation = async (req: Request, res: Response) => {
       where: { id }
     });
 
-    res.json(createSuccessResponse(null, 'Location deleted successfully', 200, { requestId: req.id }));
+    const response = createSuccessResponse(null, 'Location deleted successfully', 200, { requestId: req.id });
+    res.status(response.statusCode).json(response);
   } catch (error: any) {
     console.error('Error deleting location:', error);
     if (error.code === 'P2025') {
-      return res.status(404).json(createErrorResponse('Location not found', ErrorCode.NOT_FOUND, 404, undefined, req.id));
+      const errorResponse = createErrorResponse('Location not found', ErrorCode.NOT_FOUND, 404, undefined, req.id);
+      return res.status(errorResponse.statusCode).json(errorResponse);
     }
-    res.status(500).json(createErrorResponse('Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
+    const response = createErrorResponse('Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+    res.status(response.statusCode).json(response);
   }
 };

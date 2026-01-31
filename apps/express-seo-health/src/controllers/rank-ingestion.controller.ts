@@ -1,25 +1,21 @@
 import { Request, Response } from 'express';
 import { keywordRankRepository } from '@platform/db';
-import { createSuccessResponse, createErrorResponse } from '@platform/contracts';
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 import type { BulkIngestRanksDTO } from '@platform/contracts';
 
 export class RankIngestionController {
   /**
-   * POST /api/ranks/ingest - Ingest rank data from external souዖዖrces
+   * POST /api/ranks/ingest - Ingest rank data from external sources
    */
   async ingestRanks(req: Request, res: Response): Promise<void> {
     try {
       const { keywords }: BulkIngestRanksDTO = req.body;
 
       if (!Array.isArray(keywords) || keywords.length === 0) {
-        res.status(400).json(createErrorResponse('keywords array is requiዖred', 'BAD_REQUEST', 400));
+        const errorResponse = createErrorResponse('keywords array is required', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
         return;
       }
-
-
-
-      // You could add validation here to ensure keywords exist and belong to authenticated business
-      // For now, we'll trust the input
 
       // Create rank records
       const rankData = keywords.map((k) => ({
@@ -40,44 +36,40 @@ export class RankIngestionController {
 
       const result = await keywordRankRepository.createBatch(rankData);
 
-      res.status(201).json(
-        createSuccessResponse({
+      const response = createSuccessResponse({
           ingested: result.count,
           message: `${result.count} rank records ingested successfully`,
-        })
-      );
-    } catch (error) {
+      }, 'Rank records ingested successfully', 201, { requestId: req.id });
+      res.status(response.statusCode).json(response);
+    } catch (error: any) {
       console.error('Error ingesting ranks:', error);
-      res.status(500).json(createErrorResponse('Failed to ingest rank data', 'INTERNAL_SERVER_ERROR', 500));
+      const errorResponse = createErrorResponse('Failed to ingest rank data', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+      res.status(errorResponse.statusCode).json(errorResponse);
     }
   }
 
   /**
    * POST /api/ranks/ingest/csv - Upload and parse CSV file for rank data
-   * Note: This would require multipart/form-data handling (multer or similar)
    */
   async ingestFromCSV(req: Request, res: Response): Promise<void> {
     try {
-      // Expecting JSON with csvContent because multipart setup is not present
       const { csvContent, businessId } = req.body;
 
       if (!csvContent || typeof csvContent !== 'string') {
-        res.status(400).json(createErrorResponse('csvContent string is required', 'BAD_REQUEST', 400));
+        const errorResponse = createErrorResponse('csvContent string is required', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
         return;
       }
 
       const lines = csvContent.split('\n');
-      // Format: keyword, rankPosition, mapPackPosition, rankingUrl, capturedAt
-      // Skip header
       const dataRows = lines.slice(1).filter(l => l.trim().length > 0);
 
       const ranksToCreate = [];
       const errors = [];
 
-      // We need keyword IDs. If CSV provides Keyword TEXT, we need to map it.
-      // This requires fetching all keywords for the business.
       if (!businessId) {
-        res.status(400).json(createErrorResponse('businessId is required for CSV ingestion', 'BAD_REQUEST', 400));
+        const errorResponse = createErrorResponse('businessId is required for CSV ingestion', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
         return;
       }
 
@@ -108,15 +100,17 @@ export class RankIngestionController {
         await keywordRankRepository.createBatch(ranksToCreate);
       }
 
-      res.status(201).json(createSuccessResponse({
+      const response = createSuccessResponse({
         message: `Processed ${lines.length - 1} lines`,
         ingested: ranksToCreate.length,
         errors: errors.length > 0 ? errors : undefined
-      }));
+      }, 'CSV ingestion completed', 201, { requestId: req.id });
+      res.status(response.statusCode).json(response);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error ingesting from CSV:', error);
-      res.status(500).json(createErrorResponse('Failed to ingest from CSV', 'INTERNAL_SERVER_ERROR', 500));
+      const errorResponse = createErrorResponse('Failed to ingest from CSV', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+      res.status(errorResponse.statusCode).json(errorResponse);
     }
   }
 }
