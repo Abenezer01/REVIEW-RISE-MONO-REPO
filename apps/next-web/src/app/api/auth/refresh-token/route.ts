@@ -1,9 +1,10 @@
+/* eslint-disable import/no-unresolved */
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { z } from 'zod'
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts'
 
 import { backendClient } from '@/utils/backendClient'
-
 import { SERVICES_CONFIG } from '@/configs/services'
 
 const refreshTokenSchema = z.object({
@@ -20,13 +21,15 @@ export async function POST(request: NextRequest) {
     const validationResult = refreshTokenSchema.safeParse(body)
 
     if (!validationResult.success) {
-      return NextResponse.json(
-        {
-          message: 'Validation failed',
-          errors: validationResult.error.flatten().fieldErrors
-        },
-        { status: 400 }
+      const response = createErrorResponse(
+        'Validation failed',
+        ErrorCode.VALIDATION_ERROR,
+        400,
+        validationResult.error.flatten().fieldErrors
       )
+
+      
+return NextResponse.json(response, { status: response.statusCode })
     }
 
     // Proxy to auth service
@@ -38,15 +41,20 @@ export async function POST(request: NextRequest) {
 
     const data = apiResponse?.data ?? apiResponse
 
-    return NextResponse.json({
+    const response = createSuccessResponse({
       accessToken: data?.accessToken,
-      message: 'Token refreshed successfully'
-    })
+    }, 'Token refreshed successfully')
+
+    return NextResponse.json(response, { status: response.statusCode })
   } catch (error: any) {
     // Propagate the error status from the backend
-    return NextResponse.json(
-      { message: error.message || 'Internal Server Error' },
-      { status: error.status || 500 }
+    const response = createErrorResponse(
+      error.message || 'Internal Server Error',
+      error.code || ErrorCode.INTERNAL_SERVER_ERROR,
+      error.status || 500
     )
+
+    
+return NextResponse.json(response, { status: response.statusCode })
   }
 }

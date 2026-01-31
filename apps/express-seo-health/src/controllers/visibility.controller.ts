@@ -19,7 +19,8 @@ export class VisibilityController {
       } = req.query;
 
       if (!businessId) {
-        res.status(400).json(createErrorResponse('businessId is required', 'BAD_REQUEST', 400));
+        const errorResponse = createErrorResponse('businessId is required', 'BAD_REQUEST', 400, undefined, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
         return;
       }
 
@@ -35,32 +36,35 @@ export class VisibilityController {
         }
       );
 
-      res.json(
-        createSuccessResponse(
-          metrics.map((m) => ({
-            id: m.id,
-            businessId: m.businessId,
-            locationId: m.locationId || undefined,
-            periodStart: m.periodStart.toISOString(),
-            periodEnd: m.periodEnd.toISOString(),
-            periodType: m.periodType,
-            mapPackAppearances: m.mapPackAppearances,
-            totalTrackedKeywords: m.totalTrackedKeywords,
-            mapPackVisibility: m.mapPackVisibility,
-            top3Count: m.top3Count,
-            top10Count: m.top10Count,
-            top20Count: m.top20Count,
-            shareOfVoice: m.shareOfVoice,
-            featuredSnippetCount: m.featuredSnippetCount,
-            localPackCount: m.localPackCount,
-            computedAt: m.computedAt.toISOString(),
-            createdAt: m.createdAt.toISOString(),
-          }))
-        )
+      const successResponse = createSuccessResponse(
+        metrics.map((m) => ({
+          id: m.id,
+          businessId: m.businessId,
+          locationId: m.locationId || undefined,
+          periodStart: m.periodStart.toISOString(),
+          periodEnd: m.periodEnd.toISOString(),
+          periodType: m.periodType,
+          mapPackAppearances: m.mapPackAppearances,
+          totalTrackedKeywords: m.totalTrackedKeywords,
+          mapPackVisibility: m.mapPackVisibility,
+          top3Count: m.top3Count,
+          top10Count: m.top10Count,
+          top20Count: m.top20Count,
+          shareOfVoice: m.shareOfVoice,
+          featuredSnippetCount: m.featuredSnippetCount,
+          localPackCount: m.localPackCount,
+          computedAt: m.computedAt.toISOString(),
+          createdAt: m.createdAt.toISOString(),
+        })),
+        'Visibility metrics fetched successfully',
+        200,
+        { requestId: req.id }
       );
-    } catch (error) {
+      res.status(successResponse.statusCode).json(successResponse);
+    } catch (error: any) {
       console.error('Error fetching visibility metrics:', error);
-      res.status(500).json(createErrorResponse('Failed to fetch visibility metrics', 'INTERNAL_SERVER_ERROR', 500));
+      const errorResponse = createErrorResponse('Failed to fetch visibility metrics', 'INTERNAL_SERVER_ERROR', 500, error.message, req.id);
+      res.status(errorResponse.statusCode).json(errorResponse);
     }
   }
 
@@ -72,9 +76,8 @@ export class VisibilityController {
       const { businessId, locationId, startDate, endDate } = req.query;
 
       if (!businessId || !startDate || !endDate) {
-        res
-          .status(400)
-          .json(createErrorResponse('businessId, startDate, and endDate are required', 'BAD_REQUEST', 400));
+        const errorResponse = createErrorResponse('businessId, startDate, and endDate are required', 'BAD_REQUEST', 400, undefined, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
         return;
       }
 
@@ -85,19 +88,19 @@ export class VisibilityController {
         new Date(endDate as string)
       );
 
-      res.json(
-        createSuccessResponse({
-          businessId,
-          locationId: locationId || undefined,
-          shareOfVoice: sovData.shareOfVoice,
-          breakdown: sovData.breakdown,
-          periodStart: (startDate as string),
-          periodEnd: (endDate as string),
-        })
-      );
-    } catch (error) {
+      const successResponse = createSuccessResponse({
+        businessId,
+        locationId: locationId || undefined,
+        shareOfVoice: sovData.shareOfVoice,
+        breakdown: sovData.breakdown,
+        periodStart: (startDate as string),
+        periodEnd: (endDate as string),
+      }, 'Share of Voice computed successfully', 200, { requestId: req.id });
+      res.status(successResponse.statusCode).json(successResponse);
+    } catch (error: any) {
       console.error('Error computing Share of Voice:', error);
-      res.status(500).json(createErrorResponse('Failed to compute Share of Voice', 'INTERNAL_SERVER_ERROR', 500));
+      const errorResponse = createErrorResponse('Failed to compute Share of Voice', 'INTERNAL_SERVER_ERROR', 500, error.message, req.id);
+      res.status(errorResponse.statusCode).json(errorResponse);
     }
   }
 
@@ -109,9 +112,8 @@ export class VisibilityController {
       const { businessId, locationId, startDate, endDate } = req.query;
 
       if (!businessId || !startDate || !endDate) {
-        res
-          .status(400)
-          .json(createErrorResponse('businessId, startDate, and endDate are required', 'BAD_REQUEST', 400));
+        const errorResponse = createErrorResponse('businessId, startDate, and endDate are required', 'BAD_REQUEST', 400, undefined, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
         return;
       }
 
@@ -122,22 +124,22 @@ export class VisibilityController {
         new Date(endDate as string)
       );
 
-      res.json(
-        createSuccessResponse({
-          businessId,
-          locationId: locationId || undefined,
-          periodStart: startDate,
-          periodEnd: endDate,
-          features: {
-            featuredSnippet: serpData.featuredSnippetCount,
-            localPack: serpData.localPackCount,
-            // Add other SERP features if needed
-          },
-        })
-      );
-    } catch (error) {
+      const successResponse = createSuccessResponse({
+        businessId,
+        locationId: locationId || undefined,
+        periodStart: startDate,
+        periodEnd: endDate,
+        features: {
+          featuredSnippet: serpData.featuredSnippetCount,
+          localPack: serpData.localPackCount,
+          // Add other SERP features if needed
+        },
+      }, 'SERP features fetched successfully', 200, { requestId: req.id });
+      res.status(successResponse.statusCode).json(successResponse);
+    } catch (error: any) {
       console.error('Error fetching SERP features:', error);
-      res.status(500).json(createErrorResponse('Failed to track SERP features', 'INTERNAL_SERVER_ERROR', 500));
+      const errorResponse = createErrorResponse('Failed to track SERP features', 'INTERNAL_SERVER_ERROR', 500, error.message, req.id);
+      res.status(errorResponse.statusCode).json(errorResponse);
     }
   }
 
@@ -149,9 +151,8 @@ export class VisibilityController {
       const { businessId, locationId, startDate, endDate, metric = 'rank' } = req.query;
 
       if (!businessId || !startDate || !endDate) {
-        res
-          .status(400)
-          .json(createErrorResponse('businessId, startDate, and endDate are required', 'BAD_REQUEST', 400));
+        const errorResponse = createErrorResponse('businessId, startDate, and endDate are required', 'BAD_REQUEST', 400, undefined, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
         return;
       }
 
@@ -188,7 +189,7 @@ export class VisibilityController {
       }
 
       // Build data matrix
-      // periods x keywords? Or keywords x periods. 
+      // periods x keywords? Or keywords x periods.
       // DTO says data: number[][] - usually rows x cols.
       // Heatmap component expects: keywords rows, dates columns.
       // So data[keywordIndex][dateIndex]
@@ -204,22 +205,19 @@ export class VisibilityController {
         });
       });
 
-      res.json(
-        createSuccessResponse({
-          businessId,
-          locationId: locationId || undefined,
-          keywords: keywords.map(k => k.keyword), // Names
-          periods,
-          data: data as number[][], // Cast to number[][] (nulls handled by frontend usually or need 0?)
-          // Wait, DTO allows nulls? Interface says number[][]. Ideally null for no rank.
-          // Let's assume frontend handles null or we pass 0. 
-          // My generic heatmap component handles null.
-          metric: metric as string,
-        })
-      );
-    } catch (error) {
+      const successResponse = createSuccessResponse({
+        businessId,
+        locationId: locationId || undefined,
+        keywords: keywords.map(k => k.keyword), // Names
+        periods,
+        data: data as number[][], // Cast to number[][] (nulls handled by frontend usually or need 0?)
+        metric: metric as string,
+      }, 'Heatmap data fetched successfully', 200, { requestId: req.id });
+      res.status(successResponse.statusCode).json(successResponse);
+    } catch (error: any) {
       console.error('Error generating heatmap data:', error);
-      res.status(500).json(createErrorResponse('Failed to fetch heatmap data', 'INTERNAL_SERVER_ERROR', 500));
+      const errorResponse = createErrorResponse('Failed to fetch heatmap data', 'INTERNAL_SERVER_ERROR', 500, error.message, req.id);
+      res.status(errorResponse.statusCode).json(errorResponse);
     }
   }
 
@@ -231,15 +229,14 @@ export class VisibilityController {
       const { businessId, locationId, periodType, periodStart, periodEnd } = req.body;
 
       if (!businessId || !periodType || !periodStart || !periodEnd) {
-        res
-          .status(400)
-          .json(
-            createErrorResponse(
-              'businessId, periodType, periodStart, and periodEnd are required',
-              'BAD_REQUEST',
-              400
-            )
-          );
+        const errorResponse = createErrorResponse(
+          'businessId, periodType, periodStart, and periodEnd are required',
+          'BAD_REQUEST',
+          400,
+          undefined,
+          req.id
+        );
+        res.status(errorResponse.statusCode).json(errorResponse);
         return;
       }
 
@@ -251,16 +248,16 @@ export class VisibilityController {
         new Date(periodEnd)
       );
 
-      res.json(
-        createSuccessResponse({
-          message: 'Metrics computed successfully',
-          businessId,
-          periodType,
-        })
-      );
-    } catch (error) {
+      const successResponse = createSuccessResponse({
+        message: 'Metrics computed successfully',
+        businessId,
+        periodType,
+      }, 'Metrics computed successfully', 200, { requestId: req.id });
+      res.status(successResponse.statusCode).json(successResponse);
+    } catch (error: any) {
       console.error('Error computing metrics:', error);
-      res.status(500).json(createErrorResponse('Failed to trigger computation', 'INTERNAL_SERVER_ERROR', 500));
+      const errorResponse = createErrorResponse('Failed to trigger computation', 'INTERNAL_SERVER_ERROR', 500, error.message, req.id);
+      res.status(errorResponse.statusCode).json(errorResponse);
     }
   }
 }

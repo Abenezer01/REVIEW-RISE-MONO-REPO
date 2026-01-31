@@ -73,13 +73,14 @@ const ReviewSourcesDashboard = () => {
         try {
             setLoading(true);
 
+            // Use apiClient (auto-unwraps data field)
             const [sourcesRes, statsRes] = await Promise.all([
-                apiClient.get(`${REVIEWS_API_URL}/locations/${locationId}/sources`),
-                apiClient.get(`${REVIEWS_API_URL}/locations/${locationId}/stats`)
+                apiClient.get<ReviewSource[]>(`${REVIEWS_API_URL}/locations/${locationId}/sources`),
+                apiClient.get<ReviewStats>(`${REVIEWS_API_URL}/locations/${locationId}/stats`)
             ]);
 
-            if (sourcesRes.data?.data) setSources(sourcesRes.data.data);
-            if (statsRes.data?.data) setStats(statsRes.data.data);
+            if (sourcesRes.data) setSources(sourcesRes.data);
+            if (statsRes.data) setStats(statsRes.data);
 
         } catch (error) {
             console.error('Failed to fetch dashboard data', error);
@@ -99,12 +100,12 @@ const ReviewSourcesDashboard = () => {
 
     const handleConnectGoogle = async () => {
         try {
-            const res = await apiClient.get(`${REVIEWS_API_URL}/auth/google/connect`, {
+            const res = await apiClient.get<{ url: string }>(`${REVIEWS_API_URL}/auth/google/connect`, {
                 params: { locationId }
             });
 
-            if (res.data?.data?.url) {
-                window.location.href = res.data.data.url;
+            if (res.data?.url) {
+                window.location.href = res.data.url;
             }
         } catch (error) {
             console.error('Failed to get connect URL', error);

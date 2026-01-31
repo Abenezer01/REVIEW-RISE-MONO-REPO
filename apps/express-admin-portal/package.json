@@ -12,6 +12,7 @@
   "dependencies": {
     "@platform/auth": "workspace:*",
     "@platform/contracts": "workspace:*",
+    "@platform/middleware": "workspace:*",
     "@platform/db": "workspace:*",
     "@platform/types": "workspace:*",
     "@platform/utils": "workspace:*",
@@ -20,7 +21,7 @@
     "express": "^4.19.2",
     "helmet": "^7.1.0",
     "morgan": "^1.10.0",
-    "zod": "^3.22.4"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

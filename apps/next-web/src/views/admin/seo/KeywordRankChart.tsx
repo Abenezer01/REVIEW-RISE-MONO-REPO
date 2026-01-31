@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
-import axios from 'axios'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import Card from '@mui/material/Card'
 import type { ApexOptions } from 'apexcharts'
+
+import apiClient from '@/lib/apiClient'
+import { SERVICES_CONFIG } from '@/configs/services';
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
@@ -19,8 +21,6 @@ interface Props {
   open: boolean
   onClose: () => void
 }
-
-import { SERVICES_CONFIG } from '@/configs/services';
 
 const API_URL = SERVICES_CONFIG.seo.url;
 
@@ -34,14 +34,14 @@ export default function KeywordRankChart({ keywordId, keywordText, open, onClose
     const start = new Date()
 
     start.setDate(today.getDate() - 30)
-    axios.get(`${API_URL}/keywords/${keywordId}/ranks`, {
+    apiClient.get(`${API_URL}/keywords/${keywordId}/ranks`, {
       params: {
         startDate: start.toISOString(),
         endDate: today.toISOString(),
         limit: 100
       }
     }).then(res => {
-      const data = res.data?.data || []
+      const data = res.data || []
 
       const sorted = [...data].sort((a: any, b: any) =>
         new Date(a.capturedAt).getTime() - new Date(b.capturedAt).getTime()
@@ -81,4 +81,3 @@ export default function KeywordRankChart({ keywordId, keywordText, open, onClose
     </Dialog>
   )
 }
-

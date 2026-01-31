@@ -6,6 +6,7 @@ import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Alert from '@mui/material/Alert'
 
+import apiClient from '@/lib/apiClient'
 import BrandInputSection from './BrandInputSection'
 import AIVisibilityOverview, { type BrandVisibilityMetrics } from './AIVisibilityOverview'
 import AIPlatformBreakdown, { type PlatformData } from './AIPlatformBreakdown'
@@ -34,33 +35,9 @@ const AIVisibilityDashboard = () => {
     try {
       setLoadingMessage('Validating URL accessibility and robots.txt...')
 
-      // Call real validation API
-      const validationResponse = await fetch('/api/ai-visibility/validate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url }),
-      })
-
-      if (!validationResponse.ok) {
-        const errorData = await validationResponse.json().catch(() => ({}))
-
-        console.error('Validation API Error:', errorData)
-        const message = errorData.message || 'Validation failed'
-
-        setErrorMessage(message)
-        throw new Error(message)
-      }
-
-      const validationResponseData = await validationResponse.json()
-
-      if (!validationResponseData.success || !validationResponseData.data) {
-        console.error('Validation API Error: Invalid response structure', validationResponseData)
-        throw new Error(validationResponseData.message || 'Validation failed: Invalid response')
-      }
-
-      const validationData: AiVisibilityValidationResults = validationResponseData.data
+      // Call real validation API using apiClient (auto-unwraps data field)
+      const validationData = await apiClient.post<AiVisibilityValidationResults>('/api/ai-visibility/validate', { url })
+        .then(res => res.data)
 
       setValidationResults(validationData)
 
@@ -69,81 +46,61 @@ const AIVisibilityDashboard = () => {
         setErrorMessage('URL is not publicly accessible. Please ensure it is live and not behind a login or IP restriction.')
         setLoading(false)
 
-        return // Stop if validation fails
+return
       }
 
       if (!validationData.robotsTxt.allowsAIBots) {
         setErrorMessage('robots.txt disallows AI bots. Please update your robots.txt to allow crawlers.')
         setLoading(false)
 
-        return // Stop if validation fails
+return
       }
 
       if (!validationData.seoPractices.properHtml) {
         setErrorMessage('Basic SEO practices not met (e.g., no proper HTML structure). Please ensure your page has valid HTML.')
         setLoading(false)
 
-        return // Stop if validation fails
+return
       }
 
       // If validation passes, proceed with AI analysis
       setLoadingMessage('Analyzing AI visibility and generating insights...')
 
-      const response = await fetch('/api/ai-visibility/analyze', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ url }),
-        })
+      const analysisData = await apiClient.post<any>('/api/ai-visibility/analyze', { url })
+        .then(res => res.data)
 
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}))
+      // Calculate Technical Readiness Score from validation results
+      let technicalScore = 0
 
-            console.error('Analysis API Error:', errorData)
-            const message = errorData.message || 'Analysis failed'
+      const checks = [
+          validationData.urlAccessibility.isPubliclyAccessible,
+          validationData.urlAccessibility.noLoginWall,
+          validationData.urlAccessibility.noIpRestriction,
+          validationData.urlAccessibility.noAggressiveBotBlocking,
+          validationData.robotsTxt.allowsAIBots,
+          validationData.seoPractices.properHtml,
+          validationData.seoPractices.semanticTags,
+          validationData.seoPractices.sitemapXml,
+          validationData.seoPractices.cleanUrls
+      ]
 
-            setErrorMessage(message)
-            throw new Error(message)
-        }
+      const passed = checks.filter(Boolean).length
 
-        const data = await response.json()
+      technicalScore = Math.round((passed / checks.length) * 100)
 
-        if (data.success && data.data) {
-            // Calculate Technical Readiness Score from validation results
-            let technicalScore = 0
+      setMetrics({
+          ...analysisData.metrics,
+          technicalReadiness: technicalScore
+      })
+      setPlatformData(analysisData.platformData)
+      setTips(analysisData.tips)
+      setAnalyzed(true)
 
-            if (validationResults) {
-                const checks = [
-                    validationResults.urlAccessibility.isPubliclyAccessible,
-                    validationResults.urlAccessibility.noLoginWall,
-                    validationResults.urlAccessibility.noIpRestriction,
-                    validationResults.urlAccessibility.noAggressiveBotBlocking,
-                    validationResults.robotsTxt.allowsAIBots,
-                    validationResults.seoPractices.properHtml,
-                    validationResults.seoPractices.semanticTags,
-                    validationResults.seoPractices.sitemapXml,
-                    validationResults.seoPractices.cleanUrls
-                ]
-
-                const passed = checks.filter(Boolean).length
-
-                technicalScore = Math.round((passed / checks.length) * 100)
-            }
-
-            setMetrics({
-                ...data.data.metrics,
-                technicalReadiness: technicalScore
-            })
-            setPlatformData(data.data.platformData)
-            setTips(data.data.tips)
-            setAnalyzed(true)
-        }
     } catch (error: any) {
         console.error('Error analyzing brand:', error)
-        setErrorMessage(error.message || 'An unexpected error occurred')
+        const message = error.response?.data?.message || error.message || 'An unexpected error occurred'
 
-        // Fallback or error handling could go here
+        setErrorMessage(message)
     } finally {
         setLoading(false)
         setLoadingMessage(null) // Clear loading message on completion or error

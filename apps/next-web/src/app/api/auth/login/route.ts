@@ -3,6 +3,8 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 import { z } from 'zod'
 
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts'
+
 import { backendClient } from '@/utils/backendClient'
 
 import { SERVICES_CONFIG } from '@/configs/services'
@@ -23,13 +25,15 @@ export async function POST(request: NextRequest) {
     const validationResult = loginSchema.safeParse(body)
 
     if (!validationResult.success) {
-      return NextResponse.json(
-        {
-          message: 'Validation failed',
-          errors: validationResult.error.flatten().fieldErrors
-        },
-        { status: 400 }
+      const response = createErrorResponse(
+        'Validation failed',
+        ErrorCode.VALIDATION_ERROR,
+        400,
+        validationResult.error.flatten().fieldErrors
       )
+
+      
+return NextResponse.json(response, { status: response.statusCode })
     }
 
     // Proxy to auth service
@@ -47,19 +51,25 @@ export async function POST(request: NextRequest) {
       data = apiResponse
     }
 
-    const response = NextResponse.json({
-      user: data?.user,
-      accessToken: data?.accessToken,
-      refreshToken: data?.refreshToken,
-      message: 'Login successful'
-    })
+    const response = createSuccessResponse(
+      {
+        user: data?.user,
+        accessToken: data?.accessToken,
+        refreshToken: data?.refreshToken,
+      },
+      'Login successful'
+    )
 
-    return response
+    return NextResponse.json(response, { status: response.statusCode })
   } catch (error: any) {
     // Handle specific error cases if needed, otherwise fallback to generic error
-    return NextResponse.json(
-      { message: error.message || 'Internal Server Error' },
-      { status: error.status || 500 }
+    const response = createErrorResponse(
+      error.message || 'Internal Server Error',
+      error.code || ErrorCode.INTERNAL_SERVER_ERROR,
+      error.status || 500
     )
+
+    
+return NextResponse.json(response, { status: response.statusCode })
   }
 }

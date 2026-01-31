@@ -54,11 +54,11 @@ const ReviewsDashboard = () => {
 
   const isLoading = businessLoading || analyticsLoading || !businessId
   
-  // Data for Recent Reviews Widget (keep using summaryData)
-  const recentSummary = summaryData.data?.data
+  // Data for Recent Reviews Widget
+  const recentSummary = summaryData.data
 
-  // Data for Metric Cards (use new dashboardMetrics)
-  const dashboardStats = dashboardMetrics.data?.data
+  // Data for Metric Cards
+  const dashboardStats = dashboardMetrics.data
 
   const metrics = {
     // Top Cards Data
@@ -80,28 +80,28 @@ const ReviewsDashboard = () => {
   }
   
   // Rating Trend
-  const trendData = (ratingTrend.data?.data && ratingTrend.data.data.length > 0) 
-    ? ratingTrend.data.data 
+  const trendData = (ratingTrend.data && Array.isArray(ratingTrend.data) && ratingTrend.data.length > 0)
+    ? ratingTrend.data
     : []
 
   // Volume
-  const volumeSeriesData = (volumeData.data?.data && volumeData.data.data.length > 0)
-    ? volumeData.data.data
+  const volumeSeriesData = (volumeData.data && Array.isArray(volumeData.data) && volumeData.data.length > 0)
+    ? volumeData.data
     : []
 
   // Sentiment
-  const sentimentHeatmapData = (sentimentData.data?.data && sentimentData.data.data.length > 0)
-    ? sentimentData.data.data
+  const sentimentHeatmapData = (sentimentData.data && Array.isArray(sentimentData.data) && sentimentData.data.length > 0)
+    ? sentimentData.data
     : []
 
     // Keywords
-  const keywordsCloudData = (keywordsData.data?.data && keywordsData.data.data.length > 0)
-    ? keywordsData.data.data
+  const keywordsCloudData = (keywordsData.data && Array.isArray(keywordsData.data) && keywordsData.data.length > 0)
+    ? keywordsData.data
     : []
 
   // Competitors
-  const competitorListData = (competitorData.data?.data?.competitors && competitorData.data.data.competitors.length > 0)
-    ? competitorData.data.data.competitors
+  const competitorListData = (competitorData.data?.competitors && competitorData.data.competitors.length > 0)
+    ? competitorData.data.competitors
     : []
 
 
@@ -124,10 +124,6 @@ return Array.from(platforms).map(platform => ({
           }))
       }
 
-
-      // Handle potential API variance if it returns something else? 
-      // Assuming API returns same structure as mock for now based on controller code.
-      // Controller returns: { date, volumes: { [platform]: number } }
       return []
    })()
 

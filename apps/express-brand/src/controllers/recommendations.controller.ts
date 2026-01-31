@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { repositories } from '@platform/db';
 import axios from 'axios';
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 
 const WORKER_JOBS_URL = process.env.WORKER_JOBS_URL || 'http://localhost:3009';
 
@@ -26,13 +27,15 @@ export class RecommendationsController {
                 businessId,
             });
 
-            res.status(202).json({
+            const response = createSuccessResponse({
                 message: 'Recommendation generation started',
                 jobId: job.id,
-            });
-        } catch (error) {
+            }, 'Accepted', 202, { requestId: req.id });
+            res.status(response.statusCode).json(response);
+        } catch (error: any) {
             console.error('Failed to trigger generation:', error);
-            res.status(500).json({ error: 'Failed to trigger recommendation generation' });
+            const response = createErrorResponse('Failed to trigger recommendation generation', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -54,10 +57,12 @@ export class RecommendationsController {
                 orderBy: { priorityScore: 'desc' },
             } as any);
 
-            res.json(recommendations);
-        } catch (error) {
+            const response = createSuccessResponse(recommendations, 'Recommendations fetched', 200, { requestId: req.id });
+            res.status(response.statusCode).json(response);
+        } catch (error: any) {
             console.error('Failed to fetch recommendations:', error);
-            res.status(500).json({ error: 'Failed to fetch recommendations' });
+            const response = createErrorResponse('Failed to fetch recommendations', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -70,10 +75,12 @@ export class RecommendationsController {
 
         try {
             const updated = await repositories.brandRecommendation.updateStatus(id, status);
-            res.json(updated);
-        } catch (error) {
+            const response = createSuccessResponse(updated, 'Recommendation status updated', 200, { requestId: req.id });
+            res.status(response.statusCode).json(response);
+        } catch (error: any) {
             console.error('Failed to update recommendation:', error);
-            res.status(500).json({ error: 'Failed to update recommendation' });
+            const response = createErrorResponse('Failed to update recommendation', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -96,13 +103,15 @@ export class RecommendationsController {
                 businessId,
             });
 
-            res.status(202).json({
+            const response = createSuccessResponse({
                 message: 'Plan generation started',
                 jobId: job.id,
-            });
-        } catch (error) {
+            }, 'Accepted', 202, { requestId: req.id });
+            res.status(response.statusCode).json(response);
+        } catch (error: any) {
             console.error('Failed to trigger plan generation:', error);
-            res.status(500).json({ error: 'Failed to trigger plan generation' });
+            const response = createErrorResponse('Failed to trigger plan generation', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -122,13 +131,16 @@ export class RecommendationsController {
             } as any);
 
             if (!plan) {
-                return res.status(404).json({ error: 'No plan found' });
+                const errorResponse = createErrorResponse('No plan found', ErrorCode.NOT_FOUND, 404, undefined, req.id);
+                return res.status(errorResponse.statusCode).json(errorResponse);
             }
 
-            res.json(plan);
-        } catch (error) {
+            const response = createSuccessResponse(plan, 'Plan fetched', 200, { requestId: req.id });
+            res.status(response.statusCode).json(response);
+        } catch (error: any) {
             console.error('Failed to fetch plan:', error);
-            res.status(500).json({ error: 'Failed to fetch plan' });
+            const response = createErrorResponse('Failed to fetch plan', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -140,10 +152,12 @@ export class RecommendationsController {
 
         try {
             const score = await repositories.brandScore.findLatestByBusinessId(businessId);
-            res.json(score || { visibilityScore: 0, trustScore: 0, consistencyScore: 0 });
-        } catch (error) {
+            const response = createSuccessResponse(score || { visibilityScore: 0, trustScore: 0, consistencyScore: 0 }, 'Scores fetched', 200, { requestId: req.id });
+            res.status(response.statusCode).json(response);
+        } catch (error: any) {
             console.error('Failed to fetch scores:', error);
-            res.status(500).json({ error: 'Failed to fetch score' });
+            const response = createErrorResponse('Failed to fetch scores', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            res.status(response.statusCode).json(response);
         }
     }
 }

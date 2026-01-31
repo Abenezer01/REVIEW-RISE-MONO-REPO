@@ -1,6 +1,5 @@
 import { llmService } from './llm.service';
-import OpenAI from 'openai'; // Still needed for DALL-E direct call if kept here
-
+import { imageGenerationService } from './image/image-generation.service';
 import { GenerateScriptRequest, GenerateScriptResponse } from '@platform/contracts';
 import { prisma } from '@platform/db';
 import { PROMPTS } from '../prompts/content-studio.prompts';
@@ -44,15 +43,6 @@ export class ContentStudioService {
         if (parts.length === 0) return '';
 
         return `\nBRAND IDENTITY:\n${parts.join('\n')}\n`;
-    }
-
-    // Kept for DALL-E specific logic
-    private getOpenAI() {
-        const apiKey = process.env.OPENAI_API_KEY || process.env.LLM_PROVIDER_API_KEY;
-        if (!apiKey) {
-            throw new Error('OPENAI_API_KEY or LLM_PROVIDER_API_KEY is not set');
-        }
-        return new OpenAI({ apiKey });
     }
 
     async generateCaptions(platform: string, description: string, tone: string) {
@@ -114,49 +104,13 @@ Return a JSON object: { "adaptedText": "Your adapted caption here" }`;
     }
 
     async generateImage(
-        prompt: string, 
+        prompt: string,
         style: string = 'Photorealistic',
         quality: string = 'high',
         aspectRatio: string = '16:9',
         variations: number = 1
     ) {
-        const openai = this.getOpenAI();
-        
-        // Map aspect ratio to DALL-E size format
-        const sizeMap: Record<string, string> = {
-            '1:1': '1024x1024',
-            '16:9': '1792x1024',
-            '9:16': '1024x1792',
-            '4:3': '1024x1024'
-        };
-        const size = sizeMap[aspectRatio] || '1024x1024';
-
-        // Enhance prompt with style
-        const stylePrompts: Record<string, string> = {
-            'Photorealistic': 'photorealistic, high detail, professional photography',
-            'Digital Art': 'digital art, vibrant colors, modern illustration',
-            '3D Render': '3D render, octane render, highly detailed',
-            'Illustration': 'hand-drawn illustration, artistic, creative'
-        };
-        const styleEnhancement = stylePrompts[style] || '';
-        const enhancedPrompt = `${prompt}, ${styleEnhancement}`;
-
-        // Map quality to DALL-E quality parameter
-        const qualityParam = quality === 'high' ? 'hd' : 'standard';
-
-        const response = await openai.images.generate({
-            model: "dall-e-3",
-            prompt: enhancedPrompt,
-            n: 1, // DALL-E 3 only supports n=1
-            size: size as any,
-            quality: qualityParam as any
-        });
-        
-        return {
-            urls: response.data?.map(img => img.url) || [],
-            prompt: enhancedPrompt,
-            settings: { style, quality, aspectRatio, variations }
-        };
+        return imageGenerationService.generate(prompt, { style, quality, aspectRatio, variations });
     }
 
     async generateCarousel(topic: string, tone?: string, platform?: string) {
@@ -165,11 +119,11 @@ Return a JSON object: { "adaptedText": "Your adapted caption here" }`;
     }
 
     async generateScript(params: GenerateScriptRequest): Promise<GenerateScriptResponse> {
-        const { 
-            videoTopic, 
-            videoGoal, 
-            targetAudience, 
-            tone = 'professional', 
+        const {
+            videoTopic,
+            videoGoal,
+            targetAudience,
+            tone = 'professional',
             platform = 'Instagram',
             duration = 30,
             includeCallToAction

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '@platform/db';
 import { z } from 'zod';
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 
 export class StudioDraftsController {
 
@@ -31,16 +32,19 @@ export class StudioDraftsController {
                 )
             );
 
-            res.status(201).json({
+            const response = createSuccessResponse({
                 count: drafts.length,
                 message: 'Caption drafts saved successfully'
-            });
+            }, 'Created', 201, { requestId: req.id });
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error saving caption drafts:', error);
             if (error instanceof z.ZodError) {
-                res.status(400).json({ error: 'Validation failed', details: error });
+                const response = createErrorResponse('Validation failed', ErrorCode.VALIDATION_ERROR, 400, error.issues, req.id);
+                res.status(response.statusCode).json(response);
             } else {
-                res.status(500).json({ error: 'Failed to save caption drafts' });
+                const response = createErrorResponse('Failed to save caption drafts', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+                res.status(response.statusCode).json(response);
             }
         }
     }
@@ -53,7 +57,8 @@ export class StudioDraftsController {
             const offset = req.query.offset as string | undefined;
 
             if (!businessId) {
-                return res.status(400).json({ error: 'Business ID is required' });
+                const response = createErrorResponse('Business ID is required', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+                return res.status(response.statusCode).json(response);
             }
 
             const drafts = await prisma.captionDraft.findMany({
@@ -63,10 +68,12 @@ export class StudioDraftsController {
                 take: limit ? parseInt(limit) : 50
             });
 
-            res.json({ drafts, count: drafts.length });
+            const response = createSuccessResponse({ drafts, count: drafts.length }, 'Success', 200, { requestId: req.id });
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error fetching caption drafts:', error);
-            res.status(500).json({ error: 'Failed to fetch caption drafts' });
+            const response = createErrorResponse('Failed to fetch caption drafts', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -99,13 +106,16 @@ export class StudioDraftsController {
                 )
             );
 
-            res.status(201).json({ count: ideas.length, message: 'Ideas saved successfully' });
+            const response = createSuccessResponse({ count: ideas.length, message: 'Ideas saved successfully' }, 'Created', 201, { requestId: req.id });
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error saving content ideas:', error);
             if (error instanceof z.ZodError) {
-                res.status(400).json({ error: 'Validation failed', details: error });
+                const response = createErrorResponse('Validation failed', ErrorCode.VALIDATION_ERROR, 400, error.issues, req.id);
+                res.status(response.statusCode).json(response);
             } else {
-                res.status(500).json({ error: 'Failed to save content ideas' });
+                const response = createErrorResponse('Failed to save content ideas', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+                res.status(response.statusCode).json(response);
             }
         }
     }
@@ -118,7 +128,8 @@ export class StudioDraftsController {
             const offset = req.query.offset as string | undefined;
 
             if (!businessId) {
-                return res.status(400).json({ error: 'Business ID is required' });
+                const response = createErrorResponse('Business ID is required', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+                return res.status(response.statusCode).json(response);
             }
 
             const ideas = await prisma.contentIdea.findMany({
@@ -128,10 +139,12 @@ export class StudioDraftsController {
                 take: limit ? parseInt(limit) : 50
             });
 
-            res.json({ ideas, count: ideas.length });
+            const response = createSuccessResponse({ ideas, count: ideas.length }, 'Success', 200, { requestId: req.id });
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error fetching content ideas:', error);
-            res.status(500).json({ error: 'Failed to fetch content ideas' });
+            const response = createErrorResponse('Failed to fetch content ideas', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -172,13 +185,16 @@ export class StudioDraftsController {
                 );
             }
 
-            res.status(201).json({ id: imagePrompt.id, message: 'Image prompt saved successfully' });
+            const response = createSuccessResponse({ id: imagePrompt.id, message: 'Image prompt saved successfully' }, 'Created', 201, { requestId: req.id });
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error saving image prompt:', error);
             if (error instanceof z.ZodError) {
-                res.status(400).json({ error: 'Validation failed', details: error });
+                const response = createErrorResponse('Validation failed', ErrorCode.VALIDATION_ERROR, 400, error.issues, req.id);
+                res.status(response.statusCode).json(response);
             } else {
-                res.status(500).json({ error: 'Failed to save image prompt' });
+                const response = createErrorResponse('Failed to save image prompt', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+                res.status(response.statusCode).json(response);
             }
         }
     }
@@ -207,13 +223,16 @@ export class StudioDraftsController {
                 }
             });
 
-            res.status(201).json({ id: carouselDraft.id, message: 'Carousel draft saved successfully' });
+            const response = createSuccessResponse({ id: carouselDraft.id, message: 'Carousel draft saved successfully' }, 'Created', 201, { requestId: req.id });
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error saving carousel draft:', error);
             if (error instanceof z.ZodError) {
-                res.status(400).json({ error: 'Validation failed', details: error });
+                const response = createErrorResponse('Validation failed', ErrorCode.VALIDATION_ERROR, 400, error.issues, req.id);
+                res.status(response.statusCode).json(response);
             } else {
-                res.status(500).json({ error: 'Failed to save carousel draft' });
+                const response = createErrorResponse('Failed to save carousel draft', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+                res.status(response.statusCode).json(response);
             }
         }
     }
@@ -226,7 +245,8 @@ export class StudioDraftsController {
             const offset = req.query.offset as string | undefined;
 
             if (!businessId) {
-                return res.status(400).json({ error: 'Business ID is required' });
+                const response = createErrorResponse('Business ID is required', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+                return res.status(response.statusCode).json(response);
             }
 
             const drafts = await prisma.carouselDraft.findMany({
@@ -240,10 +260,12 @@ export class StudioDraftsController {
                 where: { businessId }
             });
 
-            res.json({ drafts, count });
+            const response = createSuccessResponse({ drafts, count }, 'Success', 200, { requestId: req.id });
+            res.status(response.statusCode).json(response);
         } catch (error) {
             console.error('Error fetching carousel drafts:', error);
-            res.status(500).json({ error: 'Failed to fetch carousel drafts' });
+            const response = createErrorResponse('Failed to fetch carousel drafts', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -274,13 +296,16 @@ export class StudioDraftsController {
                 }
             });
 
-            res.status(201).json({ id: scriptDraft.id, message: 'Script draft saved successfully' });
+            const response = createSuccessResponse({ id: scriptDraft.id, message: 'Script draft saved successfully' }, 'Created', 201, { requestId: req.id });
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error saving script draft:', error);
             if (error instanceof z.ZodError) {
-                res.status(400).json({ error: 'Validation failed', details: error });
+                const response = createErrorResponse('Validation failed', ErrorCode.VALIDATION_ERROR, 400, error.issues, req.id);
+                res.status(response.statusCode).json(response);
             } else {
-                res.status(500).json({ error: 'Failed to save script draft' });
+                const response = createErrorResponse('Failed to save script draft', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+                res.status(response.statusCode).json(response);
             }
         }
     }

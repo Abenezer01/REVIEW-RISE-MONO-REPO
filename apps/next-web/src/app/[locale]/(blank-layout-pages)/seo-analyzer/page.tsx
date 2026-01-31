@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 
-import axios from 'axios'
 import { useTranslations } from 'next-intl'
 
 import Box from '@mui/material/Box'
@@ -30,6 +29,7 @@ import WarningIcon from '@mui/icons-material/Warning'
 import ErrorIcon from '@mui/icons-material/Error'
 
 import { SERVICES_CONFIG } from '@/configs/services'
+import apiClient from '@/lib/apiClient'
 
 // Tabler Icons (Simple SVG Wrappers)
 const IconWorld = () => (
@@ -82,12 +82,13 @@ export default function SeoAnalyzerPage() {
             // Ensure protocol
             const targetUrl = url.startsWith('http') ? url : `https://${url}`
 
-            const response = await axios.post(`${SERVICES_CONFIG.seo.url}/seo/analyze`, {
+            // Use apiClient (auto-unwraps data field)
+            const response = await apiClient.post<SeoResult>(`${SERVICES_CONFIG.seo.url}/seo/analyze`, {
                 url: targetUrl
             })
 
-            if (response.data && response.data.data) {
-                setResult(response.data.data)
+            if (response.data) {
+                setResult(response.data)
             } else {
                 throw new Error('Invalid response format')
             }
@@ -242,7 +243,7 @@ export default function SeoAnalyzerPage() {
                                                 <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'white' }}>{rec.title}</Typography>
                                                 <Chip label={rec.impact} size="small" color={rec.impact === 'High' ? 'error' : 'secondary'} variant="outlined" />
                                             </Box>
-                                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                                            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                                                 {rec.description}
                                             </Typography>
                                         </Box>

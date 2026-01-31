@@ -14,6 +14,7 @@
   "dependencies": {
     "@platform/auth": "workspace:*",
     "@platform/contracts": "workspace:*",
+    "@platform/middleware": "workspace:*",
     "@platform/db": "workspace:*",
     "@platform/types": "workspace:*",
     "@platform/utils": "workspace:*",
@@ -25,7 +26,7 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "zod": "^4.1.13"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",

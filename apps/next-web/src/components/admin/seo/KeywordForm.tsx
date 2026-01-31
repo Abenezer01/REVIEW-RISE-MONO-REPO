@@ -3,7 +3,6 @@
 import { useState } from 'react'
 
 import * as Yup from 'yup'
-import axios from 'axios'
 import { Grid, Stack, Button, TextField, Typography, Card, CardContent } from '@mui/material'
 
 import type { KeywordDTO } from '@platform/contracts'
@@ -14,6 +13,7 @@ import CustomTagsInput from '@/components/shared/form/custom-tags-input'
 import CustomSelectBox from '@/components/shared/form/custom-select'
 
 import { SERVICES_CONFIG } from '@/configs/services';
+import apiClient from '@/lib/apiClient'
 
 const API_URL = SERVICES_CONFIG.seo.url;
 
@@ -30,23 +30,31 @@ const KeywordForm = ({ businessId, initialData, onCancel, onSuccess }: KeywordFo
   const [harvested, setHarvested] = useState<{ keyword: string; tags: string[] }[]>([])
 
   const handleSuggest = async () => {
-    const res = await axios.get(`${API_URL}/keywords/suggest`, {
-      params: { businessId, category: 'services', limit: 20 }
-    })
+    try {
+      const res = await apiClient.get<any>(`${API_URL}/keywords/suggest`, {
+        params: { businessId, category: 'services', limit: 20 }
+      })
 
-    setSuggestions(res.data?.data?.suggestions || [])
+      setSuggestions(res.data?.suggestions || [])
+    } catch (error) {
+      console.error('Failed to get suggestions', error)
+    }
   }
 
   const handleHarvest = async () => {
     if (!competitorDomain) return
 
-    const res = await axios.post(`${API_URL}/keywords/harvest`, {
-      businessId,
-      competitorDomain,
-      limit: 20
-    })
+    try {
+      const res = await apiClient.post<any>(`${API_URL}/keywords/harvest`, {
+        businessId,
+        competitorDomain,
+        limit: 20
+      })
 
-    setHarvested(res.data?.data?.keywords || [])
+      setHarvested(res.data?.keywords || [])
+    } catch (error) {
+      console.error('Failed to harvest keywords', error)
+    }
   }
 
   return (
@@ -87,10 +95,10 @@ const KeywordForm = ({ businessId, initialData, onCancel, onSuccess }: KeywordFo
         files: []
       })}
       createActionFunc={async (payload: any) => {
-        const res = await axios.post(`${API_URL}/keywords`, payload.data)
+        const res = await apiClient.post(`${API_URL}/keywords`, payload.data)
 
 
-        return res.data
+return res.data
       }}
       onActionSuccess={onSuccess}
     >
@@ -186,4 +194,3 @@ const KeywordForm = ({ businessId, initialData, onCancel, onSuccess }: KeywordFo
 }
 
 export default KeywordForm
-

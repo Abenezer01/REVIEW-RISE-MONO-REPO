@@ -79,7 +79,7 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
             });
 
             setProfiles(result.data);
-            setTotalCount(result.pagination.total);
+            setTotalCount(result.meta.total || 0);
         } catch (err: any) {
             setError(err.message || 'Failed to fetch brand profiles.');
             setProfiles([]);
@@ -91,11 +91,11 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
 
     const fetchBusinesses = async () => {
         try {
-            const response = await apiClient.get<{ data: BusinessDto[] }>('/api/admin/businesses', {
+            const result = await apiClient.get<any>('/admin/businesses', {
                 params: { limit: 100 },
             });
 
-            setBusinesses(response.data.data || []);
+            setBusinesses(result.data.data || []);
         } catch (err) {
             console.error('Failed to fetch businesses:', err);
         }

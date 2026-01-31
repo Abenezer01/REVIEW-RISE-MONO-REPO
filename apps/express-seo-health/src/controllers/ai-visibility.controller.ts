@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createSuccessResponse, createErrorResponse } from '@platform/contracts';
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 import { prisma } from '@platform/db';
 import { aiVisibilityService } from '../services/ai-visibility.service';
 import { fetchWebsite } from '../services/website-fetcher.service';
@@ -30,7 +30,8 @@ export class AIVisibilityController {
       const { url } = req.body;
 
       if (!url) {
-        res.status(400).json(createErrorResponse('URL is required', 'BAD_REQUEST', 400));
+        const errorResponse = createErrorResponse('URL is required', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
         return;
       }
 
@@ -68,7 +69,8 @@ export class AIVisibilityController {
       }
 
       if (!business) {
-        res.status(500).json(createErrorResponse('No business context found to save metrics', 'INTERNAL_SERVER_ERROR', 500));
+        const errorResponse = createErrorResponse('No business context found to save metrics', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
         return;
       }
 
@@ -164,16 +166,18 @@ export class AIVisibilityController {
       const tips = await aiVisibilityService.generateStrategicRecommendations(metrics, analysisResults, brandName);
 
       // 8. Return Response
-      res.json(createSuccessResponse({
+      const response = createSuccessResponse({
         metrics: metrics,
         platformData: analysisResults,
         tips,
         dbRecordId: savedMetric.id
-      }));
+      }, 'AI visibility analysis completed', 200, { requestId: req.id });
+      res.status(response.statusCode).json(response);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Analysis failed:', error);
-      res.status(500).json(createErrorResponse('Failed to analyze AI visibility', 'INTERNAL_SERVER_ERROR', 500));
+      const response = createErrorResponse('Failed to analyze AI visibility', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+      res.status(response.statusCode).json(response);
     }
   }
 
@@ -186,7 +190,8 @@ export class AIVisibilityController {
       const { url } = req.body;
 
       if (!url) {
-        res.status(400).json(createErrorResponse('URL is required', 'BAD_REQUEST', 400));
+        const errorResponse = createErrorResponse('URL is required', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+        res.status(errorResponse.statusCode).json(errorResponse);
         return;
       }
 
@@ -262,11 +267,15 @@ export class AIVisibilityController {
         }
       };
 
-      res.json(createSuccessResponse(validationResults));
+      const response = createSuccessResponse(validationResults, 'URL validation completed', 200, { requestId: req.id });
+      res.status(response.statusCode).json(response);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Validation failed:', error);
-      res.status(500).json(createErrorResponse('Failed to validate URL', 'INTERNAL_SERVER_ERROR', 500));
+      const response = createErrorResponse('Failed to validate URL', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+      res.status(response.statusCode).json(response);
     }
   }
 }
+
+export const aiVisibilityController = new AIVisibilityController();

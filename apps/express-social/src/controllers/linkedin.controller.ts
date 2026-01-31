@@ -1,9 +1,6 @@
 import { Request, Response } from 'express';
 import { linkedInService } from '../services/linkedin.service';
 import {
-    LinkedInAuthUrlQuerySchema,
-    LinkedInCallbackBodySchema,
-    LinkedInConnectOrgBodySchema,
     createSuccessResponse,
     createErrorResponse,
     ErrorCode
@@ -17,19 +14,7 @@ export class LinkedInController {
      */
     async getAuthUrl(req: Request, res: Response) {
         try {
-            // Validate query parameters
-            const parseResult = LinkedInAuthUrlQuerySchema.safeParse(req.query);
-            if (!parseResult.success) {
-                const response = createErrorResponse(
-                    'Invalid query parameters',
-                    ErrorCode.VALIDATION_ERROR,
-                    400,
-                    parseResult.error.issues
-                );
-                return res.status(400).json(response);
-            }
-
-            const { businessId, locationId } = parseResult.data;
+            const { businessId, locationId } = req.query as any;
 
             const state = Buffer.from(JSON.stringify({
                 businessId,
@@ -40,17 +25,21 @@ export class LinkedInController {
             
             const response = createSuccessResponse(
                 { url },
-                'LinkedIn OAuth URL generated successfully'
+                'LinkedIn OAuth URL generated successfully',
+                200,
+                { requestId: req.id }
             );
-            res.json(response);
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error in getAuthUrl:', error);
             const response = createErrorResponse(
                 'Failed to generate OAuth URL',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                req.id
             );
-            res.status(500).json(response);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -60,24 +49,10 @@ export class LinkedInController {
      */
     async handleCallback(req: Request, res: Response) {
         try {
-            const parseResult = LinkedInCallbackBodySchema.safeParse(req.body);
-            if (!parseResult.success) {
-                const response = createErrorResponse(
-                    'Invalid request body',
-                    ErrorCode.VALIDATION_ERROR,
-                    400,
-                    parseResult.error.issues
-                );
-                return res.status(400).json(response);
-            }
-
-            const { code, state } = parseResult.data;
+            const { code, state } = req.body;
 
             const tokenResponse = await linkedInService.exchangeCodeForToken(code);
 
-            // Render HTML to post message to opener
-            // Note: This is a special case where we need to return HTML instead of JSON
-            // to communicate with the popup window
             const responseHtml = `
                 <html>
                 <script>
@@ -100,9 +75,11 @@ export class LinkedInController {
             const response = createErrorResponse(
                 'Failed to authenticate with LinkedIn',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                req.id
             );
-            res.status(500).json(response);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -118,26 +95,32 @@ export class LinkedInController {
                 const response = createErrorResponse(
                     'x-li-access-token header is required',
                     ErrorCode.BAD_REQUEST,
-                    400
+                    400,
+                    undefined,
+                    req.id
                 );
-                return res.status(400).json(response);
+                return res.status(response.statusCode).json(response);
             }
 
             const orgs = await linkedInService.listOrganizations(accessToken);
             
             const response = createSuccessResponse(
                 { organizations: orgs },
-                'LinkedIn organizations retrieved successfully'
+                'LinkedIn organizations retrieved successfully',
+                200,
+                { requestId: req.id }
             );
-            res.json(response);
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error in listOrganizations:', error);
             const response = createErrorResponse(
                 'Failed to list LinkedIn organizations',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                req.id
             );
-            res.status(500).json(response);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -147,18 +130,7 @@ export class LinkedInController {
      */
     async connectOrganization(req: Request, res: Response) {
         try {
-            const parseResult = LinkedInConnectOrgBodySchema.safeParse(req.body);
-            if (!parseResult.success) {
-                const response = createErrorResponse(
-                    'Invalid request body',
-                    ErrorCode.VALIDATION_ERROR,
-                    400,
-                    parseResult.error.issues
-                );
-                return res.status(400).json(response);
-            }
-
-            const { businessId, locationId, organization, tokenData } = parseResult.data;
+            const { businessId, locationId, organization, tokenData } = req.body;
 
             const connection = await linkedInService.connectOrganization(
                 businessId,
@@ -174,18 +146,21 @@ export class LinkedInController {
             const response = createSuccessResponse(
                 { connection: sanitized },
                 'LinkedIn organization connected successfully',
-                201
+                201,
+                { requestId: req.id }
             );
-            res.status(201).json(response);
+            res.status(response.statusCode).json(response);
 
         } catch (error: any) {
             console.error('Error in connectOrganization:', error);
             const response = createErrorResponse(
                 'Failed to connect LinkedIn organization',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                req.id
             );
-            res.status(500).json(response);
+            res.status(response.statusCode).json(response);
         }
     }
 }

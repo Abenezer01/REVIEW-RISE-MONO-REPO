@@ -98,8 +98,8 @@ export const SERVICES_CONFIG = {
                 return `${getClientBaseUrl()}/api/admin`;
             }
 
-            
-return 'http://localhost:3012';
+
+            return 'http://localhost:3012';
         }
     }
 };
