@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as reviewService from '../services/review.service';
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 
 export const listReviews = async (req: Request, res: Response) => {
     try {
@@ -16,7 +17,8 @@ export const listReviews = async (req: Request, res: Response) => {
         } = req.query;
 
         if (!locationId) {
-            return res.status(400).json({ error: 'locationId is required' });
+            const errorResponse = createErrorResponse('locationId is required', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+            return res.status(errorResponse.statusCode).json(errorResponse);
         }
 
         const result = await reviewService.listReviewsByLocation({
@@ -31,10 +33,12 @@ export const listReviews = async (req: Request, res: Response) => {
             replyStatus: replyStatus as string,
         });
 
-        return res.json(result);
+        const successResponse = createSuccessResponse(result, 'Reviews fetched successfully', 200, { requestId: req.id });
+        return res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
         console.error('Error in listReviews controller:', error);
-        return res.status(500).json({ error: error.message || 'Internal server error' });
+        const errorResponse = createErrorResponse(error.message || 'Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+        return res.status(errorResponse.statusCode).json(errorResponse);
     }
 };
 
@@ -44,7 +48,8 @@ export const postReply = async (req: Request, res: Response) => {
         const { comment, authorType, sourceType, userId } = req.body;
 
         if (!reviewId || !comment) {
-            return res.status(400).json({ error: 'reviewId and comment are required' });
+            const errorResponse = createErrorResponse('reviewId and comment are required', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+            return res.status(errorResponse.statusCode).json(errorResponse);
         }
 
         const result = await reviewService.postReviewReply(reviewId, comment, {
@@ -52,10 +57,12 @@ export const postReply = async (req: Request, res: Response) => {
             sourceType,
             userId
         });
-        return res.json(result);
+        const successResponse = createSuccessResponse(result, 'Reply posted successfully', 200, { requestId: req.id });
+        return res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
         console.error('Error in postReply controller:', error);
-        return res.status(500).json({ error: error.message || 'Internal server error' });
+        const errorResponse = createErrorResponse(error.message || 'Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+        return res.status(errorResponse.statusCode).json(errorResponse);
     }
 };
 
@@ -64,13 +71,16 @@ export const rejectReply = async (req: Request, res: Response) => {
         const { reviewId } = req.params;
 
         if (!reviewId) {
-            return res.status(400).json({ error: 'reviewId is required' });
+            const errorResponse = createErrorResponse('reviewId is required', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+            return res.status(errorResponse.statusCode).json(errorResponse);
         }
 
         const result = await reviewService.rejectReviewReply(reviewId);
-        return res.json(result);
+        const successResponse = createSuccessResponse(result, 'Reply rejected successfully', 200, { requestId: req.id });
+        return res.status(successResponse.statusCode).json(successResponse);
     } catch (error: any) {
         console.error('Error in rejectReply controller:', error);
-        return res.status(500).json({ error: error.message || 'Internal server error' });
+        const errorResponse = createErrorResponse(error.message || 'Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+        return res.status(errorResponse.statusCode).json(errorResponse);
     }
 };

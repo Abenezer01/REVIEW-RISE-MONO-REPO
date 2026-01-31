@@ -11,12 +11,16 @@ export const useBusinessId = () => {
     const fetchBusinessId = async () => {
       try {
         // Fallback: Fetch first available business/location
-        const response = await apiClient.get<any[]>(`${SERVICES.admin.url}/locations`, {
+        // apiClient returns { data: any[], meta: ... } for paginated responses like /locations
+        const response = await apiClient.get<any>(`${SERVICES.admin.url}/locations`, {
           params: { limit: 1 }
         });
 
-        if (response.data?.[0]?.businessId) {
-          setBusinessId(response.data[0].businessId);
+        // The interceptor unwraps the response. For paginated, response.data is { data, meta }
+        const locations = response.data?.data || response.data || [];
+
+        if (locations[0]?.businessId) {
+          setBusinessId(locations[0].businessId);
         }
       } catch (error) {
         console.error('Failed to fetch business ID', error);
