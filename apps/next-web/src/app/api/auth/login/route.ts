@@ -3,6 +3,8 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 import { z } from 'zod'
 
+import { createSuccessResponse, createErrorResponse } from '@platform/contracts'
+
 import { backendClient } from '@/utils/backendClient'
 
 import { SERVICES_CONFIG } from '@/configs/services'
@@ -24,41 +26,27 @@ export async function POST(request: NextRequest) {
 
     if (!validationResult.success) {
       return NextResponse.json(
-        {
-          message: 'Validation failed',
-          errors: validationResult.error.flatten().fieldErrors
-        },
+        createErrorResponse('Validation failed', 'VALIDATION_ERROR', 400, validationResult.error.flatten().fieldErrors),
         { status: 400 }
       )
     }
 
     // Proxy to auth service
-    let data;
-
-    const apiResponse = await backendClient('/v1/auth/login', {
+    const data = await backendClient('/v1/auth/login', {
       method: 'POST',
       data: validationResult.data,
       baseUrl: AUTH_SERVICE_URL
     })
 
-    if (apiResponse && apiResponse.data) {
-      data = apiResponse.data
-    } else {
-      data = apiResponse
-    }
-
-    const response = NextResponse.json({
+    return NextResponse.json(createSuccessResponse({
       user: data?.user,
       accessToken: data?.accessToken,
       refreshToken: data?.refreshToken,
-      message: 'Login successful'
-    })
-
-    return response
+    }, 'Login successful'))
   } catch (error: any) {
     // Handle specific error cases if needed, otherwise fallback to generic error
     return NextResponse.json(
-      { message: error.message || 'Internal Server Error' },
+      createErrorResponse(error.message || 'Internal Server Error', error.code, error.status || 500),
       { status: error.status || 500 }
     )
   }
