@@ -4,8 +4,6 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import v1Routes from './routes/v1';
-import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
-import { requestIdMiddleware, errorHandler } from '@platform/middleware';
 
 dotenv.config();
 
@@ -16,7 +14,6 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
-app.use(requestIdMiddleware);
 
 // Mount routes at root to align with Nginx proxy behavior (which strips /api/seo/ but doesn't rewrite to /api/v1)
 app.use('/', v1Routes);
@@ -24,38 +21,27 @@ app.use('/', v1Routes);
 app.use('/api/v1', v1Routes);
 
 app.get('/', (req, res) => {
-    res.json(createSuccessResponse(
-        { version: '1.0.0' },
-        'SEO Health Checker Service is running',
-        200,
-        { requestId: req.id }
-    ));
+    res.json({ 
+        message: 'SEO Health Checker Service is running',
+        version: '1.0.0'
+    });
 });
 
 app.get('/health', (req, res) => {
-    res.json(createSuccessResponse(
-        {
-            status: 'ok',
-            service: 'express-seo-health'
-        },
-        'Service is healthy',
-        200,
-        { requestId: req.id }
-    ));
+    res.json({ 
+        status: 'ok', 
+        service: 'express-seo-health',
+        timestamp: new Date().toISOString()
+    });
 });
 
 app.use((req, res) => {
-    res.status(404).json(createErrorResponse(
-        'The requested endpoint does not exist. Please check the URL and method.',
-        ErrorCode.NOT_FOUND,
-        404,
-        { requestedEndpoint: req.originalUrl },
-        req.id
-    ));
+    res.status(404).json({
+        error: 'Endpoint not found',
+        message: 'The requested endpoint does not exist. Please check the URL and method.',
+        requestedEndpoint: req.originalUrl
+    });
 });
-
-// Use central error handler
-app.use(errorHandler);
 
 app.listen(PORT, () => {
     // eslint-disable-next-line no-console

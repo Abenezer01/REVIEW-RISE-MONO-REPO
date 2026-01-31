@@ -2,8 +2,6 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 import { z } from 'zod'
 
-import { createSuccessResponse, createErrorResponse } from '@platform/contracts'
-
 import { backendClient } from '@/utils/backendClient'
 
 import { SERVICES_CONFIG } from '@/configs/services'
@@ -23,25 +21,31 @@ export async function POST(request: NextRequest) {
 
     if (!validationResult.success) {
       return NextResponse.json(
-        createErrorResponse('Validation failed', 'VALIDATION_ERROR', 400, validationResult.error.flatten().fieldErrors),
+        {
+          message: 'Validation failed',
+          errors: validationResult.error.flatten().fieldErrors
+        },
         { status: 400 }
       )
     }
 
     // Proxy to auth service
-    const data = await backendClient('/v1/auth/refresh-token', {
+    const apiResponse = await backendClient('/v1/auth/refresh-token', {
       method: 'POST',
       data: validationResult.data,
       baseUrl: AUTH_SERVICE_URL
     })
 
-    return NextResponse.json(createSuccessResponse({
+    const data = apiResponse?.data ?? apiResponse
+
+    return NextResponse.json({
       accessToken: data?.accessToken,
-    }, 'Token refreshed successfully'))
+      message: 'Token refreshed successfully'
+    })
   } catch (error: any) {
     // Propagate the error status from the backend
     return NextResponse.json(
-      createErrorResponse(error.message || 'Internal Server Error', error.code, error.status || 500),
+      { message: error.message || 'Internal Server Error' },
       { status: error.status || 500 }
     )
   }
