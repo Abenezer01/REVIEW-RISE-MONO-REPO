@@ -60,9 +60,34 @@ const menuData: MenuItem[] = [
   },
   {
     title: 'navigation.social-rise',
-    href: '/admin/social-rise',
     icon: 'tabler-brand-twitter',
-    allowedRoles: [ROLES.ADMIN]
+    allowedRoles: [ROLES.ADMIN],
+    children: [
+      {
+        title: 'navigation.social-content',
+        href: '/admin/social-rise',
+        icon: 'tabler-calendar',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.social-planner',
+        href: '/admin/social-rise/planner',
+        icon: 'tabler-wand',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.content-templates',
+        href: '/admin/social-rise/content-templates',
+        icon: 'tabler-file-text',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.seasonal-events',
+        href: '/admin/social-rise/seasonal-events',
+        icon: 'tabler-calendar-event',
+        allowedRoles: [ROLES.ADMIN]
+      }
+    ]
   },
   {
     title: 'navigation.seo-intelligence',

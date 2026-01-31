@@ -1,11 +1,6 @@
 import { Request, Response } from 'express';
 import { facebookService } from '../services/facebook.service';
 import {
-    FacebookAuthUrlQuerySchema,
-    FacebookCallbackBodySchema,
-    FacebookConnectPageBodySchema,
-    FacebookPageIdParamSchema,
-    FacebookInstagramConnectBodySchema,
     createSuccessResponse,
     createErrorResponse,
     ErrorCode
@@ -18,19 +13,7 @@ export class FacebookController {
      */
     async getAuthUrl(req: Request, res: Response) {
         try {
-            // Validate query parameters
-            const parseResult = FacebookAuthUrlQuerySchema.safeParse(req.query);
-            if (!parseResult.success) {
-                const response = createErrorResponse(
-                    'Invalid query parameters',
-                    ErrorCode.VALIDATION_ERROR,
-                    400,
-                    parseResult.error.issues
-                );
-                return res.status(400).json(response);
-            }
-
-            const { businessId, locationId } = parseResult.data;
+            const { businessId, locationId } = req.query as any;
 
             // Encode state to pass business/location context
             const state = Buffer.from(JSON.stringify({
@@ -42,17 +25,21 @@ export class FacebookController {
             
             const response = createSuccessResponse(
                 { url },
-                'Facebook OAuth URL generated successfully'
+                'Facebook OAuth URL generated successfully',
+                200,
+                { requestId: req.id }
             );
-            res.json(response);
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error in getAuthUrl:', error);
             const response = createErrorResponse(
                 'Failed to generate OAuth URL',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                req.id
             );
-            res.status(500).json(response);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -62,18 +49,7 @@ export class FacebookController {
      */
     async handleCallback(req: Request, res: Response) {
         try {
-            const parseResult = FacebookCallbackBodySchema.safeParse(req.body);
-            if (!parseResult.success) {
-                const response = createErrorResponse(
-                    'Invalid request body',
-                    ErrorCode.VALIDATION_ERROR,
-                    400,
-                    parseResult.error.issues
-                );
-                return res.status(400).json(response);
-            }
-
-            const { code, state } = parseResult.data;
+            const { code, state } = req.body;
 
             // Exchange code for short-lived token
             const tokens = await facebookService.exchangeCodeForToken(code);
@@ -87,18 +63,22 @@ export class FacebookController {
                     expiresIn: longLivedToken.expires_in,
                     state
                 },
-                'Facebook authentication successful'
+                'Facebook authentication successful',
+                200,
+                { requestId: req.id }
             );
-            res.json(response);
+            res.status(response.statusCode).json(response);
 
         } catch (error: any) {
             console.error('Error in handleCallback:', error);
             const response = createErrorResponse(
                 'Failed to authenticate with Facebook',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                req.id
             );
-            res.status(500).json(response);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -114,26 +94,32 @@ export class FacebookController {
                 const response = createErrorResponse(
                     'x-fb-access-token header is required',
                     ErrorCode.BAD_REQUEST,
-                    400
+                    400,
+                    undefined,
+                    req.id
                 );
-                return res.status(400).json(response);
+                return res.status(response.statusCode).json(response);
             }
 
             const pages = await facebookService.listPages(accessToken);
             
             const response = createSuccessResponse(
                 { pages },
-                'Facebook pages retrieved successfully'
+                'Facebook pages retrieved successfully',
+                200,
+                { requestId: req.id }
             );
-            res.json(response);
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error in listPages:', error);
             const response = createErrorResponse(
                 'Failed to list Facebook pages',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                req.id
             );
-            res.status(500).json(response);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -143,18 +129,7 @@ export class FacebookController {
      */
     async connectPage(req: Request, res: Response) {
         try {
-            const parseResult = FacebookConnectPageBodySchema.safeParse(req.body);
-            if (!parseResult.success) {
-                const response = createErrorResponse(
-                    'Invalid request body',
-                    ErrorCode.VALIDATION_ERROR,
-                    400,
-                    parseResult.error.issues
-                );
-                return res.status(400).json(response);
-            }
-
-            const { businessId, locationId, page, userAccessToken } = parseResult.data;
+            const { businessId, locationId, page, userAccessToken } = req.body;
 
             const connection = await facebookService.connectPage(
                 businessId,
@@ -170,17 +145,20 @@ export class FacebookController {
             const response = createSuccessResponse(
                 { connection: sanitized },
                 'Facebook page connected successfully',
-                201
+                201,
+                { requestId: req.id }
             );
-            res.status(201).json(response);
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error in connectPage:', error);
             const response = createErrorResponse(
                 'Failed to connect Facebook page',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                req.id
             );
-            res.status(500).json(response);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -190,44 +168,39 @@ export class FacebookController {
      */
     async getInstagramAccounts(req: Request, res: Response) {
         try {
-            const paramResult = FacebookPageIdParamSchema.safeParse(req.params);
-            if (!paramResult.success) {
-                const response = createErrorResponse(
-                    'Invalid page ID',
-                    ErrorCode.VALIDATION_ERROR,
-                    400,
-                    paramResult.error.issues
-                );
-                return res.status(400).json(response);
-            }
-
-            const { pageId } = paramResult.data;
+            const { pageId } = req.params;
             const accessToken = req.headers['x-fb-page-access-token'] as string;
 
             if (!accessToken) {
                 const response = createErrorResponse(
                     'x-fb-page-access-token header is required',
                     ErrorCode.BAD_REQUEST,
-                    400
+                    400,
+                    undefined,
+                    req.id
                 );
-                return res.status(400).json(response);
+                return res.status(response.statusCode).json(response);
             }
 
             const igAccount = await facebookService.getInstagramBusinessAccount(pageId, accessToken);
 
             const response = createSuccessResponse(
                 { instagramAccount: igAccount },
-                'Instagram accounts retrieved successfully'
+                'Instagram accounts retrieved successfully',
+                200,
+                { requestId: req.id }
             );
-            res.json(response);
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error in getInstagramAccounts:', error);
             const response = createErrorResponse(
                 'Failed to get Instagram accounts',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                req.id
             );
-            res.status(500).json(response);
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -237,18 +210,7 @@ export class FacebookController {
      */
     async connectInstagram(req: Request, res: Response) {
         try {
-            const parseResult = FacebookInstagramConnectBodySchema.safeParse(req.body);
-            if (!parseResult.success) {
-                const response = createErrorResponse(
-                    'Invalid request body',
-                    ErrorCode.VALIDATION_ERROR,
-                    400,
-                    parseResult.error.issues
-                );
-                return res.status(400).json(response);
-            }
-
-            const { businessId, locationId, igAccountId, pageId, userAccessToken } = parseResult.data;
+            const { businessId, locationId, igAccountId, pageId, userAccessToken } = req.body;
 
             const connection = await facebookService.connectInstagram(
                 businessId,
@@ -265,18 +227,21 @@ export class FacebookController {
             const response = createSuccessResponse(
                 { connection: sanitized },
                 'Instagram account connected successfully',
-                201
+                201,
+                { requestId: req.id }
             );
-            res.status(201).json(response);
+            res.status(response.statusCode).json(response);
 
         } catch (error: any) {
             console.error('Error in connectInstagram:', error);
             const response = createErrorResponse(
                 'Failed to connect Instagram account',
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                500
+                500,
+                undefined,
+                req.id
             );
-            res.status(500).json(response);
+            res.status(response.statusCode).json(response);
         }
     }
 }

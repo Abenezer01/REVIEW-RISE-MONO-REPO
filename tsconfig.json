@@ -14,7 +14,8 @@
         "@platform/contracts": ["packages/@platform/contracts/src/index.ts"],
         "@platform/auth": ["packages/@platform/auth/src/index.ts"],
         "@platform/queues": ["packages/@platform/queues/src/index.ts"],
-        "@platform/utils": ["packages/@platform/utils/src/index.ts"]
+        "@platform/utils": ["packages/@platform/utils/src/index.ts"],
+        "@platform/middleware": ["packages/@platform/middleware/src/index.ts"]
       }
     },
     "exclude": ["node_modules", "dist"]

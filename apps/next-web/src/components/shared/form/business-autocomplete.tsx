@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
@@ -34,11 +35,13 @@ const BusinessAutocomplete: React.FC<BusinessAutocompleteProps> = ({ name, label
                 setLoading(true)
 
                 try {
+                    // apiClient returns { data: BusinessDto[], meta: ... } for paginated responses
                     const response = await apiClient.get<PaginatedResponse<BusinessDto>>('/admin/businesses', {
                         params: { search, limit: 20 }
                     })
 
-                    setOptions(response.data.data || [])
+                    // response.data is now the unwrapped PaginatedResponse structure: { data, meta }
+                    setOptions((response.data as any).data || [])
                 } catch (error) {
                     console.error('Error fetching businesses:', error)
                     setOptions([])

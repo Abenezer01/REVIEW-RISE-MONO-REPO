@@ -20,14 +20,12 @@ export const listReviewSources = async (req: Request, res: Response) => {
             // Exclude tokens
         }));
 
-        res.status(200).json(
-            createSuccessResponse(sanitizedSources, 'Review sources fetched successfully')
-        );
-    } catch (error) {
+        const response = createSuccessResponse(sanitizedSources, 'Review sources fetched successfully', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
+    } catch (error: any) {
         console.error('List review sources error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
@@ -36,14 +34,12 @@ export const listLocationReviews = async (req: Request, res: Response) => {
         const { locationId } = req.params;
         const reviews = await reviewRepository.findByLocationId(locationId);
 
-        res.status(200).json(
-            createSuccessResponse(reviews, 'Reviews fetched successfully')
-        );
-    } catch (error) {
+        const response = createSuccessResponse(reviews, 'Reviews fetched successfully', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
+    } catch (error: any) {
         console.error('List reviews error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
@@ -57,14 +53,12 @@ export const disconnectReviewSource = async (req: Request, res: Response) => {
         // Let's delete it for now to allow re-connection cleanly, or introduce status update.
         await reviewSourceRepository.delete(id);
 
-        res.status(200).json(
-            createSuccessResponse({}, 'Review source disconnected successfully')
-        );
-    } catch (error) {
+        const response = createSuccessResponse({}, 'Review source disconnected successfully', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
+    } catch (error: any) {
         console.error('Disconnect review source error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
@@ -79,18 +73,16 @@ export const getReviewStats = async (req: Request, res: Response) => {
             ? reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / totalReviews 
             : 0;
 
-        res.status(200).json(
-            createSuccessResponse({
-                totalReviews,
-                averageRating: Number(averageRating.toFixed(1)),
-                platforms: ['google', 'yelp'] // Mock or derive from sources
-            }, 'Review stats fetched successfully')
-        );
-    } catch (error) {
+        const response = createSuccessResponse({
+            totalReviews,
+            averageRating: Number(averageRating.toFixed(1)),
+            platforms: ['google', 'yelp'] // Mock or derive from sources
+        }, 'Review stats fetched successfully', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
+    } catch (error: any) {
         console.error('Get review stats error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
@@ -103,14 +95,12 @@ export const syncReviews = async (req: Request, res: Response) => {
         // Let's await for now as MVP.
         const results = await reviewSyncService.syncReviewsForLocation(locationId);
 
-        res.status(200).json(
-            createSuccessResponse(results, 'Sync completed')
-        );
-    } catch (error) {
+        const response = createSuccessResponse(results, 'Sync completed', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
+    } catch (error: any) {
         console.error('Sync reviews error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
@@ -162,13 +152,11 @@ export const getLocationKeywords = async (req: Request, res: Response) => {
             .sort((a, b) => b.count - a.count)
             .slice(0, 20); // Top 20 keywords
 
-        res.status(200).json(
-            createSuccessResponse({ keywords }, 'Keywords fetched successfully')
-        );
-    } catch (error) {
+        const response = createSuccessResponse({ keywords }, 'Keywords fetched successfully', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
+    } catch (error: any) {
         console.error('Get location keywords error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };

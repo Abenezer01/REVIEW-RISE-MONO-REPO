@@ -31,7 +31,7 @@ export class LLMService {
         if (provider === 'gemini') {
             try {
                 const genAI = this.getGemini();
-                // Default to 1.5-flash for speed/efficiency
+                // Default to 2.5-flash as requested by the user
                 // Ensure we don't pass an OpenAI model name to Gemini
                 const modelName = exactGeminiModel(options.model) || "gemini-2.5-flash";  
                 const model = genAI.getGenerativeModel({ 

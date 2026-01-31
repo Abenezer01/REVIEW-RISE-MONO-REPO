@@ -43,7 +43,7 @@ async function main() {
 
             // Check if exact match exists (handling null locationId explicitly in JS)
             const exists = existingRoles.find(r => r.locationId === lId);
-            
+
             if (!exists) {
                 const createData: any = {
                     userId: uId,
@@ -53,14 +53,14 @@ async function main() {
                 if (lId) {
                     createData.locationId = lId;
                 }
-                
+
                 await prisma.userBusinessRole.create({
                     data: createData
                 });
             }
         } catch (e) {
             console.error(`FAILED assignRole for u=${uId} b=${bId} r=${rId} l=${lId}`, e);
-            throw e; 
+            throw e;
         }
     };
 
@@ -88,11 +88,11 @@ async function main() {
     const assignSystemRole = async (userId: string, roleName: string) => {
         const role = await prisma.role.findUnique({ where: { name: roleName } });
         if (role) {
-             await prisma.userRole.upsert({
+            await prisma.userRole.upsert({
                 where: { userId_roleId: { userId, roleId: role.id } },
                 create: { userId, roleId: role.id },
                 update: {}
-             });
+            });
         }
     };
 
@@ -337,10 +337,10 @@ async function main() {
     // Create Brand Profile for business1
     console.log('🎭 Creating brand profile for business1...');
     await prisma.brandProfile.upsert({
-        where: { id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' },
+        where: { id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb' },
         update: {},
         create: {
-            id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+            id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
             businessId: business1.id,
             websiteUrl: 'https://acme-restaurant.com',
             status: 'completed',
@@ -360,10 +360,10 @@ async function main() {
     // 6. Create Locations
     console.log('📍 Creating locations...');
     await prisma.location.upsert({
-        where: { id: '11111111-1111-1111-1111-111111111111' },
+        where: { id: '11111111-1111-4111-8111-111111111111' },
         update: {},
         create: {
-            id: '11111111-1111-1111-1111-111111111111',
+            id: '11111111-1111-4111-8111-111111111111',
             name: 'ACME Downtown',
             address: '123 Main Street, New York, NY 10001, US',
             status: 'active',
@@ -372,10 +372,10 @@ async function main() {
     });
 
     await prisma.location.upsert({
-        where: { id: '22222222-2222-2222-2222-222222222222' },
+        where: { id: '22222222-2222-4222-8222-222222222222' },
         update: {},
         create: {
-            id: '22222222-2222-2222-2222-222222222222',
+            id: '22222222-2222-4222-8222-222222222222',
             name: 'ACME Uptown',
             address: '456 Park Avenue, New York, NY 10021, US',
             status: 'active',
@@ -384,10 +384,10 @@ async function main() {
     });
 
     await prisma.location.upsert({
-        where: { id: '33333333-3333-3333-3333-333333333333' },
+        where: { id: '33333333-3333-4333-8333-333333333333' },
         update: {},
         create: {
-            id: '33333333-3333-3333-3333-333333333333',
+            id: '33333333-3333-4333-8333-333333333333',
             name: 'Tech Cafe Main',
             address: '789 Tech Boulevard, San Francisco, CA 94102, US',
             status: 'active',
@@ -399,19 +399,19 @@ async function main() {
 
     // 7. Assign Users to Businesses with Roles
     console.log('🔗 Assigning users to businesses...');
-    
+
     // ACME Downtown ID
-    const acmeDowntownId = '11111111-1111-1111-1111-111111111111';
-    
+    const acmeDowntownId = '11111111-1111-4111-8111-111111111111';
+
     // Assign Owner role to user1 for business1
     await assignRole(user1.id, business1.id, ownerRole.id, null);
-    
+
     // Assign Admin role to user2 for business1
     await assignRole(user2.id, business1.id, adminRole.id, null);
-    
+
     // Assign Manager role to user3 for business2
     await assignRole(user3.id, business2.id, managerRole.id, null);
-    
+
     // Assign Manager role to user2 specifically for ACME Downtown
     await assignRole(user2.id, business1.id, managerRole.id, acmeDowntownId);
 
@@ -428,10 +428,10 @@ async function main() {
     // 8. Create Sample Subscriptions
     console.log('💳 Creating subscriptions...');
     await prisma.subscription.upsert({
-        where: { id: '44444444-4444-4444-4444-444444444444' },
+        where: { id: '44444444-4444-4444-8444-444444444444' },
         update: {},
         create: {
-            id: '44444444-4444-4444-4444-444444444444',
+            id: '44444444-4444-4444-8444-444444444444',
             businessId: business1.id,
             plan: 'professional',
             status: 'active',
@@ -442,10 +442,10 @@ async function main() {
     });
 
     await prisma.subscription.upsert({
-        where: { id: '55555555-5555-5555-5555-555555555555' },
+        where: { id: '55555555-5555-4555-8555-555555555555' },
         update: {},
         create: {
-            id: '55555555-5555-5555-5555-555555555555',
+            id: '55555555-5555-4555-8555-555555555555',
             businessId: business2.id,
             plan: 'starter',
             status: 'active',
@@ -462,45 +462,45 @@ async function main() {
     console.log('💳 Creating problematic subscriptions...');
     // Unpaid subscription (e.g., payment failed on renewal)
     await prisma.subscription.upsert({
-      where: { id: '99999999-9999-9999-9999-999999999999' },
-      update: {},
-      create: {
-        id: '99999999-9999-9999-9999-999999999999',
-        businessId: business1.id,
-        plan: 'professional',
-        status: 'unpaid',
-        currentPeriodEnd: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-        stripeSubscriptionId: 'sub_test_acme_unpaid',
-        stripeCustomerId: 'cus_test_acme_123',
-      },
+        where: { id: '99999999-9999-4999-8999-999999999999' },
+        update: {},
+        create: {
+            id: '99999999-9999-4999-8999-999999999999',
+            businessId: business1.id,
+            plan: 'professional',
+            status: 'unpaid',
+            currentPeriodEnd: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+            stripeSubscriptionId: 'sub_test_acme_unpaid',
+            stripeCustomerId: 'cus_test_acme_123',
+        },
     });
     // Incomplete subscription (e.g., payment method requires action)
     await prisma.subscription.upsert({
-      where: { id: '00000000-0000-0000-0000-000000000000' },
-      update: {},
-      create: {
-        id: '00000000-0000-0000-0000-000000000000',
-        businessId: business2.id,
-        plan: 'starter',
-        status: 'incomplete',
-        currentPeriodEnd: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now (but incomplete)
-        stripeSubscriptionId: 'sub_test_tech_incomplete',
-        stripeCustomerId: 'cus_test_tech_123',
-      },
+        where: { id: '00000000-0000-4000-8000-000000000000' },
+        update: {},
+        create: {
+            id: '00000000-0000-4000-8000-000000000000',
+            businessId: business2.id,
+            plan: 'starter',
+            status: 'incomplete',
+            currentPeriodEnd: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now (but incomplete)
+            stripeSubscriptionId: 'sub_test_tech_incomplete',
+            stripeCustomerId: 'cus_test_tech_123',
+        },
     });
     // Incomplete_expired subscription (e.g., payment action not taken in time)
     await prisma.subscription.upsert({
-      where: { id: '11111111-1111-1111-1111-111111111111' },
-      update: {},
-      create: {
-        id: '11111111-1111-1111-1111-111111111111',
-        businessId: business1.id,
-        plan: 'basic',
-        status: 'incomplete_expired',
-        currentPeriodEnd: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
-        stripeSubscriptionId: 'sub_test_acme_incomplete_expired',
-        stripeCustomerId: 'cus_test_acme_123',
-      },
+        where: { id: '11111111-1111-4111-8111-111111111111' },
+        update: {},
+        create: {
+            id: '11111111-1111-4111-8111-111111111111',
+            businessId: business1.id,
+            plan: 'basic',
+            status: 'incomplete_expired',
+            currentPeriodEnd: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+            stripeSubscriptionId: 'sub_test_acme_incomplete_expired',
+            stripeCustomerId: 'cus_test_acme_123',
+        },
     });
     console.log(`✅ Created 3 problematic subscriptions\n`);
 
@@ -509,64 +509,64 @@ async function main() {
 
     // Audit log for unpaid subscription (Insufficient funds)
     await prisma.auditLog.create({
-      data: {
-        userId: user2.id, // Admin user
-        action: 'subscription:issue_contacted',
-        entityType: 'Subscription',
-        entityId: '99999999-9999-9999-9999-999999999999', // Unpaid subscription
-        details: {
-          reason: 'Insufficient funds or exceeded credit limit',
-          status: 'contacted',
-          notes: 'Customer contacted regarding payment failure due to insufficient funds.',
+        data: {
+            userId: user2.id, // Admin user
+            action: 'subscription:issue_contacted',
+            entityType: 'Subscription',
+            entityId: '99999999-9999-4999-8999-999999999999', // Unpaid subscription
+            details: {
+                reason: 'Insufficient funds or exceeded credit limit',
+                status: 'contacted',
+                notes: 'Customer contacted regarding payment failure due to insufficient funds.',
+            },
         },
-      },
     });
 
     // Audit log for incomplete subscription (Fraud suspicion)
     await prisma.auditLog.create({
-      data: {
-        userId: user2.id, // Admin user
-        action: 'subscription:issue_contacted',
-        entityType: 'Subscription',
-        entityId: '00000000-0000-0000-0000-000000000000', // Incomplete subscription
+        data: {
+            userId: user2.id, // Admin user
+            action: 'subscription:issue_contacted',
+            entityType: 'Subscription',
+            entityId: '00000000-0000-4000-8000-000000000000', // Incomplete subscription
             details: {
-          reason: 'Fraud suspicion or security flags',
-          status: 'contacted',
-          notes: 'Payment flagged for potential fraud, customer notified for verification.',
+                reason: 'Fraud suspicion or security flags',
+                status: 'contacted',
+                notes: 'Payment flagged for potential fraud, customer notified for verification.',
+            },
         },
-      },
     });
 
     // Audit log for incomplete_expired subscription (Technical or processing issues)
     await prisma.auditLog.create({
-      data: {
-        userId: user2.id, // Admin user
-        action: 'subscription:issue_contacted',
-        entityType: 'Subscription',
-        entityId: '11111111-1111-1111-1111-111111111111', // Incomplete_expired subscription
+        data: {
+            userId: user2.id, // Admin user
+            action: 'subscription:issue_contacted',
+            entityType: 'Subscription',
+            entityId: '11111111-1111-4111-8111-111111111111', // Incomplete_expired subscription
             details: {
-          reason: 'Technical or processing issues',
-          status: 'contacted',
-          notes: 'Payment failed due to a technical issue during processing. Retrying payment.',
+                reason: 'Technical or processing issues',
+                status: 'contacted',
+                notes: 'Payment failed due to a technical issue during processing. Retrying payment.',
+            },
         },
-      },
     });
 
     console.log(`✅ Created 3 audit logs for problematic subscriptions\n`);
 
     // 9. Create Failed Jobs
     console.log('⚠️ Creating failed jobs...');
-    
+
     // Job 1: Review Fetch Failure
     await prisma.job.upsert({
-        where: { id: '66666666-6666-6666-6666-666666666666' },
+        where: { id: '66666666-6666-4666-8666-666666666666' },
         update: {},
         create: {
-            id: '66666666-6666-6666-6666-666666666666',
+            id: '66666666-6666-4666-8666-666666666666',
             type: 'reviews',
             status: 'failed',
             businessId: business1.id,
-            locationId: '11111111-1111-1111-1111-111111111111',
+            locationId: '11111111-1111-4111-8111-111111111111',
             error: {
                 message: 'Google API rate limit exceeded',
                 code: 'RATE_LIMIT_EXCEEDED',
@@ -585,14 +585,14 @@ async function main() {
 
     // Job 2: Social Post Failure
     await prisma.job.upsert({
-        where: { id: '77777777-7777-7777-7777-777777777777' },
+        where: { id: '77777777-7777-4777-8777-777777777777' },
         update: {},
         create: {
-            id: '77777777-7777-7777-7777-777777777777',
+            id: '77777777-7777-4777-8777-777777777777',
             type: 'social_posts',
             status: 'failed',
             businessId: business2.id,
-            locationId: '33333333-3333-3333-3333-333333333333',
+            locationId: '33333333-3333-4333-8333-333333333333',
             error: {
                 message: 'Invalid image format',
                 code: 'INVALID_FORMAT',
@@ -612,10 +612,10 @@ async function main() {
 
     // Job 3: AI Task Failure
     await prisma.job.upsert({
-        where: { id: '88888888-8888-8888-8888-888888888888' },
+        where: { id: '88888888-8888-4888-8888-888888888888' },
         update: {},
         create: {
-            id: '88888888-8888-8888-8888-888888888888',
+            id: '88888888-8888-4888-8888-888888888888',
             type: 'ai_tasks',
             status: 'failed',
             businessId: business1.id,
@@ -639,7 +639,7 @@ async function main() {
 
     // 10. Create Review Sync Logs
     console.log('📝 Creating review sync logs...');
-    
+
     // Clear reviews and replies to check flow from scratch
     console.log('🗑️ Deleting existing reviews, replies and sources...');
     await prisma.reviewReply.deleteMany({});
@@ -651,8 +651,8 @@ async function main() {
     console.log('🔌 Creating review source for ACME Downtown...');
     const reviewSource1 = await prisma.reviewSource.create({
         data: {
-            id: '77777777-7777-7777-7777-777777777777',
-            locationId: '11111111-1111-1111-1111-111111111111',
+            id: '77777777-7777-4777-8777-777777777777',
+            locationId: '11111111-1111-4111-8111-111111111111',
             platform: 'gbp',
             accessToken: 'dummy_access_token',
             refreshToken: 'dummy_refresh_token',
@@ -669,7 +669,7 @@ async function main() {
     await prisma.reviewSyncLog.create({
         data: {
             businessId: business1.id,
-            locationId: '11111111-1111-1111-1111-111111111111',
+            locationId: '11111111-1111-4111-8111-111111111111',
             platform: 'google',
             status: 'success',
             reviewsSynced: 15,
@@ -695,7 +695,7 @@ async function main() {
     await prisma.reviewSyncLog.create({
         data: {
             businessId: business1.id,
-            locationId: '22222222-2222-2222-2222-222222222222',
+            locationId: '22222222-2222-4222-8222-222222222222',
             platform: 'facebook',
             status: 'failed',
             errorMessage: 'Facebook Graph API Error: Session expired',
@@ -703,7 +703,7 @@ async function main() {
             durationMs: 500,
             startedAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
             completedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 + 500),
-            jobId: '66666666-6666-6666-6666-666666666666',
+            jobId: '66666666-6666-4666-8666-666666666666',
             requestData: {
                 pageId: '1029384756',
                 fields: 'rating,review_text,created_time'
@@ -722,7 +722,7 @@ async function main() {
     await prisma.reviewSyncLog.create({
         data: {
             businessId: business2.id,
-            locationId: '33333333-3333-3333-3333-333333333333',
+            locationId: '33333333-3333-4333-8333-333333333333',
             platform: 'yelp',
             status: 'success',
             reviewsSynced: 5,
@@ -746,8 +746,8 @@ async function main() {
 
     // 11. Create Sample Reviews
     console.log('⭐ Creating sample reviews...');
-    const location1_id = '11111111-1111-1111-1111-111111111111';
-    
+    const location1_id = '11111111-1111-4111-8111-111111111111';
+
     await prisma.review.create({
         data: {
             author: 'Alice Johnson',
@@ -758,7 +758,7 @@ async function main() {
             externalId: 'google_review_1',
             businessId: business1.id,
             locationId: location1_id,
-            reviewSourceId: '77777777-7777-7777-7777-777777777777',
+            reviewSourceId: '77777777-7777-4777-8777-777777777777',
             sentiment: 'Positive',
             replyStatus: 'pending'
         }
@@ -774,13 +774,98 @@ async function main() {
             externalId: 'google_review_2',
             businessId: business1.id,
             locationId: location1_id,
-            reviewSourceId: '77777777-7777-7777-7777-777777777777',
+            reviewSourceId: '77777777-7777-4777-8777-777777777777',
             sentiment: 'Neutral',
             replyStatus: 'pending'
         }
     });
 
     console.log(`✅ Created 2 sample reviews\n`);
+
+    // 12. Create Content Templates (Task 4.1)
+    console.log('📝 Creating content templates...');
+    const industries = ['Local Restaurant', 'Salon', 'Agency', 'Real Estate'];
+
+    const templates = [
+        // Local Restaurant
+        { industry: 'Local Restaurant', title: 'Menu Spotlight', contentType: 'image', content: 'Check out our delicious [Dish Name]! Made fresh daily with local ingredients. #LocalEats #Foodie' },
+        { industry: 'Local Restaurant', title: 'Behind the Scenes', contentType: 'video', content: 'Meet our chef and see how we prepare your favorite dishes! #KitchenLife #ChefSpotlight' },
+        { industry: 'Local Restaurant', title: 'Customer Favorite', contentType: 'image', content: 'Our customers can\'t get enough of [Popular Dish]. Come try it today! #CustomerLove #TopPick' },
+        { industry: 'Local Restaurant', title: 'Special Offer', contentType: 'image', content: 'Limited time offer! Get 20% off your next meal when you mention this post. #DiningDeal #LocalBiz' },
+
+        // Salon
+        { industry: 'Salon', title: 'Transformation Tuesday', contentType: 'image', content: 'Check out this amazing hair transformation! Book your appointment today. #HairGoals #SalonLife' },
+        { industry: 'Salon', title: 'Product Recommendation', contentType: 'image', content: 'Keep your hair looking fresh with [Product Name]. Now available in-store! #HairCare #BeautyTips' },
+        { industry: 'Salon', title: 'Stylist Spotlight', contentType: 'video', content: 'Meet [Stylist Name], our expert in [Specialty]. #StylistLife #ExpertAdvice' },
+        { industry: 'Salon', title: 'New Service Alert', contentType: 'image', content: 'We are now offering [New Service]! Treat yourself to some pampering. #NewService #PamperDay' },
+
+        // Agency
+        { industry: 'Agency', title: 'Case Study', contentType: 'carousel', content: 'How we helped [Client Name] achieve [Result]. Swipe to see the details! #SuccessStory #MarketingAgency' },
+        { industry: 'Agency', title: 'Expert Tip', contentType: 'image', content: 'Want to improve your [Metric]? Here is a quick tip from our experts. #MarketingTips #ExpertAdvice' },
+        { industry: 'Agency', title: 'Industry News', contentType: 'image', content: 'Stay ahead of the curve! Here is what you need to know about [Industry Trend]. #IndustryTrends #AgencyInsights' },
+        { industry: 'Agency', title: 'Meet the Team', contentType: 'video', content: 'Get to know the faces behind the magic at [Agency Name]. #TeamSpotlight #AgencyLife' },
+
+        // Real Estate
+        { industry: 'Real Estate', title: 'New Listing', contentType: 'carousel', content: 'Check out this stunning new listing in [Neighborhood]! 3 bed, 2 bath, and a beautiful backyard. #NewListing #HomeForSale' },
+        { industry: 'Real Estate', title: 'Open House', contentType: 'image', content: 'Join us this Saturday for an open house at [Address]. See you there! #OpenHouse #RealEstate' },
+        { industry: 'Real Estate', title: 'Market Update', contentType: 'image', content: 'The market in [City] is heating up! Here is the latest update for buyers and sellers. #MarketUpdate #RealEstateNews' },
+        { industry: 'Real Estate', title: 'Home Maintenance Tip', contentType: 'image', content: 'Keep your home in top shape with these quick maintenance tips. #HomeTips #RealEstateExpert' }
+    ];
+
+    /*
+    for (const t of templates) {
+        const existing = await (prisma as any).contentTemplate.findFirst({
+            where: {
+                industry: t.industry,
+                title: t.title
+            }
+        });
+
+        if (!existing) {
+            await (prisma as any).contentTemplate.create({
+                data: {
+                    industry: t.industry,
+                    title: t.title,
+                    contentType: t.contentType,
+                    content: t.content,
+                    objective: 'Engagement'
+                }
+            });
+        }
+    }
+    console.log(`✅ Created ${templates.length} content templates\n`);
+
+    // 13. Create Seasonal Events (Task 4.1)
+    console.log('📅 Creating seasonal events...');
+    const events = [
+        { name: 'Valentine\'s Day', date: new Date(2026, 1, 14), market: 'Global', description: 'Celebration of love and affection.', tags: ['love', 'romance', 'gifts'] },
+        { name: 'President\'s Day', date: new Date(2026, 1, 16), market: 'US', description: 'Honoring US Presidents.', tags: ['holiday', 'history', 'usa'] },
+        { name: 'St. Patrick\'s Day', date: new Date(2026, 2, 17), market: 'Global', description: 'Celebration of Irish culture.', tags: ['irish', 'green', 'culture'] },
+        { name: 'First Day of Spring', date: new Date(2026, 2, 20), market: 'Northern Hemisphere', description: 'Vernal equinox.', tags: ['spring', 'nature', 'renewal'] }
+    ];
+
+    for (const e of events) {
+        const existing = await (prisma as any).seasonalEvent.findFirst({
+            where: {
+                name: e.name,
+                date: e.date
+            }
+        });
+
+        if (!existing) {
+            await (prisma as any).seasonalEvent.create({
+                data: {
+                    name: e.name,
+                    date: e.date,
+                    market: e.market,
+                    description: e.description,
+                    tags: e.tags
+                }
+            });
+        }
+    }
+    console.log(`✅ Created ${events.length} seasonal events\n`);
+    */
 
     console.log('✨ Seed completed successfully!\n');
     console.log('Summary:');

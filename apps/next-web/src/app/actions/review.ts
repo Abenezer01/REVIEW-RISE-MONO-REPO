@@ -183,7 +183,7 @@ export async function analyzeSingleReview(reviewId: string) {
     // Call Express AI service
     const expressAiUrl = SERVICES_CONFIG.ai.url
 
-    const response = await fetch(`${expressAiUrl}/ai/reviews/analyze`, {
+    const response = await fetch(`${expressAiUrl}/reviews/analyze`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

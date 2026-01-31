@@ -10,6 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { alpha, useTheme } from '@mui/material/styles';
 import type { GridColDef } from '@mui/x-data-grid';
 
 import { BrandService, type PublishingLog } from '@/services/brand.service';
@@ -26,6 +27,8 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
 };
 
 const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingLogsTableProps) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const [logs, setLogs] = useState<PublishingLog[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -204,7 +207,16 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4, mb: 6 }}>
+      <Box sx={{ 
+        display: 'flex', 
+        flexWrap: 'wrap', 
+        gap: 3, 
+        mb: 8,
+        p: 5,
+        borderRadius: '20px',
+        bgcolor: isDark ? alpha(theme.palette.common.white, 0.02) : alpha(theme.palette.common.black, 0.01),
+        border: `1px solid ${isDark ? alpha(theme.palette.common.white, 0.05) : alpha(theme.palette.common.black, 0.05)}`
+      }}>
         <TextField
           id="log-platform-filter"
           select
@@ -212,14 +224,55 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
           label="Platform"
           value={filters.platform}
           onChange={(e) => setFilters({ ...filters, platform: e.target.value })}
-          sx={{ minWidth: 150 }}
+          sx={{ 
+            minWidth: 180,
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '12px',
+              bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : 'background.paper',
+              '& fieldset': { border: 'none' },
+              '&.Mui-focused': {
+                boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
+              }
+            },
+            '& .MuiInputLabel-root': { fontWeight: 600 }
+          }}
         >
-          <MenuItem value="ALL">All Platforms</MenuItem>
-          <MenuItem value="INSTAGRAM">Instagram</MenuItem>
-          <MenuItem value="FACEBOOK">Facebook</MenuItem>
-          <MenuItem value="LINKEDIN">LinkedIn</MenuItem>
-          <MenuItem value="TWITTER">Twitter (X)</MenuItem>
-          <MenuItem value="GOOGLE_BUSINESS">Google Business</MenuItem>
+          <MenuItem value="ALL">
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Icon icon="tabler-world" fontSize={18} />
+              <Typography variant="body2" fontWeight="600">All Platforms</Typography>
+            </Box>
+          </MenuItem>
+          <MenuItem value="INSTAGRAM">
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Icon icon="tabler-brand-instagram" fontSize={18} style={{ color: '#E4405F' }} />
+              <Typography variant="body2" fontWeight="600">Instagram</Typography>
+            </Box>
+          </MenuItem>
+          <MenuItem value="FACEBOOK">
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Icon icon="tabler-brand-facebook" fontSize={18} style={{ color: '#1877F2' }} />
+              <Typography variant="body2" fontWeight="600">Facebook</Typography>
+            </Box>
+          </MenuItem>
+          <MenuItem value="LINKEDIN">
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Icon icon="tabler-brand-linkedin" fontSize={18} style={{ color: '#0A66C2' }} />
+              <Typography variant="body2" fontWeight="600">LinkedIn</Typography>
+            </Box>
+          </MenuItem>
+          <MenuItem value="TWITTER">
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Icon icon="tabler-brand-x" fontSize={18} />
+              <Typography variant="body2" fontWeight="600">Twitter (X)</Typography>
+            </Box>
+          </MenuItem>
+          <MenuItem value="GOOGLE_BUSINESS">
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Icon icon="tabler-brand-google" fontSize={18} style={{ color: '#4285F4' }} />
+              <Typography variant="body2" fontWeight="600">Google Business</Typography>
+            </Box>
+          </MenuItem>
         </TextField>
 
         <TextField
@@ -229,7 +282,18 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
           label="Status"
           value={filters.status}
           onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          sx={{ minWidth: 150 }}
+          sx={{ 
+            minWidth: 160,
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '12px',
+              bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : 'background.paper',
+              '& fieldset': { border: 'none' },
+              '&.Mui-focused': {
+                boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
+              }
+            },
+            '& .MuiInputLabel-root': { fontWeight: 600 }
+          }}
         >
           <MenuItem value="ALL">All Statuses</MenuItem>
           <MenuItem value="completed">Published</MenuItem>
@@ -246,6 +310,18 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
           value={filters.startDate}
           onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
           slotProps={{ inputLabel: { shrink: true } }}
+          sx={{ 
+            minWidth: 160,
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '12px',
+              bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : 'background.paper',
+              '& fieldset': { border: 'none' },
+              '&.Mui-focused': {
+                boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
+              }
+            },
+            '& .MuiInputLabel-root': { fontWeight: 600 }
+          }}
         />
 
         <TextField
@@ -256,14 +332,40 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
           value={filters.endDate}
           onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
           slotProps={{ inputLabel: { shrink: true } }}
+          sx={{ 
+            minWidth: 160,
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '12px',
+              bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : 'background.paper',
+              '& fieldset': { border: 'none' },
+              '&.Mui-focused': {
+                boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
+              }
+            },
+            '& .MuiInputLabel-root': { fontWeight: 600 }
+          }}
         />
       </Box>
 
-      <TableListing
-        columns={columns}
-        items={logs}
-        isLoading={loading}
-      />
+      <Box sx={{ 
+        '& .MuiDataGrid-root': {
+          border: 'none',
+          '& .MuiDataGrid-columnHeaders': {
+            bgcolor: isDark ? alpha(theme.palette.common.white, 0.02) : alpha(theme.palette.common.black, 0.01),
+            borderRadius: '12px',
+            mb: 2
+          },
+          '& .MuiDataGrid-cell': {
+            borderColor: isDark ? alpha(theme.palette.common.white, 0.05) : alpha(theme.palette.common.black, 0.05),
+          }
+        }
+      }}>
+        <TableListing
+          columns={columns}
+          items={logs}
+          isLoading={loading}
+        />
+      </Box>
     </Box>
   );
 };

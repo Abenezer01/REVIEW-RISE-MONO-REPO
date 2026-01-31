@@ -13,6 +13,8 @@
     "@google/generative-ai": "^0.24.1",
     "axios": "^1.6.0",
     "@platform/contracts": "workspace:*",
+    "@platform/middleware": "workspace:*",
+    "zod": "^4.3.6",
     "@platform/db": "workspace:*",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

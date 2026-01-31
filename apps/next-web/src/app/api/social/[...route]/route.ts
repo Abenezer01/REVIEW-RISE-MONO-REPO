@@ -1,5 +1,8 @@
-import type { NextRequest} from 'next/server';
+/* eslint-disable import/no-unresolved */
+import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+
+import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 
 import { SERVICES_CONFIG } from '@/configs/services';
 
@@ -40,7 +43,11 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ route: st
             body,
         });
 
-        // Handle response
+        // Handle 204 No Content
+        if (response.status === 204) {
+            return new NextResponse(null, { status: 204 });
+        }
+
         const text = await response.text();
         let data;
 
@@ -50,12 +57,41 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ route: st
             data = { message: text };
         }
 
-        return NextResponse.json(data, { status: response.status });
+        // If it's already standardized, pass it through
+        if (data && typeof data === 'object' && ('success' in data) && ('data' in data || 'error' in data)) {
+            return NextResponse.json(data, { status: response.status });
+        }
+
+        // Otherwise wrap it
+        if (response.ok) {
+            const wrapped = createSuccessResponse(data, 'Success', response.status);
+
+            
+return NextResponse.json(wrapped, { status: response.status });
+        } else {
+            const wrapped = createErrorResponse(
+                data.message || data.error || 'Proxy Error',
+                data.code || ErrorCode.INTERNAL_SERVER_ERROR,
+                response.status,
+                data.details || data
+            );
+
+            
+return NextResponse.json(wrapped, { status: response.status });
+        }
 
     } catch (error) {
         console.error('Social Proxy error:', error);
+
+        const errorResponse = createErrorResponse(
+            'Proxy error',
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            500,
+            String(error)
+        );
+
         
-return NextResponse.json({ error: 'Proxy error', details: String(error) }, { status: 500 });
+return NextResponse.json(errorResponse, { status: 500 });
     }
 }
 
