@@ -1,6 +1,7 @@
 /* eslint-disable import/no-unresolved */
 import { type NextRequest, NextResponse } from 'next/server'
 
+import { createSuccessResponse, createErrorResponse } from '@platform/contracts'
 import { backendClient } from '@/utils/backendClient'
 import { getServerAuthHeaders } from '@/utils/getServerAuthHeaders'
 import { SERVICES_CONFIG } from '@/configs/services'
@@ -21,12 +22,12 @@ export async function POST(request: NextRequest) {
       headers: authHeaders
     })
 
-    return NextResponse.json(data)
+    return NextResponse.json(createSuccessResponse(data))
   } catch (error: any) {
     console.error('Error in AI Visibility API proxy:', error)
 
     return NextResponse.json(
-      { message: error.message || 'Internal Server Error' },
+      createErrorResponse(error.message || 'Internal Server Error', error.code, error.status || 500),
       { status: error.status || 500 }
     )
   }
