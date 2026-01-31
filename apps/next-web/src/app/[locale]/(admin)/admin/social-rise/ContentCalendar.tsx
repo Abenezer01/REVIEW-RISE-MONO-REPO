@@ -207,7 +207,7 @@ const ContentCalendar = ({ scheduledPosts, onEventDrop, onDateClick, onEventClic
                   <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
                     {platforms.map((p: string) => {
                       const platformKey = PLATFORM_ICONS[p] ? p : p.toUpperCase().replace(/\s+/g, '_');
-                      const platform = PLATFORM_ICONS[platformKey] || { icon: 'tabler-world', color: 'inherit' };
+                      const platform = PLATFORM_ICONS[platformKey] || { icon: 'tabler-world', color: theme.palette.text.secondary };
 
                       return (
                         <Box

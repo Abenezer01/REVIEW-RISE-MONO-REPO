@@ -31,7 +31,9 @@ export async function POST(request: NextRequest) {
         400,
         validationResult.error.flatten().fieldErrors
       )
-      return NextResponse.json(response, { status: response.statusCode })
+
+      
+return NextResponse.json(response, { status: response.statusCode })
     }
 
     // Proxy to auth service
@@ -66,6 +68,8 @@ export async function POST(request: NextRequest) {
       error.code || ErrorCode.INTERNAL_SERVER_ERROR,
       error.status || 500
     )
-    return NextResponse.json(response, { status: response.statusCode })
+
+    
+return NextResponse.json(response, { status: response.statusCode })
   }
 }

@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+
 import { createErrorResponse, ErrorCode } from '@platform/contracts';
 
 import { SERVICES_CONFIG } from '@/configs/services';
@@ -87,7 +88,9 @@ async function proxy(req: NextRequest) {
       500,
       String(error)
     );
-    return NextResponse.json(response, { status: response.statusCode });
+
+    
+return NextResponse.json(response, { status: response.statusCode });
   }
 }
 

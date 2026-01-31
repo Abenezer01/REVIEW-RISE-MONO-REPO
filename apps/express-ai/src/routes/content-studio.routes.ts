@@ -26,5 +26,7 @@ router.post('/prompts/generate', validateRequest(PromptIdeaRequestSchema), (req,
 router.post('/images', validateRequest(ImageGenerationRequestSchema), (req, res) => contentStudioController.generateImage(req, res));
 router.post('/carousels', validateRequest(CarouselRequestSchema), (req, res) => contentStudioController.generateCarousel(req, res));
 router.post('/scripts', validateRequest(ScriptRequestSchema), (req, res) => contentStudioController.generateScript(req, res));
+router.post('/complete-post', (req, res) => contentStudioController.generateCompletePost(req, res));
+
 
 export default router;

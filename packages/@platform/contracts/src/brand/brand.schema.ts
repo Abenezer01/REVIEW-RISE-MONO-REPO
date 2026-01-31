@@ -39,7 +39,15 @@ export const BrandContentSchema = z.object({
 export const UpdateBrandContentSchema = BrandContentSchema.partial();
 
 export const ScheduledPostSchema = z.object({
-    content: z.string().min(1),
+    content: z.union([
+        z.string().min(1),
+        z.object({
+            title: z.string().optional(),
+            text: z.string(),
+            hashtags: z.string().optional(),
+            media: z.array(z.any()).optional(),
+        })
+    ]),
     scheduledAt: z.string().datetime(),
     platforms: z.array(z.string()),
 });

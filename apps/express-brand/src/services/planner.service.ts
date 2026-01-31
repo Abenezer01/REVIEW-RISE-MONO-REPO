@@ -46,15 +46,19 @@ export const generateMonthlyPlan = async (businessId: string, options: {
       context: aiContext
     });
 
-    if (aiResponse.data?.days && Array.isArray(aiResponse.data.days)) {
+    // The AI service wraps the response in a success response object
+    // Extract the actual data which contains the days array
+    const planData = aiResponse.data?.data || aiResponse.data;
+
+    if (planData?.days && Array.isArray(planData.days)) {
       // Filter days based on frequency
       const interval = frequency === 'high' ? 1 : frequency === 'medium' ? 2 : 3;
       const requestedPlatforms = options.platforms || ['Instagram', 'Facebook'];
 
-      const filteredDays = aiResponse.data.days.filter((d: any) => d.day % interval === 0).map((d: any) => {
+      const filteredDays = planData.days.filter((d: any) => d.day % interval === 0).map((d: any) => {
         // Normalize platform(s) to array
         let dayPlatforms: string[] = [];
-        
+
         if (d.platform && typeof d.platform === 'string') {
           dayPlatforms = [d.platform];
         } else if (d.platforms && Array.isArray(d.platforms) && d.platforms.length > 0) {
@@ -70,13 +74,14 @@ export const generateMonthlyPlan = async (businessId: string, options: {
           suggestedCopy: d.suggestedCopy || d.caption || d.contentIdea, // Ensure we have something to show
         };
       });
-      
+
       return await (prisma as any).monthlyPlannerPlan.upsert({
         where: { businessId_month_year: { businessId, month, year } },
         update: { industry, config: options as any, days: filteredDays, status: 'generated' },
         create: { businessId, month, year, industry, config: options as any, days: filteredDays, status: 'generated' }
       });
     } else {
+      console.error('Invalid AI response structure:', JSON.stringify(aiResponse.data, null, 2));
       throw new Error('AI returned an invalid response format');
     }
   } catch (error) {
@@ -120,7 +125,7 @@ export const convertPlanToDrafts = async (planId: string, locationId?: string) =
         businessId: plan.businessId,
         locationId,
         platforms: day.platforms,
-        content: JSON.stringify({ 
+        content: JSON.stringify({
           text: day.suggestedCopy || day.contentIdea,
           contentType: day.contentType,
           seasonalHook: day.seasonalHook,

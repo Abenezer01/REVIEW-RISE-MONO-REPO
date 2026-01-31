@@ -1,6 +1,7 @@
 /* eslint-disable import/no-unresolved */
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+
 import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 
 import { SERVICES_CONFIG } from '@/configs/services';
@@ -93,7 +94,9 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
     // Otherwise wrap it
     if (response.ok) {
         const wrapped = createSuccessResponse(data, 'Success', response.status);
-        return NextResponse.json(wrapped, { status: response.status });
+
+        
+return NextResponse.json(wrapped, { status: response.status });
     } else {
         const wrapped = createErrorResponse(
             data.message || data.error || 'Proxy Error',
@@ -101,7 +104,9 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
             response.status,
             data.details || data
         );
-        return NextResponse.json(wrapped, { status: response.status });
+
+        
+return NextResponse.json(wrapped, { status: response.status });
     }
   } catch (error) {
     console.error('Proxy error:', error);
@@ -112,7 +117,9 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
       500,
       String(error)
     );
-    return NextResponse.json(errorResponse, { status: 500 });
+
+    
+return NextResponse.json(errorResponse, { status: 500 });
   }
 }
 

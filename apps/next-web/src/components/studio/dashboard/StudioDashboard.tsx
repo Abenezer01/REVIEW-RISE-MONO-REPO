@@ -2,6 +2,8 @@
 
 import React from 'react'
 
+import { useRouter } from 'next/navigation'
+
 import { Grid, Typography, Box, Button, Paper } from '@mui/material'
 import { useTranslations } from 'next-intl'
 
@@ -9,12 +11,9 @@ import ToolCard from './ToolCard'
 import RecentGenerations from './RecentGenerations'
 import CreditUsage from './CreditUsage'
 
-interface StudioDashboardProps {
-    onNavigate: (view: number) => void
-}
-
-export default function StudioDashboard({ onNavigate }: StudioDashboardProps) {
+export default function StudioDashboard() {
     const t = useTranslations('studio')
+    const router = useRouter()
 
     return (
         <Grid container spacing={4}>
@@ -120,6 +119,20 @@ export default function StudioDashboard({ onNavigate }: StudioDashboardProps) {
                 <Grid container spacing={3}>
                     <Grid size={{sm: 12, md: 6}}>
                         <ToolCard 
+                            title={t('magic.title') || 'Smart Create'}
+                            description={t('magic.subtitle')}
+                            icon={<i className="tabler-sparkles" style={{ fontSize: 24 }} />}
+                            color="#E65100"
+                            stats={[
+                                { label: 'Outputs', value: '4-in-1' },
+                                { label: 'Speed', value: '10s' }
+                            ]}
+                            isNew
+                            onClick={() => router.push('/admin/studio/smart-create')}
+                        />
+                    </Grid>
+                    <Grid size={{sm: 12, md: 6}}>
+                        <ToolCard 
                             title={t('captions.title')}
                             description={t('captions.subtitle')}
                             icon={<i className="tabler-wand" style={{ fontSize: 24 }} />}
@@ -129,7 +142,7 @@ export default function StudioDashboard({ onNavigate }: StudioDashboardProps) {
                                 { label: 'Generated', value: '1,247' }
                             ]}
                             isPopular
-                            onClick={() => onNavigate(0)}
+                            onClick={() => router.push('/admin/studio/captions')}
                         />
                     </Grid>
                     <Grid size={{sm: 12, md: 6}}>
@@ -142,7 +155,7 @@ export default function StudioDashboard({ onNavigate }: StudioDashboardProps) {
                                 { label: 'Hashtags', value: '20-30' },
                                 { label: 'Generated', value: '892' }
                             ]}
-                            onClick={() => onNavigate(1)}
+                            onClick={() => router.push('/admin/studio/hashtags')}
                         />
                     </Grid>
                     <Grid size={{sm: 12, md: 6}}>
@@ -155,7 +168,7 @@ export default function StudioDashboard({ onNavigate }: StudioDashboardProps) {
                                 { label: 'Ideas', value: '10+' },
                                 { label: 'Generated', value: '634' }
                             ]}
-                            onClick={() => onNavigate(2)}
+                            onClick={() => router.push('/admin/studio/ideas')}
                         />
                     </Grid>
                      <Grid size={{sm: 12, md: 6}}>
@@ -168,8 +181,7 @@ export default function StudioDashboard({ onNavigate }: StudioDashboardProps) {
                                 { label: 'Days', value: '30' },
                                 { label: 'Generated', value: '156' }
                             ]}
-                            isNew
-                            onClick={() => onNavigate(3)}
+                            onClick={() => router.push('/admin/studio/planner')}
                         />
                     </Grid>
                      <Grid size={{sm: 12, md: 6}}>
@@ -182,7 +194,7 @@ export default function StudioDashboard({ onNavigate }: StudioDashboardProps) {
                                 { label: 'Variations', value: '3' },
                                 { label: 'Generated', value: '423' }
                             ]}
-                            onClick={() => onNavigate(4)}
+                            onClick={() => router.push('/admin/studio/images')}
                         />
                     </Grid>
                     <Grid size={{sm: 12, md: 6}}>
@@ -195,7 +207,7 @@ export default function StudioDashboard({ onNavigate }: StudioDashboardProps) {
                                 { label: 'Slides', value: '5-8' },
                                 { label: 'Generated', value: '289' }
                             ]}
-                            onClick={() => onNavigate(5)}
+                            onClick={() => router.push('/admin/studio/carousels')}
                         />
                     </Grid>
                     <Grid size={{sm: 12, md: 6}}>
@@ -208,7 +220,7 @@ export default function StudioDashboard({ onNavigate }: StudioDashboardProps) {
                                 { label: 'Types', value: '3' },
                                 { label: 'Generated', value: '112' }
                             ]}
-                            onClick={() => onNavigate(6)}
+                            onClick={() => router.push('/admin/studio/scripts')}
                         />
                     </Grid>
                 </Grid>

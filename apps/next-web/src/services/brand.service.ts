@@ -301,7 +301,7 @@ export const BrandService = {
     status?: string;
     locationId?: string;
   }) => {
-    const response = await apiClient.get<PublishingLog[]>(`/api/v1/brands/${businessId}/scheduling/logs`, { params });
+    const response = await apiClient.get<PublishingLog[]>(`/api/brands/${businessId}/scheduling/logs`, { params });
 
     return response.data || [];
   },

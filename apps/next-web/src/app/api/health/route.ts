@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+
 import { createSuccessResponse } from '@platform/contracts';
 
 export async function GET() {
@@ -7,5 +8,7 @@ export async function GET() {
     'Service is healthy',
     200
   );
-  return NextResponse.json(response, { status: response.statusCode });
+
+  
+return NextResponse.json(response, { status: response.statusCode });
 }

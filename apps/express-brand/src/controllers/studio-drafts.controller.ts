@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 
 export class StudioDraftsController {
-    
+
     // Save Caption Drafts (bulk)
     async saveCaptionDrafts(req: Request, res: Response) {
         try {
@@ -33,8 +33,8 @@ export class StudioDraftsController {
             );
 
             const response = createSuccessResponse({
-                count: drafts.length, 
-                message: 'Caption drafts saved successfully' 
+                count: drafts.length,
+                message: 'Caption drafts saved successfully'
             }, 'Created', 201, { requestId: req.id });
             res.status(response.statusCode).json(response);
         } catch (error: any) {

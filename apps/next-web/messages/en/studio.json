@@ -14,6 +14,7 @@
     "credits": "Credits"
   },
   "tabs": {
+    "magic": "Smart Create",
     "captions": "Captions",
     "hashtags": "Hashtags",
     "ideas": "Ideas",
@@ -21,6 +22,10 @@
     "images": "Images",
     "carousels": "Carousels",
     "scripts": "Scripts"
+  },
+  "magic": {
+    "title": "Smart Create",
+    "subtitle": "Generate captions, hashtags, and ideas in one go."
   },
   "captions": {
     "title": "Caption Generator",
