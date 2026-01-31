@@ -33,9 +33,8 @@ export const register = async (req: Request, res: Response) => {
         const existingUser = await userRepository.findByEmail(email);
 
         if (existingUser) {
-            return res.status(400).json(
-                createErrorResponse('User already exists', ErrorCode.BAD_REQUEST, 400)
-            );
+            const response = createErrorResponse('User already exists', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -46,26 +45,23 @@ export const register = async (req: Request, res: Response) => {
             name: `${firstName} ${lastName}`,
         });
 
-        res.status(201).json(
-            createSuccessResponse({ userId: user.id }, 'User created successfully', 201)
-        );
-    } catch (error) {
+        const response = createSuccessResponse({ userId: user.id }, 'User created successfully', 201, { requestId: req.id });
+        res.status(response.statusCode).json(response);
+    } catch (error: any) {
         if (error instanceof z.ZodError) {
             const validationErrors = error.issues.map(e => ({
                 field: e.path.join('.'),
                 message: e.message
             }));
 
-            return res.status(400).json(
-                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
-            );
+            const response = createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         // eslint-disable-next-line no-console
         console.error('Registration error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
@@ -77,26 +73,23 @@ export const login = async (req: Request, res: Response) => {
 
         if (!user || !user.password) {
             // console.log('User not found or no password', user);
-            return res.status(401).json(
-                createErrorResponse('Invalid credentials', ErrorCode.UNAUTHORIZED, 401)
-            );
+            const response = createErrorResponse('Invalid credentials', ErrorCode.UNAUTHORIZED, 401, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         const isValidPassword = await bcrypt.compare(password, user.password);
         // console.log('isValidPassword', isValidPassword);
         if (!isValidPassword) {
-            return res.status(401).json(
-                createErrorResponse('Invalid credentials', ErrorCode.UNAUTHORIZED, 401)
-            );
+            const response = createErrorResponse('Invalid credentials', ErrorCode.UNAUTHORIZED, 401, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         // Check if email is verified
         if (!user.emailVerified) {
-            return res.status(403).json(
-                createErrorResponse('Please verify your email before logging in', ErrorCode.FORBIDDEN, 403, {
-                    requiresVerification: true
-                })
-            );
+            const response = createErrorResponse('Please verify your email before logging in', ErrorCode.FORBIDDEN, 403, {
+                requiresVerification: true
+            }, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         // Extract Default Location ID
@@ -134,31 +127,28 @@ export const login = async (req: Request, res: Response) => {
             locationId: defaultLocationId // Attach to user object response
         };
 
-        res.status(200).json(
-            createSuccessResponse({
-                user: userResponse,
-                accessToken,
-                refreshToken
-            }, 'Login successful')
-        );
+        const response = createSuccessResponse({
+            user: userResponse,
+            accessToken,
+            refreshToken
+        }, 'Login successful', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
 
-    } catch (error) {
+    } catch (error: any) {
         if (error instanceof z.ZodError) {
             const validationErrors = error.issues.map(e => ({
                 field: e.path.join('.'),
                 message: e.message
             }));
 
-            return res.status(400).json(
-                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
-            );
+            const response = createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         // eslint-disable-next-line no-console
         console.error('Login error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
@@ -169,16 +159,14 @@ export const refreshToken = async (req: Request, res: Response) => {
         const session = await sessionRepository.findSession(refreshToken);
 
         if (!session) {
-            return res.status(401).json(
-                createErrorResponse('Invalid refresh token', ErrorCode.UNAUTHORIZED, 401)
-            );
+            const response = createErrorResponse('Invalid refresh token', ErrorCode.UNAUTHORIZED, 401, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         if (session.expires < new Date()) {
             await sessionRepository.deleteSession(session.id);
-            return res.status(401).json(
-                createErrorResponse('Refresh token expired', ErrorCode.UNAUTHORIZED, 401)
-            );
+            const response = createErrorResponse('Refresh token expired', ErrorCode.UNAUTHORIZED, 401, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         const user = session.user;
@@ -188,27 +176,24 @@ export const refreshToken = async (req: Request, res: Response) => {
             { expiresIn: '15m' }
         );
 
-        res.status(200).json(
-            createSuccessResponse({ accessToken: newAccessToken }, 'Token refreshed successfully')
-        );
+        const response = createSuccessResponse({ accessToken: newAccessToken }, 'Token refreshed successfully', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
 
-    } catch (error) {
+    } catch (error: any) {
         if (error instanceof z.ZodError) {
             const validationErrors = error.issues.map(e => ({
                 field: e.path.join('.'),
                 message: e.message
             }));
 
-            return res.status(400).json(
-                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
-            );
+            const response = createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         // eslint-disable-next-line no-console
         console.error('Refresh token error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
@@ -216,36 +201,28 @@ export const me = async (req: Request, res: Response) => {
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json(
-                createErrorResponse('Missing or invalid authorization header', ErrorCode.UNAUTHORIZED, 401)
-            );
+            const response = createErrorResponse('Missing or invalid authorization header', ErrorCode.UNAUTHORIZED, 401, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
         const token = authHeader.substring('Bearer '.length);
-        // console.log("TOKEN", token)
-        // const token = authHeader.substring('Bearer '.length);
-        // console.log("TOKEN", token)
-        // console.log(JWT_SECRET)
         const payload = jwt.verify(token, JWT_SECRET) as any;
-        // console.log("PAYLOAD", payload)
         const roles = Array.isArray(payload.roles) ? payload.roles : [];
-        // console.log("ROLES", roles)
         const user = {
             id: payload.userId,
             email: payload.email,
             role: roles[0] || 'user',
             locationId: payload.locationId // Return from token payload
         };
-        res.status(200).json(
-            createSuccessResponse({ user }, 'User fetched successfully', 200)
-        );
-    } catch (error) {
+        const response = createSuccessResponse({ user }, 'User fetched successfully', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
+    } catch (error: any) {
         // eslint-disable-next-line no-console
         console.error('Me error:', error);
-        return res.status(401).json(
-            createErrorResponse('Invalid token', ErrorCode.UNAUTHORIZED, 401)
-        );
+        const response = createErrorResponse('Invalid token', ErrorCode.UNAUTHORIZED, 401, error.message, req.id);
+        return res.status(response.statusCode).json(response);
     }
 };
+
 export const forgotPassword = async (req: Request, res: Response) => {
     try {
         const { email } = forgotPasswordSchema.parse(req.body);
@@ -254,9 +231,8 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
         if (!user) {
             // Return success even if user not found to prevent enumeration
-            return res.status(401).json(
-                createErrorResponse('Invalid credentials', ErrorCode.UNAUTHORIZED, 401)
-            );
+            const response = createErrorResponse('Invalid credentials', ErrorCode.UNAUTHORIZED, 401, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         // Generate reset token
@@ -276,26 +252,23 @@ export const forgotPassword = async (req: Request, res: Response) => {
         console.log(`[MOCK EMAIL] Password reset token for ${email}: ${token}`);
         // In a real app: await sendEmail(user.email, "Password Reset", `Use this token: ${token}`);
 
-        res.status(200).json(
-            createSuccessResponse({}, 'A password reset email has been sent.')
-        );
-    } catch (error) {
+        const response = createSuccessResponse({}, 'A password reset email has been sent.', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
+    } catch (error: any) {
         if (error instanceof z.ZodError) {
             const validationErrors = error.issues.map(e => ({
                 field: e.path.join('.'),
                 message: e.message
             }));
 
-            return res.status(400).json(
-                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
-            );
+            const response = createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         // eslint-disable-next-line no-console
         console.error('Forgot password error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
@@ -306,24 +279,21 @@ export const resetPassword = async (req: Request, res: Response) => {
         const resetToken = await passwordResetTokenRepository.findByToken(token);
 
         if (!resetToken) {
-            return res.status(400).json(
-                createErrorResponse('Invalid or expired token', ErrorCode.BAD_REQUEST, 400)
-            );
+            const response = createErrorResponse('Invalid or expired token', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         if (resetToken.expires < new Date()) {
             await passwordResetTokenRepository.deleteToken(resetToken.id);
-            return res.status(400).json(
-                createErrorResponse('Invalid or expired token', ErrorCode.BAD_REQUEST, 400)
-            );
+            const response = createErrorResponse('Invalid or expired token', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         const user = await userRepository.findByEmail(resetToken.email);
 
         if (!user) {
-            return res.status(400).json(
-                createErrorResponse('User no longer exists', ErrorCode.BAD_REQUEST, 400)
-            );
+            const response = createErrorResponse('User no longer exists', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -333,27 +303,24 @@ export const resetPassword = async (req: Request, res: Response) => {
         // Delete the used token
         await passwordResetTokenRepository.deleteToken(resetToken.id);
 
-        res.status(200).json(
-            createSuccessResponse({}, 'Password reset successful')
-        );
+        const response = createSuccessResponse({}, 'Password reset successful', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
 
-    } catch (error) {
+    } catch (error: any) {
         if (error instanceof z.ZodError) {
             const validationErrors = error.issues.map(e => ({
                 field: e.path.join('.'),
                 message: e.message
             }));
 
-            return res.status(400).json(
-                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
-            );
+            const response = createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         // eslint-disable-next-line no-console
         console.error('Reset password error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
@@ -364,30 +331,26 @@ export const verifyEmail = async (req: Request, res: Response) => {
         const verificationToken = await emailVerificationTokenRepository.findByToken(token);
 
         if (!verificationToken) {
-            return res.status(400).json(
-                createErrorResponse('Invalid or expired verification token', ErrorCode.BAD_REQUEST, 400)
-            );
+            const response = createErrorResponse('Invalid or expired verification token', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         if (verificationToken.expires < new Date()) {
             await emailVerificationTokenRepository.deleteToken(verificationToken.id);
-            return res.status(400).json(
-                createErrorResponse('Verification token has expired. Please request a new one.', ErrorCode.BAD_REQUEST, 400)
-            );
+            const response = createErrorResponse('Verification token has expired. Please request a new one.', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         const user = await userRepository.findByEmail(verificationToken.email);
 
         if (!user) {
-            return res.status(400).json(
-                createErrorResponse('User not found', ErrorCode.BAD_REQUEST, 400)
-            );
+            const response = createErrorResponse('User not found', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         if (user.emailVerified) {
-            return res.status(400).json(
-                createErrorResponse('Email is already verified', ErrorCode.BAD_REQUEST, 400)
-            );
+            const response = createErrorResponse('Email is already verified', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         // Update user's emailVerified field
@@ -399,27 +362,24 @@ export const verifyEmail = async (req: Request, res: Response) => {
         // Delete all other verification tokens for this email
         await emailVerificationTokenRepository.deleteByEmail(verificationToken.email);
 
-        res.status(200).json(
-            createSuccessResponse({}, 'Email verified successfully! You can now log in.')
-        );
+        const response = createSuccessResponse({}, 'Email verified successfully! You can now log in.', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
 
-    } catch (error) {
+    } catch (error: any) {
         if (error instanceof z.ZodError) {
             const validationErrors = error.issues.map(e => ({
                 field: e.path.join('.'),
                 message: e.message
             }));
 
-            return res.status(400).json(
-                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
-            );
+            const response = createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         // eslint-disable-next-line no-console
         console.error('Email verification error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
@@ -431,15 +391,13 @@ export const resendVerificationEmail = async (req: Request, res: Response) => {
 
         if (!user) {
             // Return success even if user not found to prevent enumeration
-            return res.status(200).json(
-                createSuccessResponse({}, 'If an account exists with this email, a verification email has been sent.')
-            );
+            const response = createSuccessResponse({}, 'If an account exists with this email, a verification email has been sent.', 200, { requestId: req.id });
+            return res.status(response.statusCode).json(response);
         }
 
         if (user.emailVerified) {
-            return res.status(400).json(
-                createErrorResponse('Email is already verified', ErrorCode.BAD_REQUEST, 400)
-            );
+            const response = createErrorResponse('Email is already verified', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         // Delete any existing verification tokens for this email
@@ -460,27 +418,24 @@ export const resendVerificationEmail = async (req: Request, res: Response) => {
         // Send verification email
         await sendVerificationEmail(email, verificationToken);
 
-        res.status(200).json(
-            createSuccessResponse({}, 'Verification email has been sent. Please check your inbox.')
-        );
+        const response = createSuccessResponse({}, 'Verification email has been sent. Please check your inbox.', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
 
-    } catch (error) {
+    } catch (error: any) {
         if (error instanceof z.ZodError) {
             const validationErrors = error.issues.map(e => ({
                 field: e.path.join('.'),
                 message: e.message
             }));
 
-            return res.status(400).json(
-                createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors)
-            );
+            const response = createErrorResponse('Validation failed', ErrorCode.BAD_REQUEST, 400, validationErrors, req.id);
+            return res.status(response.statusCode).json(response);
         }
 
         // eslint-disable-next-line no-console
         console.error('Resend verification error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
@@ -495,14 +450,12 @@ export const logout = async (req: Request, res: Response) => {
             }
         }
 
-        res.status(200).json(
-            createSuccessResponse({}, 'Logged out successfully')
-        );
-    } catch (error) {
+        const response = createSuccessResponse({}, 'Logged out successfully', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
+    } catch (error: any) {
         // eslint-disable-next-line no-console
         console.error('Logout error:', error);
-        res.status(500).json(
-            createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500)
-        );
+        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
     }
 };

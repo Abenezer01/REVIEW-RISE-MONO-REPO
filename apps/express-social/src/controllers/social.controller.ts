@@ -10,12 +10,14 @@ export class SocialController {
       const { platform, connectionId, content } = req.body;
 
       if (!platform || !connectionId || !content) {
-        return res.status(400).json(createErrorResponse('Missing required fields', ErrorCode.VALIDATION_ERROR, 400, undefined, req.id));
+        const errorResponse = createErrorResponse('Missing required fields', ErrorCode.VALIDATION_ERROR, 400, undefined, req.id);
+        return res.status(errorResponse.statusCode).json(errorResponse);
       }
 
       const connection = await socialConnectionRepository.findById(connectionId);
       if (!connection) {
-        return res.status(404).json(createErrorResponse('Connection not found', ErrorCode.NOT_FOUND, 404, undefined, req.id));
+        const errorResponse = createErrorResponse('Connection not found', ErrorCode.NOT_FOUND, 404, undefined, req.id);
+        return res.status(errorResponse.statusCode).json(errorResponse);
       }
 
       let result;
@@ -32,13 +34,16 @@ export class SocialController {
           result = await linkedInService.publishOrganizationPost(connection.pageId!, connection.accessToken, content);
           break;
         default:
-          return res.status(400).json(createErrorResponse(`Platform ${platform} not supported for publishing`, ErrorCode.VALIDATION_ERROR, 400, undefined, req.id));
+          const errorResponse = createErrorResponse(`Platform ${platform} not supported for publishing`, ErrorCode.VALIDATION_ERROR, 400, undefined, req.id);
+          return res.status(errorResponse.statusCode).json(errorResponse);
       }
 
-      res.json(createSuccessResponse(result, 'Post published successfully', 200, { requestId: req.id }));
+      const successResponse = createSuccessResponse(result, 'Post published successfully', 200, { requestId: req.id });
+      res.status(successResponse.statusCode).json(successResponse);
     } catch (e: any) {
       console.error('Publishing error:', e.message);
-      res.status(500).json(createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id));
+      const errorResponse = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+      res.status(errorResponse.statusCode).json(errorResponse);
     }
   }
 }

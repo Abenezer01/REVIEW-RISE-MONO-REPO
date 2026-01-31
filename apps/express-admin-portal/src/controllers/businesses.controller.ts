@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { prisma } from '@platform/db';
-import { createPaginatedResponse, createErrorResponse } from '@platform/contracts';
+import { createPaginatedResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
 
 export const getBusinesses = async (req: Request, res: Response) => {
   try {
     const { search = '', page = 1, limit = 20 } = req.query as any;
-    const skip = (page - 1) * limit;
+    const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
 
     const where: any = {
         deletedAt: null 
@@ -13,8 +13,8 @@ export const getBusinesses = async (req: Request, res: Response) => {
     
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } }
+        { name: { contains: search as string, mode: 'insensitive' } },
+        { email: { contains: search as string, mode: 'insensitive' } }
       ];
     }
 
@@ -22,22 +22,24 @@ export const getBusinesses = async (req: Request, res: Response) => {
       prisma.business.findMany({
         where,
         skip,
-        take: limit,
+        take: parseInt(limit as string),
         orderBy: { name: 'asc' },
         select: { id: true, name: true, email: true } // Select only needed fields
       }),
       prisma.business.count({ where }),
     ]);
 
-    res.json(createPaginatedResponse(
+    const response = createPaginatedResponse(
       businesses,
-      { total, page, limit },
+      { total, page: parseInt(page as string), limit: parseInt(limit as string) },
       'Businesses fetched successfully',
       200,
       { requestId: req.id }
-    ));
-  } catch (error) {
+    );
+    res.status(response.statusCode).json(response);
+  } catch (error: any) {
     console.error('Error fetching businesses:', error);
-    res.status(500).json(createErrorResponse('Internal Server Error', 'INTERNAL_SERVER_ERROR', 500, undefined, req.id));
+    const response = createErrorResponse('Internal Server Error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+    res.status(response.statusCode).json(response);
   }
 };

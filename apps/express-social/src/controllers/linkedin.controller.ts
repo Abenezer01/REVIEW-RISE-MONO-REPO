@@ -23,21 +23,23 @@ export class LinkedInController {
 
             const url = linkedInService.getAuthUrl(state);
             
-            res.json(createSuccessResponse(
+            const response = createSuccessResponse(
                 { url },
                 'LinkedIn OAuth URL generated successfully',
                 200,
                 { requestId: req.id }
-            ));
+            );
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error in getAuthUrl:', error);
-            res.status(500).json(createErrorResponse(
+            const response = createErrorResponse(
                 'Failed to generate OAuth URL',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -70,13 +72,14 @@ export class LinkedInController {
 
         } catch (error: any) {
             console.error('Error in handleCallback:', error);
-            res.status(500).json(createErrorResponse(
+            const response = createErrorResponse(
                 'Failed to authenticate with LinkedIn',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -89,32 +92,35 @@ export class LinkedInController {
             const accessToken = req.headers['x-li-access-token'] as string;
             
             if (!accessToken) {
-                return res.status(400).json(createErrorResponse(
+                const response = createErrorResponse(
                     'x-li-access-token header is required',
                     ErrorCode.BAD_REQUEST,
                     400,
                     undefined,
                     req.id
-                ));
+                );
+                return res.status(response.statusCode).json(response);
             }
 
             const orgs = await linkedInService.listOrganizations(accessToken);
             
-            res.json(createSuccessResponse(
+            const response = createSuccessResponse(
                 { organizations: orgs },
                 'LinkedIn organizations retrieved successfully',
                 200,
                 { requestId: req.id }
-            ));
+            );
+            res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error in listOrganizations:', error);
-            res.status(500).json(createErrorResponse(
+            const response = createErrorResponse(
                 'Failed to list LinkedIn organizations',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(response.statusCode).json(response);
         }
     }
 
@@ -137,22 +143,24 @@ export class LinkedInController {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { accessToken, refreshToken, ...sanitized } = connection as any;
 
-            res.status(201).json(createSuccessResponse(
+            const response = createSuccessResponse(
                 { connection: sanitized },
                 'LinkedIn organization connected successfully',
                 201,
                 { requestId: req.id }
-            ));
+            );
+            res.status(response.statusCode).json(response);
 
         } catch (error: any) {
             console.error('Error in connectOrganization:', error);
-            res.status(500).json(createErrorResponse(
+            const response = createErrorResponse(
                 'Failed to connect LinkedIn organization',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(response.statusCode).json(response);
         }
     }
 }

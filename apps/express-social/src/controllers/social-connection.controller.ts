@@ -7,91 +7,52 @@ import {
 } from '@platform/contracts';
 
 export class SocialConnectionController {
+
     /**
-     * List Connections
+     * List all active connections for a business/location
      * GET /api/v1/social/connections
      */
     async listConnections(req: Request, res: Response) {
         try {
             const { businessId, locationId } = req.query as any;
 
-            let connections;
-            if (locationId) {
-                connections = await socialConnectionRepository.findByLocationId(locationId);
-            } else {
-                connections = await socialConnectionRepository.findByBusinessId(businessId);
+            if (!businessId) {
+                const errorResponse = createErrorResponse('businessId is required', ErrorCode.BAD_REQUEST, 400, undefined, req.id);
+                return res.status(errorResponse.statusCode).json(errorResponse);
             }
 
-            // Sanitize connections (remove tokens)
-            const sanitized = connections.map((conn: any) => {
+            const connections = await socialConnectionRepository.findByBusiness(businessId, locationId);
+
+            // Sanitize (don't return tokens)
+            const sanitized = connections.map(conn => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const { accessToken, refreshToken, ...rest } = conn;
+                const { accessToken, refreshToken, ...rest } = conn as any;
                 return rest;
             });
 
-            res.json(createSuccessResponse(
+            const successResponse = createSuccessResponse(
                 { connections: sanitized },
                 'Connections retrieved successfully',
                 200,
                 { requestId: req.id }
-            ));
+            );
+            res.status(successResponse.statusCode).json(successResponse);
 
         } catch (error: any) {
             console.error('Error listing connections:', error);
-            res.status(500).json(createErrorResponse(
+            const errorResponse = createErrorResponse(
                 'Failed to list connections',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(errorResponse.statusCode).json(errorResponse);
         }
     }
 
     /**
-     * Get Single Connection
-     * GET /api/v1/social/connections/:id
-     */
-    async getConnection(req: Request, res: Response) {
-        try {
-            const { id } = req.params;
-            const connection = await socialConnectionRepository.findById(id);
-
-            if (!connection) {
-                return res.status(404).json(createErrorResponse(
-                    'Connection not found',
-                    ErrorCode.NOT_FOUND,
-                    404,
-                    undefined,
-                    req.id
-                ));
-            }
-
-            // Sanitize connection (remove tokens)
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { accessToken, refreshToken, ...rest } = connection;
-            
-            res.json(createSuccessResponse(
-                { connection: rest },
-                'Connection retrieved successfully',
-                200,
-                { requestId: req.id }
-            ));
-
-        } catch (error: any) {
-            console.error('Error getting connection:', error);
-            res.status(500).json(createErrorResponse(
-                'Failed to get connection',
-                ErrorCode.INTERNAL_SERVER_ERROR,
-                500,
-                undefined,
-                req.id
-            ));
-        }
-    }
-
-    /**
-     * Disconnect/Delete Connection
+     * Disconnect/Delete a connection
      * DELETE /api/v1/social/connections/:id
      */
     async disconnect(req: Request, res: Response) {
@@ -99,23 +60,25 @@ export class SocialConnectionController {
             const { id } = req.params;
 
             await socialConnectionRepository.delete(id);
-            
-            res.json(createSuccessResponse(
+
+            const successResponse = createSuccessResponse(
                 { success: true, message: 'Connection removed' },
                 'Connection deleted successfully',
                 200,
                 { requestId: req.id }
-            ));
+            );
+            res.status(successResponse.statusCode).json(successResponse);
 
         } catch (error: any) {
             console.error('Error disconnecting:', error);
-            res.status(500).json(createErrorResponse(
+            const errorResponse = createErrorResponse(
                 'Failed to disconnect',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 undefined,
                 req.id
-            ));
+            );
+            res.status(errorResponse.statusCode).json(errorResponse);
         }
     }
 
@@ -131,24 +94,26 @@ export class SocialConnectionController {
             const connection = await socialConnectionRepository.findByIdWithDecryption(id);
 
             if (!connection) {
-                return res.status(404).json(createErrorResponse(
+                const errorResponse = createErrorResponse(
                     'Connection not found',
                     ErrorCode.NOT_FOUND,
                     404,
                     undefined,
                     req.id
-                ));
+                );
+                return res.status(errorResponse.statusCode).json(errorResponse);
             }
 
             // Check if we have a refresh token
             if (!connection.refreshToken && connection.platform !== 'facebook') {
-                return res.status(400).json(createErrorResponse(
+                const errorResponse = createErrorResponse(
                     'No refresh token available. Please reconnect the account.',
                     ErrorCode.BAD_REQUEST,
                     400,
                     undefined,
                     req.id
-                ));
+                );
+                return res.status(errorResponse.statusCode).json(errorResponse);
             }
 
             let newAccessToken: string;
@@ -163,13 +128,14 @@ export class SocialConnectionController {
                     const { facebookService } = await import('../services/facebook.service');
                     
                     if (!connection.pageId || !connection.refreshToken) {
-                        return res.status(400).json(createErrorResponse(
+                        const errorResponse = createErrorResponse(
                             'Missing required data for Facebook refresh',
                             ErrorCode.BAD_REQUEST,
                             400,
                             undefined,
                             req.id
-                        ));
+                        );
+                        return res.status(errorResponse.statusCode).json(errorResponse);
                     }
 
                     newAccessToken = await facebookService.refreshPageToken(
@@ -185,13 +151,14 @@ export class SocialConnectionController {
                     const { linkedInService } = await import('../services/linkedin.service');
                     
                     if (!connection.refreshToken) {
-                        return res.status(400).json(createErrorResponse(
+                        const errorResponse = createErrorResponse(
                             'No refresh token available for LinkedIn. Please reconnect.',
                             ErrorCode.BAD_REQUEST,
                             400,
                             undefined,
                             req.id
-                        ));
+                        );
+                        return res.status(errorResponse.statusCode).json(errorResponse);
                     }
 
                     const tokenResponse = await linkedInService.refreshAccessToken(connection.refreshToken);
@@ -202,13 +169,14 @@ export class SocialConnectionController {
                 }
 
                 default: {
-                    return res.status(400).json(createErrorResponse(
+                    const errorResponse = createErrorResponse(
                         `Token refresh not supported for platform: ${connection.platform}`,
                         ErrorCode.BAD_REQUEST,
                         400,
                         undefined,
                         req.id
-                    ));
+                    );
+                    return res.status(errorResponse.statusCode).json(errorResponse);
                 }
             }
 
@@ -219,7 +187,7 @@ export class SocialConnectionController {
                 tokenExpiry: newExpiry
             });
 
-            res.json(createSuccessResponse(
+            const successResponse = createSuccessResponse(
                 {
                     success: true,
                     message: 'Token refreshed successfully',
@@ -233,7 +201,8 @@ export class SocialConnectionController {
                 'Token refreshed successfully',
                 200,
                 { requestId: req.id }
-            ));
+            );
+            res.status(successResponse.statusCode).json(successResponse);
 
         } catch (error: any) {
             console.error('Error refreshing connection:', error);
@@ -247,13 +216,14 @@ export class SocialConnectionController {
                 );
             }
 
-            res.status(500).json(createErrorResponse(
+            const errorResponse = createErrorResponse(
                 'Failed to refresh connection',
                 ErrorCode.INTERNAL_SERVER_ERROR,
                 500,
                 { error: error.message },
                 req.id
-            ));
+            );
+            res.status(errorResponse.statusCode).json(errorResponse);
         }
     }
 }

@@ -11,28 +11,31 @@ const dnaSchema = z.object({
 });
 
 export const get = async (req: Request, res: Response) => {
-    const requestId = (req as any).id || crypto.randomUUID();
     try {
         const businessId = req.params.id;
         const dna = await DNAService.getDNA(businessId);
-        res.json(createSuccessResponse(dna, 'DNA fetched', 200, { requestId }));
+        const response = createSuccessResponse(dna, 'DNA fetched', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
     } catch (e: any) {
-        res.status(500).json(createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
+        const response = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
 
 export const upsert = async (req: Request, res: Response) => {
-    const requestId = (req as any).id || crypto.randomUUID();
     try {
         const businessId = req.params.id;
         const validation = dnaSchema.safeParse(req.body);
         if(!validation.success) {
-            return res.status(400).json(createErrorResponse('Invalid inputs', ErrorCode.VALIDATION_ERROR, 400, undefined, requestId));
+            const errorResponse = createErrorResponse('Invalid inputs', ErrorCode.VALIDATION_ERROR, 400, undefined, req.id);
+            return res.status(errorResponse.statusCode).json(errorResponse);
         }
         
         const result = await DNAService.upsertDNA(businessId, validation.data);
-        res.json(createSuccessResponse(result, 'DNA saved', 200, { requestId }));
+        const response = createSuccessResponse(result, 'DNA saved', 200, { requestId: req.id });
+        res.status(response.statusCode).json(response);
     } catch (e: any) {
-        res.status(500).json(createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, requestId));
+        const response = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+        res.status(response.statusCode).json(response);
     }
 };
