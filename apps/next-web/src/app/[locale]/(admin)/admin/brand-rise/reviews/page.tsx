@@ -23,7 +23,9 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Stack from '@mui/material/Stack';
 import { useTranslations } from 'next-intl';
-import toast from 'react-hot-toast';
+
+import { useSystemMessages } from '@platform/shared-ui';
+import { SystemMessageCode } from '@platform/contracts';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusinessId } from '@/hooks/useBusinessId';
@@ -41,6 +43,7 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
 }
 
 const ReviewsPage = () => {
+  const { notify } = useSystemMessages();
   const theme = useTheme();
   const t = useTranslations('dashboard');
   const { businessId } = useBusinessId();
@@ -121,12 +124,12 @@ const ReviewsPage = () => {
 
       try {
           await BrandService.postReviewReply(businessId, selectedReview.id, replyText);
-          toast.success('Reply posted successfully');
+          notify(SystemMessageCode.REVIEWS_REPLY_POSTED);
           setReplyDialogOpen(false);
           refreshData(); // Refresh list
       } catch (error) {
           console.error('Failed to send reply', error);
-          toast.error('Failed to post reply');
+          notify(SystemMessageCode.GENERIC_ERROR);
       } finally {
           setReplying(false);
       }
@@ -137,11 +140,11 @@ const ReviewsPage = () => {
       
       try {
           await BrandService.rejectReviewReply(businessId, reviewId);
-          toast.success('Reply rejected');
+          notify(SystemMessageCode.REVIEWS_REPLY_REJECTED);
           refreshData();
       } catch (error) {
           console.error('Failed to reject reply', error);
-          toast.error('Failed to reject reply');
+          notify(SystemMessageCode.GENERIC_ERROR);
       }
   };
 

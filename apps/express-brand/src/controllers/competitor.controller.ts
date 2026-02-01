@@ -61,7 +61,7 @@ export const discover = async (req: Request, res: Response) => {
         // For MVP we await it.
         const competitors = await CompetitorDiscoveryService.runDiscoveryPipeline(businessId, keywords);
         
-        const response = createSuccessResponse(competitors, 'Discovery completed', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
+        const response = createSuccessResponse(competitors, 'Discovery completed', 200, { requestId: req.id }, SystemMessageCode.COMPETITOR_DISCOVERY_STARTED);
         res.status(response.statusCode).json(response);
     } catch (e: any) {
         console.error(e);
@@ -74,7 +74,7 @@ export const extract = async (req: Request, res: Response) => {
     try {
         const competitorId = req.params.competitorId;
         const snapshot = await CompetitorExtractorService.createSnapshot(competitorId);
-        const response = createSuccessResponse(snapshot, 'Snapshot extracted', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
+        const response = createSuccessResponse(snapshot, 'Snapshot extracted', 200, { requestId: req.id }, SystemMessageCode.COMPETITOR_ANALYSIS_STARTED);
         res.status(response.statusCode).json(response);
     } catch (e: any) {
         // Map specific service errors to 400/404

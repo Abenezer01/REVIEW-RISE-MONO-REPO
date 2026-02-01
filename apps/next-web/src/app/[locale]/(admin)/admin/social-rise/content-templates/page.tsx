@@ -20,7 +20,9 @@ import {
   Grid
 } from '@mui/material';
 import type { GridColDef } from '@mui/x-data-grid';
-import toast from 'react-hot-toast';
+
+import { useSystemMessages } from '@platform/shared-ui';
+import { SystemMessageCode } from '@platform/contracts';
 
 import { BrandService } from '@/services/brand.service';
 import { useBusinessId } from '@/hooks/useBusinessId';
@@ -32,6 +34,7 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
 };
 
 const ContentTemplatesPage = () => {
+  const { notify } = useSystemMessages();
   const { businessId } = useBusinessId();
   const [templates, setTemplates] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -61,7 +64,7 @@ const ContentTemplatesPage = () => {
       setTemplates(data || []); 
     } catch (error) {
       console.error('Failed to fetch templates', error);
-      toast.error('Failed to load templates');
+      notify(SystemMessageCode.GENERIC_ERROR);
     } finally {
       setLoading(false);
     }
@@ -112,13 +115,13 @@ const ContentTemplatesPage = () => {
 
     try {
       await BrandService.deletePlannerTemplate(businessId, itemToDelete);
-      toast.success('Template deleted successfully');
+      notify(SystemMessageCode.ITEM_DELETED);
       setDeleteDialogOpen(false);
       setItemToDelete(null);
       fetchTemplates();
     } catch (error) {
       console.error('Failed to delete template', error);
-      toast.error('Failed to delete template');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 
@@ -208,17 +211,17 @@ const ContentTemplatesPage = () => {
     try {
       if (editingTemplate) {
         await BrandService.updatePlannerTemplate(businessId, editingTemplate.id, formData);
-        toast.success('Template updated successfully');
+        notify(SystemMessageCode.ITEM_UPDATED);
       } else {
         await BrandService.createPlannerTemplate(businessId, formData);
-        toast.success('Template created successfully');
+        notify(SystemMessageCode.ITEM_CREATED);
       }
       
       handleClose();
       fetchTemplates();
     } catch (error) {
       console.error('Failed to save template', error);
-      toast.error('Failed to save template');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 

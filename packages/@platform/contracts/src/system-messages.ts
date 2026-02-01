@@ -58,6 +58,8 @@ export enum SystemMessageCode {
   POST_DUPLICATED = 'POST_DUPLICATED',
   RECOMMENDATION_GENERATION_STARTED = 'RECOMMENDATION_GENERATION_STARTED',
   PLAN_GENERATION_STARTED = 'PLAN_GENERATION_STARTED',
+  COMPETITOR_DISCOVERY_STARTED = 'COMPETITOR_DISCOVERY_STARTED',
+  COMPETITOR_ANALYSIS_STARTED = 'COMPETITOR_ANALYSIS_STARTED',
 
   // AI
   AI_CAPTIONS_GENERATED = 'AI_CAPTIONS_GENERATED',
@@ -74,6 +76,7 @@ export enum SystemMessageCode {
   REVIEWS_SOURCE_DISCONNECTED = 'REVIEWS_SOURCE_DISCONNECTED',
   REVIEWS_REPLY_POSTED = 'REVIEWS_REPLY_POSTED',
   REVIEWS_REPLY_REJECTED = 'REVIEWS_REPLY_REJECTED',
+  REVIEWS_REPLY_EMPTY = 'REVIEWS_REPLY_EMPTY',
 
   // SEO
   SEO_ANALYSIS_COMPLETED = 'SEO_ANALYSIS_COMPLETED',
@@ -91,6 +94,13 @@ export enum SystemMessageCode {
   SOCIAL_POST_PUBLISHED = 'SOCIAL_POST_PUBLISHED',
   SOCIAL_CONNECTION_CREATED = 'SOCIAL_CONNECTION_CREATED',
   SOCIAL_CONNECTION_DELETED = 'SOCIAL_CONNECTION_DELETED',
+
+  // UI/General
+  COPIED_TO_CLIPBOARD = 'COPIED_TO_CLIPBOARD',
+  DOWNLOAD_SUCCESS = 'DOWNLOAD_SUCCESS',
+  DOWNLOAD_FAILED = 'DOWNLOAD_FAILED',
+  GENERIC_ERROR = 'GENERIC_ERROR',
+  GENERIC_SUCCESS = 'GENERIC_SUCCESS',
 }
 
 /**
@@ -171,6 +181,7 @@ export const DefaultSeverityMap: Record<SystemMessageCode, SystemMessageSeverity
   [SystemMessageCode.REVIEWS_SOURCE_DISCONNECTED]: SystemMessageSeverity.INFO,
   [SystemMessageCode.REVIEWS_REPLY_POSTED]: SystemMessageSeverity.SUCCESS,
   [SystemMessageCode.REVIEWS_REPLY_REJECTED]: SystemMessageSeverity.INFO,
+  [SystemMessageCode.REVIEWS_REPLY_EMPTY]: SystemMessageSeverity.WARNING,
 
   [SystemMessageCode.SEO_ANALYSIS_COMPLETED]: SystemMessageSeverity.SUCCESS,
   [SystemMessageCode.SEO_KEYWORD_CREATED]: SystemMessageSeverity.SUCCESS,
@@ -185,4 +196,12 @@ export const DefaultSeverityMap: Record<SystemMessageCode, SystemMessageSeverity
   [SystemMessageCode.SOCIAL_POST_PUBLISHED]: SystemMessageSeverity.SUCCESS,
   [SystemMessageCode.SOCIAL_CONNECTION_CREATED]: SystemMessageSeverity.SUCCESS,
   [SystemMessageCode.SOCIAL_CONNECTION_DELETED]: SystemMessageSeverity.INFO,
+
+  [SystemMessageCode.COPIED_TO_CLIPBOARD]: SystemMessageSeverity.SUCCESS,
+  [SystemMessageCode.DOWNLOAD_SUCCESS]: SystemMessageSeverity.SUCCESS,
+  [SystemMessageCode.DOWNLOAD_FAILED]: SystemMessageSeverity.ERROR,
+  [SystemMessageCode.GENERIC_ERROR]: SystemMessageSeverity.ERROR,
+  [SystemMessageCode.GENERIC_SUCCESS]: SystemMessageSeverity.SUCCESS,
+  [SystemMessageCode.COMPETITOR_DISCOVERY_STARTED]: SystemMessageSeverity.INFO,
+  [SystemMessageCode.COMPETITOR_ANALYSIS_STARTED]: SystemMessageSeverity.INFO,
 };

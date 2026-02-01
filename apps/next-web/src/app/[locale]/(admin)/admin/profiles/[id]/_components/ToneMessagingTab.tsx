@@ -27,7 +27,8 @@ import {
   Close as CloseIcon,
   CheckCircle as CheckIcon,
 } from '@mui/icons-material';
-import toast from 'react-hot-toast';
+import { useSystemMessages } from '@platform/shared-ui';
+import { SystemMessageCode } from '@platform/contracts';
 
 import { BrandProfileService } from '@/services/brand-profile.service';
 import type { BrandProfile } from '@/services/brand-profile.service';
@@ -39,6 +40,7 @@ interface ToneMessagingTabProps {
 }
 
 const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, isUpdating }) => {
+  const { notify } = useSystemMessages();
   const theme = useTheme();
   const [isGenerating, setIsGenerating] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
@@ -57,10 +59,10 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
       const newTone = await BrandProfileService.generateBrandTone(profile.id);
       
       setEditedTone(newTone);
-      toast.success('Brand tone generated successfully!');
+      notify(SystemMessageCode.BRAND_TONE_GENERATED);
       await onUpdate({ tone: newTone });
     } catch (error) {
-      toast.error('Failed to generate brand tone');
+      notify(SystemMessageCode.GENERIC_ERROR);
     } finally {
       setIsGenerating(false);
     }
@@ -70,9 +72,9 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
     try {
       await onUpdate({ tone: editedTone });
       setEditingSection(null);
-      toast.success('Section updated successfully');
+      notify(SystemMessageCode.SUCCESS);
     } catch (error) {
-      toast.error('Failed to update section');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 

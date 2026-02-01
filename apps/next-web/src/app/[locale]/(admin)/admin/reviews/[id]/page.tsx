@@ -29,7 +29,8 @@ import TimelineConnector from '@mui/lab/TimelineConnector'
 import TimelineContent from '@mui/lab/TimelineContent'
 import TimelineDot from '@mui/lab/TimelineDot'
 
-import { toast } from 'react-toastify'
+import { useSystemMessages } from '@platform/shared-ui'
+import { SystemMessageCode } from '@platform/contracts'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -49,6 +50,7 @@ const DEFAULT_TONE_PRESETS = [
 ]
 
 const ReviewDetailPage = () => {
+  const { notify } = useSystemMessages()
   const theme = useTheme()
   const params = useParams()
   const router = useRouter()
@@ -136,7 +138,7 @@ const ReviewDetailPage = () => {
 
   const handleSaveReply = async () => {
     if (!reply.trim()) {
-      toast.error('Please enter a reply')
+      notify(SystemMessageCode.REVIEWS_REPLY_EMPTY)
 
       return
     }
@@ -148,12 +150,12 @@ const ReviewDetailPage = () => {
     setIsSubmitting(false)
 
     if (res.success) {
-      toast.success('Reply saved successfully')
+      notify(SystemMessageCode.REVIEWS_REPLY_POSTED)
 
       // Update local state
       setCurrentReview(res.data)
     } else {
-      toast.error(res.error || 'Failed to save reply')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 
@@ -165,12 +167,12 @@ const ReviewDetailPage = () => {
     setIsSubmitting(false)
 
     if (res.success) {
-      toast.success('Reply rejected/skipped')
+      notify(SystemMessageCode.REVIEWS_REPLY_REJECTED)
 
       // Update local state
       setCurrentReview(res.data)
     } else {
-      toast.error(res.error || 'Failed to reject reply')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 
@@ -187,12 +189,12 @@ const ReviewDetailPage = () => {
     const analysisRes = await analyzeSingleReview(currentReview.id)
 
     if (analysisRes.success) {
-      toast.success('Review analysis completed')
+      notify(SystemMessageCode.SUCCESS)
 
       // Update with analysis result first
       setCurrentReview(analysisRes.data)
     } else {
-      toast.error(analysisRes.error || 'Failed to analyze review')
+      notify(SystemMessageCode.GENERIC_ERROR)
       setIsRegenerating(false)
 
       return
@@ -203,7 +205,7 @@ const ReviewDetailPage = () => {
     setIsRegenerating(false)
 
     if (suggestionRes.success && suggestionRes.data) {
-      toast.success('AI suggestions regenerated')
+      notify(SystemMessageCode.SUCCESS)
       
       const updatedReview = suggestionRes.data as any
       
@@ -218,7 +220,7 @@ const ReviewDetailPage = () => {
         }
       }
     } else {
-      toast.error(suggestionRes.error || 'Failed to regenerate suggestions')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 

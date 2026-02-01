@@ -71,6 +71,21 @@ module.exports = {
                 count: 1
             }
         ],
+        'no-restricted-imports': [
+            'error',
+            {
+                paths: [
+                    {
+                        name: 'react-hot-toast',
+                        message: 'Please use SystemMessageProvider and notify() from @platform/shared-ui instead.'
+                    },
+                    {
+                        name: 'react-toastify',
+                        message: 'Please use SystemMessageProvider and notify() from @platform/shared-ui instead.'
+                    }
+                ]
+            }
+        ],
         'import/order': [
             'error',
             {
@@ -120,6 +135,12 @@ module.exports = {
             rules: {
                 '@typescript-eslint/explicit-module-boundary-types': 'off',
                 '@typescript-eslint/no-var-requires': 'off'
+            }
+        },
+        {
+            files: ['src/components/SystemMessageProvider.tsx', 'src/components/feedback/Toast.tsx'],
+            rules: {
+                'no-restricted-imports': 'off'
             }
         }
     ]

@@ -29,7 +29,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import GroupsIcon from '@mui/icons-material/Groups';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
-import { toast } from 'react-hot-toast';
+import { useSystemMessages } from '@platform/shared-ui';
+import { SystemMessageCode } from '@platform/contracts';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
 import { BrandService } from '@/services/brand.service';
@@ -77,6 +78,7 @@ const PositioningMapChart = ({ data }: { data: any }) => {
 };
 
 export default function ReportDetailPage() {
+    const { notify } = useSystemMessages();
     const t = useTranslations('dashboard');
     const theme = useTheme();
     const params = useParams();
@@ -114,17 +116,17 @@ export default function ReportDetailPage() {
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
-            toast.success('PDF downloaded successfully');
+            notify(SystemMessageCode.DOWNLOAD_SUCCESS);
         } catch (e) {
             console.error(e);
-            toast.error('Failed to download PDF');
+            notify(SystemMessageCode.DOWNLOAD_FAILED);
         }
     };
 
     const handleShare = () => {
         // Copy current URL to clipboard
         navigator.clipboard.writeText(window.location.href);
-        toast.success('Report link copied to clipboard');
+        notify(SystemMessageCode.COPIED_TO_CLIPBOARD);
     };
 
     if (isLoading) return <CircularProgress />;

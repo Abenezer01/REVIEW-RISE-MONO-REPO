@@ -16,7 +16,9 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 
 // Third-party Imports
 import classnames from 'classnames'
-import { toast } from 'react-hot-toast'
+
+import { useSystemMessages } from '@platform/shared-ui'
+import { SystemMessageCode } from '@platform/contracts'
 
 // Type Imports
 import type { SystemMode } from '@core/types'
@@ -62,6 +64,8 @@ const MaskImg = styled('img')({
 })
 
 const LoginV2 = ({ mode }: { mode: SystemMode }) => {
+  const { notify } = useSystemMessages()
+
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [email, setEmail] = useState('')
@@ -83,12 +87,20 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
 
   useEffect(() => {
     if (state?.success && state.user) {
-      toast.success('Login successful!', { id: 'login-success' })
+      if (state.messageCode) {
+        notify(state.messageCode)
+      } else {
+        notify(SystemMessageCode.AUTH_LOGIN_SUCCESS)
+      }
       login(state.user)
-    } else if (state?.success === false && state?.message) {
-      toast.error(state.message)
+    } else if (state?.success === false) {
+      if (state.messageCode) {
+        notify(state.messageCode)
+      } else {
+        notify(SystemMessageCode.AUTH_LOGIN_FAILED)
+      }
     }
-  }, [state, login])
+  }, [state, login, notify])
 
   const characterIllustration = useImageVariant(
     mode,

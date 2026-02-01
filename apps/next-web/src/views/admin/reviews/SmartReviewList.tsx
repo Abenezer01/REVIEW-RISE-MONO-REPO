@@ -18,7 +18,8 @@ import { CardHeader, Divider } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import type { GridColDef } from '@mui/x-data-grid'
 
-import { toast } from 'react-toastify'
+import { useSystemMessages } from '@platform/shared-ui'
+import { SystemMessageCode } from '@platform/contracts'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -32,6 +33,7 @@ import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
 import { Link } from '@/i18n/routing'
 
 const SmartReviewList = () => {
+  const { notify } = useSystemMessages()
   const theme = useTheme()
   const { locationId } = useLocationFilter()
   const [data, setData] = useState<any[]>([])
@@ -81,7 +83,7 @@ const SmartReviewList = () => {
       setData(res.data)
       setTotal(res.meta.total)
     } else {
-      toast.error(res.error || 'Failed to fetch reviews')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
 
     setLoading(false)
@@ -284,17 +286,17 @@ const SmartReviewList = () => {
                     color="primary"
                     startIcon={<i className="tabler-wand" />}
                     onClick={async () => {
-                        toast.info('Starting sentiment analysis...');
+                        notify(SystemMessageCode.SUCCESS);
 
                         // Dynamic import to avoid server-side issues if any
                         const { triggerSentimentAnalysis } = await import('@/app/actions/job');
                         const res = await triggerSentimentAnalysis();
 
                         if (res.success) {
-                            toast.success('Sentiment analysis started via background job');
+                            notify(SystemMessageCode.SUCCESS);
                             setTimeout(fetchData, 2000); // Reload after a bit
                         } else {
-                            toast.error(res.error || 'Failed to start analysis');
+                            notify(SystemMessageCode.GENERIC_ERROR);
                         }
                     }}
                     size="small"

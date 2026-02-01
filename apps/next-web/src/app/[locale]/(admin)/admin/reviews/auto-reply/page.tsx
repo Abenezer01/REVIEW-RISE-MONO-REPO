@@ -20,13 +20,16 @@ import {
 } from '@mui/material'
 import { Store as StoreIcon, InfoOutlined as InfoIcon, SmartToy as RobotIcon } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
-import toast from 'react-hot-toast'
+
+import { useSystemMessages } from '@platform/shared-ui'
+import { SystemMessageCode } from '@platform/contracts'
 
 import AutoReplySettings from '@/views/admin/reviews/components/AutoReplySettings'
 import { getCurrentAccount } from '@/app/actions/account'
 import { getBrandProfileByBusinessId, updateAutoReplySettings } from '@/app/actions/brand-profile'
 
 const AutoReplySettingsPage = () => {
+  const { notify } = useSystemMessages()
   const tDashboard = useTranslations('dashboard')
   const [businesses, setBusinesses] = useState<any[]>([])
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('')
@@ -59,7 +62,7 @@ const AutoReplySettingsPage = () => {
         }
       } catch (error: any) {
         console.error('Failed to fetch initial data:', error)
-        toast.error(error.message || 'Failed to load businesses')
+        notify(SystemMessageCode.GENERIC_ERROR)
       } finally {
         setLoading(false)
       }
@@ -82,7 +85,7 @@ const AutoReplySettingsPage = () => {
         } else {
           setBrandProfile(null)
 
-          toast.error(result.error || 'Brand profile not found for this business')
+          notify(SystemMessageCode.BRAND_PROFILE_NOT_FOUND)
         }
       } catch (error) {
         console.error('Failed to fetch brand profile:', error)
@@ -99,20 +102,19 @@ const AutoReplySettingsPage = () => {
     if (!selectedBusinessId || isUpdating) return
 
     setIsUpdating(true)
-    const toastId = toast.loading('Updating settings...')
 
     try {
       const result = await updateAutoReplySettings(selectedBusinessId, data.autoReplySettings)
 
       if (result.success) {
         setBrandProfile(result.data)
-        toast.success('Auto-reply settings updated', { id: toastId })
+        notify(SystemMessageCode.SAVE_SUCCESS)
       } else {
         throw new Error(result.error)
       }
     } catch (error: any) {
       console.error('Update failed:', error)
-      toast.error(error.message || 'Failed to update auto-reply settings', { id: toastId })
+      notify(SystemMessageCode.SAVE_FAILED)
     } finally {
       setIsUpdating(false)
     }
