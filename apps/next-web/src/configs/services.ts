@@ -71,7 +71,17 @@ export const SERVICES_CONFIG = {
         },
     },
     ai: {
-        url: process.env.EXPRESS_AI_URL || 'http://localhost:3002/api/v1',
+        get url() {
+            if (typeof window === 'undefined') {
+                return process.env.EXPRESS_AI_URL || 'http://localhost:3002/api/v1';
+            }
+
+            if (isProduction()) {
+                return `${getClientBaseUrl()}/api/ai/api/v1`;
+            }
+
+            return 'http://localhost:3002/api/v1';
+        },
     },
     social: {
         get url() {
