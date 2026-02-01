@@ -8,7 +8,7 @@ import {
   Button
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
-import { useSystemMessages } from '@platform/shared-ui';
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 import { SystemMessageCode } from '@platform/contracts';
 
 import { DiscoveryInput } from '@/components/brand-rise/competitors/DiscoveryInput';

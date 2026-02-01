@@ -3,8 +3,10 @@
 import React, { useState } from 'react'
 
 import { Box, Card, CardContent, Grid, TextField, MenuItem, Typography, Button } from '@mui/material'
-import { toast } from 'react-toastify'
 import { keyframes } from '@mui/material/styles'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+import { SystemMessageCode } from '@platform/contracts'
 
 import { SERVICES } from '@/configs/services'
 import apiClient from '@/lib/apiClient'
@@ -51,6 +53,7 @@ interface UnifiedPostGeneratorProps {
 }
 
 export default function UnifiedPostGenerator({ initialDate }: UnifiedPostGeneratorProps) {
+    const { notify } = useSystemMessages()
     const [loading, setLoading] = useState(false)
     
     // Inputs
@@ -67,7 +70,7 @@ export default function UnifiedPostGenerator({ initialDate }: UnifiedPostGenerat
 
     const handleGenerate = async () => {
         if (!topic) {
-            toast.error('Please enter a topic or focus')
+            notify(SystemMessageCode.VALIDATION_ERROR)
             
 return
         }
@@ -87,10 +90,10 @@ return
             })
 
             setResult(response.data)
-            toast.success('Generated complete post package!')
+            notify(SystemMessageCode.SUCCESS)
         } catch (error) {
             console.error(error)
-            toast.error('Failed to generate post package')
+            notify(SystemMessageCode.GENERIC_ERROR)
         } finally {
             setLoading(false)
         }

@@ -26,7 +26,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslations } from 'next-intl';
 
-import { useSystemMessages } from '@platform/shared-ui';
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 import { SystemMessageCode } from '@platform/contracts';
 
 import { BrandProfileService } from '@/services/brand-profile.service';

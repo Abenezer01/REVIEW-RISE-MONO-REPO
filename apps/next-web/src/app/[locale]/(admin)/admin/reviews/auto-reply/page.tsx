@@ -21,7 +21,7 @@ import {
 import { Store as StoreIcon, InfoOutlined as InfoIcon, SmartToy as RobotIcon } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 
-import { useSystemMessages } from '@platform/shared-ui'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 import { SystemMessageCode } from '@platform/contracts'
 
 import AutoReplySettings from '@/views/admin/reviews/components/AutoReplySettings'

@@ -13,7 +13,8 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
 
-import { toast } from 'react-toastify'
+import { SystemMessageCode } from '@platform/contracts'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import type { GenerateScriptRequest, GenerateScriptResponse, ScriptData } from '@platform/contracts'
 
@@ -25,6 +26,7 @@ import VideoDurationSelector from './scripts/VideoDurationSelector'
 import StudioGenerateButton from './shared/StudioGenerateButton'
 
 export default function ScriptWriter() {
+    const { notify } = useSystemMessages()
     const [loading, setLoading] = useState(false)
     const [videoTopic, setVideoTopic] = useState('')
     const [videoGoal, setVideoGoal] = useState('')
@@ -40,7 +42,7 @@ export default function ScriptWriter() {
 
     const handleGenerate = async () => {
         if (!videoTopic) {
-            toast.error('Please enter a video topic')
+            notify(SystemMessageCode.AI_GENERATION_FAILED)
             
 return
         }
@@ -66,10 +68,10 @@ return
             const data = response.data
 
             setScript(data.script)
-            toast.success('Script generated!')
+            notify(SystemMessageCode.AI_GENERATION_SUCCESS)
         } catch (error) {
             console.error(error)
-            toast.error('Failed to generate script')
+            // Error handled by interceptor
         } finally {
             setLoading(false)
         }

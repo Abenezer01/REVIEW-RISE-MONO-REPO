@@ -29,7 +29,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import GroupsIcon from '@mui/icons-material/Groups';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
-import { useSystemMessages } from '@platform/shared-ui';
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 import { SystemMessageCode } from '@platform/contracts';
 
 import { useBusinessId } from '@/hooks/useBusinessId';

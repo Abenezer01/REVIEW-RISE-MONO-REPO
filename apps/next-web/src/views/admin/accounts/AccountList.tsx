@@ -14,7 +14,8 @@ import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import InputAdornment from '@mui/material/InputAdornment'
-import { toast } from 'react-toastify'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+import { SystemMessageCode } from '@platform/contracts'
 import type { GridColDef } from '@mui/x-data-grid'
 
 // Core Component Imports
@@ -36,6 +37,7 @@ const getInitials = (string: string) =>
   string.split(/\s/).reduce((response, word) => (response += word.slice(0, 1)), '')
 
 const AccountList = () => {
+  const { notify } = useSystemMessages()
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
@@ -92,10 +94,10 @@ const AccountList = () => {
     const res = await deleteAccount(accountToDelete.id)
 
     if (res.success) {
-      toast.success('Account deleted successfully')
+      notify(SystemMessageCode.ITEM_DELETED)
       fetchData()
     } else {
-      toast.error(res.message || 'Failed to delete account')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
 
     setDeleteDialogOpen(false)

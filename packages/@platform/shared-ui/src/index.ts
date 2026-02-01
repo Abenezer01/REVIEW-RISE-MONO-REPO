@@ -32,4 +32,3 @@ export { default as List } from './components/display/List';
 export { default as LoadingSpinner } from './components/feedback/LoadingSpinner';
 export { default as EmptyState } from './components/feedback/EmptyState';
 export { showToast, ToastContainer } from './components/feedback/Toast';
-export * from './components/SystemMessageProvider';

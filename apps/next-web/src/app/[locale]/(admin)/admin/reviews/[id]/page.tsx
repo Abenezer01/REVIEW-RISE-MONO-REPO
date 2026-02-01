@@ -29,7 +29,7 @@ import TimelineConnector from '@mui/lab/TimelineConnector'
 import TimelineContent from '@mui/lab/TimelineContent'
 import TimelineDot from '@mui/lab/TimelineDot'
 
-import { useSystemMessages } from '@platform/shared-ui'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 import { SystemMessageCode } from '@platform/contracts'
 
 import CustomChip from '@core/components/mui/Chip'

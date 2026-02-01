@@ -9,7 +9,7 @@ import { Formik } from 'formik';
 
 import type * as Yup from 'yup';
 
-import { useSystemMessages } from '@platform/shared-ui';
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 import { SystemMessageCode } from '@platform/contracts';
 import type { ApiResponse, ApiPayload } from '@platform/contracts';
 
