@@ -3,7 +3,8 @@ import { useState } from 'react';
 
 import { IconButton, Menu, MenuItem } from '@mui/material';
 
-import toast from 'react-hot-toast';
+import { useSystemMessages } from '@platform/shared-ui';
+import { SystemMessageCode } from '@platform/contracts';
 
 import type { AbilityRule } from '@/types/general/permission';
 import type { ListingItemAction } from '@/types/general/listing-item';
@@ -28,6 +29,7 @@ const RowOptions = <T extends { id?: string | number }>({
   deletePermissionRule,
   editPermissionRule,
 }: RowOptionsProps<T>) => {
+  const { notify } = useSystemMessages();
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -39,10 +41,10 @@ const RowOptions = <T extends { id?: string | number }>({
 
     try {
       await onDelete();
-      toast.success('Item successfully deleted');
+      notify(SystemMessageCode.ITEM_DELETED);
       handleCloseDeleteDialog();
     } catch {
-      toast.error('Failed to delete item');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 

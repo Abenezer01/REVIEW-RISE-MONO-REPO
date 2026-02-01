@@ -6,7 +6,7 @@ import helmet from 'helmet';
 import { prisma } from '@platform/db';
 import { generateToken } from '@platform/auth';
 import v1Routes from './routes/v1';
-import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
+import { createSuccessResponse, createErrorResponse, SystemMessageCode } from '@platform/contracts';
 import { requestIdMiddleware, errorHandler } from '@platform/middleware';
 
 dotenv.config();
@@ -27,7 +27,8 @@ app.get('/', (req, res) => {
         null,
         'Express Auth Service is running',
         200,
-        { requestId: req.id }
+        { requestId: req.id },
+        SystemMessageCode.SUCCESS
     );
     res.status(response.statusCode).json(response);
 });
@@ -37,7 +38,8 @@ app.get('/health', (req, res) => {
         { service: 'express-auth' },
         'Service is healthy',
         200,
-        { requestId: req.id }
+        { requestId: req.id },
+        SystemMessageCode.SUCCESS
     );
     res.status(response.statusCode).json(response);
 });
@@ -49,7 +51,8 @@ app.get('/db-test', async (req, res) => {
             { userCount },
             'Database connection successful',
             200,
-            { requestId: req.id }
+            { requestId: req.id },
+            SystemMessageCode.SUCCESS
         );
         res.status(response.statusCode).json(response);
     } catch (error) {
@@ -57,7 +60,7 @@ app.get('/db-test', async (req, res) => {
         console.error('Database connection error:', error);
         const response = createErrorResponse(
             'Database connection failed',
-            ErrorCode.INTERNAL_SERVER_ERROR,
+            SystemMessageCode.INTERNAL_SERVER_ERROR,
             500,
             error,
             req.id
@@ -84,13 +87,14 @@ app.get('/rbac-test', async (req, res) => {
             { token },
             'Token generated successfully using @platform/auth',
             200,
-            { requestId: req.id }
+            { requestId: req.id },
+            SystemMessageCode.SUCCESS
         );
         res.status(response.statusCode).json(response);
     } catch (error: any) {
         const response = createErrorResponse(
             'RBAC test failed',
-            ErrorCode.INTERNAL_SERVER_ERROR,
+            SystemMessageCode.INTERNAL_SERVER_ERROR,
             500,
             error.message,
             req.id
@@ -102,7 +106,7 @@ app.get('/rbac-test', async (req, res) => {
 app.use((req, res) => {
     const response = createErrorResponse(
         'The requested endpoint does not exist. Please check the URL and method.',
-        ErrorCode.NOT_FOUND,
+        SystemMessageCode.NOT_FOUND,
         404,
         { requestedEndpoint: req.originalUrl },
         req.id

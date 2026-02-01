@@ -40,7 +40,8 @@ import {
   AutoGraph as StepIcon,
   RecordVoiceOver as VoiceIcon
 } from '@mui/icons-material';
-import toast from 'react-hot-toast';
+import { useSystemMessages } from '@platform/shared-ui';
+import { SystemMessageCode } from '@platform/contracts';
 
 interface AutoReplySettingsProps {
   profile: any;
@@ -49,6 +50,7 @@ interface AutoReplySettingsProps {
 }
 
 const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate, isUpdating }) => {
+  const { notify } = useSystemMessages();
   const [settings, setSettings] = useState(profile.autoReplySettings || {
     enabled: false,
     mode: 'positive', // 'positive' | 'positive_neutral'
@@ -93,9 +95,9 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
   const handleSave = async () => {
     try {
       await onUpdate({ autoReplySettings: settings });
-      toast.success('Auto-reply settings updated');
+      notify(SystemMessageCode.SAVE_SUCCESS);
     } catch {
-      toast.error('Failed to update auto-reply settings');
+      notify(SystemMessageCode.SAVE_FAILED);
     }
   };
 

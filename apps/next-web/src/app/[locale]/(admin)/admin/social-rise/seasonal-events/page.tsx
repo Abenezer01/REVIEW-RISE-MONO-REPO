@@ -19,7 +19,9 @@ import {
   Tooltip
 } from '@mui/material';
 import type { GridColDef } from '@mui/x-data-grid';
-import toast from 'react-hot-toast';
+
+import { useSystemMessages } from '@platform/shared-ui';
+import { SystemMessageCode } from '@platform/contracts';
 
 import { BrandService } from '@/services/brand.service';
 import { useBusinessId } from '@/hooks/useBusinessId';
@@ -31,6 +33,7 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
 };
 
 const SeasonalEventsPage = () => {
+  const { notify } = useSystemMessages();
   const { businessId } = useBusinessId();
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -65,7 +68,7 @@ const SeasonalEventsPage = () => {
       setEvents(data || []);
     } catch (error) {
       console.error('Failed to fetch events', error);
-      toast.error('Failed to load events');
+      notify(SystemMessageCode.GENERIC_ERROR);
     } finally {
       setLoading(false);
     }
@@ -107,10 +110,10 @@ const SeasonalEventsPage = () => {
     try {
       if (editingEvent) {
         await BrandService.updatePlannerEvent(businessId, editingEvent.id, formData);
-        toast.success('Event updated successfully');
+        notify(SystemMessageCode.ITEM_UPDATED);
       } else {
         await BrandService.createPlannerEvent(businessId, formData);
-        toast.success('Event created successfully');
+        notify(SystemMessageCode.ITEM_CREATED);
       }
 
       handleClose();
@@ -118,7 +121,7 @@ const SeasonalEventsPage = () => {
       fetchEvents();
     } catch (error) {
       console.error('Failed to save event', error);
-      toast.error('Failed to save event');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 
@@ -132,13 +135,13 @@ const SeasonalEventsPage = () => {
 
     try {
       await BrandService.deletePlannerEvent(businessId, itemToDelete);
-      toast.success('Event deleted successfully');
+      notify(SystemMessageCode.ITEM_DELETED);
       setDeleteDialogOpen(false);
       setItemToDelete(null);
       fetchEvents();
     } catch (error) {
       console.error('Failed to delete event', error);
-      toast.error('Failed to delete event');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 

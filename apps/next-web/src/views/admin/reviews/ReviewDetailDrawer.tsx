@@ -16,7 +16,8 @@ import MenuItem from '@mui/material/MenuItem'
 import Avatar from '@mui/material/Avatar'
 import Stack from '@mui/material/Stack'
 
-import { toast } from 'react-toastify'
+import { useSystemMessages } from '@platform/shared-ui'
+import { SystemMessageCode } from '@platform/contracts'
 
 import Timeline from '@mui/lab/Timeline'
 import TimelineItem from '@mui/lab/TimelineItem'
@@ -49,6 +50,7 @@ const DEFAULT_TONE_PRESETS = [
 ]
 
 const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDrawerProps) => {
+  const { notify } = useSystemMessages()
   const theme = useTheme()
   const [reply, setReply] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -112,7 +114,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
 
   const handleSaveReply = async () => {
     if (!reply.trim()) {
-      toast.error('Please enter a reply')
+      notify(SystemMessageCode.REVIEWS_REPLY_EMPTY)
 
       return
     }
@@ -129,7 +131,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
     setIsSubmitting(false)
 
     if (res.success) {
-      toast.success('Reply saved successfully')
+      notify(SystemMessageCode.REVIEWS_REPLY_POSTED)
       
       if (res.data) {
         setCurrentReview(res.data as any)
@@ -137,7 +139,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
       
       if (onSuccess) onSuccess(res.data)
     } else {
-      toast.error(res.error || 'Failed to save reply')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 
@@ -149,10 +151,10 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
     setIsSubmitting(false)
 
     if (res.success) {
-      toast.success('Reply rejected/skipped')
+      notify(SystemMessageCode.REVIEWS_REPLY_REJECTED)
       if (onSuccess) onSuccess(res.data)
     } else {
-      toast.error(res.error || 'Failed to reject reply')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 
@@ -169,13 +171,13 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
     const analysisRes = await analyzeSingleReview(currentReview.id)
 
     if (analysisRes.success) {
-      toast.success('Review analysis completed')
+      notify(SystemMessageCode.SUCCESS)
 
       // Update with analysis result first
       setCurrentReview(analysisRes.data)
       if (onSuccess) onSuccess(analysisRes.data, false)
     } else {
-      toast.error(analysisRes.error || 'Failed to analyze review')
+      notify(SystemMessageCode.GENERIC_ERROR)
       setIsRegenerating(false)
 
       return
@@ -186,7 +188,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
     setIsRegenerating(false)
 
     if (suggestionRes.success && suggestionRes.data) {
-      toast.success('AI suggestions regenerated')
+      notify(SystemMessageCode.SUCCESS)
       
       const updatedReview = suggestionRes.data as any
       
@@ -203,7 +205,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
       
       if (onSuccess) onSuccess(updatedReview, false)
     } else {
-      toast.error(suggestionRes.error || 'Failed to regenerate suggestions')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 

@@ -10,6 +10,9 @@ export * from './auth.schema';
 // Response types
 export * from './responses';
 
+// System messages
+export * from './system-messages';
+
 // Utilities
 export * from './utils/encryption.util';
 

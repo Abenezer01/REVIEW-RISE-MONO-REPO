@@ -16,7 +16,8 @@ import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
-import { toast } from 'react-toastify'
+import { useSystemMessages } from '@platform/shared-ui'
+import { SystemMessageCode } from '@platform/contracts'
 import type { GridColDef } from '@mui/x-data-grid'
 import { useTheme } from '@mui/material/styles'
 
@@ -46,6 +47,7 @@ type Props = {
 }
 
 const JobList = ({ initialType = '' }: Props) => {
+  const { notify } = useSystemMessages()
   const theme = useTheme()
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -76,7 +78,7 @@ const JobList = ({ initialType = '' }: Props) => {
       setData(res.data)
       setTotal(res.meta.total)
     } else {
-      toast.error(res.error || 'Failed to fetch jobs')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
 
     setLoading(false)
@@ -95,11 +97,11 @@ const JobList = ({ initialType = '' }: Props) => {
     const res = await retryJob(id)
 
     if (res.success) {
-      toast.success('Job queued for retry')
+      notify(SystemMessageCode.SUCCESS)
       fetchData()
       if (selectedJob?.id === id) setOpenDetail(false)
     } else {
-      toast.error(res.error || 'Failed to retry job')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 
@@ -107,11 +109,11 @@ const JobList = ({ initialType = '' }: Props) => {
     const res = await resolveJob(id, 'Resolved by admin')
 
     if (res.success) {
-      toast.success('Job marked as resolved')
+      notify(SystemMessageCode.SUCCESS)
       fetchData()
       if (selectedJob?.id === id) setOpenDetail(false)
     } else {
-      toast.error(res.error || 'Failed to resolve job')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 
@@ -119,11 +121,11 @@ const JobList = ({ initialType = '' }: Props) => {
     const res = await ignoreJob(id, 'Ignored by admin')
 
     if (res.success) {
-      toast.success('Job ignored')
+      notify(SystemMessageCode.SUCCESS)
       fetchData()
       if (selectedJob?.id === id) setOpenDetail(false)
     } else {
-      toast.error(res.error || 'Failed to ignore job')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 
@@ -173,15 +175,15 @@ const JobList = ({ initialType = '' }: Props) => {
         const csvContent = convertToCSV(res.data)
 
         downloadCSV(csvContent, `failed_jobs_${new Date().toISOString().split('T')[0]}.csv`)
-        toast.success(`Exported ${res.data.length} jobs`)
+        notify(SystemMessageCode.DOWNLOAD_SUCCESS)
       } else if (res.success && res.data.length === 0) {
-        toast.info('No jobs to export')
+        notify(SystemMessageCode.SUCCESS)
       } else {
-        toast.error(res.error || 'Failed to fetch jobs for export')
+        notify(SystemMessageCode.GENERIC_ERROR)
       }
     } catch (error) {
       console.error('Export error:', error)
-      toast.error('An error occurred during export')
+      notify(SystemMessageCode.GENERIC_ERROR)
     } finally {
       setLoadingExport(false)
     }

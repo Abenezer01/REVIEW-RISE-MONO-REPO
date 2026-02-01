@@ -6,10 +6,11 @@ import { LoadingButton } from '@mui/lab';
 import { Box, Button, Grid } from '@mui/material'; // <-- Imported Dialog components
 import type { FormikProps, FormikHelpers, FormikValues } from 'formik';
 import { Formik } from 'formik';
-import { toast } from 'react-hot-toast';
 
 import type * as Yup from 'yup';
 
+import { useSystemMessages } from '@platform/shared-ui';
+import { SystemMessageCode } from '@platform/contracts';
 import type { ApiResponse, ApiPayload } from '@platform/contracts';
 
 import { useRouter } from '@/i18n/routing';
@@ -64,6 +65,7 @@ const FormPageWrapper = <T extends FormikValues>({
   onActionSuccess,
   renderPage = true
 }: FormPageWrapperProps<T>) => {
+  const { notify } = useSystemMessages();
   const t = useTranslation('common');
   const router = useRouter();
   const requiredFields = getRequiredFields(validationSchema);
@@ -91,7 +93,7 @@ const FormPageWrapper = <T extends FormikValues>({
         router.push(baseUrl as any);
       }
 
-      toast.success(`${title} ${t(edit ? 'form.success-updated' : 'form.success-created')}`);
+      notify(edit ? SystemMessageCode.ITEM_UPDATED : SystemMessageCode.ITEM_CREATED);
     } catch (err: any) {
       const apiError = (err.response && err.response.data) ? err.response.data : err as ApiResponse;
 
@@ -100,13 +102,10 @@ const FormPageWrapper = <T extends FormikValues>({
       setErrors(parseError(apiError) as any);
       setSubmitting(false);
 
-      if (apiError.error && typeof apiError.error === 'string') {
-        toast.error(apiError.error);
-      } else if (apiError.error && apiError.error?.message) {
-        toast.error(apiError.error.message);
-      }
-      else if (apiError.error) {
-        toast.error(`${t(edit ? 'form.error-update' : 'form.error-create')} ${title}`);
+      if (apiError.messageCode) {
+        notify(apiError.messageCode);
+      } else {
+        notify(SystemMessageCode.GENERIC_ERROR);
       }
     }
   };

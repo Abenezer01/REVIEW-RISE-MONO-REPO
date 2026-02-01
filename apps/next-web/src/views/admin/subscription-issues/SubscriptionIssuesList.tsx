@@ -16,7 +16,8 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
-import toast from 'react-hot-toast'
+import { useSystemMessages } from '@platform/shared-ui'
+import { SystemMessageCode } from '@platform/contracts'
 import type { GridColDef } from '@mui/x-data-grid'
 
 // Core Component Imports
@@ -39,6 +40,7 @@ const getInitials = (string: string) =>
   string.split(/\s/).reduce((response, word) => (response += word.slice(0, 1)), '')
 
 const SubscriptionIssuesList = () => {
+  const { notify } = useSystemMessages()
   const [data, setData] = useState<SubscriptionIssue[]>([])
   const [loading, setLoading] = useState(true)
   const [detailOpen, setDetailOpen] = useState(false)
@@ -65,10 +67,10 @@ const SubscriptionIssuesList = () => {
     const res = await markSubscriptionAsContacted(id)
 
     if (res.success) {
-      toast.success('Marked as contacted')
+      notify(SystemMessageCode.SUCCESS)
       fetchData()
     } else {
-      toast.error(res.message || 'Failed to update')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 
@@ -77,10 +79,10 @@ const SubscriptionIssuesList = () => {
     const res = await toggleSubscriptionStatus(id, newStatus)
 
     if (res.success) {
-      toast.success(`Subscription ${newStatus === 'active' ? 'resumed' : 'paused'}`)
+      notify(SystemMessageCode.SUCCESS)
       fetchData()
     } else {
-      toast.error(res.message || 'Failed to update status')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 
