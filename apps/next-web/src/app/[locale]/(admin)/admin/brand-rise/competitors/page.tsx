@@ -8,7 +8,8 @@ import {
   Button
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
-import { toast } from 'react-hot-toast';
+import { useSystemMessages } from '@platform/shared-ui';
+import { SystemMessageCode } from '@platform/contracts';
 
 import { DiscoveryInput } from '@/components/brand-rise/competitors/DiscoveryInput';
 import { CompetitorList } from '@/components/brand-rise/competitors/CompetitorList';
@@ -16,6 +17,7 @@ import { CompetitorList } from '@/components/brand-rise/competitors/CompetitorLi
 import { useCompetitors } from './hooks/useCompetitors';
 
 export default function CompetitorsPage() {
+  const { notify } = useSystemMessages();
   const { 
     competitors, 
     isListLoading, 
@@ -57,10 +59,10 @@ export default function CompetitorsPage() {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      toast.success('Competitor list exported successfully');
+      notify(SystemMessageCode.DOWNLOAD_SUCCESS);
     } catch (error) {
       console.error('Export failed:', error);
-      toast.error('Failed to export competitor list');
+      notify(SystemMessageCode.DOWNLOAD_FAILED);
     }
   };
 

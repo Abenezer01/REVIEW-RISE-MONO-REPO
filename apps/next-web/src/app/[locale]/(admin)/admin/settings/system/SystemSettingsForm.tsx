@@ -3,7 +3,8 @@
 
 import { useState } from 'react'
 
-import toast from 'react-hot-toast'
+import { useSystemMessages } from '@platform/shared-ui'
+import { SystemMessageCode } from '@platform/contracts'
 import {
     Box,
     Card,
@@ -35,6 +36,7 @@ interface SystemSettingsFormProps {
 }
 
 export default function SystemSettingsForm({ initialSettings }: SystemSettingsFormProps) {
+    const { notify } = useSystemMessages()
     const [settings, setSettings] = useState(initialSettings)
     const [logoFile, setLogoFile] = useState<File | null>(null)
     const [logoPreview, setLogoPreview] = useState<string | null>(settings.site_logo || null)
@@ -60,7 +62,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
             
             // Validate file size (2MB max)
             if (file.size > 2 * 1024 * 1024) {
-                toast.error('Logo file size must be less than 2MB')
+                notify(SystemMessageCode.VALIDATION_ERROR)
             
                 return
             }
@@ -140,7 +142,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
 
     const handleSave = async () => {
         if (!validateForm()) {
-            toast.error('Please fix the validation errors before saving')
+            notify(SystemMessageCode.VALIDATION_ERROR)
             
             return
         }
@@ -190,10 +192,10 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
         setSaving(false)
 
         if (res.success) {
-            toast.success('Settings updated successfully')
+            notify(SystemMessageCode.SAVE_SUCCESS)
             setErrors({ site_name: '', site_title: '', footer_text: '', max_requests: '', window_ms: '', smtp_port: '', from_email: '', session_timeout: '', password_min_length: '' })
         } else {
-            toast.error(res.error || 'Failed to update settings')
+            notify(SystemMessageCode.SAVE_FAILED)
         }
     }
 

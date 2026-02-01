@@ -13,7 +13,9 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { formatDate } from '@platform/utils'
 import { useTranslations } from 'next-intl'
-import { toast } from 'react-toastify'
+
+import { useSystemMessages } from '@platform/shared-ui'
+import { SystemMessageCode } from '@platform/contracts'
 
 import { SERVICES } from '@/configs/services'
 import { useBusinessId } from '@/hooks/useBusinessId'
@@ -42,6 +44,7 @@ const BUSINESS_TYPES = [
 ]
 
 export default function PlanGenerator() {
+    const { notify } = useSystemMessages()
     const t = useTranslations('studio.planner')
     const { businessId } = useBusinessId()
     const [loading, setLoading] = useState(false)
@@ -139,10 +142,10 @@ return {
             }))
             
             setPlan(newPlan)
-            toast.success('30-Day Plan generated!')
+            notify(SystemMessageCode.AI_PLAN_GENERATED)
         } catch (error) {
             console.error(error)
-            toast.error('Failed to generate plan')
+            notify(SystemMessageCode.GENERIC_ERROR)
         } finally {
             setLoading(false)
         }
@@ -172,10 +175,10 @@ return {
                 businessId,
                 posts: formattedPosts
             })
-            toast.success('Plan saved to drafts successfully!')
+            notify(SystemMessageCode.SAVE_SUCCESS)
         } catch (error) {
             console.error('Failed to save plan:', error)
-            toast.error('Failed to save plan')
+            notify(SystemMessageCode.SAVE_FAILED)
         }
     }
 

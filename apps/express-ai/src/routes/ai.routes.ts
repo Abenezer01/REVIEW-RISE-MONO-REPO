@@ -10,7 +10,8 @@ import {
     GenerateVisibilityPlanRequestSchema,
     AnalyzeReviewRequestSchema,
     createSuccessResponse,
-    createErrorResponse
+    createErrorResponse,
+    SystemMessageCode
 } from '@platform/contracts';
 import { llmService } from '../services/llm.service';
 
@@ -20,10 +21,10 @@ router.post('/classify-competitor', validateRequest(ClassifyCompetitorRequestSch
     try {
         const { domain, title, snippet, businessContext } = req.body;
         const result = await competitorClassifier.classify(domain, title || '', snippet || '', businessContext);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Competitor classified', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('API Error:', error);
-        res.status(500).json(createErrorResponse('Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse('Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
@@ -31,10 +32,10 @@ router.post('/analyze-competitor', validateRequest(AnalyzeCompetitorRequestSchem
     try {
         const { domain, headline, uvp, serviceList, businessContext } = req.body;
         const result = await competitorClassifier.analyze(domain, headline, uvp, serviceList || [], businessContext);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Competitor analyzed', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('API Error:', error);
-        res.status(500).json(createErrorResponse('Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse('Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
@@ -42,20 +43,20 @@ router.post('/generate-report', validateRequest(GenerateReportRequestSchema), as
     try {
         const { competitors, businessType } = req.body;
         const result = await competitorClassifier.generateOpportunitiesReport(competitors, businessType);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Report generated', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('API Error:', error);
-        res.status(500).json(createErrorResponse('Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse('Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
 router.get('/provider-status', async (req, res) => {
     try {
         const info = competitorClassifier.getProviderInfo();
-        res.json(createSuccessResponse(info));
+        res.json(createSuccessResponse(info, 'Provider status fetched', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('API Error:', error);
-        res.status(500).json(createErrorResponse('Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse('Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
@@ -69,10 +70,10 @@ router.post('/generate-review-replies', validateRequest(GenerateReviewRepliesReq
     try {
         const { reviewId, options } = req.body;
         const result = await replyGenerator.generateReplyVariations(reviewId, options);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Replies generated', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('Review Reply Generation Error:', error);
-        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
@@ -80,10 +81,10 @@ router.post('/generate-recommendations', validateRequest(GenerateRecommendations
     try {
         const { category, context } = req.body;
         const result = await brandStrategist.generateRecommendations(category, context);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Recommendations generated', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('Recommendation Generation Error:', error);
-        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
@@ -91,10 +92,10 @@ router.post('/generate-visibility-plan', validateRequest(GenerateVisibilityPlanR
     try {
         const { context } = req.body;
         const result = await brandStrategist.generateVisibilityPlan(context);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Visibility plan generated', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('Visibility Plan Generation Error:', error);
-        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
@@ -150,10 +151,10 @@ router.post('/reviews/analyze', validateRequest(AnalyzeReviewRequestSchema), asy
     try {
         const { content, rating } = req.body;
         const result = await reviewSentimentService.analyzeReview(content || '', rating);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Review analyzed', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('Review Analysis Error:', error);
-        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 

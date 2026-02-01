@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
+import { createSuccessResponse, createErrorResponse, SystemMessageCode } from '@platform/contracts';
 import { sendVerificationEmail } from '../services/email.service';
 
 /**
@@ -21,7 +21,7 @@ export const sendVerificationEmailHandler = async (req: Request, res: Response) 
 
         await sendVerificationEmail(email, token);
 
-        const response = createSuccessResponse({}, 'Verification email sent successfully', 200, { requestId: req.id });
+        const response = createSuccessResponse({}, 'Verification email sent successfully', 200, { requestId: req.id }, SystemMessageCode.AUTH_VERIFICATION_EMAIL_SENT);
         res.status(response.statusCode).json(response);
     } catch (error: any) {
         if (error instanceof z.ZodError) {

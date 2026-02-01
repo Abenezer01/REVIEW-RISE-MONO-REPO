@@ -35,7 +35,8 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 
-import toast from 'react-hot-toast';
+import { useSystemMessages } from '@platform/shared-ui';
+import { SystemMessageCode } from '@platform/contracts';
 
 import type { BrandProfile } from '@/services/brand-profile.service';
 
@@ -54,6 +55,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
   onUpdate,
   isUpdating
 }) => {
+  const { notify } = useSystemMessages();
   const theme = useTheme();
   const [editingSection, setEditingSection] = React.useState<string | null>(null);
   const [editedDescription, setEditedDescription] = React.useState(profile.description || '');
@@ -65,9 +67,9 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
     try {
       await onUpdate({ colors: editedColors });
       setEditingSection(null);
-      toast.success('Colors updated');
+      notify(SystemMessageCode.SUCCESS);
     } catch (error) {
-      toast.error('Failed to update colors');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 
@@ -75,9 +77,9 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
     try {
       await onUpdate({ assets: editedAssets });
       setEditingSection(null);
-      toast.success('Assets updated');
+      notify(SystemMessageCode.SUCCESS);
     } catch (error) {
-      toast.error('Failed to update assets');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 
@@ -85,9 +87,9 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
     try {
       await onUpdate({ fonts: editedFonts });
       setEditingSection(null);
-      toast.success('Typography updated');
+      notify(SystemMessageCode.SUCCESS);
     } catch (error) {
-      toast.error('Failed to update typography');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 
@@ -110,9 +112,9 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
     try {
       await onUpdate({ description: editedDescription });
       setEditingSection(null);
-      toast.success('Description updated');
+      notify(SystemMessageCode.SUCCESS);
     } catch (error) {
-      toast.error('Failed to update description');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 

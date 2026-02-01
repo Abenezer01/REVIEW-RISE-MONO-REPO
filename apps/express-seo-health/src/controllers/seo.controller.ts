@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { createSuccessResponse, createErrorResponse, createValidationErrorResponse, ErrorCode } from '@platform/contracts';
+import { createSuccessResponse, createErrorResponse, createValidationErrorResponse, SystemMessageCode } from '@platform/contracts';
 import { analyzeSEOHealth } from '../services/seo-analyzer.service';
 
 const analyzeSchema = z.object({
@@ -42,7 +42,8 @@ export const analyzeSEO = async (req: Request, res: Response) => {
             analysis,
             'SEO analysis completed successfully',
             200,
-            { requestId: req.id, duration }
+            { requestId: req.id, duration },
+            SystemMessageCode.SEO_ANALYSIS_COMPLETED
         );
         
         res.status(response.statusCode).json(response);
@@ -54,7 +55,7 @@ export const analyzeSEO = async (req: Request, res: Response) => {
         
         const response = createErrorResponse(
             error.message || 'SEO analysis failed',
-            ErrorCode.INTERNAL_SERVER_ERROR,
+            SystemMessageCode.INTERNAL_SERVER_ERROR,
             500,
             process.env.NODE_ENV === 'development' ? error.stack : undefined,
             req.id

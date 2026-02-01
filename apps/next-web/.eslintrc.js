@@ -59,6 +59,21 @@ module.exports = {
         count: 1
       }
     ],
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: 'react-hot-toast',
+            message: 'Please use SystemMessageProvider and notify() from @platform/shared-ui instead.'
+          },
+          {
+            name: 'react-toastify',
+            message: 'Please use SystemMessageProvider and notify() from @platform/shared-ui instead.'
+          }
+        ]
+      }
+    ],
     'import/order': [
       'error',
       {

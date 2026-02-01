@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import { createSuccessResponse } from '@platform/contracts';
+import { createSuccessResponse, SystemMessageCode } from '@platform/contracts';
 import { requestIdMiddleware, errorHandler } from '@platform/middleware';
 
 // Load environment variables
@@ -21,13 +21,13 @@ app.use(morgan('combined'));
 
 // Health Check
 app.get('/health', (req, res) => {
-  const response = createSuccessResponse({ service: 'express-admin-portal' }, 'Service is healthy', 200, { requestId: req.id });
+  const response = createSuccessResponse({ service: 'express-admin-portal' }, 'Service is healthy', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
   res.status(response.statusCode).json(response);
 });
 
 // Basic Route
 app.get('/', (req, res) => {
-  const response = createSuccessResponse(null, 'Welcome to Review Rise Admin Portal API', 200, { requestId: req.id });
+  const response = createSuccessResponse(null, 'Welcome to Review Rise Admin Portal API', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
   res.status(response.statusCode).json(response);
 });
 
