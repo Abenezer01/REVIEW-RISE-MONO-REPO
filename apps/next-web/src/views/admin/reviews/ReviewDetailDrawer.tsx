@@ -16,7 +16,7 @@ import MenuItem from '@mui/material/MenuItem'
 import Avatar from '@mui/material/Avatar'
 import Stack from '@mui/material/Stack'
 
-import { useSystemMessages } from '@platform/shared-ui'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 import { SystemMessageCode } from '@platform/contracts'
 
 import Timeline from '@mui/lab/Timeline'

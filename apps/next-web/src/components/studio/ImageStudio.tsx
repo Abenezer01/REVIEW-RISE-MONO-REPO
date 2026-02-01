@@ -15,7 +15,8 @@ import Slider from '@mui/material/Slider'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
 
-import { toast } from 'react-toastify'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+import { SystemMessageCode } from '@platform/contracts'
 
 import { useBusinessId } from '@/hooks/useBusinessId'
 import { SERVICES } from '@/configs/services'
@@ -39,6 +40,7 @@ const ASPECT_RATIOS = [
 ]
 
 export default function ImageStudio() {
+    const { notify } = useSystemMessages()
     const { businessId } = useBusinessId()
     const [loading, setLoading] = useState(false)
     const [prompt, setPrompt] = useState('')
@@ -57,7 +59,7 @@ export default function ImageStudio() {
 
     const handleGenerate = async () => {
         if (!prompt) {
-            toast.error('Please enter a description')
+            notify(SystemMessageCode.VALIDATION_ERROR)
             
 return
         }
@@ -79,11 +81,11 @@ return
             if (data.urls && data.urls.length > 0) {
                 setGeneratedImage(data.urls[0])
                 setRecentImages(prev => [data.urls[0], ...prev].slice(0, 6))
-                toast.success('Image generated!')
+                notify(SystemMessageCode.AI_IMAGE_GENERATED)
             }
         } catch (error) {
             console.error(error)
-            toast.error('Failed to generate image')
+            notify(SystemMessageCode.GENERIC_ERROR)
         } finally {
             setLoading(false)
         }
@@ -91,7 +93,7 @@ return
 
     const handleSavePrompt = async () => {
         if (!businessId || !prompt || !generatedImage) {
-            toast.error('No image to save')
+            notify(SystemMessageCode.GENERIC_ERROR)
             
 return
         }
@@ -104,10 +106,10 @@ return
                 aspectRatio,
                 imageUrls: [generatedImage]
             })
-            toast.success('Prompt saved successfully!')
+            notify(SystemMessageCode.SAVE_SUCCESS)
         } catch (error) {
             console.error('Error saving prompt:', error)
-            toast.error('Failed to save prompt')
+            notify(SystemMessageCode.SAVE_FAILED)
         }
     }
 

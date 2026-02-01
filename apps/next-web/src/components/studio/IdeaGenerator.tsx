@@ -14,8 +14,9 @@ import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
 import Chip from '@mui/material/Chip'
-import { toast } from 'react-toastify'
 
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+import { SystemMessageCode } from '@platform/contracts'
 
 import { useBusinessId } from '@/hooks/useBusinessId'
 import { SERVICES } from '@/configs/services'
@@ -50,6 +51,7 @@ const TONES = ['Professional', 'Casual', 'Tutorial', 'Storytelling']
 type FilterTab = 'all' | 'blog' | 'social' | 'video'
 
 export default function IdeaGenerator() {
+    const { notify } = useSystemMessages()
     const t = useTranslations('studio.ideas')
     const { businessId } = useBusinessId()
     const [loading, setLoading] = useState(false)
@@ -113,10 +115,10 @@ export default function IdeaGenerator() {
                 }
             }
             
-            toast.success(`${enhancedIdeas.length} ideas generated!`)
+            notify(SystemMessageCode.AI_IDEAS_GENERATED)
         } catch (error) {
             console.error(error)
-            toast.error('Failed to generate ideas')
+            notify(SystemMessageCode.GENERIC_ERROR)
         } finally {
             setLoading(false)
         }
@@ -124,7 +126,7 @@ export default function IdeaGenerator() {
 
     const handleSaveDraft = async (idea: any) => {
         if (!businessId) {
-            toast.error('Business context missing')
+            notify(SystemMessageCode.GENERIC_ERROR)
             
 return
         }
@@ -137,16 +139,16 @@ return
                 status: 'draft'
             })
 
-            toast.success('Saved to drafts')
+            notify(SystemMessageCode.SAVE_SUCCESS)
         } catch (error) {
             console.error(error)
-            toast.error('Failed to save draft')
+            notify(SystemMessageCode.SAVE_FAILED)
         }
     }
 
     const handleCopy = (text: string) => {
         navigator.clipboard.writeText(text)
-        toast.success('Copied to clipboard')
+        notify(SystemMessageCode.COPIED_TO_CLIPBOARD)
     }
 
     // Filter ideas

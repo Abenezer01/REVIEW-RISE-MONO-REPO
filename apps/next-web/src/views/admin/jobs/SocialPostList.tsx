@@ -17,7 +17,8 @@ import Tooltip from '@mui/material/Tooltip'
 import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
 import Avatar from '@mui/material/Avatar'
-import { toast } from 'react-toastify'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+import { SystemMessageCode } from '@platform/contracts'
 import type { GridColDef } from '@mui/x-data-grid'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -30,6 +31,7 @@ import { getJobs } from '@/app/actions/job'
 import SocialPostDetailModal from './SocialPostDetailModal'
 
 const SocialPostList = () => {
+  const { notify } = useSystemMessages()
   const theme = useTheme()
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -66,7 +68,7 @@ const SocialPostList = () => {
       setData(res.data)
       setTotal(res.meta.total)
     } else {
-      toast.error(res.error || 'Failed to fetch social posts')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
 
     setLoading(false)

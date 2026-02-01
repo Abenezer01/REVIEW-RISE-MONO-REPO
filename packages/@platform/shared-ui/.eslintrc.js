@@ -138,7 +138,7 @@ module.exports = {
             }
         },
         {
-            files: ['src/components/SystemMessageProvider.tsx', 'src/components/feedback/Toast.tsx'],
+            files: ['src/components/feedback/Toast.tsx'],
             rules: {
                 'no-restricted-imports': 'off'
             }

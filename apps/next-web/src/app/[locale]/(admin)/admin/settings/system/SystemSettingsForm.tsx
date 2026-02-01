@@ -3,7 +3,7 @@
 
 import { useState } from 'react'
 
-import { useSystemMessages } from '@platform/shared-ui'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 import { SystemMessageCode } from '@platform/contracts'
 import {
     Box,

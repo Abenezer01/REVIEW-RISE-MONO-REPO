@@ -15,7 +15,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import TokenRefresher from '@/components/TokenRefresher'
 import { getServerUser } from '@/utils/serverAuth'
 import ReactQueryProvider from '@/components/ReactQueryProvider'
-import { SystemMessageProvider } from '@platform/shared-ui'
+import { SystemMessageProvider } from '@/shared/components/SystemMessageProvider'
 
 type Props = ChildrenType & {
   direction: Direction

@@ -17,7 +17,8 @@ import Tooltip from '@mui/material/Tooltip'
 import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
 import Avatar from '@mui/material/Avatar'
-import { toast } from 'react-toastify'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+import { SystemMessageCode } from '@platform/contracts'
 import type { GridColDef } from '@mui/x-data-grid'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -30,6 +31,7 @@ import { getReviewSyncLogs, retryJob } from '@/app/actions/job'
 import ReviewSyncDetailModal from './ReviewSyncDetailModal'
 
 const ReviewSyncList = () => {
+  const { notify } = useSystemMessages()
   const theme = useTheme()
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -66,7 +68,7 @@ const ReviewSyncList = () => {
       setData(res.data)
       setTotal(res.meta.total)
     } else {
-      toast.error(res.error || 'Failed to fetch review sync logs')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
 
     setLoading(false)
@@ -92,7 +94,7 @@ const ReviewSyncList = () => {
 
   const handleRetry = async (jobId: string) => {
     if (!jobId) {
-      toast.error('Cannot retry: No associated job found')
+      notify(SystemMessageCode.GENERIC_ERROR)
 
       return
     }
@@ -100,7 +102,7 @@ const ReviewSyncList = () => {
     const res = await retryJob(jobId)
 
     if (res.success) {
-      toast.success('Job retried successfully')
+      notify(SystemMessageCode.SUCCESS)
 
       // We might not see status update immediately in logs unless a new log is created
       fetchData()
@@ -109,7 +111,7 @@ const ReviewSyncList = () => {
         setOpenDetail(false)
       }
     } else {
-      toast.error(res.error || 'Failed to retry job')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 

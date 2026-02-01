@@ -17,7 +17,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 // Third-party Imports
 import classnames from 'classnames'
 
-import { useSystemMessages } from '@platform/shared-ui'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 import { SystemMessageCode } from '@platform/contracts'
 
 // Type Imports

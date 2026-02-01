@@ -22,7 +22,7 @@ All API responses include a `messageCode` field.
 }
 ```
 
-### 3. SystemMessageProvider (Shared UI)
+### 3. SystemMessageProvider
 A React provider that handles displaying messages via:
 - **TOAST**: Small notifications (using `react-hot-toast`).
 - **MODAL**: Blocking dialogs for important information.
@@ -43,7 +43,7 @@ res.json(createSuccessResponse(data, SystemMessageCode.ITEM_CREATED));
 Use the `useSystemMessages` hook:
 
 ```typescript
-import { useSystemMessages } from '@platform/shared-ui';
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 import { SystemMessageCode } from '@platform/contracts';
 
 const { notify } = useSystemMessages();
@@ -90,7 +90,7 @@ toast.success('Settings saved!');
 
 ### After (Required)
 ```typescript
-import { useSystemMessages } from '@platform/shared-ui';
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 import { SystemMessageCode } from '@platform/contracts';
 
 const { notify } = useSystemMessages();

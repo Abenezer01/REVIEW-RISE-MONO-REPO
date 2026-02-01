@@ -20,7 +20,7 @@ import Typography from '@mui/material/Typography';
 import { useTranslations } from 'next-intl';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSystemMessages } from '@platform/shared-ui';
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 import { SystemMessageCode } from '@platform/contracts';
 
 import { useAuth } from '@/contexts/AuthContext';

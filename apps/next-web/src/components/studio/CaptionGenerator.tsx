@@ -13,7 +13,8 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 
-import { toast } from 'react-toastify'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+import { SystemMessageCode } from '@platform/contracts'
 import { useTranslations } from 'next-intl'
 
 import { useBusinessId } from '@/hooks/useBusinessId'
@@ -29,6 +30,7 @@ import ProTips from './captions/ProTips'
 const CTA_OPTIONS = ['Shop Now', 'Learn More', 'Sign Up', 'Get Started', 'No CTA']
 
 export default function CaptionGenerator() {
+  const { notify } = useSystemMessages()
   const t = useTranslations('studio.captions')
   const [loading, setLoading] = useState(false)
   
@@ -49,7 +51,7 @@ export default function CaptionGenerator() {
 
   const handleGenerate = async () => {
     if (!productDescription) {
-        toast.error('Please enter a product description')
+        notify(SystemMessageCode.VALIDATION_ERROR)
         
 return
     }
@@ -89,10 +91,10 @@ return
             }
         }
         
-        toast.success('Captions generated!')
+        notify(SystemMessageCode.AI_CAPTIONS_GENERATED)
     } catch (error) {
         console.error(error)
-        toast.error('Failed to generate captions')
+        notify(SystemMessageCode.GENERIC_ERROR)
     } finally {
         setLoading(false)
     }
@@ -107,10 +109,10 @@ return
             status: 'draft',
             mediaUrls: []
         })
-        toast.success('Caption saved to drafts!')
+        notify(SystemMessageCode.SAVE_SUCCESS)
     } catch (error) {
         console.error(error)
-        toast.error('Failed to save caption')
+        notify(SystemMessageCode.SAVE_FAILED)
     }
   }
 
