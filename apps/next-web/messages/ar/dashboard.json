@@ -1,15 +1,10 @@
 {
   "navigation": {
     "dashboard": "لوحة التحكم",
-    "ai-studio": "ستوديو المحتوى بالذكاء الاصطناعي",
     "reviews": "المراجعات",
     "reviews-dashboard": "لوحة تحليلات المراجعات",
     "reviews-list": "جميع المراجعات",
-    "auto-reply": "إعدادات الرد التلقائي",
     "social-rise": "سوشل رايز",
-    "social-overview": "نظرة عامة",
-    "social-content": "المحتوى والرسائل",
-    "social-planner": "المخطط الشهري",
     "seo-intelligence": "تحليلات السيو",
     "accounts": "الحسابات",
     "subscription-issues": "مشكلات الاشتراك",
@@ -26,14 +21,12 @@
     "gbp-rocket": "جي بي بي روكيت",
     "ad-rise": "أد رايز",
     "brand-rise": "براند رايز",
-    "content-templates": "قوالب المحتوى",
-    "seasonal-events": "المناسبات الموسمية",
     "settings": "الإعدادات",
     "system-settings": "إعدادات النظام",
     "feature-flags": "أعلام الميزات",
-    "ai-visibility": "رؤية الذكاء الاصطناعي"
+    "ai-visibility": "رؤية الذكاء الاصطناعي",
+    "auto-reply": "إعدادات الرد التلقائي"
   },
-  "auto-reply": "إعدادات الرد التلقائي",
   "overview": {
     "title": "نظرة عامة على لوحة التحكم",
     "welcome": "مرحباً بعودتك",
@@ -80,8 +73,7 @@
       "tabs": {
         "overview": "نظرة عامة",
         "reviews": "المراجعات",
-        "sources": "مصادر المراجعات",
-        "social": "الروابط الاجتماعية"
+        "sources": "مصادر المراجعات"
       },
       "saveFirst": "يرجى حفظ الفرع أولاً للربط."
     },
@@ -197,40 +189,16 @@
     "subtitle": "رؤى أداء العلامة وظهورها",
     "tabs": {
       "overview": "نظرة عامة",
-      "visibility": "خطة الظهور",
-      "recommendations": "التوصيات",
+      "visibility": "الظهور",
       "dna": "هوية العلامة",
       "competitors": "المنافسون",
-      "planner": "المخطط الشهري",
       "content": "المحتوى والرسائل",
       "reviews": "المراجعات والسمعة",
       "reports": "التقارير"
     },
     "reports": {
-      "title": "تقارير فرص العلامة التجارية",
-      "subtitle": "تحليل مدعوم بالذكاء الاصطناعي للثغرات والاستراتيجيات والتموضع.",
-      "generate": "إنشاء تقرير بالذكاء الاصطناعي",
-      "generating": "جاري الإنشاء...",
-      "viewInsights": "عرض الرؤى",
-      "share": "مشاركة",
-      "exportPdf": "تصدير PDF",
-      "noReports": "لم يتم إنشاء تقارير بعد. انقر على \"إنشاء تقرير بالذكاء الاصطناعي\" للبدء.",
-      "columns": {
-        "date": "تاريخ التقرير",
-        "status": "الحالة",
-        "id": "المعرف",
-        "actions": "الإجراءات"
-      },
-      "detail": {
-        "title": "تقرير الاستراتيجية",
-        "subtitle": "الفرص والرؤى المولدة بالذكاء الاصطناعي",
-        "positioning": "التموضع في السوق",
-        "positioningDesc": "علامتك التجارية مقابل المنافسين في أبعاد رئيسية.",
-        "strategies": "استراتيجيات التميز",
-        "gaps": "ثغرات السوق",
-        "taglines": "شعارات مقترحة",
-        "roadmap": "خارطة طريق المحتوى"
-      }
+      "title": "تقارير العلامة",
+      "generate": "إنشاء تقرير"
     },
     "reviews": {
       "recent": "المراجعات الأخيرة",
@@ -238,11 +206,9 @@
       "sentiment": "توزيع المشاعر"
     },
     "content": {
-      "title": "إدارة المحتوى",
       "calendar": "تقويم المحتوى",
       "add": "إضافة محتوى",
-      "ideas": "أفكار المحتوى",
-      "logs": "سجلات النشر"
+      "ideas": "أفكار المحتوى"
     },
     "dna": {
       "summary": "ملخص هوية العلامة",
@@ -252,114 +218,7 @@
       "viewFull": "عرض دليل الهوية الكامل"
     },
     "competitors": {
-      "tracking": "تتبع المنافسين",
-      "discoveryTitle": "اكتشاف المنافسين",
-      "discoverySubtitle": "تحليل مواقع المنافسين لتحديد الثغرات والاستراتيجيات والفرص.",
-      "inputLabel": "أضف كلمات مفتاحية (مثلاً: 'سباك الرياض')",
-      "discoverBtn": "اكتشاف المنافسين",
-      "discovering": "جاري الاكتشاف...",
-      "analyzeWebsite": "تحليل الموقع",
-      "analyzing": "جاري التحليل...",
-      "noAnalysis": "لا يوجد تحليل مفصل متاح بعد.",
-      "noCompetitors": "لا يتم تتبع أي منافسين بعد. أضف واحداً أعلاه.",
-      "uvp": "القيمة المقترحة الفريدة",
-      "services": "الخدمات",
-      "analysis": "التحليل",
-      "listTitle": "المنافسون الذين يتم تتبعهم",
-      "toast": {
-        "discoverySuccess": "تم اكتشاف المنافسين بنجاح",
-        "discoveryError": "فشل اكتشاف المنافسين",
-        "addedSuccess": "تم تتبع المنافس بنجاح",
-        "removedSuccess": "تمت إزالة المنافس",
-        "analysisStarted": "بدأ التحليل",
-        "analysisFailed": "فشل التحليل"
-      },
-      "strategy": "الاستراتيجية: {value}",
-      "learn": "تعلم: {value}"
-    },
-    "jobs": {
-      "title": "مهام وتقارير الذكاء الاصطناعي",
-      "subtitle": "مراقبة مهام العمال الآليين وتنزيل التقارير المولدة",
-      "activeJobs": "المهام النشطة ({count})",
-      "reportsLibrary": "مكتبة التقارير ({count})",
-      "activeJobsTitle": "مهام الذكاء الاصطناعي النشطة",
-      "autoRefresh": "تحديث تلقائي: 30 ثانية",
-      "running": "جاري التنفيذ",
-      "completed": "مكتمل",
-      "failed": "فاشل",
-      "analyzing": "جاري تحليل بيانات العلامة ورؤى المنافسين...",
-      "success": "تم إنشاء التقرير بنجاح",
-      "started": "بدأ",
-      "estimatedTime": "الوقت المقدر",
-      "brand": "العلامة التجارية",
-      "jobId": "معرف المهمة",
-      "duration": "المدة",
-      "output": "المخرجات",
-      "failedAt": "فشل في",
-      "retryCount": "عدد المحاولات",
-      "target": "الهدف",
-      "viewReport": "عرض التقرير",
-      "clear": "مسح",
-      "retryJob": "إعادة المحاولة",
-      "viewLogs": "عرض السجلات",
-      "availableGenerators": "المولدات المتاحة",
-      "generateBtn": "إنشاء الخطة",
-      "generatingBtn": "جاري الإنشاء...",
-      "generatedReports": "التقارير المولدة",
-      "new": "جديد",
-      "generated": "تم الإنشاء",
-      "version": "الإصدار",
-      "pages": "الصفحات",
-      "pagesCount": "{count} صفحات",
-      "download": "تنزيل",
-      "preview": "معاينة"
-    },
-    "visibilityPlan": {
-      "backToDashboard": "العودة للوحة التحكم",
-      "launchTitle": "عزز ظهورك في 30 يوماً",
-      "launchSubtitle": "خطة عمل شاملة مدعومة بالذكاء الاصطناعي مصممة لزيادة تواجدك على الإنترنت، وتعزيز الوعي بالعلامة التجارية، وتحقيق نتائج ملموسة عبر جميع القنوات التسويقية.",
-      "sharePlan": "مشاركة الخطة",
-      "exportPlan": "تصدير الخطة",
-      "totalTasks": "إجمالي المهام",
-      "completed": "مكتمل",
-      "weeks": "أسابيع",
-      "complete": "مكتمل",
-      "daysRemaining": "متبقي {days} أيام",
-      "weeklyActionPlan": "خطة العمل الأسبوعية",
-      "weekHeader": "الأسبوع {number}: {focus}",
-      "statusCompleted": "مكتمل",
-      "statusInProgress": "قيد التنفيذ",
-      "tasksCount": "{completed}/{total} مهام",
-      "goals30Day": "أهداف 30 يوماً",
-      "helpfulResources": "موارد مفيدة",
-      "current": "الحالي: {value}",
-      "target": "الهدف: {value}",
-      "viewGuide": "عرض الدليل",
-      "resources": {
-        "seo": {
-          "title": "دليل أفضل ممارسات السيو",
-          "desc": "دليل كامل لتحسين المحتوى لمحركات البحث"
-        },
-        "social": {
-          "title": "ماستركلاس وسائل التواصل الاجتماعي",
-          "desc": "دروس فيديو حول إنشاء محتوى اجتماعي جذاب"
-        },
-        "content": {
-          "title": "مولد أفكار المحتوى",
-          "desc": "أداة مدعومة بالذكاء الاصطناعي لتوليد أفكار محتوى لعلامتك التجارية"
-        }
-      },
-      "generateBtn": "إنشاء مخطط 30 يوماً",
-      "generatingBtn": "جاري صياغة استراتيجيتك...",
-      "dayTimeline": "الخط الزمني اليومي",
-      "week": "الأسبوع {number}: {focus}",
-      "estHours": "{hours} ساعة مقدرة",
-      "successMetrics": "مقاييس النجاح",
-      "kpiTargets": "أهداف KPI لهذه الخطة",
-      "targetBy": "الهدف بحلول {timeframe}",
-      "metricsInfo": "تساعد المقاييس في تتبع فعالية هذه الخطة.",
-      "expectedOutcomes": "النتائج المتوقعة",
-      "regenerate": "إعادة إنشاء الخطة"
+      "tracking": "تتبع المنافسين"
     }
   }
 }
