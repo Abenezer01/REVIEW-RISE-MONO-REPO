@@ -21,6 +21,7 @@
     "delete": "حذف",
     "edit": "تعديل",
     "add": "إضافة",
+    "create": "إنشاء",
     "search": "بحث",
     "filter": "تصفية",
     "export": "تصدير",
@@ -38,7 +39,29 @@
     "back": "رجوع",
     "next": "التالي",
     "previous": "السابق",
-    "finish": "إنهاء"
+    "finish": "إنهاء",
+    "retry": "إعادة المحاولة",
+    "no-items": "لم يتم العثور على عناصر",
+    "items-selected": "عناصر مختارة",
+    "exportFormat": "صيغة التصدير",
+    "exportCurrentPageOnly": "تصدير سجلات الصفحة الحالية فقط",
+    "selectFields": "اختر الحقول",
+    "search-placeholder": "بحث...",
+    "found": "تم العثور على",
+    "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا العنصر؟"
+  },
+  "form": {
+    "success-created": "تم الإنشاء بنجاح",
+    "success-updated": "تم التحديث بنجاح",
+    "error-create": "فشل الإنشاء",
+    "error-update": "فشل التحديث",
+    "search-placeholder": "اكتب للبحث...",
+    "type-min-chars": "اكتب على الأقل {minChars} حروف",
+    "no-results": "لا توجد نتائج"
+  },
+  "dialog": {
+    "confirm-edit-title": "تأكيد التعديل",
+    "confirm-edit-message": "هل أنت متأكد من تعديل هذا العنصر؟"
   },
   "language": {
     "select": "اختر اللغة",
