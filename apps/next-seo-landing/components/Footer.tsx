@@ -1,6 +1,10 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 export default function Footer() {
+  const t = useTranslations('landing');
+
   return (
     <footer className="footer">
       <div className="container">
@@ -9,21 +13,21 @@ export default function Footer() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2L2 19.5h20L12 2z" />
             </svg>
-            <span>ReviewRise</span>
+            <span>{t('common.brandName')}</span>
           </div>
           <div className="links">
-            <a href="#features">Features</a>
-            <a href="#how-it-works">How it Works</a>
-            <a href="https://app.reviewrise.com">Sign In</a>
+            <a href="#features">{t('footer.features')}</a>
+            <a href="#how-it-works">{t('howItWorks.title')}</a>
+            <a href="https://app.reviewrise.com">{t('footer.login')}</a>
           </div>
         </div>
         <div className="bottom">
           <p className="copyright">
-            © {new Date().getFullYear()} ReviewRise. All rights reserved.
+            {'©'} {new Date().getFullYear()} {t('common.brandName')}{'.'} {t('footer.rights')}
           </p>
           <div className="legal">
-            <a href="/privacy">Privacy</a>
-            <a href="/terms">Terms</a>
+            <a href="/privacy">{t('footer.privacy')}</a>
+            <a href="/terms">{t('footer.terms')}</a>
           </div>
         </div>
       </div>

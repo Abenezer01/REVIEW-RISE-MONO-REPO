@@ -16,6 +16,8 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import LightbulbIcon from '@mui/icons-material/Lightbulb'
 
+import { useTranslation } from '@/hooks/useTranslation'
+
 export interface Suggestion {
   id: string
   title: string
@@ -29,6 +31,7 @@ interface AIOptimizationTipsProps {
 }
 
 const AIOptimizationTips: React.FC<AIOptimizationTipsProps> = ({ tips }) => {
+  const t = useTranslation('dashboard')
 
   const getImpactColor = (impact: string) => {
       switch(impact) {
@@ -42,8 +45,8 @@ const AIOptimizationTips: React.FC<AIOptimizationTipsProps> = ({ tips }) => {
   return (
     <Card sx={{ height: '100%' }}>
       <CardHeader
-        title="Optimization Tips"
-        subheader="Actionable suggestions to improve AI visibility"
+        title={t('aiVisibility.tips.title')}
+        subheader={t('aiVisibility.tips.subtitle')}
         avatar={
             <Avatar variant="rounded" sx={{ bgcolor: 'primary.main', color: 'common.white' }}>
                 <LightbulbIcon />
@@ -59,7 +62,7 @@ const AIOptimizationTips: React.FC<AIOptimizationTipsProps> = ({ tips }) => {
                     disableGutters
                     secondaryAction={
                         <Chip
-                            label={suggestion.impact}
+                            label={t(`aiVisibility.tips.impact.${suggestion.impact}`)}
                             color={getImpactColor(suggestion.impact) as any}
                             size="small"
                             variant="tonal"

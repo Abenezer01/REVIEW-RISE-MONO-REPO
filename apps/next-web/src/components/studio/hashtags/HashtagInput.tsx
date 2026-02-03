@@ -8,6 +8,7 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+import { useTranslations } from 'next-intl'
 
 import PlatformSelector from '../selectors/PlatformSelector'
 import StudioGenerateButton from '../shared/StudioGenerateButton'
@@ -37,46 +38,46 @@ export default function HashtagInput({
     onGenerate,
     loading
 }: HashtagInputProps) {
+    const t = useTranslations('studio.hashtags')
+
     return (
         <Card variant="outlined" sx={{ borderRadius: 2 }}>
             <CardContent sx={{ p: 4 }}>
                 <Typography variant="h6" fontWeight="bold" mb={3}>
-                    Tell AI About Your Content
+                    {t('inputTitle')}
                 </Typography>
                 
                 <Grid container spacing={3}>
                     <Grid size={{ xs: 12, md: 6 }}>
                         <Typography variant="subtitle2" fontWeight="bold" mb={1} sx={{ color: 'text.secondary' }}>
-                            Industry / Niche
+                            {t('industryLabel')}
                         </Typography>
                         <TextField
-                            placeholder="e.g., Fitness, Fashion, Tech"
+                            placeholder={ 'e.g., Fitness, Fashion, Tech' }
                             value={niche}
                             onChange={(e) => onNicheChange(e.target.value)}
                             fullWidth
                             size="small"
-                            helperText="Your business category"
                         />
                     </Grid>
                     <Grid size={{ xs: 12, md: 6 }}>
                         <Typography variant="subtitle2" fontWeight="bold" mb={1} sx={{ color: 'text.secondary' }}>
-                            Target Audience
+                            {t('audienceLabel')}
                         </Typography>
                         <TextField
-                            placeholder="e.g., Young professionals, Millennials"
+                            placeholder={ 'e.g., Young professionals, Millennials' }
                             value={audience}
                             onChange={(e) => onAudienceChange(e.target.value)}
                             fullWidth
                             size="small"
-                            helperText="Who you're trying to reach"
                         />
                     </Grid>
                     <Grid size={12}>
                         <Typography variant="subtitle2" fontWeight="bold" mb={1} sx={{ color: 'text.secondary' }}>
-                            Content Description
+                            {t('descriptionLabel')}
                         </Typography>
                         <TextField
-                            placeholder="Be specific for better hashtag recommendations"
+                            placeholder={t('topicPlaceholder')}
                             value={description}
                             onChange={(e) => onDescriptionChange(e.target.value)}
                             fullWidth
@@ -96,8 +97,8 @@ export default function HashtagInput({
                     <StudioGenerateButton
                         onClick={onGenerate}
                         loading={loading}
-                        label="Generate"
-                        loadingLabel="Generating..."
+                        label={t('submitButton')}
+                        loadingLabel={t('loading')}
                     />
                 </Box>
             </CardContent>

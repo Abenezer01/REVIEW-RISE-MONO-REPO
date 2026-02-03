@@ -107,6 +107,8 @@ export default function SeoAnalyzerPage() {
         return '#f44336' // Red
     }
 
+    const tc = useTranslations('common.common')
+
     return (
         <Box
             sx={{
@@ -120,7 +122,7 @@ export default function SeoAnalyzerPage() {
             <Container maxWidth="lg">
                 <Box sx={{ pt: { xs: 8, md: 12 }, pb: { xs: 4, md: 6 }, textAlign: 'center' }}>
                     <Chip
-                        label={t('hero.badge') || "AI-Powered SEO Tool"}
+                        label={t('hero.badge')}
                         sx={{
                             mb: 3,
                             bgcolor: 'rgba(255, 152, 0, 0.1)',
@@ -140,11 +142,11 @@ export default function SeoAnalyzerPage() {
                             WebkitTextFillColor: 'transparent',
                         }}
                     >
-                        {t('hero.title') || "Instant SEO Health Check"}
+                        {t('hero.title')}
                     </Typography>
 
                     <Typography sx={{ mb: 4, color: 'rgba(255, 255, 255, 0.7)', maxWidth: '600px', mx: 'auto' }}>
-                        {t('hero.subtitle') || "Enter your URL to get a comprehensive standard audit plus AI-generated strategic insights."}
+                        {t('hero.subtitle')}
                     </Typography>
 
                     <Box sx={{ maxWidth: '700px', mx: 'auto', display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
@@ -152,7 +154,7 @@ export default function SeoAnalyzerPage() {
                             fullWidth
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
-                            placeholder={t('hero.inputPlaceholder') || "example.com"}
+                            placeholder={t('hero.inputPlaceholder')}
                             disabled={loading}
                             InputProps={{
                                 startAdornment: <InputAdornment position="start"><IconWorld /></InputAdornment>,
@@ -173,7 +175,7 @@ export default function SeoAnalyzerPage() {
                                 opacity: loading ? 0.7 : 1
                             }}
                         >
-                            {loading ? <CircularProgress size={24} color="inherit" /> : (t('hero.ctaButton') || "Analyze")}
+                            {loading ? <CircularProgress size={24} color="inherit" /> : t('hero.ctaButton')}
                         </Button>
                     </Box>
 
@@ -188,9 +190,9 @@ export default function SeoAnalyzerPage() {
             {loading && (
                 <Container maxWidth="md">
                     <Box sx={{ textAlign: 'center', py: 8 }}>
-                        <Typography variant="h5" sx={{ mb: 2 }}>Analyzing {url}...</Typography>
+                        <Typography variant="h5" sx={{ mb: 2 }}>{t('results.analyzing', { url })}</Typography>
                         <LinearProgress color="warning" sx={{ height: 8, borderRadius: 4, bgcolor: 'rgba(255,255,255,0.1)' }} />
-                        <Typography variant="body2" sx={{ mt: 2, color: 'gray' }}>Checking meta tags, performance, security, and content quality...</Typography>
+                        <Typography variant="body2" sx={{ mt: 2, color: 'gray' }}>{t('results.checking')}</Typography>
                     </Box>
                 </Container>
             )}
@@ -220,9 +222,9 @@ export default function SeoAnalyzerPage() {
                                             <Typography variant="h3" fontWeight="bold">{result.healthScore}</Typography>
                                         </Box>
                                     </Box>
-                                    <Typography variant="h5">Overall Health Score</Typography>
+                                    <Typography variant="h5">{t('results.healthScore')}</Typography>
                                     <Typography variant="body2" sx={{ color: 'gray', mt: 1 }}>
-                                        {result.meta.title ? `"${result.meta.title}"` : 'No Title Detected'}
+                                        {result.meta.title ? `"${result.meta.title}"` : t('results.noTitle')}
                                     </Typography>
                                 </CardContent>
                             </Card>
@@ -233,7 +235,7 @@ export default function SeoAnalyzerPage() {
                                 <CardContent>
                                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 1 }}>
                                         <IconSparkles />
-                                        <Typography variant="h5" sx={{ fontWeight: 700, color: '#d1c4e9' }}>AI Strategic Insights</Typography>
+                                        <Typography variant="h5" sx={{ fontWeight: 700, color: '#d1c4e9' }}>{t('results.aiInsights')}</Typography>
                                     </Box>
                                     <Divider sx={{ bgcolor: 'rgba(255,255,255,0.1)', mb: 2 }} />
 
@@ -249,7 +251,7 @@ export default function SeoAnalyzerPage() {
                                         </Box>
                                     ))}
                                     {(!result.strategicRecommendations || result.strategicRecommendations.length === 0) && (
-                                        <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'gray' }}>No strategic insights available at this time.</Typography>
+                                        <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'gray' }}>{t('results.noInsights')}</Typography>
                                     )}
                                 </CardContent>
                             </Card>
@@ -257,11 +259,11 @@ export default function SeoAnalyzerPage() {
                     </Grid>
 
                     {/* 2. Detailed Recommendations */}
-                    <Typography variant="h4" sx={{ mb: 3, fontWeight: 700 }}>Audit Details</Typography>
+                    <Typography variant="h4" sx={{ mb: 3, fontWeight: 700 }}>{t('results.auditDetails')}</Typography>
 
                     {result.recommendations.length === 0 ? (
                         <Alert severity="success" sx={{ mb: 4, bgcolor: 'rgba(76, 175, 80, 0.1)', color: '#a5d6a7' }}>
-                            Great job! No critical issues found.
+                            {t('results.noIssues')}
                         </Alert>
                     ) : (
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -279,7 +281,7 @@ export default function SeoAnalyzerPage() {
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ bgcolor: 'rgba(0,0,0,0.2)' }}>
                                         <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', mb: 1 }}>
-                                            <strong>Recommendation:</strong> {rec.recommendation}
+                                            <strong>{t('results.recommendation')}</strong> {rec.recommendation}
                                         </Typography>
                                     </AccordionDetails>
                                 </Accordion>

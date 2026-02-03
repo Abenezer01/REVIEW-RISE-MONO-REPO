@@ -1,0 +1,132 @@
+{
+  "connections": {
+    "title": "Social Media Connections",
+    "subtitle": "Manage your connected social media accounts and sync settings",
+    "refreshing": "Refreshing...",
+    "refreshAll": "Refresh All",
+    "connectAccount": "Connect Account",
+    "stats": {
+      "connectedAccounts": "CONNECTED ACCOUNTS",
+      "activeConnections": "Active social media connections",
+      "totalReach": "TOTAL REACH",
+      "combinedFollowers": "Combined followers across platforms",
+      "tokenStatus": "TOKEN STATUS",
+      "healthy": "Healthy",
+      "issues": "{count} Issues",
+      "allTokensValid": "All tokens are valid",
+      "needsReconnection": "Account needs reconnection"
+    },
+    "list": {
+      "title": "Connected Accounts",
+      "all": "All",
+      "active": "Active",
+      "issues": "Issues",
+      "mockItem": "Mock Connection Item {index} (Connect real accounts to see details)"
+    },
+    "platforms": {
+      "title": "Available Platforms",
+      "facebook": {
+        "name": "Facebook Pages",
+        "description": "Connect your Facebook Business Page to schedule posts, track engagement, and manage comments.",
+        "features": [
+          "Post scheduling & publishing",
+          "Engagement analytics",
+          "Comment management"
+        ]
+      },
+      "instagram": {
+        "name": "Instagram Business",
+        "description": "Link your Instagram Business account via Facebook to publish content and track performance.",
+        "features": [
+          "Photo & video publishing",
+          "Story scheduling",
+          "Insights & metrics"
+        ]
+      },
+      "linkedin": {
+        "name": "LinkedIn Pages",
+        "description": "Connect your LinkedIn Company Page to share professional content and grow your network.",
+        "features": [
+          "Professional content sharing",
+          "Page analytics",
+          "Follower insights"
+        ]
+      }
+    },
+    "modals": {
+      "selectFb": "Select Facebook Page",
+      "selectLi": "Select LinkedIn Page",
+      "connectIg": "Connect Instagram Business",
+      "igLinkedToFb": "This Instagram account is linked to your Facebook Page. Click Connect to enable analytics and publishing.",
+      "noAccountFound": "No account found.",
+      "connecting": "Connecting...",
+      "connect": "Connect",
+      "cancel": "Cancel"
+    },
+    "alerts": {
+      "failedToConnect": "Failed to connect {platform}",
+      "failedToList": "Failed to list {platform}",
+      "pleaseConnectFbFirst": "Please connect your Facebook Page first. Instagram Business accounts must be connected via their linked Facebook Page.",
+      "fbMissingToken": "Facebook connection is missing access token. Please reconnect Facebook.",
+      "noIgFound": "No Instagram Business Account found linked to Facebook Page \"{name}\". Please ensure your Instagram is switched to a Business account and linked to this page in Facebook settings.",
+      "failedToFindIg": "Failed to find linked Instagram account. Please try again.",
+      "confirmDisconnect": "Are you sure you want to disconnect?"
+    },
+    "card": {
+      "tokenExpired": "Token Expired",
+      "active": "Active",
+      "platformLabels": {
+        "instagram": "Instagram Business",
+        "linkedin": "LinkedIn Page",
+        "facebook": "Facebook Page"
+      },
+      "connectedDaysAgo": "Connected {days} days ago",
+      "lastSyncedHoursAgo": "Last synced {hours} hours ago",
+      "accessTokenExpired": "Access token expired. Reconnect to restore functionality.",
+      "followers": "FOLLOWERS",
+      "posts": "POSTS",
+      "reconnect": "Reconnect",
+      "refresh": "Refresh",
+      "remove": "Remove",
+      "disconnect": "Disconnect"
+    },
+    "fbConnect": {
+      "steps": ["Authorize", "Select Page", "Complete"],
+      "permissionsTitle": "AdRise needs the following permissions to manage your Facebook Page. You can revoke access at any time.",
+      "permissions": [
+        {"title": "Read Page Data", "desc": "View your page insights, posts, and engagement metrics"},
+        {"title": "Publish Content", "desc": "Create and schedule posts on your behalf"},
+        {"title": "Manage Comments", "desc": "Read and respond to comments and messages"},
+        {"title": "Access Insights", "desc": "View analytics and performance data"}
+      ],
+      "dataSecureTitle": "Your Data is Secure",
+      "dataSecureDesc": "All tokens are encrypted and stored securely. We never access your personal data or post without your permission.",
+      "choosePageTitle": "Choose a Page to Connect",
+      "choosePageDesc": "Select which Facebook Page you want to connect to AdRise. You can connect additional pages later.",
+      "noPagesFound": "No pages found or access denied. Please try reconnecting.",
+      "followers": "{count}K followers",
+      "connectedTitle": "Connected!",
+      "connectedDesc": "Your Facebook Page has been successfully linked.",
+      "selectPageHeader": "Select Facebook Page",
+      "connectPageHeader": "Connect Facebook Page",
+      "stepLabel": "Step {current} of {total}",
+      "cancel": "Cancel",
+      "back": "Back",
+      "continueWithFb": "Continue with Facebook",
+      "connecting": "Connecting...",
+      "connectPage": "Connect Page",
+      "done": "Done"
+    },
+    "planner": {
+      "goToScheduler": "GO TO SCHEDULER",
+      "aiAdaptationActive": "AI ADAPTATION ACTIVE",
+      "aiStrategySync": "Strategy is automatically synced with your Brand DNA mission and voice.",
+      "curatingStrategy": "Curating your strategy...",
+      "targeting": "Targeting",
+      "week": "WEEK",
+      "day": "DAY",
+      "platforms": "PLATFORMS:",
+      "scheduled": "SCHEDULED"
+    }
+  }
+}

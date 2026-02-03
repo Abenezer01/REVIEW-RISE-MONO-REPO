@@ -12,12 +12,14 @@ import type { KeywordDTO } from '@platform/contracts'
 import { useAuth } from '@/contexts/AuthContext'
 import apiClient from '@/lib/apiClient'
 import { SERVICES_CONFIG } from '@/configs/services';
+import { useTranslation } from '@/hooks/useTranslation'
 
 const KeywordListing = dynamic(() => import('@/components/admin/seo/KeywordListing'), { ssr: false })
 
 const API_URL = SERVICES_CONFIG.seo.url;
 
 export default function KeywordManager() {
+  const t = useTranslation('dashboard')
   const { user } = useAuth()
 
   const [businessId, setBusinessId] = useState<string | null>(null)
@@ -91,10 +93,10 @@ export default function KeywordManager() {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Typography variant="h4" fontWeight="bold" gutterBottom>
-        SEO Keywords
+        {t('seo.visibility.keywordsTitle')}
       </Typography>
       <Typography variant="body2" color="text.secondary" gutterBottom>
-        Add, view, and manage tracked keywords for local SEO
+        {t('seo.visibility.keywordsSubtitle')}
       </Typography>
 
       <KeywordListing

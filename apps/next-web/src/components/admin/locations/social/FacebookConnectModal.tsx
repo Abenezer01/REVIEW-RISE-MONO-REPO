@@ -34,6 +34,8 @@ import {
     Close as CloseIcon
 } from '@mui/icons-material';
 
+import { useTranslations } from 'next-intl';
+
 import type { FacebookPage } from './types';
 
 interface Props {
@@ -48,7 +50,9 @@ interface Props {
 const steps = ['Authorize', 'Select Page', 'Complete'];
 
 export const FacebookConnectModal = ({ open, onClose, onStartAuth, onConfirmPage, pages, loading }: Props) => {
+    const t = useTranslations('social.connections.fbConnect');
     const theme = useTheme();
+    const steps = t.raw('steps');
     const [activeStep, setActiveStep] = useState(0);
     const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
 
@@ -80,23 +84,23 @@ export const FacebookConnectModal = ({ open, onClose, onStartAuth, onConfirmPage
                 return (
                     <Stack spacing={3} mt={1}>
                         <Typography variant="body2" color="text.secondary">
-                            AdRise needs the following permissions to manage your Facebook Page. You can revoke access at any time.
+                            {t('permissionsTitle')}
                         </Typography>
 
                         <Stack spacing={2}>
                             {[
-                                { icon: <VisibilityIcon />, title: 'Read Page Data', desc: 'View your page insights, posts, and engagement metrics' },
-                                { icon: <EditIcon />, title: 'Publish Content', desc: 'Create and schedule posts on your behalf' },
-                                { icon: <ChatIcon />, title: 'Manage Comments', desc: 'Read and respond to comments and messages' },
-                                { icon: <AssessmentIcon />, title: 'Access Insights', desc: 'View analytics and performance data' },
-                            ].map((item, index) => (
+                                <VisibilityIcon key="vis" />,
+                                <EditIcon key="edit" />,
+                                <ChatIcon key="chat" />,
+                                <AssessmentIcon key="assess" />
+                            ].map((icon, index) => (
                                 <Stack key={index} direction="row" spacing={2} alignItems="center">
                                     <Avatar variant="rounded" sx={{ bgcolor: alpha(theme.palette.warning.main, 0.1), color: theme.palette.warning.main }}>
-                                        {item.icon}
+                                        {icon}
                                     </Avatar>
                                     <Box>
-                                        <Typography variant="subtitle2" fontWeight={600}>{item.title}</Typography>
-                                        <Typography variant="caption" color="text.secondary">{item.desc}</Typography>
+                                        <Typography variant="subtitle2" fontWeight={600}>{t(`permissions.${index}.title`)}</Typography>
+                                        <Typography variant="caption" color="text.secondary">{t(`permissions.${index}.desc`)}</Typography>
                                     </Box>
                                 </Stack>
                             ))}
@@ -106,9 +110,9 @@ export const FacebookConnectModal = ({ open, onClose, onStartAuth, onConfirmPage
                             <Stack direction="row" spacing={2} alignItems="center">
                                 <SecurityIcon color="info" />
                                 <Box>
-                                    <Typography variant="subtitle2" color="info.main" fontWeight={600}>Your Data is Secure</Typography>
+                                    <Typography variant="subtitle2" color="info.main" fontWeight={600}>{t('dataSecureTitle')}</Typography>
                                     <Typography variant="caption" color="text.secondary">
-                                        All tokens are encrypted and stored securely. We never access your personal data or post without your permission.
+                                        {t('dataSecureDesc')}
                                     </Typography>
                                 </Box>
                             </Stack>
@@ -119,14 +123,14 @@ export const FacebookConnectModal = ({ open, onClose, onStartAuth, onConfirmPage
                 return (
                     <Box mt={2} maxHeight={400} overflow="auto">
                         <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                            Choose a Page to Connect
+                            {t('choosePageTitle')}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" paragraph>
-                            Select which Facebook Page you want to connect to AdRise. You can connect additional pages later.
+                            {t('choosePageDesc')}
                         </Typography>
 
                         {pages.length === 0 ? (
-                            <Alert severity="info" sx={{ mt: 2 }}>No pages found or access denied. Please try reconnecting.</Alert>
+                            <Alert severity="info" sx={{ mt: 2 }}>{t('noPagesFound')}</Alert>
                         ) : (
                             <List>
                                 {pages.map((page) => (
@@ -160,7 +164,7 @@ export const FacebookConnectModal = ({ open, onClose, onStartAuth, onConfirmPage
                                             primary={<Typography variant="subtitle1" fontWeight={600}>{page.name}</Typography>}
                                             secondary={
                                                 <Typography variant="caption" color="text.secondary">
-                                                    ID: {page.id} • {Math.floor(Math.random() * 500)}K followers
+                                                    ID: {page.id} • {t('followers', { count: Math.floor(Math.random() * 500) })}
                                                 </Typography>
                                             }
                                         />
@@ -176,8 +180,8 @@ export const FacebookConnectModal = ({ open, onClose, onStartAuth, onConfirmPage
                         <Avatar sx={{ width: 64, height: 64, bgcolor: 'success.main', mb: 2 }}>
                             <FacebookIcon fontSize="large" />
                         </Avatar>
-                        <Typography variant="h5" fontWeight={600}>Connected!</Typography>
-                        <Typography color="text.secondary">Your Facebook Page has been successfully linked.</Typography>
+                        <Typography variant="h5" fontWeight={600}>{t('connectedTitle')}</Typography>
+                        <Typography color="text.secondary">{t('connectedDesc')}</Typography>
                     </Box>
                 );
             default:
@@ -194,10 +198,10 @@ export const FacebookConnectModal = ({ open, onClose, onStartAuth, onConfirmPage
                     </Avatar>
                     <Box>
                         <Typography variant="h6" fontWeight={700}>
-                            {activeStep === 1 ? 'Select Facebook Page' : 'Connect Facebook Page'}
+                            {activeStep === 1 ? t('selectPageHeader') : t('connectPageHeader')}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                            Step {activeStep + 1} of 3
+                            {t('stepLabel', { current: activeStep + 1, total: 3 })}
                         </Typography>
                     </Box>
                 </Box>
@@ -223,7 +227,7 @@ export const FacebookConnectModal = ({ open, onClose, onStartAuth, onConfirmPage
             <DialogActions sx={{ p: 3, pt: 0, justifyContent: 'space-between' }}>
                 {activeStep !== 2 && (
                     <Button variant="outlined" onClick={activeStep === 0 ? onClose : () => setActiveStep(prev => prev - 1)} sx={{ px: 4, height: 48 }}>
-                        {activeStep === 0 ? 'Cancel' : 'Back'}
+                        {activeStep === 0 ? t('cancel') : t('back')}
                     </Button>
                 )}
 
@@ -233,7 +237,7 @@ export const FacebookConnectModal = ({ open, onClose, onStartAuth, onConfirmPage
                         onClick={onStartAuth}
                         sx={{ bgcolor: '#1877F2', '&:hover': { bgcolor: '#166fe5' }, px: 4, height: 48 }}
                     >
-                        Continue with Facebook
+                        {t('continueWithFb')}
                     </Button>
                 )}
 
@@ -245,13 +249,13 @@ export const FacebookConnectModal = ({ open, onClose, onStartAuth, onConfirmPage
                         color="warning"
                         sx={{ px: 4, height: 48 }}
                     >
-                        {loading ? 'Connecting...' : 'Connect Page'}
+                        {loading ? t('connecting') : t('connectPage')}
                     </Button>
                 )}
 
                 {activeStep === 2 && (
                     <Button variant="contained" fullWidth onClick={onClose} color="success">
-                        Done
+                        {t('done')}
                     </Button>
                 )}
             </DialogActions>

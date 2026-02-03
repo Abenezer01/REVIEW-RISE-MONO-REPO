@@ -20,6 +20,7 @@ import MenuItem from '@mui/material/MenuItem'
 import type { SelectChangeEvent } from '@mui/material/Select';
 import Select from '@mui/material/Select'
 import Typography from '@mui/material/Typography'
+import { useTranslations } from 'next-intl'
 
 import CompetitorComparison from '@/components/shared/dashboard/CompetitorComparison'
 import DashboardLineChart from '@/components/shared/dashboard/DashboardLineChart'
@@ -31,6 +32,8 @@ import { useReviewAnalytics } from '@/hooks/reviews/useReviewAnalytics'
 import { useBusinessId } from '@/hooks/useBusinessId'
 
 const ReviewsDashboard = () => {
+  const t = useTranslations('dashboard')
+  const tc = useTranslations('common')
   const [period, setPeriod] = useState<number>(30)
   const { businessId, loading: businessLoading } = useBusinessId()
 
@@ -134,10 +137,10 @@ return Array.from(platforms).map(platform => ({
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
         <Box>
           <Typography variant="h4" fontWeight={600} gutterBottom>
-            Review Analytics Dashboard
+            {t('reviews.smart.manageSubtitle')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            AI-powered insights from customer reviews across all platforms
+            {t('reviews.smart.subtitle')}
           </Typography>
         </Box>
 
@@ -155,15 +158,15 @@ return Array.from(platforms).map(platform => ({
             }}
           >
             <Typography variant="caption" fontWeight={600}>
-              📅 Last {period} Days
+              { '📅' } {t('brandRise.visibilityPlan.dayTimeline')} {period} {tc('common.loading')}
             </Typography>
           </Box>
 
           <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel>Period</InputLabel>
-            <Select value={period} onChange={handlePeriodChange} label="Period">
-              <MenuItem value={30}>Last 30 Days</MenuItem>
-              <MenuItem value={90}>Last 90 Days</MenuItem>
+            <InputLabel>{tc('common.search')}</InputLabel>
+            <Select value={period} onChange={handlePeriodChange} label={tc('common.search')}>
+              <MenuItem value={30}>{t('brandRise.visibilityPlan.dayTimeline')} 30</MenuItem>
+              <MenuItem value={90}>{t('brandRise.visibilityPlan.dayTimeline')} 90</MenuItem>
             </Select>
           </FormControl>
 
@@ -187,7 +190,7 @@ return Array.from(platforms).map(platform => ({
             }}
           >
             <Typography variant="body2" fontWeight={500}>
-              ⬇️ Export
+              { '⬇️' } {tc('common.export')}
             </Typography>
           </Box>
         </Box>
@@ -202,54 +205,54 @@ return Array.from(platforms).map(platform => ({
           {/* Metric Cards */}
           <Grid size={{xs: 12, sm: 6, md: 3}}>
             <ReviewMetricCard
-              title="AVG. RATING"
+              title={t('overview.averageRating').toUpperCase()}
               value={metrics.avgRating?.toFixed(1) || '0.0'}
               icon={<StarIcon />}
               color="warning"
               change={metrics.avgRatingChange}
-              subtitle="vs last period"
+              subtitle={t('brandRise.overview.vsLastPeriod')}
             />
           </Grid>
 
           <Grid size={{xs: 12, sm: 6, md: 3}}>
             <ReviewMetricCard
-              title="TOTAL REVIEWS"
+              title={t('overview.totalReviews').toUpperCase()}
               value={metrics.totalReviews?.toLocaleString() || '0'}
               icon={<ReviewsIcon />}
               color="info"
               change={metrics.totalReviewsChange}
-              subtitle="vs last period"
+              subtitle={t('brandRise.overview.vsLastPeriod')}
             />
           </Grid>
 
           <Grid size={{xs: 12, sm: 6, md: 3}}>
             <ReviewMetricCard
-              title="TOTAL REPLIES"
+              title={t('overview.responseRate').toUpperCase()}
               value={metrics.responseCount?.toLocaleString() || '0'}
               icon={<ReplyIcon />}
               color="success"
               change={metrics.responseCountChange}
-              subtitle="vs last period"
+              subtitle={t('brandRise.overview.vsLastPeriod')}
             />
           </Grid>
 
           <Grid size={{xs: 12, sm: 6, md: 3}}>
             <ReviewMetricCard
-              title="POSITIVE SENTIMENT"
+              title={t('brandRise.reviews.positiveSentiment').toUpperCase()}
               value={`${metrics.positiveSentiment || 0}%`} 
               icon={<StarIcon />}
               color="secondary"
               change={metrics.sentimentChange}
-              subtitle="improvement"
+              subtitle={tc('common.apply')}
             />
           </Grid>
 
           {/* Rating Trend Chart */}
           <Grid size={{xs: 12, lg: 8}}>
             <DashboardLineChart
-              title="Rating Trend"
-              subtitle={`Average rating over time (Last ${period} days)`}
-              series={[{ name: 'Average Rating', data: trendData.map((d: any) => d.averageRating) || [] }]}
+              title={t('seo.visibility.trendsTitle')}
+              subtitle={t('brandRise.overview.last30Days')}
+              series={[{ name: t('overview.averageRating'), data: trendData.map((d: any) => d.averageRating) || [] }]}
               categories={trendData.map((d: any) => d.date) || []}
               yAxisFormatter={(val: number) => val.toFixed(1)}
               xAxisType="datetime"
@@ -260,17 +263,17 @@ return Array.from(platforms).map(platform => ({
           <Grid size={{xs: 12, lg: 4}}>
             <Card sx={{ height: '100%' }}>
               <CardHeader
-                title="Recent Reviews Summary"
+                title={t('reviews.recent')}
                 action={
                   <Box display="flex" gap={1}>
                     <Chip
-                      label={`${metrics.unrepliedCount || 0} Unreplied`}
+                      label={`${metrics.unrepliedCount || 0} ${t('overview.pendingReviews')}`}
                       color="error"
                       size="small"
                       variant="outlined"
                     />
                     <Chip
-                      label={`${metrics.recentRepliesCount || 0} Last 7 Days`}
+                      label={`${metrics.recentRepliesCount || 0} ${tc('dates.thisWeek')}`}
                       color="success"
                       size="small"
                       variant="outlined"
@@ -286,7 +289,7 @@ return Array.from(platforms).map(platform => ({
                         {metrics.unrepliedCount || 0}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        UNREPLIED
+                        {t('overview.pendingReviews').toUpperCase()}
                       </Typography>
                     </Box>
                     <Box textAlign="center">
@@ -294,7 +297,7 @@ return Array.from(platforms).map(platform => ({
                         {metrics.recentRepliesCount || 0}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        LAST 7 DAYS
+                        {tc('dates.thisWeek').toUpperCase()}
                       </Typography>
                     </Box>
                   </Box>
@@ -311,8 +314,8 @@ return Array.from(platforms).map(platform => ({
           {/* Row 1: Review Volume (8) + Keywords (4) */}
           <Grid size={{xs: 12, md: 8}}>
             <DashboardLineChart
-              title="Review Volume by Source"
-              subtitle="Number of reviews per platform over time"
+              title={t('brandRise.reviews.velocity')}
+              subtitle={t('brandRise.reviews.volumeOverTime')}
               series={preparedVolumeSeries}
               categories={volumeSeriesData.map((d: any) => d.date) || []}
               yAxisFormatter={(val: number) => Math.floor(val).toString()} // Integers only
@@ -322,8 +325,8 @@ return Array.from(platforms).map(platform => ({
 
           <Grid size={{xs: 12, md: 4}}>
             <KeywordCloud
-              title="Top Keywords"
-              subtitle="Most mentioned topics in reviews"
+              title={t('seo.visibility.trackedKeywords')}
+              subtitle={t('brandRise.dna.toneKeywords')}
               keywords={keywordsCloudData}
             />
           </Grid>
@@ -331,8 +334,8 @@ return Array.from(platforms).map(platform => ({
           {/* Row 2: Sentiment (8) + Competitor (4) */}
           <Grid size={{xs: 12, md: 8}}>
             <SentimentHeatmap
-              title="Sentiment Analysis"
-              subtitle="Sentiment distribution over time"
+              title={t('brandRise.reviews.sentiment')}
+              subtitle={t('brandRise.reviews.sentimentModel')}
               data={sentimentHeatmapData}
             />
           </Grid>

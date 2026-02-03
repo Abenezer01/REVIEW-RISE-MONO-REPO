@@ -12,11 +12,14 @@ import Checkbox from '@mui/material/Checkbox'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
+import { useTranslations } from 'next-intl'
 
 import { SystemMessageCode } from '@platform/contracts'
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import type { GenerateScriptRequest, GenerateScriptResponse, ScriptData } from '@platform/contracts'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+
 
 import { SERVICES } from '@/configs/services'
 import apiClient from '@/lib/apiClient'
@@ -26,6 +29,8 @@ import VideoDurationSelector from './scripts/VideoDurationSelector'
 import StudioGenerateButton from './shared/StudioGenerateButton'
 
 export default function ScriptWriter() {
+    const t = useTranslations('studio.scripts')
+    const tc = useTranslations('common')
     const { notify } = useSystemMessages()
     const [loading, setLoading] = useState(false)
     const [videoTopic, setVideoTopic] = useState('')
@@ -42,7 +47,7 @@ export default function ScriptWriter() {
 
     const handleGenerate = async () => {
         if (!videoTopic) {
-            notify(SystemMessageCode.AI_GENERATION_FAILED)
+            notify(SystemMessageCode.VALIDATION_ERROR)
             
 return
         }
@@ -68,9 +73,10 @@ return
             const data = response.data
 
             setScript(data.script)
-            notify(SystemMessageCode.AI_GENERATION_SUCCESS)
+            notify(SystemMessageCode.AI_SCRIPT_GENERATED)
         } catch (error) {
             console.error(error)
+
             // Error handled by interceptor
         } finally {
             setLoading(false)
@@ -91,24 +97,24 @@ return
                         <Card variant="outlined" sx={{ borderRadius: 2 }}>
                             <CardContent sx={{ p: 3 }}>
                                 <Typography variant="h6" fontWeight="bold" mb={2}>
-                                    Script Details
+                                    {t('detailsTitle')}
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                     <Box>
                                         <TextField
-                                            label="Video Topic"
-                                            placeholder="Product demo, tutorial, brand story..."
+                                            label={t('topicLabel')}
+                                            placeholder={t('topicPlaceholder')}
                                             value={videoTopic}
                                             onChange={(e) => setVideoTopic(e.target.value)}
                                             fullWidth
                                             size="small"
-                                            helperText="What is your video about?"
+                                            helperText={t('topicHelper')}
                                         />
                                     </Box>
 
                                     <TextField
-                                        label="Video Goal (Optional)"
-                                        placeholder="Increase awareness, drive sales, educate..."
+                                        label={t('goalLabel')}
+                                        placeholder={t('goalPlaceholder')}
                                         value={videoGoal}
                                         onChange={(e) => setVideoGoal(e.target.value)}
                                         fullWidth
@@ -116,8 +122,8 @@ return
                                     />
 
                                     <TextField
-                                        label="Target Audience (Optional)"
-                                        placeholder="Small business owners, tech enthusiasts..."
+                                        label={t('audienceLabel')}
+                                        placeholder={t('audiencePlaceholder')}
                                         value={targetAudience}
                                         onChange={(e) => setTargetAudience(e.target.value)}
                                         fullWidth
@@ -131,7 +137,7 @@ return
                         <Card variant="outlined" sx={{ borderRadius: 2 }}>
                             <CardContent sx={{ p: 3 }}>
                                 <Typography variant="h6" fontWeight="bold" mb={2}>
-                                    Script Style
+                                    {t('styleTitle')}
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                     <PlatformSelector value={platform} onChange={setPlatform} />
@@ -147,7 +153,7 @@ return
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                                     <i className="tabler-list-check" style={{ fontSize: 20 }} />
                                     <Typography variant="h6" fontWeight="bold">
-                                        Include in Script
+                                        {t('includeTitle')}
                                     </Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
@@ -159,7 +165,7 @@ return
                                                 color="primary"
                                             />
                                         }
-                                        label="Scene descriptions"
+                                        label={t('sceneDescriptions')}
                                     />
                                     <FormControlLabel
                                         control={
@@ -169,7 +175,7 @@ return
                                                 color="primary"
                                             />
                                         }
-                                        label="Visual suggestions"
+                                        label={t('visualSuggestions')}
                                     />
                                     <FormControlLabel
                                         control={
@@ -179,7 +185,7 @@ return
                                                 color="primary"
                                             />
                                         }
-                                        label="B-roll recommendations"
+                                        label={t('bRollRecommendations')}
                                     />
                                     <FormControlLabel
                                         control={
@@ -189,7 +195,7 @@ return
                                                 color="primary"
                                             />
                                         }
-                                        label="Call-to-action"
+                                        label={t('cta')}
                                     />
                                 </Box>
                             </CardContent>
@@ -199,17 +205,17 @@ return
                         <Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                 <Typography variant="body2" color="text.secondary">
-                                    Generation Cost
+                                    {t('generationCost')}
                                 </Typography>
                                 <Typography variant="h6" color="primary.main" fontWeight="bold">
-                                    10 Credits
+                                    {t('creditsCount', { count: 10 })}
                                 </Typography>
                             </Box>
                             <StudioGenerateButton
                                 onClick={handleGenerate}
                                 loading={loading}
-                                label="✨ Generate Script"
-                                loadingLabel="Generating..."
+                                label={t('submitButton')}
+                                loadingLabel={tc('common.generating')}
                                 fullWidth
                                 sx={{ 
                                     fontSize: '1rem',
@@ -227,7 +233,7 @@ return
                             <CardContent sx={{ p: 3 }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                                     <Typography variant="h6" fontWeight="bold">
-                                        Generated Script
+                                        {t('resultsTitle')}
                                     </Typography>
                                     <Box sx={{ display: 'flex', gap: 1 }}>
                                         <IconButton size="small">
@@ -250,7 +256,7 @@ return
                                     }}>
                                         <i className="tabler-script" style={{ fontSize: 48, opacity: 0.3 }} />
                                         <Typography variant="body2" mt={2}>
-                                            Your generated script will appear here
+                                            {t('emptyState')}
                                         </Typography>
                                     </Box>
                                 ) : (
@@ -268,7 +274,7 @@ return
                                             >
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                                                     <Chip 
-                                                        label={`SCENE ${idx + 1}`} 
+                                                        label={t('sceneLabel', { number: idx + 1 })}
                                                         size="small" 
                                                         sx={{ bgcolor: 'primary.main', color: 'white', fontWeight: 'bold' }}
                                                     />
@@ -291,7 +297,7 @@ return
                                                         borderColor: 'info.main'
                                                     }}>
                                                         <Typography variant="caption" color="info.main" fontWeight="bold" display="block" mb={0.5}>
-                                                            VOICEOVER:
+                                                            {t('voiceoverLabel')}
                                                         </Typography>
                                                         <Typography variant="body2">
                                                             {scene.voiceover}
@@ -310,7 +316,7 @@ return
                             <Card variant="outlined" sx={{ borderRadius: 2 }}>
                                 <CardContent sx={{ p: 3 }}>
                                     <Typography variant="h6" fontWeight="bold" mb={3}>
-                                        Script Statistics
+                                        {t('statsTitle')}
                                     </Typography>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-around' }}>
                                         <Box sx={{ textAlign: 'center' }}>
@@ -318,7 +324,7 @@ return
                                                 {duration}s
                                             </Typography>
                                             <Typography variant="caption" color="text.secondary">
-                                                DURATION
+                                                {t('statDuration')}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ textAlign: 'center' }}>
@@ -326,7 +332,7 @@ return
                                                 {script.scenes?.length || 0}
                                             </Typography>
                                             <Typography variant="caption" color="text.secondary">
-                                                SCENES
+                                                {t('statScenes')}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ textAlign: 'center' }}>
@@ -334,7 +340,7 @@ return
                                                 {totalWords}
                                             </Typography>
                                             <Typography variant="caption" color="text.secondary">
-                                                WORDS
+                                                {t('statWords')}
                                             </Typography>
                                         </Box>
                                     </Box>

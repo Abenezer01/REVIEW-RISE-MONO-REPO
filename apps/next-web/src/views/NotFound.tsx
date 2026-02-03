@@ -18,6 +18,7 @@ import type { SystemMode } from '@core/types'
 
 // Hook Imports
 import { useImageVariant } from '@core/hooks/useImageVariant'
+import { useTranslation } from '@/hooks/useTranslation'
 
 // Styled Components
 const MaskImg = styled('img')({
@@ -30,6 +31,8 @@ const MaskImg = styled('img')({
 })
 
 const NotFound = ({ mode }: { mode: SystemMode }) => {
+  const t = useTranslation('common')
+
   // Vars
   const darkImg = '/images/pages/misc-mask-dark.png'
   const lightImg = '/images/pages/misc-mask-light.png'
@@ -44,13 +47,14 @@ const NotFound = ({ mode }: { mode: SystemMode }) => {
       <div className='flex items-center flex-col text-center'>
         <div className='flex flex-col gap-2 is-[90vw] sm:is-[unset] mbe-6'>
           <Typography className='font-medium text-8xl' color='text.primary'>
-            404
+            {/* eslint-disable-next-line react/jsx-no-literals */}
+            {'404'}
           </Typography>
-          <Typography variant='h4'>Page Not Found ⚠️</Typography>
-          <Typography>we couldn&#39;t find the page you are looking for.</Typography>
+          <Typography variant='h4'>{t('notFound.title')}</Typography>
+          <Typography>{t('notFound.message')}</Typography>
         </div>
         <Button href='/' component={Link} variant='contained'>
-          Back To Home
+          {t('notFound.backHome')}
         </Button>
         <img
           alt='error-404-illustration'

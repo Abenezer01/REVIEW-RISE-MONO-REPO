@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslations } from 'next-intl';
 
 import { Box, Tabs, Tab } from '@mui/material';
 import { alpha } from '@mui/material/styles';
@@ -37,6 +38,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   auditLogs,
   isLoadingLogs
 }) => {
+  const t = useTranslations('BrandProfiles.detail.tabs');
   return (
     <Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
@@ -65,9 +67,9 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
             }
           }}
         >
-          <Tab label="Brand Identity" icon={<PaletteIcon />} iconPosition="start" />
-          <Tab label="Tone & Messaging" icon={<VoiceIcon />} iconPosition="start" />
-          <Tab label="Activity History" icon={<HistoryIcon />} iconPosition="start" />
+          <Tab label={t('identity')} icon={<PaletteIcon />} iconPosition="start" />
+          <Tab label={t('tone')} icon={<VoiceIcon />} iconPosition="start" />
+          <Tab label={t('history')} icon={<HistoryIcon />} iconPosition="start" />
         </Tabs>
       </Box>
 

@@ -39,6 +39,7 @@ import {
   TipsAndUpdates
 } from '@mui/icons-material';
 
+import { useTranslations } from 'next-intl';
 import { useBusinessId } from '@/hooks/useBusinessId';
 import { useLocationFilter } from '@/hooks/useLocationFilter';
 import { BrandService } from '@/services/brand.service';
@@ -65,6 +66,10 @@ const PLATFORM_ICONS: Record<string, { icon: string, color: string }> = {
 
 export default function PlannerPage() {
   const theme = useTheme();
+  const t = useTranslations('dashboard');
+  const ts = useTranslations('studio.planner');
+  const tc = useTranslations('common');
+  const tp = useTranslations('social.planner');
   const isDark = theme.palette.mode === 'dark';
   const { businessId } = useBusinessId();
   const { locationId } = useLocationFilter();
@@ -183,12 +188,12 @@ export default function PlannerPage() {
       }}>
         <Box>
           <Typography variant="h4" fontWeight="800" sx={{ letterSpacing: '-0.02em', mb: 0.5 }}>
-            Content Planner
+            {ts('title')}
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
             <Icon icon="tabler-sparkles" fontSize={16} color={theme.palette.primary.main} />
             <Typography variant="body2" color="text.secondary" fontWeight="500">
-              AI Strategy for your Brand DNA
+              {t('brandRise.dna.summary')}
             </Typography>
           </Stack>
         </Box>
@@ -203,7 +208,7 @@ export default function PlannerPage() {
               endIcon={<ArrowForward />}
               sx={{ borderRadius: 2, fontWeight: 'bold' }}
             >
-              View Scheduler
+              {t('navigation.social-rise')}
             </Button>
           )}
           {plan && plan.status !== 'converted' && (
@@ -219,7 +224,7 @@ export default function PlannerPage() {
                 boxShadow: '0 4px 14px 0 rgba(115, 103, 240, 0.39)',
               }}
             >
-              {converting ? 'Creating...' : 'Create Drafts'}
+              {converting ? tc('common.loading') : ts('savePlan')}
             </Button>
           )}
           <Button 
@@ -234,7 +239,7 @@ export default function PlannerPage() {
               boxShadow: '0 4px 14px 0 rgba(115, 103, 240, 0.39)',
             }}
           >
-            {generating ? 'Generating...' : 'Regenerate'}
+            {generating ? tc('common.generating') : ts('generateNewPlan')}
           </Button>
         </Stack>
       </Box>
@@ -253,7 +258,7 @@ export default function PlannerPage() {
                 href={`/${locale}/admin/social-rise`}
                 sx={{ fontWeight: 'bold' }}
               >
-                GO TO SCHEDULER
+                        {tp('goToScheduler')}
               </Button>
             ) : null
           }
@@ -275,16 +280,16 @@ export default function PlannerPage() {
             }}>
               <Typography variant="subtitle1" fontWeight="800" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Icon icon="tabler-calendar-event" fontSize={20} color={theme.palette.primary.main} />
-                Timeline
+                {ts('resultsTitle')}
               </Typography>
               <Divider sx={{ mb: 2.5, opacity: 0.6 }} />
               
               <Stack spacing={2.5}>
                 <FormControl fullWidth size="small">
-                  <InputLabel sx={{ fontWeight: 500 }}>Month</InputLabel>
+                  <InputLabel sx={{ fontWeight: 500 }}>{tc('common.search')}</InputLabel>
                   <Select 
                     value={month} 
-                    label="Month" 
+                    label={tc('common.search')}
                     onChange={(e) => setMonth(Number(e.target.value))}
                     sx={{ 
                       borderRadius: '12px',
@@ -298,10 +303,10 @@ export default function PlannerPage() {
                 </FormControl>
 
                 <FormControl fullWidth size="small">
-                  <InputLabel sx={{ fontWeight: 500 }}>Year</InputLabel>
+                  <InputLabel sx={{ fontWeight: 500 }}>{tc('common.confirm')}</InputLabel>
                   <Select 
                     value={year} 
-                    label="Year" 
+                    label={tc('common.confirm')}
                     onChange={(e) => setYear(Number(e.target.value))}
                     sx={{ 
                       borderRadius: '12px',
@@ -325,16 +330,16 @@ export default function PlannerPage() {
             }}>
               <Typography variant="subtitle1" fontWeight="800" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Psychology sx={{ fontSize: 20, color: theme.palette.primary.main }} />
-                Brand Strategy
+                {t('brandRise.tabs.dna')}
               </Typography>
               <Divider sx={{ mb: 2.5, opacity: 0.6 }} />
               
               <Stack spacing={2.5}>
                 <FormControl fullWidth size="small">
-                  <InputLabel sx={{ fontWeight: 500 }}>Industry</InputLabel>
+                  <InputLabel sx={{ fontWeight: 500 }}>{t('brandRise.content.industry')}</InputLabel>
                   <Select 
                     value={industry} 
-                    label="Industry" 
+                    label={t('brandRise.content.industry')}
                     onChange={(e) => setIndustry(e.target.value)}
                     sx={{ 
                       borderRadius: '12px',
@@ -348,10 +353,10 @@ export default function PlannerPage() {
                 </FormControl>
 
                 <FormControl fullWidth size="small">
-                  <InputLabel sx={{ fontWeight: 500 }}>Frequency</InputLabel>
+                  <InputLabel sx={{ fontWeight: 500 }}>{tc('common.search')}</InputLabel>
                   <Select 
                     value={frequency} 
-                    label="Frequency" 
+                    label={tc('common.search')}
                     onChange={(e) => setFrequency(e.target.value)}
                     sx={{ 
                       borderRadius: '12px',
@@ -370,11 +375,11 @@ export default function PlannerPage() {
                 </FormControl>
 
                 <FormControl fullWidth size="small">
-                  <InputLabel sx={{ fontWeight: 500 }}>Platforms</InputLabel>
+                  <InputLabel sx={{ fontWeight: 500 }}>{ts('suggestedPlatform')}</InputLabel>
                   <Select 
                     multiple 
                     value={selectedPlatforms} 
-                    label="Platforms" 
+                    label={ts('suggestedPlatform')}
                     onChange={(e) => setSelectedPlatforms(typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value)}
                     sx={{ 
                       borderRadius: '12px',
@@ -435,10 +440,10 @@ export default function PlannerPage() {
               }} />
               <Typography variant="caption" fontWeight="800" color="primary" gutterBottom display="flex" alignItems="center" gap={0.5}>
                 <AutoAwesome sx={{ fontSize: 14 }} />
-                AI ADAPTATION ACTIVE
+                {tp('aiAdaptationActive')}
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.4, display: 'block' }}>
-                Strategy is automatically synced with your Brand DNA mission and voice.
+                {tp('aiStrategySync')}
               </Typography>
             </Box>
           </Stack>
@@ -448,8 +453,8 @@ export default function PlannerPage() {
         <Grid size={{ xs: 12, md: 9 }}>
           {loading ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
-              <CircularProgress size={40} thickness={4} sx={{ mb: 2, color: 'primary.main' }} />
-              <Typography color="text.secondary" fontWeight="500">Curating your strategy...</Typography>
+              <CircularProgress size={40} thickness={4} thickness={4} sx={{ mb: 2, color: 'primary.main' }} />
+              <Typography color="text.secondary" fontWeight="500">{tp('curatingStrategy')}</Typography>
             </Box>
           ) : plan ? (
             <Box>
@@ -501,7 +506,7 @@ export default function PlannerPage() {
               {Object.keys(groupedDays).map((week) => (
                 <Box key={week} sx={{ mb: 5 }}>
                   <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: '800', letterSpacing: '0.1em', mb: 2, display: 'block' }}>
-                    WEEK {week}
+                    {tp('week')} {week}
                   </Typography>
                   
                   <Grid container spacing={2}>
@@ -556,7 +561,7 @@ export default function PlannerPage() {
                               borderRadius: '12px',
                               border: `1px solid ${isDark ? theme.palette.divider : alpha(theme.palette.primary.main, 0.1)}`
                             }}>
-                              <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: '800', color: theme.palette.primary.main, opacity: 0.8, mb: -0.5 }}>DAY</Typography>
+                              <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: '800', color: theme.palette.primary.main, opacity: 0.8, mb: -0.5 }}>{tp('day')}</Typography>
                               <Typography variant="h4" fontWeight="900" sx={{ color: theme.palette.primary.main }}>{day.day}</Typography>
                             </Box>
 
@@ -586,7 +591,7 @@ export default function PlannerPage() {
                               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', justifyContent: 'space-between' }}>
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                   <Typography variant="caption" fontWeight="800" sx={{ color: 'text.disabled', mr: 1, letterSpacing: '0.5px' }}>
-                                    PLATFORMS:
+                                    {tp('platforms')}
                                   </Typography>
                                   {(day.platforms || []).map((p: string) => (
                                     <Box key={p} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -612,7 +617,7 @@ export default function PlannerPage() {
                                   }}>
                                     <CheckCircleIcon sx={{ fontSize: 14, color: theme.palette.success.main }} />
                                     <Typography variant="caption" sx={{ color: theme.palette.success.main, fontWeight: '800', fontSize: '0.65rem' }}>
-                                      SCHEDULED
+                                      {tp('scheduled')}
                                     </Typography>
                                   </Box>
                                 )}
@@ -653,10 +658,10 @@ export default function PlannerPage() {
                 <Icon icon="tabler-sparkles" fontSize={48} />
               </Box>
               <Typography variant="h4" fontWeight="900" gutterBottom sx={{ letterSpacing: '-0.02em' }}>
-                Your Brand Strategy Starts Here
+                {ts('generatePlan')}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 5, maxWidth: 520, mx: 'auto', lineHeight: 1.6 }}>
-                Let AI analyze your brand DNA and market trends to generate a high-performing 30-day content calendar tailored to your specific industry.
+                {ts('noActivePlanDesc')}
               </Typography>
               <Button 
                 variant="contained" 
@@ -673,7 +678,7 @@ export default function PlannerPage() {
                   boxShadow: '0 8px 20px 0 rgba(115, 103, 240, 0.3)'
                 }}
               >
-                {generating ? 'Crafting Strategy...' : `Generate ${monthNames[month - 1]} Strategy`}
+                {generating ? tc('common.generating') : ts('generatePlan')}
               </Button>
             </Paper>
           )}

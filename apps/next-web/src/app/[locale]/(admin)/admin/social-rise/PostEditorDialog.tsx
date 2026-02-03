@@ -1,9 +1,11 @@
 /* eslint-disable import/no-unresolved */
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 
 import { useRouter } from 'next/navigation';
+
+import { useTranslations } from 'next-intl';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -57,10 +59,27 @@ const STATUS_OPTIONS = [
 ];
 
 const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, onDuplicate }: PostEditorDialogProps) => {
+  const t = useTranslations('studio.editor');
   const theme = useTheme();
   const router = useRouter();
   const isDark = theme.palette.mode === 'dark';
   const [loading, setLoading] = useState(false);
+
+  const PLATFORMS = useMemo(() => [
+    { value: 'INSTAGRAM', label: 'Instagram', icon: 'tabler-brand-instagram', color: '#E4405F' },
+    { value: 'FACEBOOK', label: 'Facebook', icon: 'tabler-brand-facebook', color: '#1877F2' },
+    { value: 'LINKEDIN', label: 'LinkedIn', icon: 'tabler-brand-linkedin', color: '#0A66C2' },
+    { value: 'TWITTER', label: 'Twitter (X)', icon: 'tabler-brand-x', color: '#000000' },
+    { value: 'GOOGLE_BUSINESS', label: 'Google Business', icon: 'tabler-brand-google', color: '#4285F4' }
+  ], []);
+
+  const STATUS_OPTIONS = useMemo(() => [
+    { value: 'draft', label: t('status.draft') },
+    { value: 'scheduled', label: t('status.scheduled') },
+    { value: 'published', label: t('status.published') },
+    { value: 'failed', label: t('status.failed') },
+    { value: 'cancelled', label: t('status.cancelled') }
+  ], [t]);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -141,7 +160,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
 
   const handleSave = async () => {
     if (!formData.text || formData.platforms.length === 0) {
-      alert('Please provide a caption and select at least one platform.');
+      alert(t('provideCaptionError'));
 
       return;
     }
@@ -172,7 +191,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
   const handleDelete = async () => {
     if (!post || !onDelete) return;
 
-    if (window.confirm('Are you sure you want to delete this scheduled post?')) {
+    if (window.confirm(t('confirmDelete'))) {
       setLoading(true);
 
       try {
@@ -236,10 +255,10 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
       }}>
         <Box>
           <Typography variant="h4" fontWeight="800" sx={{ letterSpacing: '-1px', lineHeight: 1.2 }}>
-            {post ? 'Edit Post Studio' : 'New Content Studio'}
+            {post ? t('editPostStudio') : t('newContentStudio')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, opacity: 0.7, fontWeight: 500 }}>
-            {post ? 'Refining your scheduled content for perfection' : 'Architecting a new piece of social media art'}
+            {post ? t('refiningContent') : t('architectingArt')}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
@@ -251,7 +270,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                     onClick={handleSmartStudio}
                     sx={{ borderRadius: '12px', textTransform: 'none', fontWeight: 600 }}
                 >
-                    Use Smart Studio
+                    {t('useSmartStudio')}
                 </Button>
             )}
             <IconButton 
@@ -278,7 +297,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
           {/* Platforms Selection */}
           <Box>
             <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: '1px', mb: 2, mt:5, display: 'block' }}>
-              DISTRIBUTION CHANNELS
+              {t('distributionChannels')}
             </Typography>
             <FormControl fullWidth>
               <Select
@@ -305,7 +324,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                 }
                 renderValue={(selected) => {
                   if (selected.length === 0) {
-                    return <Typography color="text.disabled" fontWeight={500}>Select destination platforms...</Typography>;
+                    return <Typography color="text.disabled" fontWeight={500}>{t('selectPlatforms')}</Typography>;
                   }
 
                   return (
@@ -372,14 +391,14 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
              <Box>
                 <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: '1px', mb: 2, display: 'block' }}>
-                    CONTENT CORE
+                    {t('contentCore')}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap', mb: 4 }}>
                 <TextField
                     id="post-title-input"
                     fullWidth
-                    label="Internal Campaign Name"
-                    placeholder="E.g., Summer 2026 Collection"
+                    label={t('campaignName')}
+                    placeholder={t('campaignPlaceholder')}
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     sx={{ 
@@ -401,8 +420,8 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                 <TextField
                     id="post-hashtags-input"
                     fullWidth
-                    label="Smart Hashtags"
-                    placeholder="#innovation #design #future"
+                    label={t('smartHashtags')}
+                    placeholder={t('hashtagsPlaceholder')}
                     value={formData.hashtags}
                     onChange={(e) => setFormData({ ...formData, hashtags: e.target.value })}
                     sx={{ 
@@ -427,8 +446,8 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                 fullWidth
                 multiline
                 rows={6}
-                label="Post Caption"
-                placeholder="Compose your message here..."
+                label={t('postCaption')}
+                placeholder={t('composePlaceholder')}
                 value={formData.text}
                 onChange={(e) => setFormData({ ...formData, text: e.target.value })}
                 sx={{ 
@@ -450,7 +469,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
           {/* Media Section */}
           <Box>
             <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: '1px', mb: 2, display: 'block' }}>
-              VISUAL ASSETS
+              {t('visualAssets')}
             </Typography>
             
             {/* Hidden File Input */}
@@ -557,7 +576,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                 }}>
                     <Icon icon="tabler-cloud-upload" fontSize={24} />
                 </Box>
-                <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.65rem', letterSpacing: '0.5px' }}>UPLOAD</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.65rem', letterSpacing: '0.5px' }}>{t('upload')}</Typography>
               </Box>
             </Box>
           </Box>
@@ -565,7 +584,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
           {/* Scheduling & Status */}
           <Box>
             <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: '1px', mb: 2, display: 'block' }}>
-              LOGISTICS
+              {t('logistics')}
             </Typography>
             <Box sx={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <Box sx={{ flex: 1, minWidth: 260 }}>
@@ -580,7 +599,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                     <TextField 
                         id="post-scheduled-at-input" 
                         fullWidth 
-                        label="Publish Schedule"
+                        label={t('publishSchedule')}
                         sx={{ 
                         '& .MuiOutlinedInput-root': { 
                             borderRadius: '16px',
@@ -649,7 +668,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                 disabled={loading}
                 sx={{ borderRadius: '10px', textTransform: 'none', fontWeight: 600 }}
               >
-                Delete
+                {t('delete')}
               </Button>
               <Button 
                 variant="tonal" 
@@ -659,7 +678,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                 disabled={loading}
                 sx={{ borderRadius: '10px', textTransform: 'none', fontWeight: 600 }}
               >
-                Duplicate
+                {t('duplicate')}
               </Button>
             </>
           )}
@@ -672,7 +691,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
             disabled={loading}
             sx={{ borderRadius: '10px', px: 6, textTransform: 'none', fontWeight: 600 }}
           >
-            Cancel
+            {t('cancel')}
           </Button>
           <Button 
             variant="contained" 
@@ -694,7 +713,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
               boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.3)}`
             }}
           >
-            {loading ? 'Saving...' : post ? 'Update Post' : 'Schedule Post'}
+            {loading ? t('saving') : post ? t('updatePost') : t('schedulePost')}
           </Button>
         </Box>
       </DialogActions>

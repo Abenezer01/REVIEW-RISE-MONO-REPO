@@ -1,0 +1,42 @@
+{
+  "featureFlags": {
+    "createTitle": "إنشاء علامة ميزة",
+    "editTitle": "تعديل علامة ميزة",
+    "name": "الاسم",
+    "namePlaceholder": "مثلاً: new-dashboard-v2",
+    "description": "الوصف",
+    "rolloutPercentage": "نسبة النشر: {value}%",
+    "identityTargets": "أهداف الهوية المحددة",
+    "userIds": "معرفات مستخدمين محددة",
+    "userIdsPlaceholder": "أدخل المعرف واضغط Enter",
+    "emails": "رسائل بريد إلكتروني محددة",
+    "emailsPlaceholder": "user@company.com",
+    "targetingRules": "قواعد وشروط الاستهداف",
+    "addCondition": "إضافة شرط",
+    "noConditions": "لم يتم تعيين شروط. ستنطبق العلامة على الجميع بناءً على نسبة النشر.",
+    "conditionNumber": "الشرط {number}",
+    "attribute": "السمة",
+    "operator": "المعامل",
+    "values": "القيم",
+    "valuesPlaceholder": "أدخل القيمة",
+    "enabled": "مفعّل",
+    "validation": {
+      "nameRequired": "الاسم مطلوب",
+      "nameMin": "يجب أن يكون الاسم {count} أحرف على الأقل",
+      "descriptionMax": "يجب أن يكون الوصف أقل من {count} حرفًا"
+    },
+    "attributes": {
+      "country": "الدولة",
+      "group": "مجموعة المستخدمين",
+      "emailDomain": "نطاق البريد الإلكتروني",
+      "browser": "المتصفح",
+      "os": "نظام التشغيل",
+      "deviceType": "نوع الجهاز",
+      "language": "اللغة"
+    },
+    "operators": {
+      "in": "واحد من",
+      "not_in": "ليس واحداً من"
+    }
+  }
+}

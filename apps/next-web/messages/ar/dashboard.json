@@ -1,37 +1,124 @@
 {
   "navigation": {
-    "dashboard": "لوحة التحكم",
+    "dashboard": "لوحة القيادة",
+    "ai-studio": "استوديو محتوى الذكاء الاصطناعي",
     "reviews": "المراجعات",
-    "reviews-dashboard": "لوحة تحليلات المراجعات",
-    "reviews-list": "جميع المراجعات",
-    "social-rise": "سوشل رايز",
-    "seo-intelligence": "تحليلات السيو",
+    "reviews-dashboard": "لوحة مراجعات",
+    "reviews-list": "كل المراجعات",
+    "auto-reply": "إعدادات الرد التلقائي",
+    "social-rise": "سوشيال رايز",
+    "social-overview": "نظرة عامة",
+    "social-content": "المحتوى والرسائل",
+    "social-planner": "المخطط الشهري",
+    "seo-intelligence": "ذكاء سيو",
     "accounts": "الحسابات",
-    "subscription-issues": "مشكلات الاشتراك",
+    "subscription-issues": "مشاكل الاشتراك",
     "jobs": "المهام",
     "logs": "السجلات",
     "failed-jobs": "المهام الفاشلة",
     "social-media-post-logs": "سجلات منشورات التواصل الاجتماعي",
     "review-sync-logs": "سجلات مزامنة المراجعات",
     "home": "الرئيسية",
-    "about": "عن الموقع",
+    "about": "حول",
     "seo-overview": "نظرة عامة",
-    "seo-visibility": "ظهور في نتائج البحث",
-    "seo-keywords": "الكلمات المفتاحية",
+    "seo-visibility": "الظهور في نتائج البحث",
+    "seo-keywords": "كلمات سيو",
     "gbp-rocket": "جي بي بي روكيت",
     "ad-rise": "أد رايز",
     "brand-rise": "براند رايز",
+    "content-templates": "قوالب المحتوى",
+    "seasonal-events": "الأحداث الموسمية",
     "settings": "الإعدادات",
     "system-settings": "إعدادات النظام",
     "feature-flags": "أعلام الميزات",
-    "ai-visibility": "رؤية الذكاء الاصطناعي",
-    "auto-reply": "إعدادات الرد التلقائي"
+    "ai-visibility": "ظهور الذكاء الاصطناعي"
+  },
+  "auto-reply": "إعدادات الرد التلقائي",
+  "seo": {
+    "visibility": {
+      "title": "الظهور في نتائج البحث",
+      "subtitle": "تتبع وجودك في حزمة الخرائط وأداء التصنيف العضوي",
+      "refreshData": "تحديث البيانات",
+      "loadingProfile": "جاري تحميل ملف تعريف عملك...",
+      "noBusiness": "لم يتم العثور على عمل",
+      "noBusinessDesc": "يبدو أن حسابك غير مرتبط بأي أعمال.",
+      "noBusinessUser": "لم يتم العثور على أعمال لهذا المستخدم.",
+      "loadFailed": "فشل تحميل أعمال المستخدم.",
+      "loadDashboardFailed": "فشل تحميل بيانات لوحة القيادة. يرجى التحقق من الاتصال بخدمة سيو.",
+      "currentPerformance": "الأداء الحالي",
+      "mapPack": "وضوح Map Pack",
+      "shareOfVoice": "حصة الصوت",
+      "loading": "جاري تحميل المخطط...",
+      "trendsTitle": "اتجاهات الظهور (30 يومًا)",
+      "rankingHistory": "سجل ترتيب الكلمات الرئيسية",
+      "trackedKeywords": "الكلمات الرئيسية المتتبعة",
+      "keywordsTitle": "كلمات سيو",
+      "keywordsSubtitle": "إضافة وعرض وإدارة الكلمات الرئيسية المتتبعة للسيو المحلي",
+      "rankings": {
+        "organic": "الترتيب العضوي",
+        "mapPack": "Map Pack",
+        "historyTitle": "سجل الترتيب"
+      }
+    }
+  },
+  "autoReply": {
+    "title": "نظام الرد التلقائي بالذكاء الاصطناعي",
+    "description": "عند التمكين، سيقوم الذكاء الاصطناعي لدينا بالرد تلقائيًا على المراجعات بناءً على تكوينك، باستخدام صوت علامتك التجارية ونبرتها.",
+    "systemActive": "النظام نشط",
+    "systemPaused": "النظام متوقف مؤقتًا",
+    "responseRules": "قواعد الاستجابة",
+    "rulesSubtitle": "حدد المراجعات التي يجب أن تؤدي إلى رد تلقائي",
+    "targetSentiment": "الشعور المستهدف",
+    "sentimentTooltip": "اختر مستويات التصنيف التي يجب أن تتلقى ردودًا آلية",
+    "positiveOnly": "إيجابي فقط",
+    "positiveOnlyDesc": "الأفضل للشركات التي ترغب فقط في أتمتة المراجعات عالية الثناء.",
+    "positiveNeutral": "إيجابي + محايد",
+    "positiveNeutralDesc": "تغطية شاملة بما في ذلك مراجعات 3 نجوم لتحقيق أقصى قدر من الكفاءة.",
+    "negativeSafeguard": "حماية المراجعة السلبية",
+    "negativeSafeguardDesc": "احتفظ دائمًا بمراجعات نجمة ونجمتين للموافقة اليدوية قبل النشر.",
+    "timingDelivery": "التوقيت والتسليم",
+    "timingSubtitle": "التحكم في وقت وعدد مرات إرسال الردود",
+    "replyDelay": "تأخير الرد",
+    "delayDesc": "وقت الانتظار لجعل ردود الذكاء الاصطناعي تبدو أكثر طبيعية",
+    "hour": "ساعة",
+    "hours": "ساعات",
+    "instant": "فوري",
+    "dailyLimit": "الحد اليومي للردود",
+    "limitDesc": "الحد الأقصى للردود الآلية خلال فترة 24 ساعة",
+    "securitySafeguards": "ضمانات السلامة",
+    "saveSettings": "حفظ الإعدادات",
+    "saving": "جاري الحفظ...",
+    "quickGuide": "دليل سريع",
+    "guideSubtitle": "كيف يتعامل سير العمل مع المراجعات",
+    "brandVoice": "صوت العلامة التجارية",
+    "voiceSubtitle": "الشخصية والنبرة",
+    "activeStatus": "الحالة: نشط",
+    "voiceDesc": "ستعكس ردودك تلقائيًا شخصية علامتك التجارية وقيمها الراسخة عبر جميع المنصات.",
+    "configureVoice": "تكوين صوت العلامة التجارية",
+    "steps": {
+      "sentiment": {
+        "title": "تحليل المشاعر",
+        "desc": "يتم تحليل المراجعات الجديدة لتصنيف النجوم ومشاعر المحتوى."
+      },
+      "ai": {
+        "title": "توليد الذكاء الاصطناعي",
+        "desc": "يتم صياغة الردود باستخدام صوت علامتك التجارية الفريد وأنماط الاستجابة."
+      },
+      "delay": {
+        "title": "تأخير طبيعي",
+        "desc": "تنتظر الردود فترة التأخير المكونة قبل وضعها في قائمة الانتظار للنشر."
+      },
+      "manual": {
+        "title": "مراجعة يدوية",
+        "desc": "يتم دائمًا الاحتفاظ بالمراجعات السلبية أو التي تم وضع علامة عليها لموافقتك البشرية."
+      }
+    }
   },
   "overview": {
-    "title": "نظرة عامة على لوحة التحكم",
-    "welcome": "مرحباً بعودتك",
+    "title": "نظرة عامة على لوحة القيادة",
+    "welcome": "مرحبًا بعودتك",
     "totalReviews": "إجمالي المراجعات",
-    "averageRating": "متوسط التقييم",
+    "averageRating": "متوسط التصنيف",
     "responseRate": "معدل الاستجابة",
     "pendingReviews": "المراجعات المعلقة",
     "loading": "جاري التحميل...",
@@ -40,58 +127,176 @@
   "stats": {
     "thisWeek": "هذا الأسبوع",
     "thisMonth": "هذا الشهر",
-    "thisYear": "هذا العام",
+    "thisYear": "هذه السنة",
     "allTime": "كل الوقت"
   },
   "reviews": {
     "title": "المراجعات",
     "recent": "المراجعات الأخيرة",
-    "positive": "إيجابية",
-    "negative": "سلبية",
-    "neutral": "محايدة",
+    "positive": "إيجابي",
+    "negative": "سلبي",
+    "neutral": "محايد",
     "reply": "رد",
-    "viewAll": "عرض جميع المراجعات"
+    "viewAll": "عرض كل المراجعات",
+    "smart": {
+      "title": "Smart Reviews™",
+      "subtitle": "عرض وإدارة جميع مراجعات العملاء في مكان واحد",
+      "manageSubtitle": "إدارة ومراقبة سمعة عملائك عبر المنصات",
+      "runSentiment": "تشغيل تحليل المشاعر",
+      "reviewsCount": "{count} مراجعات",
+      "totalCount": "{count} إجمالي",
+      "searchPlaceholder": "البحث في المراجعات...",
+      "filterRating": "تصفية حسب التصنيف",
+      "allRatings": "كل التصنيفات",
+      "stars": "{count} نجوم",
+      "filterProvider": "تصفية حسب المزود",
+      "allProviders": "كل المزودين",
+      "filterSentiment": "تصفية حسب المشاعر",
+      "allSentiments": "كل المشاعر",
+      "filterStatus": "تصفية حسب الحالة",
+      "allStatuses": "كل الحالات",
+      "empty": {
+        "title": "لم يتم العثور على مراجعات",
+        "description": "حاول تعديل المرشحات للعثور على ما تبحث عنه."
+      },
+      "columns": {
+        "reviewer": "المراجع",
+        "review": "المراجعة",
+        "sentiment": "المشاعر",
+        "status": "الحالة",
+        "actions": "الإجراءات"
+      },
+      "anonymous": "مجهول",
+      "noContent": "لم يتم تقديم محتوى",
+      "detail": {
+        "title": "تفاصيل المراجعة",
+        "subtitle": "عرض وإدارة ملاحظات العملاء",
+        "publishedDate": "تاريخ النشر",
+        "source": "المصدر",
+        "reviewContent": "محتوى المراجعة",
+        "noContent": "لم يتم تقديم أي محتوى.",
+        "internalTags": "الوسوم الداخلية",
+        "extractedEmotions": "المشاعر والمواضيع المستخرجة",
+        "noAnalysis": "لا يوجد تحليل متاح",
+        "keyTopics": "المواضيع الرئيسية",
+        "replyHistory": "سجل الردود",
+        "aiAutoReply": "رد تلقائي بالذكاء الاصطناعي",
+        "teamMember": "عضو الفريق",
+        "live": "مباشر",
+        "aiSuggestions": "اقتراحات الذكاء الاصطناعي الذكية",
+        "aiAnalysis": "تحليل الذكاء الاصطناعي",
+        "suggestedReplies": "الردود المقترحة",
+        "noSuggestions": "لا توجد اقتراحات بعد",
+        "noSuggestionsDesc": "انقر فوق زر \"توليد الذكاء الاصطناعي\" أدناه للحصول على 3 أشكال مخصصة للرد على هذه المراجعة.",
+        "regenerate": "إعادة توليد",
+        "generateAI": "توليد بالذكاء الاصطناعي",
+        "useThis": "استخدام هذا",
+        "yourReply": "ردك",
+        "writeReply": "اكتب ردك هنا...",
+        "reject": "رفض",
+        "updateReply": "تحديث الرد",
+        "postReply": "نشر الرد",
+        "defaultReply": "عزيزي {author}، شكرًا جزيلاً لك على مراجعتك ذات الـ {rating} نجوم! نحن نقدر ملاحظاتك ونأمل في رؤيتك مرة أخرى قريبًا."
+      }
+    }
   },
   "actions": {
     "respondToReview": "الرد على المراجعة",
-    "generateResponse": "إنشاء رد بالذكاء الاصطناعي",
+    "generateResponse": "توليد رد بالذكاء الاصطناعي",
     "viewDetails": "عرض التفاصيل",
-    "markAsRead": "وضع علامة كمقروء",
-    "disconnect": "فصل",
-    "connectGoogle": "ربط حساب جوجل"
+    "markAsRead": "تحديد كمقروء",
+    "disconnect": "قطع الاتصال",
+    "connectGoogle": "الاتصال بجوجل"
   },
   "locations": {
-    "title": "إدارة الفروع",
-    "listTitle": "الفروع",
-    "createTitle": "إضافة فرع",
-    "editTitle": "تعديل الفرع",
+    "title": "إدارة المواقع",
+    "listTitle": "المواقع",
+    "createTitle": "إنشاء موقع",
+    "editTitle": "تعديل الموقع",
     "detail": {
-      "backToAccount": "العودة للحساب",
-      "backToList": "العودة للقائمة",
-      "notFound": "الفرع غير موجود",
-      "overview": "نظرة عامة على الفرع",
+      "manageSubtitle": "إدارة مواقع عملك وحالتها التشغيلية",
+      "searchPlaceholder": "البحث في المواقع",
+      "backToAccount": "العودة إلى الحساب",
+      "backToList": "العودة إلى القائمة",
+      "notFound": "الموقع غير موجود",
+      "overview": "نظرة عامة على الموقع",
       "tabs": {
         "overview": "نظرة عامة",
         "reviews": "المراجعات",
-        "sources": "مصادر المراجعات"
+        "sources": "مصادر المراجعة",
+        "social": "اتصالات التواصل الاجتماعي"
       },
-      "saveFirst": "يرجى حفظ الفرع أولاً للربط."
+      "saveFirst": "احفظ الموقع أولاً للاتصال."
     },
     "form": {
-      "name": "اسم الفرع",
+      "name": "اسم الموقع",
       "businessId": "الحساب",
       "address": "العنوان",
       "timezone": "المنطقة الزمنية",
       "status": "الحالة",
       "active": "نشط",
       "archived": "مؤرشف",
-      "platformConnections": "ربط المنصات",
-      "googlePlaceId": "معرف مكان جوجل",
+      "platformConnections": "اتصالات المنصة",
+      "googlePlaceId": "معرف Google Place",
       "facebookPageId": "معرف صفحة فيسبوك",
-      "deleteConfirm": "هل أنت متأكد من رغبتك في حذف هذا الفرع؟"
+      "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذا الموقع؟"
+    }
+  },
+  "subscriptionIssues": {
+    "title": "مشاكل الاشتراك",
+    "subtitle": "مراقبة وإدارة مشاكل الفواتير",
+    "info": "عرض الحسابات ذات الاشتراكات منتهية الصلاحية أو فشل الدفع أو مشاكل الفواتير الأخرى.",
+    "columns": {
+      "business": "العمل",
+      "status": "الحالة",
+      "issueReason": "سبب المشكلة",
+      "periodEnd": "نهاية الفترة",
+      "lastContacted": "آخر اتصال",
+      "actions": "الإجراءات"
+    },
+    "plan": "خطة {plan}",
+    "expired": "(منتهي الصلاحية)",
+    "byAdmin": "بواسطة {admin}",
+    "never": "أبدًا",
+    "tooltips": {
+      "pause": "إيقاف الاشتراك مؤقتًا",
+      "resume": "استئناف الاشتراك",
+      "markContacted": "تحديد كمتصل به",
+      "viewDetails": "عرض تفاصيل الحساب"
+    },
+    "detail": {
+      "title": "تفاصيل مشكلة الفواتير",
+      "notes": "ملاحظات",
+      "details": "تفاصيل",
+      "close": "إغلاق"
     }
   },
   "accounts": {
+    "list": {
+      "title": "الحسابات",
+      "createAccount": "إنشاء حساب",
+      "searchPlaceholder": "البحث في الحساب...",
+      "allStatus": "كل الحالات",
+      "allPlans": "كل الخطط",
+      "noDescription": "لا يوجد وصف",
+      "columns": {
+        "account": "الحساب",
+        "nameEmail": "الاسم / البريد الإلكتروني",
+        "status": "الحالة",
+        "plan": "الخطة",
+        "createdDate": "تاريخ الإنشاء",
+        "actions": "الإجراءات"
+      },
+      "tooltips": {
+        "viewDetails": "عرض التفاصيل",
+        "edit": "تعديل",
+        "delete": "حذف"
+      },
+      "deleteDialog": {
+        "title": "حذف الحساب",
+        "confirm": "هل أنت متأكد أنك تريد حذف {name}؟ لا يمكن التراجع عن هذا الإجراء."
+      }
+    },
     "title": "تفاصيل الحساب",
     "notFound": "الحساب غير موجود",
     "createdOn": "تم الإنشاء في {date}",
@@ -100,14 +305,14 @@
     "loadAccountFailed": "فشل تحميل الحساب",
     "tabs": {
       "overview": "نظرة عامة",
-      "locations": "الفروع",
-      "users": "المستخدمين",
+      "locations": "المواقع",
+      "users": "المستخدمون",
       "channels": "القنوات",
       "auditLogs": "سجلات التدقيق"
     },
     "deleteUser": {
-      "title": "حذف مستخدم",
-      "confirm": "هل أنت متأكد من رغبتك في إزالة {name} من هذا الحساب؟"
+      "title": "حذف المستخدم",
+      "confirm": "هل أنت متأكد أنك تريد إزالة {name} من هذا الحساب؟"
     },
     "overview": {
       "subscription": {
@@ -121,13 +326,13 @@
       "stats": {
         "title": "إحصائيات الحساب",
         "subtitle": "نظرة عامة على استخدام الحساب",
-        "locations": "الفروع",
-        "users": "المستخدمين"
+        "locations": "المواقع",
+        "users": "المستخدمون"
       }
     },
     "users": {
-      "title": "المستخدمين",
-      "subtitle": "إدارة مستخدمي حسابك والأدوار الموكلة إليهم",
+      "title": "المستخدمون",
+      "subtitle": "إدارة مستخدمي حسابك والأدوار المعينة لهم",
       "searchPlaceholder": "البحث عن مستخدم",
       "columns": {
         "user": "المستخدم",
@@ -141,7 +346,7 @@
       }
     },
     "channels": {
-      "title": "المنصات المرتبطة",
+      "title": "المنصات المتصلة",
       "subtitle": "إدارة التكامل مع منصات الطرف الثالث",
       "googleSubtitle": "ملف تعريف العمل",
       "facebookSubtitle": "الصفحات",
@@ -151,7 +356,7 @@
     "logs": {
       "title": "النشاط الأخير",
       "noLogs": "لم يتم العثور على سجلات تدقيق",
-      "noLogsSubtitle": "ستظهر الأنشطة هنا بمجرد تنفيذ الإجراءات."
+      "noLogsSubtitle": "سيظهر النشاط هنا بمجرد تنفيذ الإجراءات."
     },
     "accountDialog": {
       "editTitle": "تعديل الحساب",
@@ -160,18 +365,32 @@
       "newSubtitle": "إنشاء حساب منظمة جديد",
       "fields": {
         "name": "اسم الحساب",
-        "namePlaceholder": "مثلاً: شركة أكمي",
-        "ownerEmail": "بريد المالك",
-        "ownerEmailPlaceholder": "مثلاً: admin@acme.com",
+        "namePlaceholder": "مثلاً شركة أكمي",
+        "ownerEmail": "بريد المالك الإلكتروني",
+        "ownerEmailPlaceholder": "مثلاً admin@acme.com",
         "ownerEmailDisabled": "لا يمكن تغيير بريد المالك مباشرة",
         "status": "الحالة",
         "plan": "الخطة",
         "description": "الوصف",
-        "descriptionPlaceholder": "اكتب شيئاً عن الحساب..."
+        "descriptionPlaceholder": "اكتب شيئًا عن الحساب...",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "pending": "معلق",
+        "free": "مجاني",
+        "pro": "برو",
+        "enterprise": "إنتربرايز"
+      },
+      "validation": {
+        "nameRequired": "اسم الحساب مطلوب",
+        "emailRequired": "البريد الإلكتروني مطلوب",
+        "invalidEmail": "أدخل بريدًا إلكترونيًا صالحًا",
+        "statusRequired": "الحالة مطلوبة",
+        "planRequired": "الخطة مطلوبة",
+        "descriptionTooLong": "الوصف طويل جدًا"
       }
     },
     "userDialog": {
-      "editTitle": "تعديل مستخدم",
+      "editTitle": "تعديل المستخدم",
       "addTitle": "إضافة مستخدم",
       "fields": {
         "firstName": "الاسم الأول",
@@ -180,45 +399,89 @@
         "role": "الدور",
         "rolePlaceholder": "اختر الدور",
         "business": "العمل",
-        "location": "الفرع",
+        "location": "الموقع",
         "password": "كلمة المرور"
       }
     }
   },
+  "aiVisibility": {
+    "pageSubtitle": "حلل كيف تظهر علامتك التجارية في الإجابات التي يولدها الذكاء الاصطناعي (GEO/AIO).",
+    "geoTitle": "GEO: تحسين محركات البحث التوليدية",
+    "geoDesc": "تحسين المحتوى للتصنيف بشكل أفضل في محركات البحث المدعومة بالذكاء الاصطناعي.",
+    "aioTitle": "AIO: نظرة عامة بالذكاء الاصطناعي",
+    "aioDesc": "الملخص المولد بالذكاء الاصطناعي في أعلى نتائج البحث.",
+    "dashboard": {
+      "starting": "بدء التحليل...",
+      "validating": "التحقق من إمكانية الوصول إلى URL وملف robots.txt...",
+      "errorAccessibility": "عنوان URL غير متاح للجمهور. يرجى التأكد من أنه مباشر وليس خلف تسجيل دخول أو قيود IP.",
+      "errorRobots": "ملف robots.txt يمنع برامج تتبع الذكاء الاصطناعي. يرجى تحديث ملف robots.txt للسماح بالزواحف.",
+      "errorSeo": "لم يتم تلبية ممارسات SEO الأساسية. يرجى التأكد من أن صفحتك تحتوي على هيكل HTML صالح.",
+      "analyzing": "تحليل ظهور الذكاء الاصطناعي وتوليد الرؤى...",
+      "unexpectedError": "حدث خطأ غير متوقع",
+      "initialInfo": "أدخل عنوان URL أعلاه لتحليل ظهور الذكاء الاصطناعي والحصول على نصائح التحسين.",
+      "analysisCompleteScore": "اكتمل التحليل! حققت علامتك التجارية درجة ظهور بلغت {score}%.",
+      "analysisComplete": "اكتمل التحليل!"
+    }
+  },
   "brandRise": {
-    "subtitle": "رؤى أداء العلامة وظهورها",
-    "tabs": {
-      "overview": "نظرة عامة",
-      "visibility": "الظهور",
-      "dna": "هوية العلامة",
-      "competitors": "المنافسون",
-      "content": "المحتوى والرسائل",
-      "reviews": "المراجعات والسمعة",
-      "reports": "التقارير"
-    },
-    "reports": {
-      "title": "تقارير العلامة",
-      "generate": "إنشاء تقرير"
-    },
-    "reviews": {
-      "recent": "المراجعات الأخيرة",
-      "velocity": "وتيرة المراجعات",
-      "sentiment": "توزيع المشاعر"
-    },
-    "content": {
-      "calendar": "تقويم المحتوى",
-      "add": "إضافة محتوى",
-      "ideas": "أفكار المحتوى"
-    },
-    "dna": {
-      "summary": "ملخص هوية العلامة",
-      "voice": "صوت العلامة",
-      "audience": "الجمهور المستهدف",
-      "messages": "الرسائل الأساسية",
-      "viewFull": "عرض دليل الهوية الكامل"
-    },
+    "subtitle": "رؤى أداء وظهور العلامة التجارية",
     "competitors": {
-      "tracking": "تتبع المنافسين"
+      "tracking": "تتبع المنافسين",
+      "exportList": "تصدير القائمة",
+      "discoveryTitle": "اكتشاف المنافسين",
+      "discoverySubtitle": "تحليل مواقع المنافسين لتحديد الفجوات والاستراتيجيات والفرص.",
+      "inputLabel": "أضف كلمات رئيسية (مثلاً 'سباك في الرياض')",
+      "discoverBtn": "اكتشاف المنافسين",
+      "discovering": "جاري الاكتشاف...",
+      "analyzeWebsite": "تحليل الموقع",
+      "analyzing": "جاري التحليل...",
+      "noAnalysis": "لا يوجد تحليل مفصل متاح بعد.",
+      "noCompetitors": "لا يوجد منافسون متتبعون بعد. أضف واحداً أعلاه.",
+      "listTitle": "المنافسون المتتبعون",
+      "detail": {
+        "analysisTitle": "تحليل المنافسين",
+        "insightsFrom": "رؤى عميقة من {name}",
+        "compare": "مقارنة",
+        "tabs": {
+          "overview": "نظرة عامة",
+          "strategic": "التحليل الاستراتيجي",
+          "signals": "الإشارات والتلميحات"
+        },
+        "uvpTitle": "عرض القيمة الفريد",
+        "noUvp": "لم يتم استخراج عرض القيمة الفريد بعد.",
+        "servicesTitle": "عروض الخدمات",
+        "noServices": "لم يتم استخراج أي خدمات بعد.",
+        "pricingTitle": "تلميحات التسعير",
+        "noPricing": "لم يتم استخراج معلومات التسعير.",
+        "trustSignals": "إشارات الثقة",
+        "ratingLabel": "التقييم",
+        "clientsLabel": "العملاء",
+        "awardsLabel": "الجوائز",
+        "ctaTitle": "أنماط الدعوة لاتخاذ إجراء",
+        "ctaAudit": "احصل على تدقيق تسويقي مجاني",
+        "toLearn": "ماذا تتعلم",
+        "insightNumber": "رؤية {number}",
+        "noInsights": "لا توجد رؤى متاحة بعد.",
+        "toAvoid": "ماذا تتجنب",
+        "cautionNumber": "تنبيه {number}",
+        "noWarnings": "لا توجد تحذيرات متاحة بعد.",
+        "techStack": "المكدس التقني",
+        "strengths": "نقاط القوة",
+        "noStrengths": "لم يتم تحديد نقاط قوة بعد.",
+        "weaknesses": "نقاط الضعف",
+        "noWeaknesses": "لم يتم تحديد نقاط ضعف بعد.",
+        "diffTitle": "المميزات الفريدة",
+        "diffNumber": "ميزة {number}",
+        "noDifferentiators": "لم يتم تحديد مميزات بعد.",
+        "matrixTitle": "مصفوفة مقارنة الميزات",
+        "feature": "الميزة",
+        "competitor": "المنافس",
+        "growthHub": "مركز النمو",
+        "yourBrand": "علامتك التجارية",
+        "noneFound": "لم يتم العثور على شيء.",
+        "noneIdentified": "لم يتم تحديد شيء.",
+        "none": "لا يوجد"
+      }
     }
   }
 }

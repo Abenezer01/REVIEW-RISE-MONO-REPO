@@ -17,8 +17,9 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 // Third-party Imports
 import classnames from 'classnames'
 
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 import { SystemMessageCode } from '@platform/contracts'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 // Type Imports
 import type { SystemMode } from '@core/types'
@@ -27,6 +28,8 @@ import type { SystemMode } from '@core/types'
 import Link from '@components/Link'
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
+
+import { useTranslations } from 'next-intl'
 
 // Config Imports
 import themeConfig from '@configs/themeConfig'
@@ -65,6 +68,7 @@ const MaskImg = styled('img')({
 
 const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   const { notify } = useSystemMessages()
+  const t = useTranslations('auth')
 
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
@@ -92,6 +96,7 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
       } else {
         notify(SystemMessageCode.AUTH_LOGIN_SUCCESS)
       }
+
       login(state.user)
     } else if (state?.success === false) {
       if (state.messageCode) {
@@ -137,8 +142,8 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
         </Link>
         <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[400px] md:max-is-[unset] mbs-11 sm:mbs-14 md:mbs-0'>
           <div className='flex flex-col gap-1'>
-            <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
-            <Typography>Please sign-in to your account and start the adventure</Typography>
+            <Typography variant='h4'>{t('login.welcome', { appName: themeConfig.templateName })}</Typography>
+            <Typography>{t('login.subtitle')}</Typography>
           </div>
           <form
             noValidate
@@ -150,8 +155,8 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
               autoFocus
               fullWidth
               name='email'
-              label='Email'
-              placeholder='Enter your email'
+              label={t('login.email')}
+              placeholder={t('login.email')}
               value={email}
               type='email'
               onChange={e => setEmail(e.target.value)}
@@ -161,7 +166,7 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
             <CustomTextField
               fullWidth
               name='password'
-              label='Password'
+              label={t('login.password')}
               placeholder='············'
               id='outlined-adornment-password'
               type={isPasswordShown ? 'text' : 'password'}
@@ -182,18 +187,18 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
               }}
             />
             <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
-              <FormControlLabel control={<Checkbox />} label='Remember me' />
+              <FormControlLabel control={<Checkbox />} label={t('login.rememberMe')} />
               <Typography className='text-end' color='primary.main' component={Link}>
-                Forgot password?
+                {t('login.forgotPassword')}
               </Typography>
             </div>
             <Button fullWidth variant='contained' type='submit' disabled={isPending}>
-              {isPending ? 'Logging in...' : 'Login'}
+              {isPending ? t('login.loggingIn') : t('login.login')}
             </Button>
             <div className='flex justify-center items-center flex-wrap gap-2'>
-              <Typography>New on our platform?</Typography>
+              <Typography>{t('login.newOnPlatform')}</Typography>
               <Typography component={Link} color='primary.main'>
-                Create an account
+                {t('login.createAccount')}
               </Typography>
             </div>
             {/* <Divider className='gap-2 text-textPrimary'>or</Divider>

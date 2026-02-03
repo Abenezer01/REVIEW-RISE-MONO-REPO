@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 
 import { Box, Typography, Card, CardContent, Chip, Stack } from '@mui/material'
 
+import { useTranslation } from '@/hooks/useTranslation'
+
 interface PlanDay {
     day: number
     topic: string
@@ -20,6 +22,7 @@ interface ScheduledPostListProps {
 const PLATFORMS = ['All', 'Instagram', 'Facebook', 'Twitter', 'LinkedIn']
 
 export default function ScheduledPostList({ posts, dateLabel }: ScheduledPostListProps) {
+    const t = useTranslation('studio')
     const [filter, setFilter] = useState('All')
 
     const filteredPosts = filter === 'All' 
@@ -41,7 +44,7 @@ export default function ScheduledPostList({ posts, dateLabel }: ScheduledPostLis
             <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                     <Typography variant="h6" fontWeight="bold">
-                        Scheduled Posts
+                        {t('planner.resultsTitle')}
                         {dateLabel && <Typography component="span" variant="h6" fontWeight="normal" color="text.secondary"> • {dateLabel}</Typography>}
                     </Typography>
                 </Box>
@@ -65,7 +68,7 @@ export default function ScheduledPostList({ posts, dateLabel }: ScheduledPostLis
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {filteredPosts.length === 0 ? (
                         <Box sx={{ p: 4, textAlign: 'center', color: 'text.secondary', border: '1px dashed', borderColor: 'divider', borderRadius: 2 }}>
-                            <Typography variant="body2">No posts scheduled for this day.</Typography>
+                            <Typography variant="body2">{t('planner.scheduled.noPosts')}</Typography>
                         </Box>
                     ) : (
                         filteredPosts.map((post, idx) => (

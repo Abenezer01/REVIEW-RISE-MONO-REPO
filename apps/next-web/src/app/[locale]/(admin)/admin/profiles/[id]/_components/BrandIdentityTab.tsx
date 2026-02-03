@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
+import { useTranslations } from 'next-intl';
 
 import {
   Box,
@@ -35,8 +36,9 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 import { SystemMessageCode } from '@platform/contracts';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 
 import type { BrandProfile } from '@/services/brand-profile.service';
 
@@ -55,6 +57,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
   onUpdate,
   isUpdating
 }) => {
+  const t = useTranslations('BrandProfiles.identity');
   const { notify } = useSystemMessages();
   const theme = useTheme();
   const [editingSection, setEditingSection] = React.useState<string | null>(null);
@@ -162,7 +165,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
           {/* Description Card */}
           <Card variant="outlined" sx={{ borderRadius: 3 }}>
             <CardContent sx={{ p: 3 }}>
-              {renderSectionHeader('Brand Description', 'description', handleSaveDescription, handleCancelEdit)}
+              {renderSectionHeader(t('descriptionTitle'), 'description', handleSaveDescription, handleCancelEdit)}
               {editingSection === 'description' ? (
                 <TextField
                   fullWidth
@@ -171,11 +174,11 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                   variant="outlined"
                   value={editedDescription}
                   onChange={(e) => setEditedDescription(e.target.value)}
-                  placeholder="Enter brand description..."
+                  placeholder={t('descriptionPlaceholder')}
                 />
               ) : (
                 <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
-                  {profile.description || profile.currentExtractedData?.description || 'No description available for this brand profile.'}
+                  {profile.description || profile.currentExtractedData?.description || t('noDescription')}
                 </Typography>
               )}
             </CardContent>
@@ -184,7 +187,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
           {/* Colors Card */}
           <Card variant="outlined" sx={{ borderRadius: 3 }}>
             <CardContent sx={{ p: 3 }}>
-              {renderSectionHeader('Color Palette', 'colors', handleSaveColors, handleCancelColors)}
+              {renderSectionHeader(t('colorsTitle'), 'colors', handleSaveColors, handleCancelColors)}
               {editingSection === 'colors' ? (
                 <Stack spacing={2}>
                   {editedColors.map((color, index) => (
@@ -192,7 +195,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                       <Box sx={{ width: 40, height: 40, borderRadius: 1, bgcolor: color.hexCode, border: '1px solid divider' }} />
                       <TextField
                         size="small"
-                        label="HEX"
+                        label={t('hexLabel')}
                         value={color.hexCode}
                         onChange={(e) => {
                           const newColors = [...editedColors];
@@ -204,7 +207,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                       />
                       <TextField
                         size="small"
-                        label="Type"
+                        label={t('typeLabel')}
                         value={color.type}
                         onChange={(e) => {
                           const newColors = [...editedColors];
@@ -222,7 +225,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                     </Stack>
                   ))}
                   <Button startIcon={<AddIcon />} onClick={() => setEditedColors([...editedColors, { hexCode: '#000000', type: 'primary' }])}>
-                    Add Color
+                    {t('addColor')}
                   </Button>
                 </Stack>
               ) : (
@@ -235,7 +238,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                         onClick={onCopyAllColors}
                         sx={{ borderRadius: 2 }}
                       >
-                        Copy All
+                        {t('copyAll')}
                       </Button>
                     )}
                   </Stack>
@@ -298,7 +301,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                       </Grid>
                     )) : (
                       <Grid size={{ xs: 12 }}>
-                        <Typography color="text.secondary">No colors extracted.</Typography>
+                        <Typography color="text.secondary">{t('noColors')}</Typography>
                       </Grid>
                     )}
                   </Grid>
@@ -316,14 +319,14 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
           {/* Assets Card */}
           <Card variant="outlined" sx={{ borderRadius: 3 }}>
             <CardContent sx={{ p: 3 }}>
-              {renderSectionHeader('Brand Assets', 'assets', handleSaveAssets, handleCancelAssets)}
+              {renderSectionHeader(t('assetsTitle'), 'assets', handleSaveAssets, handleCancelAssets)}
               {editingSection === 'assets' ? (
                 <Stack spacing={2}>
                   {editedAssets.map((asset, index) => (
                     <Stack key={index} spacing={1} sx={{ p: 2, border: '1px solid divider', borderRadius: 2 }}>
                       <TextField
                         size="small"
-                        label="Alt Text"
+                        label={t('altTextLabel')}
                         value={asset.altText || ''}
                         onChange={(e) => {
                           const newAssets = [...editedAssets];
@@ -334,7 +337,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                       />
                       <TextField
                         size="small"
-                        label="URL"
+                        label={t('urlLabel')}
                         value={asset.url}
                         onChange={(e) => {
                           const newAssets = [...editedAssets];
@@ -351,7 +354,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                     </Stack>
                   ))}
                   <Button startIcon={<AddIcon />} onClick={() => setEditedAssets([...editedAssets, { altText: 'Logo', url: '', type: 'LOGO' }])}>
-                    Add Asset
+                    {t('addAsset')}
                   </Button>
                 </Stack>
               ) : (
@@ -384,14 +387,14 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                           <AssetsIcon color="action" />
                         </Box>
                         <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                          <Tooltip title={asset.altText || 'Brand Asset'}>
-                            <Typography variant="subtitle2" fontWeight="700" noWrap>{asset.altText || 'Brand Asset'}</Typography>
+                          <Tooltip title={asset.altText || t('brandAsset')}>
+                            <Typography variant="subtitle2" fontWeight="700" noWrap>{asset.altText || t('brandAsset')}</Typography>
                           </Tooltip>
                           <Typography variant="caption" color="text.secondary">{asset.type}</Typography>
                         </Box>
                       </Stack>
                       <Stack direction="row" spacing={0.5}>
-                        <Tooltip title="View">
+                        <Tooltip title={t('view')}>
                           <IconButton
                             size="small"
                             component="a"
@@ -402,7 +405,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                             <ViewIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Copy URL">
+                        <Tooltip title={t('copyUrl')}>
                           <IconButton size="small" onClick={() => onCopy(asset.url)}>
                             <CopyIcon fontSize="small" />
                           </IconButton>
@@ -410,7 +413,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                       </Stack>
                     </Paper>
                   )) : (
-                    <Typography color="text.secondary">No assets found.</Typography>
+                    <Typography color="text.secondary">{t('noAssets')}</Typography>
                   )}
                 </Stack>
               )}
@@ -420,14 +423,14 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
           {/* Typography Card */}
           <Card variant="outlined" sx={{ borderRadius: 3 }}>
             <CardContent sx={{ p: 3 }}>
-              {renderSectionHeader('Typography', 'fonts', handleSaveFonts, handleCancelFonts)}
+              {renderSectionHeader(t('typographyTitle'), 'fonts', handleSaveFonts, handleCancelFonts)}
               {editingSection === 'fonts' ? (
                 <Stack spacing={2}>
                   {editedFonts.map((font, index) => (
                     <Stack key={index} spacing={1} sx={{ p: 2, border: '1px solid divider', borderRadius: 2 }}>
                       <TextField
                         size="small"
-                        label="Font Family"
+                        label={t('fontFamilyLabel')}
                         value={font.family}
                         onChange={(e) => {
                           const newFonts = [...editedFonts];
@@ -438,7 +441,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                       />
                       <TextField
                         size="small"
-                        label="Usage"
+                        label={t('usageLabel')}
                         value={font.usage}
                         onChange={(e) => {
                           const newFonts = [...editedFonts];
@@ -455,7 +458,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                     </Stack>
                   ))}
                   <Button startIcon={<AddIcon />} onClick={() => setEditedFonts([...editedFonts, { family: '', usage: '' }])}>
-                    Add Font
+                    {t('addFont')}
                   </Button>
                 </Stack>
               ) : (
@@ -478,7 +481,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                       <Divider />
                     </Box>
                   )) : (
-                    <Typography color="text.secondary">No fonts extracted.</Typography>
+                    <Typography color="text.secondary">{t('noFonts')}</Typography>
                   )}
                 </Stack>
               )}
@@ -488,7 +491,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
           {/* Social Links Card */}
           <Card variant="outlined" sx={{ borderRadius: 3 }}>
             <CardContent sx={{ p: 3 }}>
-              <Typography variant="h6" fontWeight="700" gutterBottom>Social Presence</Typography>
+              <Typography variant="h6" fontWeight="700" gutterBottom>{t('socialTitle')}</Typography>
               <Grid container spacing={1.5} sx={{ mt: 1 }}>
                 {profile.socialLinks && profile.socialLinks.length > 0 ? profile.socialLinks.map((link, index) => (
                   <Grid size={{ xs: 12 }} key={index}>
@@ -526,7 +529,7 @@ const BrandIdentityTab: React.FC<BrandIdentityTabProps> = ({
                   </Grid>
                 )) : (
                   <Grid size={{ xs: 12 }}>
-                    <Typography color="text.secondary">No social links found.</Typography>
+                    <Typography color="text.secondary">{t('noSocial')}</Typography>
                   </Grid>
                 )}
               </Grid>

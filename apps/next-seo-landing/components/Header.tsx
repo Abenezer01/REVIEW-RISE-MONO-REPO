@@ -1,8 +1,11 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import ThemeToggle from './ThemeToggle';
 
 export default function Header() {
+  const t = useTranslations('landing');
+
   return (
     <header className="header">
       <div className="container">
@@ -10,13 +13,13 @@ export default function Header() {
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2L2 19.5h20L12 2z" />
           </svg>
-          <span>ReviewRise</span>
+          <span>{t('common.brandName')}</span>
         </div>
         <nav className="nav">
-          <a href="#features">Features</a>
-          <a href="#how-it-works">How it Works</a>
+          <a href="#features">{t('header.features')}</a>
+          <a href="#how-it-works">{t('howItWorks.title')}</a>
           <ThemeToggle />
-          <a href="https://app.reviewrise.com" className="cta-button">Sign In →</a>
+          <a href="https://app.reviewrise.com" className="cta-button">{t('footer.login')} {'→'}</a>
         </nav>
       </div>
       <style jsx>{`

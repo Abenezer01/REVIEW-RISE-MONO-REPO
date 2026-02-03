@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import {
     Box,
     Button,
@@ -27,6 +28,7 @@ interface ConnectionCardProps {
 }
 
 export const ConnectionCard = ({ connection, onRefresh, onDisconnect }: ConnectionCardProps) => {
+    const t = useTranslations('social.connections.card');
     const theme = useTheme();
 
     // Mock Data generators - In real app, these should be props or fetched
@@ -60,7 +62,7 @@ export const ConnectionCard = ({ connection, onRefresh, onDisconnect }: Connecti
                         <Stack direction="row" alignItems="center" spacing={2} mb={0.5}>
                             <Typography variant="h6" fontWeight={600}>{connection.pageName}</Typography>
                             <Chip
-                                label={isError ? "Token Expired" : "Active"}
+                                label={isError ? t('tokenExpired') : t('active')}
                                 color={isError ? "error" : "success"}
                                 size="small"
                                 variant={isError ? "filled" : "tonal"}
@@ -69,23 +71,23 @@ export const ConnectionCard = ({ connection, onRefresh, onDisconnect }: Connecti
                             />
                         </Stack>
                         <Typography variant="caption" color="text.secondary" display="block">
-                            {connection.platform === 'instagram' ? 'Instagram Business' : connection.platform === 'linkedin' ? 'LinkedIn Page' : 'Facebook Page'} • ID: {connection.pageId}
+                            {t(`platformLabels.${connection.platform as keyof typeof t.raw}`)} • { 'ID:' } {connection.pageId}
                         </Typography>
 
                         <Stack direction="row" spacing={3} mt={2}>
                             <Box display="flex" alignItems="center" gap={1}>
                                 <i className="tabler-calendar" style={{ fontSize: 16, opacity: 0.6 }} />
-                                <Typography variant="caption" color="text.secondary">Connected {daysConnected} days ago</Typography>
+                                <Typography variant="caption" color="text.secondary">{t('connectedDaysAgo', { days: daysConnected })}</Typography>
                             </Box>
                             <Box display="flex" alignItems="center" gap={1}>
                                 <i className="tabler-clock" style={{ fontSize: 16, opacity: 0.6 }} />
-                                <Typography variant="caption" color="text.secondary">Last synced {hoursSynced} hours ago</Typography>
+                                <Typography variant="caption" color="text.secondary">{t('lastSyncedHoursAgo', { hours: hoursSynced })}</Typography>
                             </Box>
                         </Stack>
 
                         {isError && (
                             <Alert severity="error" icon={<WarningIcon />} sx={{ mt: 2, bgcolor: alpha(theme.palette.error.main, 0.1) }}>
-                                Access token expired. Reconnect to restore functionality.
+                                {t('accessTokenExpired')}
                             </Alert>
                         )}
                     </Box>
@@ -93,11 +95,11 @@ export const ConnectionCard = ({ connection, onRefresh, onDisconnect }: Connecti
                     {/* Stats */}
                     <Stack direction="row" spacing={4} sx={{ width: { xs: '100%', sm: 'auto' }, justifyContent: 'space-between' }}>
                         <Box textAlign="center">
-                            <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>FOLLOWERS</Typography>
+                            <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>{t('followers')}</Typography>
                             <Typography variant="h6" fontWeight={700}>{followers.toLocaleString()}</Typography>
                         </Box>
                         <Box textAlign="center">
-                            <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>POSTS</Typography>
+                            <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>{t('posts')}</Typography>
                             <Typography variant="h6" fontWeight={700}>{posts.toLocaleString()}</Typography>
                         </Box>
                     </Stack>
@@ -106,15 +108,15 @@ export const ConnectionCard = ({ connection, onRefresh, onDisconnect }: Connecti
                     <Stack direction="row" spacing={1}>
                         {isError ? (
                             <Button variant="contained" color="warning" startIcon={<RefreshIcon />} onClick={onRefresh}>
-                                Reconnect
+                                {t('reconnect')}
                             </Button>
                         ) : (
                             <Button variant="outlined" color="secondary" startIcon={<RefreshIcon />} onClick={onRefresh}>
-                                Refresh
+                                {t('refresh')}
                             </Button>
                         )}
                         <Button variant="outlined" color="error" onClick={onDisconnect}>
-                            {isError ? "Remove" : "Disconnect"}
+                            {isError ? t('remove') : t('disconnect')}
                         </Button>
                     </Stack>
                 </Stack>

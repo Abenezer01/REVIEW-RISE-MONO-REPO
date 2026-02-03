@@ -13,9 +13,10 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 import { SystemMessageCode } from '@platform/contracts'
 import { useTranslations } from 'next-intl'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import { useBusinessId } from '@/hooks/useBusinessId'
 import { SERVICES } from '@/configs/services'
@@ -27,11 +28,12 @@ import ToneSelector from './selectors/ToneSelector'
 import ResultCard from './captions/ResultCard'
 import ProTips from './captions/ProTips'
 
-const CTA_OPTIONS = ['Shop Now', 'Learn More', 'Sign Up', 'Get Started', 'No CTA']
+const CTA_OPTIONS = ['shopNow', 'learnMore', 'signUp', 'getStarted', 'none']
 
 export default function CaptionGenerator() {
   const { notify } = useSystemMessages()
   const t = useTranslations('studio.captions')
+  const tc = useTranslations('common')
   const [loading, setLoading] = useState(false)
   
   // State
@@ -183,10 +185,10 @@ return 'Older'
 
   // Group history by date categories
   const groupedHistory = history.reduce((acc, draft) => {
-    const category = getCategoryFromDate(new Date(draft.createdAt))
+    const categoryKey = getCategoryFromDate(new Date(draft.createdAt))
 
-    if (!acc[category]) acc[category] = []
-    acc[category].push(draft)
+    if (!acc[categoryKey]) acc[categoryKey] = []
+    acc[categoryKey].push(draft)
     
 return acc
   }, {} as Record<string, any[]>)
@@ -200,7 +202,7 @@ return acc
                 {/* 1. Caption Details */}
                 <Card variant="outlined" sx={{ borderRadius: 2 }}>
                     <CardContent sx={{ p: 3 }}>
-                        <Typography variant="h6" fontWeight="bold" mb={3}>Caption Details</Typography>
+                        <Typography variant="h6" fontWeight="bold" mb={3}>{t('detailsTitle')}</Typography>
                         
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                             <PlatformSelector value={platform} onChange={setPlatform} />
@@ -208,7 +210,7 @@ return acc
                             <Box>
                                 <Typography variant="body2" fontWeight="bold" mb={1}>{t('productLabel')}</Typography>
                                 <TextField
-                                    placeholder="e.g., Eco-friendly water bottles for active lifestyles"
+                                    placeholder={t('productPlaceholder')}
                                     value={productDescription}
                                     onChange={(e) => setProductDescription(e.target.value)}
                                     fullWidth
@@ -237,7 +239,7 @@ return acc
                 {/* 2. Caption Style */}
                 <Card variant="outlined" sx={{ borderRadius: 2 }}>
                     <CardContent sx={{ p: 3 }}>
-                        <Typography variant="h6" fontWeight="bold" mb={3}>Caption Style</Typography>
+                        <Typography variant="h6" fontWeight="bold" mb={3}>{t('styleTitle')}</Typography>
                         
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                             <ToneSelector value={tone} onChange={setTone} />
@@ -248,7 +250,7 @@ return acc
                                     {CTA_OPTIONS.map((option) => (
                                         <Chip 
                                             key={option} 
-                                            label={option} 
+                                            label={t(`ctaOptions.${option}`)}
                                             onClick={() => setCta(option)}
                                             variant={cta === option ? 'filled' : 'outlined'}
                                             color={cta === option ? 'primary' : 'default'}
@@ -290,14 +292,14 @@ return acc
                         onClick={() => setShowHistory(false)}
                         size="small"
                     >
-                        Generated ({results.length})
+                        {t('generatedLabel', { count: results.length })}
                     </Button>
                     <Button 
                         variant={showHistory ? 'contained' : 'outlined'} 
                         onClick={() => setShowHistory(true)}
                         size="small"
                     >
-                        History ({history.length})
+                        {t('historyLabel', { count: history.length })}
                     </Button>
                 </Box>
                 {/* Conditional Content: Results or History */}
@@ -306,7 +308,7 @@ return acc
                         {/* Results Header */}
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Typography variant="h6" fontWeight="bold">Generated Captions</Typography>
+                                <Typography variant="h6" fontWeight="bold">{t('resultsTitle')}</Typography>
                                 {results.length > 0 && (
                                     <Typography variant="caption" color="text.secondary">{t('variations')}</Typography>
                                 )}
@@ -336,23 +338,23 @@ return acc
                 ) : (
                     <>
                         {/* History Header */}
-                        <Typography variant="h6" fontWeight="bold">Generation History</Typography>
+                        <Typography variant="h6" fontWeight="bold">{t('historyTitle')}</Typography>
 
                         {/* History List */}
                         {history.length === 0 ? (
                             <Box sx={{ p: 6, textAlign: 'center', color: 'text.secondary', border: '1px dashed', borderColor: 'divider', borderRadius: 2 }}>
                                 <i className="tabler-clock" style={{ fontSize: 32, opacity: 0.5, marginBottom: 8 }} />
-                                <Typography>No generation history yet</Typography>
+                                <Typography>{t('historyEmpty')}</Typography>
                             </Box>
                         ) : (
                             <>
-                                {['Today', 'Yesterday', 'This Week', 'Older'].map(category => (
-                                    groupedHistory[category] && groupedHistory[category].length > 0 && (
-                                        <Box key={category}>
+                                {['Today', 'Yesterday', 'This Week', 'Older'].map(categoryKey => (
+                                    groupedHistory[categoryKey] && groupedHistory[categoryKey].length > 0 && (
+                                        <Box key={categoryKey}>
                                             <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2, color: 'text.secondary' }}>
-                                                {category}
+                                                {tc(`dates.${categoryKey.toLowerCase().replace(' ', '') === 'thisweek' ? 'thisWeek' : categoryKey.toLowerCase()}`)}
                                             </Typography>
-                                            {groupedHistory[category].map((draft: any) => (
+                                            {groupedHistory[categoryKey].map((draft: any) => (
                                                 <Card key={draft.id} variant="outlined" sx={{ borderRadius: 2, mb: 2 }}>
                                                     <CardContent sx={{ p: 2 }}>
                                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 1 }}>
@@ -385,7 +387,7 @@ return acc
                                     disabled={loadingHistory}
                                     startIcon={loadingHistory ? <CircularProgress size={16} /> : <i className="tabler-chevron-down" />}
                                 >
-                                    {loadingHistory ? 'Loading...' : 'Load More'}
+                                    {loadingHistory ? tc('common.loading') : tc('common.loadMore')}
                                 </Button>
                             </Box>
                         )}
