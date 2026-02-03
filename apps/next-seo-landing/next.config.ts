@@ -1,3 +1,9 @@
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin(
+  './i18n/request.ts'
+);
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Standalone output disabled for local development to avoid Windows symlink permission errors
@@ -16,4 +22,4 @@ const nextConfig = {
   serverExternalPackages: ['@prisma/client', '@prisma/client-runtime-utils']
 }
 
-export default nextConfig
+export default withNextIntl(nextConfig)

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useTranslations } from 'next-intl';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
 import { useLocationFilter } from '@/hooks/useLocationFilter';
@@ -10,7 +9,6 @@ import { BrandService } from '@/services/brand.service';
 import type { Competitor } from '@/components/brand-rise/competitors/CompetitorCard';
 
 export const useCompetitors = () => {
-  const t = useTranslations('dashboard');
   const { businessId } = useBusinessId();
   const { locationId } = useLocationFilter();
   const queryClient = useQueryClient();

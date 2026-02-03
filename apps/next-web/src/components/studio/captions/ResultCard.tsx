@@ -4,6 +4,7 @@ import React from 'react'
 
 import { Box, Typography, Card, CardContent, IconButton, Button } from '@mui/material'
 import { toast } from 'react-toastify'
+import { useTranslations } from 'next-intl'
 
 interface ResultCardProps {
     index: number
@@ -12,9 +13,12 @@ interface ResultCardProps {
 }
 
 export default function ResultCard({ index, text, onSave }: ResultCardProps) {
+    const t = useTranslations('studio')
+    const tc = useTranslations('common.common')
+
     const copyToClipboard = () => {
         navigator.clipboard.writeText(text)
-        toast.success('Copied to clipboard')
+        toast.success(tc('success'))
     }
 
     const charCount = text.length
@@ -57,7 +61,7 @@ export default function ResultCard({ index, text, onSave }: ResultCardProps) {
                                  startIcon={<i className="tabler-device-floppy" />}
                                  sx={{ ml: 1 }}
                              >
-                                 Save
+                                 {tc('save')}
                              </Button>
                          </Box>
                         <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, color: 'text.primary' }}>
@@ -67,11 +71,11 @@ export default function ResultCard({ index, text, onSave }: ResultCardProps) {
                         <Box sx={{ display: 'flex', gap: 3, mt: 3 }}>
                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
                                 <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>Aa</Typography>
-                                <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>{charCount} characters</Typography>
+                                <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>{charCount} {t('captions.characters').toLowerCase()}</Typography>
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
                                 <i className="tabler-mood-smile" style={{ fontSize: 12 }} />
-                                <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>{emojiCount} emojis</Typography>
+                                <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>{emojiCount} {t('captions.emojis').toLowerCase()}</Typography>
                             </Box>
                         </Box>
                     </Box>

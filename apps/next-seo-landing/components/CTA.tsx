@@ -1,15 +1,19 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 export default function CTA() {
+  const t = useTranslations('landing.cta');
+
   return (
     <section className="cta">
       <div className="container">
-        <h2 className="title">Ready to improve your SEO?</h2>
+        <h2 className="title">{t('title')}</h2>
         <p className="subtitle">
-          Join thousands of websites getting better rankings
+          {t('subtitle')}
         </p>
         <a href="#" className="cta-button">
-          Get Started →
+          {t('button')} {'→'}
         </a>
       </div>
 

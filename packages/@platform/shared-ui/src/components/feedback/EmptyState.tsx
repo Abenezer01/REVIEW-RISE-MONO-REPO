@@ -11,7 +11,7 @@ interface EmptyStateProps {
     description?: string;
 }
 
-const EmptyState = ({ title = 'No Data Found', description = 'There is no data available to display.' }: EmptyStateProps) => {
+const EmptyState = ({ title, description }: EmptyStateProps) => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 5, textAlign: 'center' }}>
             <Typography variant="h6" gutterBottom>

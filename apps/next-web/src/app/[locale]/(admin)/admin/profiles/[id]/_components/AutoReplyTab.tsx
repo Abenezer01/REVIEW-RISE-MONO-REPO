@@ -27,8 +27,12 @@ import {
   Security as SecurityIcon,
   Save as SaveIcon
 } from '@mui/icons-material';
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
+
+import { useTranslations } from 'next-intl';
+
 import { SystemMessageCode } from '@platform/contracts';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 
 import type { BrandProfile } from '@/services/brand-profile.service';
 
@@ -39,7 +43,9 @@ interface AutoReplyTabProps {
 }
 
 const AutoReplyTab: React.FC<AutoReplyTabProps> = ({ profile, onUpdate, isUpdating }) => {
+  const t = useTranslations('dashboard');
   const { notify } = useSystemMessages();
+
   const [settings, setSettings] = useState(profile.autoReplySettings || {
     enabled: false,
     mode: 'positive', // 'positive' | 'positive_neutral'
@@ -98,9 +104,9 @@ const AutoReplyTab: React.FC<AutoReplyTabProps> = ({ profile, onUpdate, isUpdati
                       <RobotIcon />
                     </Box>
                     <Box>
-                      <Typography variant="h6" fontWeight="700">Auto-Reply System</Typography>
+                      <Typography variant="h6" fontWeight="700">{t('autoReply.title')}</Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Enable or disable automated AI responses to your reviews.
+                        {t('autoReply.description')}
                       </Typography>
                     </Box>
                   </Stack>
@@ -121,21 +127,21 @@ const AutoReplyTab: React.FC<AutoReplyTabProps> = ({ profile, onUpdate, isUpdati
                     <Stack spacing={3}>
                       <Stack direction="row" spacing={1} alignItems="center">
                         <SettingsIcon fontSize="small" color="primary" />
-                        <Typography variant="subtitle1" fontWeight="700">Reply Rules</Typography>
+                        <Typography variant="subtitle1" fontWeight="700">{t('autoReply.responseRules')}</Typography>
                       </Stack>
                       
                       <Box>
-                        <Typography variant="body2" fontWeight="600" sx={{ mb: 1 }}>Which reviews should we auto-reply to?</Typography>
+                        <Typography variant="body2" fontWeight="600" sx={{ mb: 1 }}>{t('autoReply.rulesSubtitle')}</Typography>
                         <RadioGroup value={settings.mode} onChange={handleChangeMode}>
                           <FormControlLabel 
                             value="positive" 
                             control={<Radio size="small" />} 
-                            label={<Typography variant="body2">Positive only (4 & 5 stars)</Typography>} 
+                            label={<Typography variant="body2">{t('autoReply.positiveOnly')}</Typography>}
                           />
                           <FormControlLabel 
                             value="positive_neutral" 
                             control={<Radio size="small" />} 
-                            label={<Typography variant="body2">Positive + Neutral (3, 4 & 5 stars)</Typography>} 
+                            label={<Typography variant="body2">{t('autoReply.positiveNeutral')}</Typography>}
                           />
                         </RadioGroup>
                       </Box>
@@ -145,9 +151,9 @@ const AutoReplyTab: React.FC<AutoReplyTabProps> = ({ profile, onUpdate, isUpdati
                       <Box>
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                           <Box>
-                            <Typography variant="body2" fontWeight="600">Manual approval for negative reviews</Typography>
+                            <Typography variant="body2" fontWeight="600">{t('autoReply.negativeSafeguard')}</Typography>
                             <Typography variant="body2" color="text.secondary">
-                              Always hold 1 & 2 star reviews for your review.
+                              {t('autoReply.negativeSafeguardDesc')}
                             </Typography>
                           </Box>
                           <Switch 
@@ -167,15 +173,15 @@ const AutoReplyTab: React.FC<AutoReplyTabProps> = ({ profile, onUpdate, isUpdati
                     <Stack spacing={4}>
                       <Stack direction="row" spacing={1} alignItems="center">
                         <TimerIcon fontSize="small" color="primary" />
-                        <Typography variant="subtitle1" fontWeight="700">Timing & Limits</Typography>
+                        <Typography variant="subtitle1" fontWeight="700">{t('autoReply.timingDelivery')}</Typography>
                       </Stack>
 
                       <Box sx={{ px: 1 }}>
                         <Typography variant="body2" fontWeight="600" gutterBottom>
-                          Reply Delay: {settings.delayHours} {settings.delayHours === 1 ? 'hour' : 'hours'}
+                          {t('autoReply.replyDelay')}: {settings.delayHours} {settings.delayHours === 1 ? t('autoReply.hour') : t('autoReply.hours')}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                          Wait time before posting the automated reply to make it look natural.
+                          {t('autoReply.delayDesc')}
                         </Typography>
                         <Slider
                           value={settings.delayHours}
@@ -183,7 +189,7 @@ const AutoReplyTab: React.FC<AutoReplyTabProps> = ({ profile, onUpdate, isUpdati
                           max={24}
                           step={1}
                           marks={[
-                            { value: 0, label: 'Instant' },
+                            { value: 0, label: t('autoReply.instant') },
                             { value: 12, label: '12h' },
                             { value: 24, label: '24h' }
                           ]}
@@ -197,14 +203,14 @@ const AutoReplyTab: React.FC<AutoReplyTabProps> = ({ profile, onUpdate, isUpdati
                       <Box>
                         <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
                           <SecurityIcon fontSize="small" color="primary" />
-                          <Typography variant="subtitle1" fontWeight="700">Safety Safeguards</Typography>
+                          <Typography variant="subtitle1" fontWeight="700">{t('autoReply.securitySafeguards')}</Typography>
                         </Stack>
                         
                         <Grid container spacing={2} alignItems="center">
                           <Grid size={{ xs: 12, sm: 8 }}>
-                            <Typography variant="body2" fontWeight="600">Max auto-replies per day</Typography>
+                            <Typography variant="body2" fontWeight="600">{t('autoReply.dailyLimit')}</Typography>
                             <Typography variant="body2" color="text.secondary">
-                              Limit the number of automated replies across all locations.
+                              {t('autoReply.limitDesc')}
                             </Typography>
                           </Grid>
                           <Grid size={{ xs: 12, sm: 4 }}>
@@ -233,7 +239,7 @@ const AutoReplyTab: React.FC<AutoReplyTabProps> = ({ profile, onUpdate, isUpdati
                 disabled={isUpdating}
                 sx={{ px: 4, py: 1.5, borderRadius: 2 }}
               >
-                Save Settings
+                {t('autoReply.saveSettings')}
               </Button>
             </Box>
           </Stack>
@@ -243,20 +249,20 @@ const AutoReplyTab: React.FC<AutoReplyTabProps> = ({ profile, onUpdate, isUpdati
           <Card variant="outlined" sx={{ bgcolor: (theme) => alpha(theme.palette.info.main, 0.02) }}>
             <CardContent>
               <Typography variant="subtitle2" fontWeight="700" color="info.main" gutterBottom>
-                How Auto-Reply Works
+                {t('autoReply.quickGuide')}
               </Typography>
               <Stack spacing={2}>
                 <Typography variant="body2">
-                  1. New reviews are detected and analyzed for sentiment.
+                  {t('autoReply.steps.sentiment.desc')}
                 </Typography>
                 <Typography variant="body2">
-                  2. If the review matches your rules, an AI reply is generated using your <strong>Brand Voice</strong> and <strong>Tone</strong>.
+                  {t('autoReply.steps.ai.desc')}
                 </Typography>
                 <Typography variant="body2">
-                  3. After the configured delay, the reply is either posted automatically or sent to your <strong>Pending Queue</strong>.
+                  {t('autoReply.steps.delay.desc')}
                 </Typography>
                 <Typography variant="body2">
-                  4. Negative reviews are always held for approval if that setting is enabled.
+                  {t('autoReply.steps.manual.desc')}
                 </Typography>
               </Stack>
             </CardContent>

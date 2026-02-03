@@ -102,6 +102,14 @@ module.exports = {
         pathGroupsExcludedImportTypes: ['react', 'type'],
         'newlines-between': 'always-and-inside-groups'
       }
+    ],
+    'react/jsx-no-literals': [
+      'error',
+      {
+        noStrings: true,
+        ignoreProps: true,
+        allowedStrings: ['%', '✓', '•', 'N/A', '|', '™', '—', ':', '(', ')', '/', '+', '-', '*', '#', '.', ',', ' ', '!']
+      }
     ]
   },
   settings: {

@@ -16,6 +16,7 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 import { Collapse } from '@mui/material';
+import { useTranslations } from 'next-intl';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
 import type { BrandRecommendation} from '@/services/brand.service';
@@ -34,6 +35,8 @@ interface ExtendedRecommendation extends BrandRecommendation {
 }
 
 const RecommendationsPage = () => {
+    const t = useTranslations('dashboard');
+    const tc = useTranslations('common');
     const { businessId, loading: businessLoading } = useBusinessId();
     const theme = useTheme();
 
@@ -136,9 +139,9 @@ return;
             {/* Header */}
             <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
-                    <Typography variant="h4" fontWeight="bold">AI Recommendations</Typography>
+                    <Typography variant="h4" fontWeight="bold">{t('brandRise.tabs.recommendations')}</Typography>
                     <Typography variant="body1" color="text.secondary">
-                        {recommendations.length} actionable recommendations prioritized by impact
+                        {t('brandRise.recommendations.actionableCount', { count: recommendations.length })}
                     </Typography>
                 </Box>
                 <Stack direction="row" spacing={2}>
@@ -147,7 +150,7 @@ return;
                         startIcon={<Icon icon="tabler-download" fontSize={20} />}
                         sx={{ color: 'text.secondary', borderColor: 'divider' }}
                     >
-                        Export CSV
+                        {tc('common.export')}
                     </Button>
                     <Button
                         variant="contained"
@@ -160,7 +163,7 @@ return;
                             boxShadow: '0px 4px 12px rgba(255, 107, 107, 0.4)'
                         }}
                     >
-                        {generating ? 'Analyzing...' : 'Generate New'}
+                        {generating ? tc('common.loading') : t('brandRise.recommendations.generateNew')}
                     </Button>
                 </Stack>
             </Stack>
@@ -191,23 +194,23 @@ return;
                     >
                         <ToggleButton value="all">
                             <Box component="span" sx={{ bgcolor: alpha(theme.palette.warning.main, 0.2), color: theme.palette.warning.main, px: 0.8, borderRadius: 0.5, mr: 1, fontSize: '0.75rem' }}>{counts.all}</Box>
-                            All
+                            {tc('common.all')}
                         </ToggleButton>
                         <ToggleButton value="high_impact">
                             <Box component="span" sx={{ bgcolor: alpha(theme.palette.error.main, 0.1), color: theme.palette.error.main, px: 0.8, borderRadius: 0.5, mr: 1, fontSize: '0.75rem' }}>{counts.highImpact}</Box>
-                            High Impact
+                            {t('aiVisibility.tips.impact.High')}
                         </ToggleButton>
                         <ToggleButton value="open">
                             <Box component="span" sx={{ bgcolor: 'action.selected', color: 'text.secondary', px: 0.8, borderRadius: 0.5, mr: 1, fontSize: '0.75rem' }}>{counts.open}</Box>
-                            Open
+                            {t('status.pending')}
                         </ToggleButton>
                         <ToggleButton value="in_progress">
                             <Box component="span" sx={{ bgcolor: alpha(theme.palette.warning.main, 0.1), color: theme.palette.warning.main, px: 0.8, borderRadius: 0.5, mr: 1, fontSize: '0.75rem' }}>{counts.inProgress}</Box>
-                            In Progress
+                            {t('status.processing')}
                         </ToggleButton>
                         <ToggleButton value="completed">
                             <Box component="span" sx={{ bgcolor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.main, px: 0.8, borderRadius: 0.5, mr: 1, fontSize: '0.75rem' }}>{counts.done}</Box>
-                            Done
+                            {t('status.completed')}
                         </ToggleButton>
                     </ToggleButtonGroup>
 
@@ -218,7 +221,7 @@ return;
                         onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
                         sx={{ color: 'text.secondary' }}
                     >
-                        Sort: Priority Score
+                        {t('brandRise.recommendations.sortPriority')}
                     </Button>
                 </Stack>
             </Card>
@@ -230,7 +233,7 @@ return;
                 </Box>
             ) : filteredRecommendations.length === 0 ? (
                 <Card sx={{ p: 5, textAlign: 'center' }}>
-                    <Typography variant="h6" color="text.secondary">No recommendations found matching filter.</Typography>
+                    <Typography variant="h6" color="text.secondary">{t('brandRise.recommendations.noFound')}</Typography>
                 </Card>
             ) : (
                 <Stack spacing={3}>
@@ -251,6 +254,8 @@ return;
 
 
 const RecommendationCard = ({ rec, theme, onUpdateStatus }: { rec: ExtendedRecommendation, theme: any, onUpdateStatus: (id: string, status: string) => void }) => {
+    const t = useTranslations('dashboard');
+    const tc = useTranslations('common');
     const isHighPriority = rec.priorityScore > 80;
     const [expanded, setExpanded] = useState(false);
 
@@ -289,8 +294,8 @@ const RecommendationCard = ({ rec, theme, onUpdateStatus }: { rec: ExtendedRecom
                     </Stack>
                     <Stack direction="row" alignItems="center" spacing={2}>
                         <Chip 
-                            label={rec.status === 'in_progress' ? 'In Progress' : 'Open'}
-                            color={rec.status === 'in_progress' ? 'warning' : 'primary'}
+                            label={rec.status === 'in_progress' ? t('status.processing') : rec.status === 'completed' ? t('status.completed') : t('status.pending')}
+                            color={rec.status === 'in_progress' ? 'warning' : rec.status === 'completed' ? 'success' : 'primary'}
                             variant={rec.status === 'open' ? 'outlined' : 'filled'}
                             size="small" 
                         />
@@ -320,33 +325,33 @@ const RecommendationCard = ({ rec, theme, onUpdateStatus }: { rec: ExtendedRecom
                 {/* Metrics Grid */}
                 <Grid container spacing={4} sx={{ mb: 4 }}>
                     <Grid size={{ xs: 6, md: 3 }}>
-                        <Typography variant="caption" display="block" color="text.secondary" gutterBottom>IMPACT</Typography>
+                        <Typography variant="caption" display="block" color="text.secondary" gutterBottom>{t('landing.results.impact')}</Typography>
                         <Typography variant="h6" fontWeight="bold" sx={{ color: rec.impact === 'high' ? 'white' : 'text.primary' }}>
-                            {rec.impact.charAt(0).toUpperCase() + rec.impact.slice(1)}
+                            {t(`aiVisibility.tips.impact.${rec.impact.charAt(0).toUpperCase() + rec.impact.slice(1)}` as any)}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">Priority Score: {rec.priorityScore}</Typography>
+                        <Typography variant="caption" color="text.secondary">{t('brandRise.recommendations.priorityScore', { score: rec.priorityScore })}</Typography>
                     </Grid>
                     <Grid size={{ xs: 6, md: 3 }}>
-                        <Typography variant="caption" display="block" color="text.secondary" gutterBottom>EFFORT</Typography>
-                        <Typography variant="h6" fontWeight="bold">{rec.effort.charAt(0).toUpperCase() + rec.effort.slice(1)}</Typography>
+                        <Typography variant="caption" display="block" color="text.secondary" gutterBottom>{t('brandRise.recommendations.effort')}</Typography>
+                        <Typography variant="h6" fontWeight="bold">{t(`aiVisibility.tips.impact.${rec.effort.charAt(0).toUpperCase() + rec.effort.slice(1)}` as any)}</Typography>
                         <Typography variant="caption" color="text.secondary">{rec.timeEstimate}</Typography>
                     </Grid>
                     <Grid size={{ xs: 6, md: 3 }}>
-                        <Typography variant="caption" display="block" color="text.secondary" gutterBottom>TARGET KPI</Typography>
+                        <Typography variant="caption" display="block" color="text.secondary" gutterBottom>{t('brandRise.recommendations.targetKPI')}</Typography>
                         <Typography variant="h6" fontWeight="bold">{rec.targetKPI}</Typography>
                         <Typography variant="caption" color="text.secondary">{rec.targetMetric}</Typography>
                     </Grid>
                     <Grid size={{ xs: 6, md: 3 }}>
-                        <Typography variant="caption" display="block" color="text.secondary" gutterBottom>CATEGORY</Typography>
-                        <Typography variant="h6" fontWeight="bold">{rec.category === 'local' ? 'Local SEO' : 'Reputation'}</Typography>
-                        <Typography variant="caption" color="text.secondary">Optimization</Typography>
+                        <Typography variant="caption" display="block" color="text.secondary" gutterBottom>{t('landing.results.categories.technical.label')}</Typography>
+                        <Typography variant="h6" fontWeight="bold">{rec.category === 'local' ? t('brandRise.recommendations.localSEO') : t('brandRise.recommendations.reputation')}</Typography>
+                        <Typography variant="caption" color="text.secondary">{t('brandRise.recommendations.optimization')}</Typography>
                     </Grid>
                 </Grid>
 
                 {/* Why This Matters */}
                <Collapse in={expanded}>
                     <Box sx={{ mb: 4, bgcolor: alpha(theme.palette.background.default, 0.5), p: 2, borderRadius: 1 }}>
-                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>Why This Matters:</Typography>
+                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>{t('brandRise.recommendations.whyTitle')}:</Typography>
                         {rec.why.map((reason, idx) => (
                             <Typography key={idx} variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                                 <Box component="span" sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: 'warning.main' }} />
@@ -355,10 +360,10 @@ const RecommendationCard = ({ rec, theme, onUpdateStatus }: { rec: ExtendedRecom
                         ))}
                         
                         <Box sx={{ mt: 2 }}>
-                             <Typography variant="subtitle2" fontWeight="bold" gutterBottom>Action Steps:</Typography>
+                             <Typography variant="subtitle2" fontWeight="bold" gutterBottom>{t('brandRise.recommendations.actionSteps')}:</Typography>
                              <Stack spacing={0.5}>
                                 {rec.steps.map((step, idx) => (
-                                    <Typography key={idx} variant="body2" color="text.secondary">• {step}</Typography>
+                                    <Typography key={idx} variant="body2" color="text.secondary">{'•'} {step}</Typography>
                                 ))}
                              </Stack>
                         </Box>
@@ -375,7 +380,7 @@ const RecommendationCard = ({ rec, theme, onUpdateStatus }: { rec: ExtendedRecom
                                 onClick={() => onUpdateStatus(rec.id, 'in_progress')}
                                 startIcon={<Icon icon="tabler-player-play" fontSize={18} />}
                             >
-                                Start Task
+                                {t('brandRise.recommendations.startTask')}
                             </Button>
                         ) : rec.status === 'in_progress' ? (
                             <Button 
@@ -384,7 +389,7 @@ const RecommendationCard = ({ rec, theme, onUpdateStatus }: { rec: ExtendedRecom
                                 onClick={() => onUpdateStatus(rec.id, 'completed')}
                                 startIcon={<Icon icon="tabler-check" fontSize={18} />}
                             >
-                                Mark Complete
+                                {t('brandRise.recommendations.markComplete')}
                             </Button>
                         ) : null}
 
@@ -395,23 +400,23 @@ const RecommendationCard = ({ rec, theme, onUpdateStatus }: { rec: ExtendedRecom
                             sx={{ borderColor: 'divider' }}
                             endIcon={<Icon icon={expanded ? "tabler-chevron-up" : "tabler-chevron-down"} fontSize={16} />}
                         >
-                            {expanded ? 'Hide Steps' : `View Steps (${rec.steps.length})`}
+                            {expanded ? t('brandRise.recommendations.hideSteps') : t('brandRise.recommendations.viewStepsCount', { count: rec.steps.length })}
                         </Button>
                         <Button 
                             variant="outlined" 
                             color="error" 
                             sx={{ borderColor: alpha(theme.palette.error.main, 0.2), color: theme.palette.error.main }}
                         >
-                            Dismiss
+                            {tc('common.delete')}
                         </Button>
                     </Stack>
 
                     <Stack direction="row" spacing={2} alignItems="center">
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <Icon icon="tabler-clock" fontSize={14} /> Generated 2 hours ago
+                            <Icon icon="tabler-clock" fontSize={14} /> {t('brandRise.recommendations.generatedTime', { time: '2 hours ago' })}
                         </Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <Icon icon="tabler-robot" fontSize={14} /> AI Strategist
+                            <Icon icon="tabler-robot" fontSize={14} /> {t('brandRise.recommendations.aiStrategist')}
                         </Typography>
                     </Stack>
                 </Stack>

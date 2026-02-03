@@ -8,8 +8,11 @@ import {
   Button
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
+import { useTranslations } from 'next-intl';
+
 import { SystemMessageCode } from '@platform/contracts';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 
 import { DiscoveryInput } from '@/components/brand-rise/competitors/DiscoveryInput';
 import { CompetitorList } from '@/components/brand-rise/competitors/CompetitorList';
@@ -17,7 +20,9 @@ import { CompetitorList } from '@/components/brand-rise/competitors/CompetitorLi
 import { useCompetitors } from './hooks/useCompetitors';
 
 export default function CompetitorsPage() {
+  const t = useTranslations('dashboard');
   const { notify } = useSystemMessages();
+
   const { 
     competitors, 
     isListLoading, 
@@ -85,7 +90,7 @@ export default function CompetitorsPage() {
                 }
             }}
         >
-            Export List
+            {t('brandRise.competitors.exportList')}
         </Button>
       </Box>
 

@@ -76,7 +76,7 @@ const BrandDnaPage = () => {
     <Box>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h5" fontWeight="bold">{t('brandRise.dna.summary')}</Typography>
-        <Typography variant="body1" color="text.secondary">Your brand&apos;s core identity, voice, and messaging guidelines at a glance</Typography>
+        <Typography variant="body1" color="text.secondary">{t('brandRise.dna.pageDesc')}</Typography>
       </Box>
 
       <Grid container spacing={4}>
@@ -89,10 +89,10 @@ const BrandDnaPage = () => {
                 <Typography variant="h6">{t('brandRise.dna.voice')}</Typography>
               </Box>
               <Typography variant="body1" color="text.secondary" paragraph>
-                {dna?.voice || 'Professional yet approachable. We communicate with clarity and confidence, making complex technology accessible to everyone. Our tone is friendly, knowledgeable, and empowering.'}
+                {dna?.voice || t('brandRise.dna.defaultVoice')}
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                We avoid jargon and speak directly to our customers&apos; needs, always maintaining authenticity and transparency in our communications.
+                {t('brandRise.dna.voiceGuidelines')}
               </Typography>
             </CardContent>
           </Card>
@@ -107,7 +107,7 @@ const BrandDnaPage = () => {
                 <Typography variant="h6">{t('brandRise.dna.audience')}</Typography>
               </Box>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                {dna?.audience || 'Small to medium-sized businesses looking to streamline their operations and scale efficiently. Decision-makers who value innovation, reliability, and exceptional customer support.'}
+                {dna?.audience || t('brandRise.dna.defaultAudience')}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                 {['SMB Owners', 'Tech Managers', 'Entrepreneurs'].map((tag) => (
@@ -166,7 +166,7 @@ const BrandDnaPage = () => {
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
                 <Icon icon="tabler-palette" fontSize={24} style={{ color: '#7367F0' }} />
-                <Typography variant="h6">Tone Keywords</Typography>
+                <Typography variant="h6">{t('brandRise.dna.toneKeywords')}</Typography>
               </Box>
               <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
                 {toneKeywords.map((keyword) => (
@@ -190,9 +190,9 @@ const BrandDnaPage = () => {
         <Grid size={{ xs: 12 }}>
           <Card sx={{ py: 4 }}>
             <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-              <Typography variant="h6" gutterBottom>Need More Details?</Typography>
+              <Typography variant="h6" gutterBottom>{t('brandRise.dna.needDetails')}</Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                Access the complete Brand DNA document with detailed guidelines, examples, and best practices
+                {t('brandRise.dna.accessGuidelines')}
               </Typography>
               <Button 
                 variant="contained" 

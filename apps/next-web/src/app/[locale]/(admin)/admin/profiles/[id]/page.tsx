@@ -26,8 +26,9 @@ import {
 } from '@mui/icons-material';
 import { useTranslations } from 'next-intl';
 
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 import { SystemMessageCode } from '@platform/contracts';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 
 import { BrandProfileService } from '@/services/brand-profile.service';
 import type { BrandProfile } from '@/services/brand-profile.service';
@@ -216,9 +217,9 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
   if (!profile) {
     return (
       <Box sx={{ p: 4 }}>
-        <Typography variant="h5" color="error">Profile not found</Typography>
+        <Typography variant="h5" color="error">{t('detail.notFound')}</Typography>
         <Button startIcon={<ArrowBackIcon />} onClick={() => router.back()} sx={{ mt: 2 }}>
-          Back to List
+          {t('detail.backToList')}
         </Button>
       </Box>
     );
@@ -302,15 +303,15 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
         onClose={() => !isDeleting && setDeleteDialogOpen(false)}
         PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
       >
-        <DialogTitle sx={{ fontWeight: 800 }}>Delete Brand Profile</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 800 }}>{t('detail.deleteTitle')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this brand profile? This action will permanently remove all extracted data and assets. This cannot be undone.
+            {t('detail.deleteConfirm')}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
           <Button onClick={() => setDeleteDialogOpen(false)} disabled={isDeleting} sx={{ borderRadius: 2 }}>
-            Cancel
+            {t('detail.cancel') || 'Cancel'}
           </Button>
           <Button
             onClick={handleDelete}
@@ -321,7 +322,7 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
             startIcon={isDeleting ? <CircularProgress size={20} color="inherit" /> : <DeleteIcon />}
             sx={{ borderRadius: 2, px: 3 }}
           >
-            {isDeleting ? 'Deleting...' : 'Delete Permanently'}
+            {isDeleting ? t('detail.deleting') : t('detail.deletePermanently')}
           </Button>
         </DialogActions>
       </Dialog>

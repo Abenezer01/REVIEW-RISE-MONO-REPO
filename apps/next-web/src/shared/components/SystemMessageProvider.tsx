@@ -1,10 +1,14 @@
 'use client';
 
 import React, { createContext, useContext, useCallback, useRef, useState, useEffect } from 'react';
+
 import { toast, Toaster } from 'react-hot-toast';
 import { useTranslations } from 'next-intl';
+
+import type {
+  SystemMessageCode
+} from '@platform/contracts';
 import {
-  SystemMessageCode,
   SystemMessageSeverity,
   DefaultSeverityMap
 } from '@platform/contracts';
@@ -40,9 +44,11 @@ const SystemMessageContext = createContext<SystemMessageContextType | undefined>
 
 export const useSystemMessages = () => {
   const context = useContext(SystemMessageContext);
+
   if (!context) {
     throw new Error('useSystemMessages must be used within a SystemMessageProvider');
   }
+
   return context;
 };
 
@@ -63,7 +69,7 @@ export const SystemMessageProvider: React.FC<{ children: React.ReactNode }> = ({
   const getMessage = useCallback((code: SystemMessageCode, params?: Record<string, any>) => {
     try {
       return t(code, params);
-    } catch (e) {
+    } catch {
       // Fallback to code if translation missing
       return code;
     }
@@ -82,6 +88,7 @@ export const SystemMessageProvider: React.FC<{ children: React.ReactNode }> = ({
       activeToasts.current.add(toastId);
 
       const duration = severity === SystemMessageSeverity.ERROR ? 5000 : 3000;
+
       const toastOptions = {
         id: toastId,
         duration,
@@ -109,6 +116,7 @@ export const SystemMessageProvider: React.FC<{ children: React.ReactNode }> = ({
       setModal({ isOpen: true, code, options });
     } else if (variant === 'INLINE') {
       const id = Math.random().toString(36).substring(7);
+
       setInlineMessages(prev => [...prev, { id, code, options }]);
 
       if (!options.persist) {
@@ -126,7 +134,8 @@ export const SystemMessageProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     systemMessageEvents.on(SYSTEM_MESSAGE_EVENT, handler);
-    return () => systemMessageEvents.off(SYSTEM_MESSAGE_EVENT, handler);
+
+return () => systemMessageEvents.off(SYSTEM_MESSAGE_EVENT, handler);
   }, [notify]);
 
   const handleModalClose = () => {
@@ -190,7 +199,7 @@ export const SystemMessageProvider: React.FC<{ children: React.ReactNode }> = ({
  * Component to render inline messages for a specific area.
  * Not strictly required but useful.
  */
-export const SystemMessageInline: React.FC<{ filter?: (code: SystemMessageCode) => boolean }> = ({ filter }) => {
+export const SystemMessageInline: React.FC<{ filter?: (code: SystemMessageCode) => boolean }> = () => {
   // In a real app, we might want to separate inline state from the provider to allow local usage
   return null; // Implementation deferred or handled by specific components
 };

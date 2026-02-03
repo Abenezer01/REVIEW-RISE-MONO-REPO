@@ -15,8 +15,9 @@ import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
 import Chip from '@mui/material/Chip'
 
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 import { SystemMessageCode } from '@platform/contracts'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import { useBusinessId } from '@/hooks/useBusinessId'
 import { SERVICES } from '@/configs/services'
@@ -27,39 +28,39 @@ import PlatformSelector from './selectors/PlatformSelector'
 import IdeaCard from './ideas/IdeaCard'
 
 const BUSINESS_TYPES = [
-    'E-commerce Store',
-    'Local Business',
-    'Consultant / Coach',
-    'SaaS / Tech',
-    'Content Creator',
-    'Restaurant / Cafe',
-    'Real Estate Agent'
+    'ecommerce',
+    'local',
+    'consultant',
+    'saas',
+    'creator',
+    'restaurant',
+    'realestate'
 ]
 
 const GOALS = [
-    'Increase Brand Awareness',
-    'Drive Website Traffic',
-    'Generate Leads',
-    'Boost Engagement',
-    'Promote New Product',
-    'Educate Audience'
+    'awareness',
+    'traffic',
+    'leads',
+    'engagement',
+    'promote',
+    'educate'
 ]
 
-const CONTENT_TYPES = ['Blog Post', 'Social Media', 'Video', 'Infographic']
-const TONES = ['Professional', 'Casual', 'Tutorial', 'Storytelling']
+const CONTENT_TYPES = ['blog', 'social', 'video', 'infographic']
 
 type FilterTab = 'all' | 'blog' | 'social' | 'video'
 
 export default function IdeaGenerator() {
     const { notify } = useSystemMessages()
     const t = useTranslations('studio.ideas')
+    const tc = useTranslations('common')
     const { businessId } = useBusinessId()
     const [loading, setLoading] = useState(false)
-    const [businessType, setBusinessType] = useState('Local Business')
-    const [goal, setGoal] = useState('')
+    const [businessType, setBusinessType] = useState('local')
+    const [goal, setGoal] = useState('awareness')
     const [topic, setTopic] = useState('')
-    const [platform, setPlatform] = useState('Instagram')
-    const [contentType, setContentType] = useState('Blog Post')
+    const [platform, setPlatform] = useState('instagram')
+    const [contentType, setContentType] = useState('blog')
     const [tone, setTone] = useState('professional')
     const [numberOfIdeas, setNumberOfIdeas] = useState(10)
     const [ideas, setIdeas] = useState<any[]>([])
@@ -94,7 +95,7 @@ export default function IdeaGenerator() {
                 readingTime: Math.floor(Math.random() * 10) + 3,
                 category: CONTENT_TYPES[idx % CONTENT_TYPES.length],
                 platform: idea.platform || platform,
-                tone: TONES[idx % TONES.length]
+                tone: tone
             }))
 
             setIdeas(enhancedIdeas)
@@ -222,10 +223,10 @@ return 'Older'
 
     // Group history by date
     const groupedHistory = history.reduce((acc, idea) => {
-        const category = getCategoryFromDate(new Date(idea.createdAt))
+        const categoryKey = getCategoryFromDate(new Date(idea.createdAt))
 
-        if (!acc[category]) acc[category] = []
-        acc[category].push(idea)
+        if (!acc[categoryKey]) acc[categoryKey] = []
+        acc[categoryKey].push(idea)
         
 return acc
     }, {} as Record<string, any[]>)
@@ -238,43 +239,43 @@ return acc
                 <CardContent sx={{ p: 4 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
                         <i className="tabler-sparkles" style={{ fontSize: 20, color: '#9C27B0' }} />
-                        <Typography variant="h6" fontWeight="bold">Generate New Ideas</Typography>
+                        <Typography variant="h6" fontWeight="bold">{t('generateTitle')}</Typography>
                     </Box>
 
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
                             <TextField
                                 select
-                                label="Business Type"
+                                label={t('businessType')}
                                 value={businessType}
                                 onChange={(e) => setBusinessType(e.target.value)}
                                 fullWidth
                             >
                                 {BUSINESS_TYPES.map((bt) => (
-                                    <MenuItem key={bt} value={bt}>{bt}</MenuItem>
+                                    <MenuItem key={bt} value={bt}>{t(`businessTypes.${bt}`)}</MenuItem>
                                 ))}
                             </TextField>
 
                             <TextField
                                 select
-                                label="Goal"
+                                label={t('goal')}
                                 value={goal}
                                 onChange={(e) => setGoal(e.target.value)}
                                 fullWidth
                             >
                                 {GOALS.map((g) => (
-                                    <MenuItem key={g} value={g}>{g}</MenuItem>
+                                    <MenuItem key={g} value={g}>{t(`goals.${g}`)}</MenuItem>
                                 ))}
                             </TextField>
                         </Box>
 
                         <TextField
-                            label="What's your topic or niche?"
-                            placeholder="E.g., Digital marketing, fitness, sustainable living..."
+                            label={t('topicLabel')}
+                            placeholder={t('topicPlaceholder')}
                             value={topic}
                             onChange={(e) => setTopic(e.target.value)}
                             fullWidth
-                            helperText="Be specific for better results. The AI will generate tailored ideas."
+                            helperText={t('topicHelper')}
                         />
 
                         <PlatformSelector value={platform} onChange={setPlatform} />
@@ -282,19 +283,19 @@ return acc
                         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
                             <TextField
                                 select
-                                label="Content Type"
+                                label={t('contentType')}
                                 value={contentType}
                                 onChange={(e) => setContentType(e.target.value)}
                                 fullWidth
                             >
                                 {CONTENT_TYPES.map((type) => (
-                                    <MenuItem key={type} value={type}>{type}</MenuItem>
+                                    <MenuItem key={type} value={type}>{t(`contentTypes.${type}`)}</MenuItem>
                                 ))}
                             </TextField>
 
                             <TextField
                                 type="number"
-                                label="Number of Ideas"
+                                label={t('numberOfIdeas')}
                                 value={numberOfIdeas}
                                 onChange={(e) => setNumberOfIdeas(parseInt(e.target.value) || 10)}
                                 inputProps={{ min: 5, max: 20 }}
@@ -308,8 +309,8 @@ return acc
                             <StudioGenerateButton
                                 onClick={handleGenerate}
                                 loading={loading}
-                                label="Generate Ideas"
-                                loadingLabel="Generating..."
+                                label={t('generateAction')}
+                                loadingLabel={tc('common.generating')}
                             />
                         </Box>
                     </Box>
@@ -325,39 +326,39 @@ return acc
                             onClick={() => setShowHistory(false)}
                             size="small"
                         >
-                            Generated ({ideas.length})
+                            {t('generatedLabel', { count: ideas.length })}
                         </Button>
                         <Button 
                             variant={showHistory ? 'contained' : 'outlined'} 
                             onClick={() => setShowHistory(true)}
                             size="small"
                         >
-                            History ({history.length})
+                            {t('historyLabel', { count: history.length })}
                         </Button>
                     </Box>
 
                     {!showHistory && (
                         <Box sx={{ display: 'flex', gap: 1 }}>
                             <Chip 
-                                label="All" 
+                                label={tc('all')}
                                 onClick={() => setActiveFilter('all')}
                                 color={activeFilter === 'all' ? 'primary' : 'default'}
                                 sx={{ fontWeight: activeFilter === 'all' ? 'bold' : 'normal' }}
                             />
                             <Chip 
-                                label="Blog" 
+                                label={t('contentTypes.blog')}
                                 onClick={() => setActiveFilter('blog')}
                                 color={activeFilter === 'blog' ? 'primary' : 'default'}
                                 sx={{ fontWeight: activeFilter === 'blog' ? 'bold' : 'normal' }}
                             />
                             <Chip 
-                                label="Social" 
+                                label={t('contentTypes.social')}
                                 onClick={() => setActiveFilter('social')}
                                 color={activeFilter === 'social' ? 'primary' : 'default'}
                                 sx={{ fontWeight: activeFilter === 'social' ? 'bold' : 'normal' }}
                             />
                             <Chip 
-                                label="Video" 
+                                label={t('contentTypes.video')}
                                 onClick={() => setActiveFilter('video')}
                                 color={activeFilter === 'video' ? 'primary' : 'default'}
                                 sx={{ fontWeight: activeFilter === 'video' ? 'bold' : 'normal' }}
@@ -393,18 +394,18 @@ return acc
                         {history.length === 0 ? (
                             <Box sx={{ p: 6, textAlign: 'center', color: 'text.secondary', border: '1px dashed', borderColor: 'divider', borderRadius: 2 }}>
                                 <i className="tabler-clock" style={{ fontSize: 32, opacity: 0.5, marginBottom: 8 }} />
-                                <Typography>No idea history yet</Typography>
+                                <Typography>{t('historyEmpty')}</Typography>
                             </Box>
                         ) : (
                             <>
-                                {['Today', 'Yesterday', 'This Week', 'Older'].map(category => (
-                                    groupedHistory[category] && groupedHistory[category].length > 0 && (
-                                        <Box key={category} sx={{ mb: 3 }}>
+                                {['Today', 'Yesterday', 'This Week', 'Older'].map(categoryKey => (
+                                    groupedHistory[categoryKey] && groupedHistory[categoryKey].length > 0 && (
+                                        <Box key={categoryKey} sx={{ mb: 3 }}>
                                             <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2, color: 'text.secondary' }}>
-                                                {category}
+                                                {tc(`dates.${categoryKey.toLowerCase().replace(' ', '') === 'thisweek' ? 'thisWeek' : categoryKey.toLowerCase()}`)}
                                             </Typography>
                                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                                {groupedHistory[category].map((idea: any) => (
+                                                {groupedHistory[categoryKey].map((idea: any) => (
                                                     <IdeaCard
                                                         key={idea.id}
                                                         idea={idea}
@@ -426,7 +427,7 @@ return acc
                                             disabled={loadingHistory}
                                             startIcon={loadingHistory ? <CircularProgress size={16} /> : <i className="tabler-chevron-down" />}
                                         >
-                                            {loadingHistory ? 'Loading...' : 'Load More'}
+                                            {loadingHistory ? tc('common.loading') : tc('common.loadMore')}
                                         </Button>
                                     </Box>
                                 )}

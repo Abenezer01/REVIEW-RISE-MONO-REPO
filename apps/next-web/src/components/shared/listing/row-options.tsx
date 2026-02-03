@@ -2,9 +2,11 @@ import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
 import { IconButton, Menu, MenuItem } from '@mui/material';
+import { useTranslations } from 'next-intl';
+
+import { SystemMessageCode } from '@platform/contracts';
 
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
-import { SystemMessageCode } from '@platform/contracts';
 
 import type { AbilityRule } from '@/types/general/permission';
 import type { ListingItemAction } from '@/types/general/listing-item';
@@ -29,6 +31,7 @@ const RowOptions = <T extends { id?: string | number }>({
   deletePermissionRule,
   editPermissionRule,
 }: RowOptionsProps<T>) => {
+  const t = useTranslations('common.common');
   const { notify } = useSystemMessages();
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -117,7 +120,7 @@ const RowOptions = <T extends { id?: string | number }>({
             }}
           >
             <i className="tabler:edit text-[20px]" />
-            Edit
+            {t('edit')}
           </MenuItem>
         )}
 
@@ -132,7 +135,7 @@ const RowOptions = <T extends { id?: string | number }>({
             }}
           >
             <i className="tabler:trash text-[20px]" />
-            Delete
+            {t('delete')}
           </MenuItem>
         )}
       </Menu>

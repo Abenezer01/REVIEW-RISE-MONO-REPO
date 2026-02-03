@@ -9,7 +9,10 @@ import CardContent from '@mui/material/CardContent'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
+
 import { toast } from 'react-toastify'
+
+import { useTranslation } from '@/hooks/useTranslation'
 
 interface HashtagResultsProps {
     results: {
@@ -23,6 +26,7 @@ interface HashtagResultsProps {
 }
 
 export default function HashtagResults({ results, onCopyAll, onExport, onRegenerate }: HashtagResultsProps) {
+    const t = useTranslation('studio')
     const [activeTab, setActiveTab] = useState<'all' | 'popular' | 'niche' | 'trending'>('all')
 
     const copyHashtag = (tag: string) => {
@@ -38,8 +42,7 @@ export default function HashtagResults({ results, onCopyAll, onExport, onRegener
                 <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center', opacity: 0.5 }}>
                     <i className="tabler-hash" style={{ fontSize: 48 }} />
                 </Box>
-                <Typography variant="h6" gutterBottom>No hashtags generated yet</Typography>
-                <Typography variant="body2">Fill in the details above to get targeted hashtags.</Typography>
+                <Typography variant="h6" gutterBottom>{t('hashtags.emptyState')}</Typography>
             </Box>
         )
     }
@@ -48,9 +51,9 @@ export default function HashtagResults({ results, onCopyAll, onExport, onRegener
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h6" fontWeight="bold">
-                    Generated Hashtags
+                    {t('hashtags.generatedTitle')}
                     <Typography component="span" variant="body2" color="text.secondary" ml={1}>
-                        {totalCount} hashtags
+                        {t('hashtags.hashtagsCount', { count: totalCount })}
                     </Typography>
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1 }}>
@@ -60,7 +63,7 @@ export default function HashtagResults({ results, onCopyAll, onExport, onRegener
                         size="small" 
                         variant="outlined"
                     >
-                        Copy All
+                            {t('hashtags.copyAll')}
                     </Button>
                     {onExport && (
                         <Button 
@@ -69,7 +72,7 @@ export default function HashtagResults({ results, onCopyAll, onExport, onRegener
                             size="small" 
                             variant="outlined"
                         >
-                            Export
+                                {t('common.export')}
                         </Button>
                     )}
                     {onRegenerate && (
@@ -79,7 +82,7 @@ export default function HashtagResults({ results, onCopyAll, onExport, onRegener
                             size="small" 
                             variant="outlined"
                         >
-                            Regenerate
+                                {t('captions.regenerate')}
                         </Button>
                     )}
                 </Box>
@@ -89,25 +92,25 @@ export default function HashtagResults({ results, onCopyAll, onExport, onRegener
                 <CardContent>
                     <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
                         <Chip 
-                            label="All" 
+                            label={t('hashtags.all')}
                             color={activeTab === 'all' ? 'primary' : 'default'}
                             onClick={() => setActiveTab('all')}
                             sx={{ fontWeight: activeTab === 'all' ? 'bold' : 'normal' }} 
                         />
                         <Chip 
-                            label="Popular" 
+                            label={t('hashtags.popular')}
                             variant={activeTab === 'popular' ? 'filled' : 'outlined'}
                             color={activeTab === 'popular' ? 'primary' : 'default'}
                             onClick={() => setActiveTab('popular')}
                         />
                         <Chip 
-                            label="Niche" 
+                            label={t('hashtags.niche')}
                             variant={activeTab === 'niche' ? 'filled' : 'outlined'}
                             color={activeTab === 'niche' ? 'primary' : 'default'}
                             onClick={() => setActiveTab('niche')}
                         />
                         <Chip 
-                            label="Trending" 
+                            label={t('hashtags.trending')}
                             variant={activeTab === 'trending' ? 'filled' : 'outlined'}
                             color={activeTab === 'trending' ? 'primary' : 'default'}
                             onClick={() => setActiveTab('trending')}
@@ -118,7 +121,7 @@ export default function HashtagResults({ results, onCopyAll, onExport, onRegener
                         {(activeTab === 'all' || activeTab === 'popular') && results.core.length > 0 && (
                             <Grid size={12}>
                                 <Typography variant="subtitle2" sx={{ mb: 2, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
-                                    Core Hashtags
+                                    {t('hashtags.coreHashtags')}
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
                                     {results.core.map((tag, i) => (
@@ -159,7 +162,7 @@ export default function HashtagResults({ results, onCopyAll, onExport, onRegener
                         {(activeTab === 'all' || activeTab === 'niche') && results.niche.length > 0 && (
                             <Grid size={12}>
                                 <Typography variant="subtitle2" sx={{ mb: 2, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
-                                    Niche & Targeted
+                                    {t('hashtags.nicheTargeted')}
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
                                     {results.niche.map((tag, i) => (
@@ -200,7 +203,7 @@ export default function HashtagResults({ results, onCopyAll, onExport, onRegener
                         {(activeTab === 'all' || activeTab === 'trending') && results.local.length > 0 && (
                             <Grid size={12}>
                                 <Typography variant="subtitle2" sx={{ mb: 2, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
-                                    Community / Trending
+                                    {t('hashtags.communityTrending')}
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
                                     {results.local.map((tag, i) => (

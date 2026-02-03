@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Globe, ArrowRight } from 'lucide-react';
 import { analyzeSEO, type SEOAnalysisResult } from '@/lib/api';
 import ResultsDisplay from './ResultsDisplay';
 import AnalysisLoader from './AnalysisLoader';
 
 export default function Hero() {
+  const t = useTranslations('landing');
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<SEOAnalysisResult | null>(null);
@@ -49,15 +51,15 @@ export default function Hero() {
       <div className="container">
         <div className="badge">
           <span className="badge-dot"></span>
-          AI-Powered SEO Analysis
+          {t('hero.badge')}
         </div>
         
         <h1 className="title">
-          Instant SEO Insights for<br />Your Website
+          {t('hero.title')}
         </h1>
 
         <p className="description">
-          Get a comprehensive SEO analysis in seconds. No signup required.
+          {t('hero.description')}
         </p>
 
         {!loading && !result && (
@@ -67,7 +69,7 @@ export default function Hero() {
                 <Globe className="input-icon" size={18} />
                 <input
                   type="url"
-                  placeholder="example.com"
+                  placeholder={t('hero.inputPlaceholder')}
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAnalyze()}
@@ -77,13 +79,13 @@ export default function Hero() {
                 className="analyze-button"
                 onClick={handleAnalyze}
               >
-                Analyze
+                {t('hero.analyzeButton')}
                 <ArrowRight size={16} />
               </button>
             </div>
 
             <p className="features-text">
-              Free • Instant Results • No Signup
+              {t('hero.featuresText')}
             </p>
           </>
         )}
@@ -95,16 +97,16 @@ export default function Hero() {
         {!loading && !result && (
           <div className="stats">
             <div className="stat">
-              <div className="stat-value">50K+</div>
-              <div className="stat-label">Sites Analyzed</div>
+              <div className="stat-value">{t('hero.stats.sitesAnalyzed')}</div>
+              <div className="stat-label">{t('hero.stats.sitesAnalyzedLabel')}</div>
             </div>
             <div className="stat">
-              <div className="stat-value">98%</div>
-              <div className="stat-label">Accuracy</div>
+              <div className="stat-value">{'98%'}</div>
+              <div className="stat-label">{t('hero.stats.accuracy')}</div>
             </div>
             <div className="stat">
-              <div className="stat-value">4.9</div>
-              <div className="stat-label">Rating</div>
+              <div className="stat-value">{'4.9'}</div>
+              <div className="stat-label">{t('hero.stats.rating')}</div>
             </div>
           </div>
         )}

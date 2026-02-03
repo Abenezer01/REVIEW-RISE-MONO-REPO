@@ -21,8 +21,9 @@ import {
 import { Store as StoreIcon, InfoOutlined as InfoIcon, SmartToy as RobotIcon } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 import { SystemMessageCode } from '@platform/contracts'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import AutoReplySettings from '@/views/admin/reviews/components/AutoReplySettings'
 import { getCurrentAccount } from '@/app/actions/account'
@@ -30,7 +31,8 @@ import { getBrandProfileByBusinessId, updateAutoReplySettings } from '@/app/acti
 
 const AutoReplySettingsPage = () => {
   const { notify } = useSystemMessages()
-  const tDashboard = useTranslations('dashboard')
+  const t = useTranslations('dashboard')
+  const tc = useTranslations('common')
   const [businesses, setBusinesses] = useState<any[]>([])
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('')
   const [brandProfile, setBrandProfile] = useState<any>(null)
@@ -145,10 +147,10 @@ const AutoReplySettingsPage = () => {
           </Avatar>
           <Box>
             <Typography variant='h3'>
-              {tDashboard('auto-reply')}
+              {t('auto-reply')}
             </Typography>
             <Typography variant='body1' color="text.secondary">
-              Configure AI-powered automated responses for your business reviews.
+              {t('autoReply.description')}
             </Typography>
           </Box>
         </Stack>
@@ -183,8 +185,8 @@ const AutoReplySettingsPage = () => {
               <StoreIcon />
             </Avatar>
             <Box>
-              <Typography variant="subtitle1" fontWeight="800">Active Business Context</Typography>
-              <Typography variant="body2" color="text.secondary">Select the business you want to configure</Typography>
+              <Typography variant="subtitle1" fontWeight="800">{t('accounts.userDialog.fields.business')}</Typography>
+              <Typography variant="body2" color="text.secondary">{t('accounts.userDialog.fields.rolePlaceholder')}</Typography>
             </Box>
           </Stack>
           
@@ -236,9 +238,9 @@ const AutoReplySettingsPage = () => {
                   <InfoIcon fontSize="large" />
                 </Avatar>
                 <Box>
-                  <Typography variant="h6" fontWeight="600">No Brand Profile Found</Typography>
+                  <Typography variant="h6" fontWeight="600">{t('locations.detail.notFound')}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 400 }}>
-                    The selected business does not have an active brand profile. Please set up a brand profile first to enable auto-reply features.
+                    {t('locations.detail.saveFirst')}
                   </Typography>
                 </Box>
               </Stack>

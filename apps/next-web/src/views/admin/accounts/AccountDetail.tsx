@@ -12,7 +12,10 @@ import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 import Box from '@mui/material/Box'
 import Skeleton from '@mui/material/Skeleton'
-import { toast } from 'react-toastify'
+
+import { SystemMessageCode } from '@platform/contracts'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 // Core Component Imports
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -39,6 +42,7 @@ const getInitials = (string: string) =>
   string.split(/\s/).reduce((response, word) => (response += word.slice(0, 1)), '')
 
 const AccountDetail = () => {
+  const { notify } = useSystemMessages()
   const t = useTranslation('dashboard')
   const { user } = useAuth()
   const [data, setData] = useState<any>(null)
@@ -101,10 +105,10 @@ const AccountDetail = () => {
       const res = await deleteAccount(userToDelete.id)
 
       if (res.success) {
-        toast.success(t('accounts.userDeleted'))
+        notify(SystemMessageCode.ITEM_DELETED)
         fetchUsers()
       } else {
-        toast.error(res.message || t('accounts.deleteUserFailed'))
+        notify(SystemMessageCode.DELETE_FAILED)
       }
 
       setDeleteUserDialogOpen(false)
@@ -119,7 +123,7 @@ const AccountDetail = () => {
     if (res && !('error' in res)) {
       setData(res)
     } else {
-      toast.error(t('accounts.loadAccountFailed'))
+      notify(SystemMessageCode.NOT_FOUND)
     }
 
     setLoading(false)
@@ -202,7 +206,7 @@ const AccountDetail = () => {
                     size='small'
                     variant='tonal'
                     color={statusColor}
-                    label={data.status}
+                    label={t(`common.status.${data.status}`)}
                     sx={{ textTransform: 'capitalize', fontWeight: 500 }}
                   />
                 </Box>
@@ -220,7 +224,7 @@ const AccountDetail = () => {
                         <i className='tabler-calendar' />
                       </CustomAvatar>
                       <Typography variant='body1'>
-                        Created {new Date(data.createdAt).toLocaleDateString()}
+                        {t('accounts.createdOn', { date: new Date(data.createdAt).toLocaleDateString() })}
                       </Typography>
                     </Box>
                   </Box>

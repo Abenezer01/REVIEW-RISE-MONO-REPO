@@ -16,9 +16,13 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+
 import { SystemMessageCode } from '@platform/contracts'
+
 import type { GridColDef } from '@mui/x-data-grid'
+
+import { useTranslation } from '@/hooks/useTranslation'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 // Core Component Imports
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -41,6 +45,7 @@ const getInitials = (string: string) =>
 
 const SubscriptionIssuesList = () => {
   const { notify } = useSystemMessages()
+  const t = useTranslation('dashboard')
   const [data, setData] = useState<SubscriptionIssue[]>([])
   const [loading, setLoading] = useState(true)
   const [detailOpen, setDetailOpen] = useState(false)
@@ -116,7 +121,7 @@ const SubscriptionIssuesList = () => {
   const columns: GridColDef[] = [
     {
       field: 'businessName',
-      headerName: 'Business',
+      headerName: t('subscriptionIssues.columns.business'),
       flex: 1,
       minWidth: 200,
       renderCell: (params) => (
@@ -142,7 +147,7 @@ const SubscriptionIssuesList = () => {
               {params.row.businessName}
             </Typography>
             <Typography variant='body2' color='text.secondary'>
-              {params.row.plan} Plan
+              {t('subscriptionIssues.plan', { plan: params.row.plan })}
             </Typography>
           </Box>
         </Box>
@@ -150,7 +155,7 @@ const SubscriptionIssuesList = () => {
     },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: t('subscriptionIssues.columns.status'),
       minWidth: 120,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
@@ -159,7 +164,7 @@ const SubscriptionIssuesList = () => {
             size='small'
             variant='tonal'
             color={statusColor[params.value] || 'secondary'}
-            label={params.value}
+            label={t(`common.status.${params.value}`)}
             sx={{ textTransform: 'capitalize' }}
           />
         </Box>
@@ -167,7 +172,7 @@ const SubscriptionIssuesList = () => {
     },
     {
       field: 'latestIssueDetails.reason',
-      headerName: 'Issue Reason',
+      headerName: t('subscriptionIssues.columns.issueReason'),
       flex: 1,
       minWidth: 200,
       renderCell: (params) => (
@@ -184,14 +189,15 @@ const SubscriptionIssuesList = () => {
           </Box>
         ) : (
           <Typography variant='body2' color='text.disabled'>
-            N/A
+            {/* eslint-disable-next-line react/jsx-no-literals */}
+            {'N/A'}
           </Typography>
         )
       )
     },
     {
       field: 'currentPeriodEnd',
-      headerName: 'Period End',
+      headerName: t('subscriptionIssues.columns.periodEnd'),
       minWidth: 150,
       valueFormatter: (value: string) => new Date(value).toLocaleDateString(),
       renderCell: (params) => {
@@ -200,14 +206,14 @@ const SubscriptionIssuesList = () => {
         return (
           <Typography variant='body2' color={isExpired ? 'error.main' : 'text.primary'}>
             {new Date(params.value).toLocaleDateString()}
-            {isExpired && ' (Expired)'}
+            {isExpired && ` ${t('subscriptionIssues.expired')}`}
           </Typography>
         )
       }
     },
     {
       field: 'contactedAt',
-      headerName: 'Last Contacted',
+      headerName: t('subscriptionIssues.columns.lastContacted'),
       minWidth: 200,
       renderCell: (params) => (
         <Box>
@@ -217,7 +223,7 @@ const SubscriptionIssuesList = () => {
                 {new Date(params.value).toLocaleDateString()}
               </Typography>
               <Typography variant='caption' color='text.secondary'>
-                by {params.row.contactedBy || 'Admin'}
+                {t('subscriptionIssues.byAdmin', { admin: params.row.contactedBy || 'Admin' })}
               </Typography>
               {params.row.latestIssueDetails && ((params.row.latestIssueDetails as any).note || (params.row.latestIssueDetails as any).notes) && (
                 <Typography variant='caption' color='text.secondary'>
@@ -227,7 +233,7 @@ const SubscriptionIssuesList = () => {
             </>
           ) : (
             <Typography variant='body2' color='text.disabled'>
-              Never
+              {t('subscriptionIssues.never')}
             </Typography>
           )}
         </Box>
@@ -235,12 +241,12 @@ const SubscriptionIssuesList = () => {
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('subscriptionIssues.columns.actions'),
       sortable: false,
       minWidth: 150,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Tooltip title={params.row.status === 'active' ? 'Pause Subscription' : 'Resume Subscription'}>
+          <Tooltip title={params.row.status === 'active' ? t('subscriptionIssues.tooltips.pause') : t('subscriptionIssues.tooltips.resume')}>
             <IconButton
               size='small'
               onClick={() => handleToggleStatus(params.row.id, params.row.status)}
@@ -249,7 +255,7 @@ const SubscriptionIssuesList = () => {
               <i className={params.row.status === 'active' ? 'tabler-player-pause' : 'tabler-player-play'} />
             </IconButton>
           </Tooltip>
-          <Tooltip title='Mark as Contacted'>
+          <Tooltip title={t('subscriptionIssues.tooltips.markContacted')}>
             <IconButton
               size='small'
               onClick={() => handleMarkContacted(params.row.id)}
@@ -258,7 +264,7 @@ const SubscriptionIssuesList = () => {
               <i className='tabler-mail-forward' />
             </IconButton>
           </Tooltip>
-          <Tooltip title='View Account Details'>
+          <Tooltip title={t('subscriptionIssues.tooltips.viewDetails')}>
             <IconButton
               size='small'
               onClick={() => handleViewDetails(params.row)}
@@ -278,7 +284,7 @@ const SubscriptionIssuesList = () => {
   return (
     <>
       <Dialog open={detailOpen} onClose={handleCloseDetails} maxWidth='sm' fullWidth>
-        <DialogTitle>Billing Issue Detail</DialogTitle>
+        <DialogTitle>{t('subscriptionIssues.detail.title')}</DialogTitle>
         <DialogContent dividers>
           {selectedIssue && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -288,7 +294,7 @@ const SubscriptionIssuesList = () => {
                 </CustomAvatar>
                 <Box>
                   <Typography variant='h6' sx={{ lineHeight: 1 }}>{selectedIssue.businessName}</Typography>
-                  <Typography variant='body2' color='text.secondary'>{selectedIssue.plan} Plan</Typography>
+                  <Typography variant='body2' color='text.secondary'>{t('subscriptionIssues.plan', { plan: selectedIssue.plan })}</Typography>
                 </Box>
               </Box>
               <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, flexWrap: 'wrap' }}>
@@ -313,14 +319,14 @@ const SubscriptionIssuesList = () => {
               </Box>
               {selectedIssue.latestIssueDetails && (selectedIssue.latestIssueDetails as any).notes && (
                 <Box>
-                  <Typography variant='subtitle2'>Notes</Typography>
+                  <Typography variant='subtitle2'>{t('subscriptionIssues.detail.notes')}</Typography>
                   <Typography variant='body2' color='text.secondary'>
                     {(selectedIssue.latestIssueDetails as any).notes}
                   </Typography>
                 </Box>
               )}
               <Box>
-                <Typography variant='subtitle2'>Details</Typography>
+                <Typography variant='subtitle2'>{t('subscriptionIssues.detail.details')}</Typography>
                 <Box
                   component='pre'
                   sx={{
@@ -342,18 +348,18 @@ const SubscriptionIssuesList = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDetails} variant='outlined' color='secondary'>Close</Button>
+          <Button onClick={handleCloseDetails} variant='outlined' color='secondary'>{t('subscriptionIssues.detail.close')}</Button>
         </DialogActions>
       </Dialog>
       <Card sx={{ mb: 6 }}>
         <CardHeader
-          title='Subscription Issues'
-          subheader='Monitor and manage billing problems'
+          title={t('subscriptionIssues.title')}
+          subheader={t('subscriptionIssues.subtitle')}
         />
         <Divider />
         <CardContent>
           <Typography variant='body2' color='text.secondary'>
-            Showing accounts with expired subscriptions, payment failures, or other billing issues.
+            {t('subscriptionIssues.info')}
           </Typography>
         </CardContent>
       </Card>

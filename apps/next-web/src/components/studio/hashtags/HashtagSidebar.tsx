@@ -7,6 +7,7 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
+import { useTranslations } from 'next-intl'
 
 const MOCK_SAVED_SETS = [
     { title: 'Fitness Campaign', count: 30 },
@@ -23,6 +24,7 @@ interface HashtagSidebarProps {
 }
 
 export default function HashtagSidebar({ insights }: HashtagSidebarProps) {
+    const t = useTranslations('studio.hashtags.sidebar')
     const defaultInsights = insights || {
         reach: '2.4M',
         engagement: '4.2%',
@@ -36,7 +38,7 @@ export default function HashtagSidebar({ insights }: HashtagSidebarProps) {
                 <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
                         <i className="tabler-chart-line" style={{ color: '#4CAF50' }} />
-                        <Typography variant="h6" fontWeight="bold">Hashtag Insights</Typography>
+                        <Typography variant="h6" fontWeight="bold">{t('title')}</Typography>
                     </Box>
 
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -45,7 +47,7 @@ export default function HashtagSidebar({ insights }: HashtagSidebarProps) {
                                 <i className="tabler-eye" style={{ color: '#4CAF50' }} />
                             </Box>
                             <Box>
-                                <Typography variant="caption" color="text.secondary">EST. REACH</Typography>
+                                <Typography variant="caption" color="text.secondary">{t('estReach')}</Typography>
                                 <Typography variant="h6" fontWeight="bold">{defaultInsights.reach}</Typography>
                             </Box>
                         </Box>
@@ -55,7 +57,7 @@ export default function HashtagSidebar({ insights }: HashtagSidebarProps) {
                                 <i className="tabler-users" style={{ color: '#2196F3' }} />
                             </Box>
                             <Box>
-                                <Typography variant="caption" color="text.secondary">ENGAGEMENT RATE</Typography>
+                                <Typography variant="caption" color="text.secondary">{t('engagementRate')}</Typography>
                                 <Typography variant="h6" fontWeight="bold">{defaultInsights.engagement}</Typography>
                             </Box>
                         </Box>
@@ -65,7 +67,7 @@ export default function HashtagSidebar({ insights }: HashtagSidebarProps) {
                                 <i className="tabler-trophy" style={{ color: '#FF9800' }} />
                             </Box>
                             <Box>
-                                <Typography variant="caption" color="text.secondary">COMPETITION</Typography>
+                                <Typography variant="caption" color="text.secondary">{t('competition')}</Typography>
                                 <Typography variant="h6" fontWeight="bold">{defaultInsights.competition}</Typography>
                             </Box>
                         </Box>
@@ -76,7 +78,7 @@ export default function HashtagSidebar({ insights }: HashtagSidebarProps) {
             {/* Saved Sets */}
             <Card variant="outlined" sx={{ borderRadius: 2 }}>
                 <CardContent>
-                    <Typography variant="h6" fontWeight="bold" mb={2}>Saved Sets</Typography>
+                    <Typography variant="h6" fontWeight="bold" mb={2}>{t('savedSets')}</Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         {MOCK_SAVED_SETS.map((set, i) => (
                             <Box 
@@ -93,7 +95,7 @@ export default function HashtagSidebar({ insights }: HashtagSidebarProps) {
                             >
                                 <Box>
                                     <Typography variant="subtitle2" fontWeight="bold">{set.title}</Typography>
-                                    <Typography variant="caption" color="text.secondary">{set.count} hashtags</Typography>
+                                    <Typography variant="caption" color="text.secondary">{set.count} {t('hashtagsCount')}</Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', gap: 1 }}>
                                     <IconButton size="small">
