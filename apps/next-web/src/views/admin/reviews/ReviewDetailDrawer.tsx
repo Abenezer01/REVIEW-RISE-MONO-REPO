@@ -15,8 +15,8 @@ import { useTheme, alpha } from '@mui/material/styles'
 import MenuItem from '@mui/material/MenuItem'
 import Avatar from '@mui/material/Avatar'
 import Stack from '@mui/material/Stack'
+import { useTranslations } from 'next-intl'
 
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 import { SystemMessageCode } from '@platform/contracts'
 
 import Timeline from '@mui/lab/Timeline'
@@ -25,6 +25,8 @@ import TimelineSeparator from '@mui/lab/TimelineSeparator'
 import TimelineConnector from '@mui/lab/TimelineConnector'
 import TimelineContent from '@mui/lab/TimelineContent'
 import TimelineDot from '@mui/lab/TimelineDot'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -50,6 +52,7 @@ const DEFAULT_TONE_PRESETS = [
 ]
 
 const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDrawerProps) => {
+  const t = useTranslations('dashboard')
   const { notify } = useSystemMessages()
   const theme = useTheme()
   const [reply, setReply] = useState('')
@@ -243,8 +246,8 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
             <i className='tabler-message-2' style={{ fontSize: '1.25rem' }} />
           </Avatar>
           <Box>
-            <Typography variant='h6' fontWeight={700}>Review Details</Typography>
-            <Typography variant='caption' color='text.secondary'>View and manage customer feedback</Typography>
+            <Typography variant='h6' fontWeight={700}>{t('reviews.smart.detail.title')}</Typography>
+            <Typography variant='caption' color='text.secondary'>{t('reviews.smart.detail.subtitle')}</Typography>
           </Box>
         </Stack>
         <IconButton 
@@ -284,7 +287,9 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <Rating value={currentReview.rating} readOnly size="small" />
                   <Typography variant='body2' fontWeight={600} color='text.primary'>
-                    {currentReview.rating}.0
+                    {currentReview.rating}
+                    {/* eslint-disable-next-line react/jsx-no-literals */}
+                    {'.0'}
                   </Typography>
                 </Box>
               </Box>
@@ -298,7 +303,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
           <Stack direction="row" spacing={6} sx={{ mb: 0 }}>
             <Box>
               <Typography variant='caption' color='text.disabled' sx={{ textTransform: 'uppercase', fontWeight: 700, mb: 1, display: 'block' }}>
-                Published Date
+                {t('reviews.smart.detail.publishedDate')}
               </Typography>
               <Typography variant='body2' fontWeight={500}>
                 {isMounted ? new Date(currentReview.publishedAt).toLocaleDateString('en-US', { 
@@ -312,12 +317,12 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
             </Box>
             <Box>
               <Typography variant='caption' color='text.disabled' sx={{ textTransform: 'uppercase', fontWeight: 700, mb: 1, display: 'block' }}>
-                Source
+                {t('reviews.smart.detail.source')}
               </Typography>
               <Stack direction="row" spacing={1.5} alignItems="center">
                 <i className={currentReview.platform === 'gbp' ? 'tabler-brand-google text-primary' : 'tabler-world text-primary'} style={{ fontSize: '1.1rem' }} />
                 <Typography variant='body2' fontWeight={600} sx={{ textTransform: 'uppercase' }}>
-                  {currentReview.platform === 'gbp' ? 'Google' : currentReview.platform}
+                  {currentReview.platform === 'gbp' ? t('common.channel.google') : currentReview.platform}
                 </Typography>
               </Stack>
             </Box>
@@ -329,7 +334,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
         {/* Content */}
         <Box sx={{ p: 6, bgcolor: (theme) => theme.palette.mode === 'light' ? alpha(theme.palette.primary.main, 0.02) : 'transparent' }}>
           <Typography variant='subtitle2' sx={{ mb: 3, textTransform: 'uppercase', color: 'text.disabled', fontWeight: 700, letterSpacing: '0.5px' }}>
-            Review Content
+            {t('reviews.smart.detail.reviewContent')}
           </Typography>
           <Box sx={{ 
             p: 4, 
@@ -339,14 +344,14 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
             boxShadow: theme => theme.shadows[0]
           }}>
             <Typography variant='body1' sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, color: 'text.primary' }}>
-              {currentReview.content || 'No content provided.'}
+              {currentReview.content || t('reviews.smart.detail.noContent')}
             </Typography>
           </Box>
           
           {currentReview.tags && currentReview.tags.length > 0 && (
             <Box sx={{ mt: 4 }}>
               <Typography variant='caption' color='text.disabled' sx={{ textTransform: 'uppercase', fontWeight: 700, mb: 2, display: 'block' }}>
-                Internal Tags
+                {t('reviews.smart.detail.internalTags')}
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                 {currentReview.tags.map((tag: string) => (
@@ -364,18 +369,18 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
           </Box>
           <Box sx={{ flex: 1 }}>
             <Typography variant='subtitle2' sx={{ mb: 1, textTransform: 'uppercase', color: 'text.disabled' }}>
-              Extracted Emotions & Topics
+              {t('reviews.smart.detail.extractedEmotions')}
             </Typography>
             {currentReview.tags && currentReview.tags.length > 0 ? (
               <EmotionChips emotions={currentReview.tags} maxDisplay={5} />
             ) : (
-              <Typography variant='caption' color='text.secondary'>No analysis available</Typography>
+              <Typography variant='caption' color='text.secondary'>{t('reviews.smart.detail.noAnalysis')}</Typography>
             )}
             
             {currentReview.aiSuggestions?.topics && currentReview.aiSuggestions.topics.length > 0 && (
               <Box sx={{ mt: 2 }}>
                 <Typography variant='caption' sx={{ color: 'text.disabled', display: 'block', mb: 0.5 }}>
-                  Key Topics
+                  {t('reviews.smart.detail.keyTopics')}
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                   {currentReview.aiSuggestions.topics.map((topic: string) => (
@@ -394,7 +399,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
           <>
             <Box sx={{ p: 6, bgcolor: theme => theme.palette.mode === 'light' ? alpha(theme.palette.secondary.main, 0.02) : 'transparent' }}>
               <Typography variant='subtitle2' sx={{ mb: 4, textTransform: 'uppercase', color: 'text.disabled', fontWeight: 700, letterSpacing: '0.5px' }}>
-                Reply History
+                {t('reviews.smart.detail.replyHistory')}
               </Typography>
               <Timeline sx={{ 
                 p: 0, 
@@ -417,7 +422,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <Box>
                           <Typography variant='body2' fontWeight={700}>
-                            {historyReply.authorType === 'auto' ? 'AI Auto-Reply' : (historyReply.user?.name || 'Team Member')}
+                            {historyReply.authorType === 'auto' ? t('reviews.smart.detail.aiAutoReply') : (historyReply.user?.name || t('reviews.smart.detail.teamMember'))}
                           </Typography>
                           <Typography variant='caption' color='text.disabled'>
                             {isMounted ? new Date(historyReply.createdAt).toLocaleString('en-US', { 
@@ -432,7 +437,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                         <Stack direction="row" spacing={2} alignItems="center">
                           {historyReply.status === 'posted' && (
                             <CustomChip 
-                              label="Live" 
+                              label={t('reviews.smart.detail.live')}
                               size='small' 
                               variant='tonal' 
                               color='success' 
@@ -503,21 +508,21 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                   <i className='tabler-robot' style={{ fontSize: '1.1rem', color: 'white' }} />
                 </Avatar>
                 <Typography variant='subtitle1' color='primary' sx={{ fontWeight: 800, letterSpacing: '-0.5px' }}>
-                  AI Smart Suggestions
+                  {t('reviews.smart.detail.aiSuggestions')}
                 </Typography>
               </Stack>
               
               <Box sx={{ mb: 5 }}>
                 <Typography variant='caption' color='text.disabled' sx={{ textTransform: 'uppercase', fontWeight: 700, mb: 1, display: 'block' }}>
-                  AI Analysis
+                  {t('reviews.smart.detail.aiAnalysis')}
                 </Typography>
                 <Typography variant='body2' sx={{ color: 'text.secondary', lineHeight: 1.5 }}>
-                  {currentReview.aiSuggestions?.analysis || 'AI analysis is being generated... This review shows ' + sentiment.toLowerCase() + ' sentiment regarding the service quality.'}
+                  {currentReview.aiSuggestions?.analysis || t('reviews.smart.detail.noAnalysis')}
                 </Typography>
               </Box>
 
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                <Typography variant='subtitle2' fontWeight={700}>Suggested Replies</Typography>
+                <Typography variant='subtitle2' fontWeight={700}>{t('reviews.smart.detail.suggestedReplies')}</Typography>
                 <CustomTextField
                   id="tone-preset-select"
                   select
@@ -575,7 +580,11 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                         )}
                       </Box>
                       <Typography variant='body2' sx={{ fontStyle: 'italic', color: 'text.primary', lineHeight: 1.5 }}>
-                        &quot;{variation}&quot;
+                        {/* eslint-disable-next-line react/jsx-no-literals */}
+                        {'"'}
+                        {variation}
+                        {/* eslint-disable-next-line react/jsx-no-literals */}
+                        {'"'}
                       </Typography>
                     </Box>
                   ))}
@@ -606,10 +615,10 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                   </Avatar>
                   <Box>
                     <Typography variant='subtitle2' fontWeight={700} sx={{ mb: 1 }}>
-                      No Suggestions Yet
+                      {t('reviews.smart.detail.noSuggestions')}
                     </Typography>
                     <Typography variant='caption' color='text.secondary' sx={{ maxWidth: 250, display: 'block' }}>
-                      Click the &quot;Generate AI&quot; button below to get 3 personalized reply variations for this review.
+                      {t('reviews.smart.detail.noSuggestionsDesc')}
                     </Typography>
                   </Box>
                 </Box>
@@ -625,7 +634,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                   disabled={isRegenerating}
                   sx={{ borderRadius: 2, fontWeight: 600 }}
                 >
-                  {variations.length > 0 ? 'Regenerate' : 'Generate AI'}
+                  {variations.length > 0 ? t('reviews.smart.detail.regenerate') : t('reviews.smart.detail.generateAI')}
                 </Button>
                 <Button
                   fullWidth
@@ -636,13 +645,13 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                     if (variations[activeVariationIndex]) {
                       setReply(variations[activeVariationIndex])
                     } else {
-                      setReply(`Dear ${currentReview.author}, thank you so much for your ${currentReview.rating}-star review! We appreciate your feedback and hope to see you again soon.`)
+                      setReply(t('reviews.smart.detail.defaultReply', { author: currentReview.author, rating: currentReview.rating }))
                     }
                   }}
                   disabled={variations.length === 0}
                   sx={{ borderRadius: 2, fontWeight: 600, boxShadow: theme => variations.length > 0 ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}` : 'none' }}
                 >
-                  Use This
+                  {t('reviews.smart.detail.useThis')}
                 </Button>
               </Stack>
             </Box>
@@ -654,14 +663,14 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
         {/* Reply Editor */}
         <Box sx={{ p: 6, mb: 4 }}>
           <Typography variant='subtitle2' sx={{ mb: 3, textTransform: 'uppercase', color: 'text.disabled', fontWeight: 700, letterSpacing: '0.5px' }}>
-            Your Reply
+            {t('reviews.smart.detail.yourReply')}
           </Typography>
           <CustomTextField
             id="review-reply-editor"
             fullWidth
             multiline
             rows={5}
-            placeholder='Write your reply here...'
+            placeholder={t('reviews.smart.detail.writeReply')}
             value={reply}
             onChange={(e) => setReply(e.target.value)}
             sx={{ 
@@ -683,7 +692,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
               startIcon={isSubmitting ? <i className='tabler-loader spin' /> : <i className='tabler-trash' />}
               sx={{ borderRadius: 2.5, fontWeight: 700 }}
             >
-              Reject
+              {t('reviews.smart.detail.reject')}
             </Button>
             <Button
               fullWidth
@@ -698,7 +707,7 @@ const ReviewDetailDrawer = ({ open, onClose, review, onSuccess }: ReviewDetailDr
                 boxShadow: theme => `0 4px 12px ${alpha(theme.palette.primary.main, 0.25)}`
               }}
             >
-              {currentReview.response ? 'Update Reply' : 'Post Reply'}
+              {currentReview.response ? t('reviews.smart.detail.updateReply') : t('reviews.smart.detail.postReply')}
             </Button>
           </Stack>
         </Box>

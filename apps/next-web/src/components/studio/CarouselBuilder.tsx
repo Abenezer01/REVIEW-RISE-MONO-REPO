@@ -14,6 +14,7 @@ import Slider from '@mui/material/Slider'
 import Switch from '@mui/material/Switch'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import IconButton from '@mui/material/IconButton'
+import { useTranslations } from 'next-intl'
 
 import { toast } from 'react-toastify'
 
@@ -27,6 +28,8 @@ import ToneSelector from './selectors/ToneSelector'
 import PlatformSelector from './selectors/PlatformSelector'
 
 export default function CarouselBuilder() {
+    const t = useTranslations('studio.carousels')
+    const tc = useTranslations('common')
     const { businessId } = useBusinessId()
     const [loading, setLoading] = useState(false)
     const [topic, setTopic] = useState('')
@@ -72,12 +75,12 @@ export default function CarouselBuilder() {
         setTopic(draft.topic || '')
         setSlides(draft.slides || [])
         setViewMode('generator')
-        toast.info('Draft loaded')
+        toast.info(t('draftLoaded'))
     }
 
     const handleGenerate = async () => {
         if (!topic) {
-            toast.error('Please enter a topic or theme')
+            toast.error(t('topicError'))
             
 return
         }
@@ -101,10 +104,10 @@ return
 
             setSlides(data.slides || [])
             setCurrentSlide(0)
-            toast.success(`${data.slides?.length || 0} slides generated!`)
+            toast.success(t('slidesGenerated', { count: data.slides?.length || 0 }))
         } catch (error) {
             console.error(error)
-            toast.error('Failed to generate carousel')
+            toast.error(t('generateError'))
         } finally {
             setLoading(false)
         }
@@ -120,7 +123,7 @@ return
 
     const handleSaveDraft = async () => {
         if (!businessId || !topic || slides.length === 0) {
-            toast.error('No carousel to save')
+            toast.error(t('noCarouselToSave'))
             
 return
         }
@@ -135,10 +138,10 @@ return
                     imagePrompt: slide.visualDescription
                 }))
             })
-            toast.success('Carousel draft saved successfully!')
+            toast.success(t('saveDraftSuccess'))
         } catch (error) {
             console.error('Error saving carousel draft:', error)
-            toast.error('Failed to save carousel draft')
+            toast.error(t('saveDraftError'))
         }
     }
 
@@ -157,7 +160,7 @@ return
                         textTransform: 'none', px: 2
                     }}
                 >
-                    Generator
+                    {t('tabGenerator')}
                 </Button>
                 <Button 
                     onClick={() => setViewMode('history')}
@@ -170,7 +173,7 @@ return
                         textTransform: 'none', px: 2
                     }}
                 >
-                    History ({history.length})
+                    {t('tabHistory', { count: history.length })}
                 </Button>
             </Box>
 
@@ -183,22 +186,22 @@ return
                         <Card variant="outlined" sx={{ borderRadius: 2 }}>
                             <CardContent sx={{ p: 3 }}>
                                 <Typography variant="h6" fontWeight="bold" mb={2}>
-                                    Carousel Content
+                                    {t('contentTitle')}
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                     <TextField
-                                        label="Topic or Theme"
-                                        placeholder="10 social media tips for 2025..."
+                                        label={t('topicLabel')}
+                                        placeholder={t('topicPlaceholder')}
                                         value={topic}
                                         onChange={(e) => setTopic(e.target.value)}
                                         fullWidth
                                         size="small"
-                                        helperText="What should your carousel be about?"
+                                        helperText={t('topicHelper')}
                                     />
 
                                     <TextField
-                                        label="Additional Details (Optional)"
-                                        placeholder="Specific requirements, target audience, key points..."
+                                        label={t('detailsLabel')}
+                                        placeholder={t('detailsPlaceholder')}
                                         multiline
                                         rows={2}
                                         value={additionalContext}
@@ -210,7 +213,7 @@ return
                                     <Box>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                             <Typography variant="body2" fontWeight="bold">
-                                                Number of Slides
+                                                {t('slideCountLabel')}
                                             </Typography>
                                             <Typography variant="body2" color="primary.main" fontWeight="bold">
                                                 {slideCount}
@@ -225,7 +228,7 @@ return
                                             sx={{ color: 'primary.main' }}
                                         />
                                         <Typography variant="caption" color="text.secondary">
-                                            Recommended: 5-10 slides
+                                            {t('recommendedSlides')}
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -236,7 +239,7 @@ return
                         <Card variant="outlined" sx={{ borderRadius: 2 }}>
                             <CardContent sx={{ p: 3 }}>
                                 <Typography variant="h6" fontWeight="bold" mb={2}>
-                                    Style & Tone
+                                    {t('styleToneTitle')}
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                     <PlatformSelector 
@@ -265,7 +268,7 @@ return
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                                     <i className="tabler-sparkles" style={{ fontSize: 20, color: '#9C27B0' }} />
                                     <Typography variant="h6" fontWeight="bold">
-                                        AI Settings
+                                        {t('aiSettingsTitle')}
                                     </Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -277,7 +280,7 @@ return
                                                 color="secondary"
                                             />
                                         }
-                                        label="Auto-generate images"
+                                        label={t('autoImages')}
                                     />
                                     <FormControlLabel
                                         control={
@@ -287,7 +290,7 @@ return
                                                 color="secondary"
                                             />
                                         }
-                                        label="Include statistics"
+                                        label={t('includeStats')}
                                     />
                                     <FormControlLabel
                                         control={
@@ -297,7 +300,7 @@ return
                                                 color="secondary"
                                             />
                                         }
-                                        label="Add call-to-action"
+                                        label={t('addCTA')}
                                     />
                                 </Box>
                             </CardContent>
@@ -307,17 +310,17 @@ return
                         <Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                 <Typography variant="body2" color="text.secondary">
-                                    Generation Cost
+                                    {t('generationCost')}
                                 </Typography>
                                 <Typography variant="h6" color="primary.main" fontWeight="bold">
-                                    15 Credits
+                                    {t('creditsCount', { count: 15 })}
                                 </Typography>
                             </Box>
                             <StudioGenerateButton
                                 onClick={handleGenerate}
                                 loading={loading}
-                                label="✨ Generate Carousel"
-                                loadingLabel="Generating..."
+                                label={t('submitButton')}
+                                loadingLabel={tc('common.generating')}
                                 fullWidth
                                 sx={{ 
                                     fontSize: '1rem',
@@ -334,7 +337,7 @@ return
                         <Card variant="outlined" sx={{ borderRadius: 2 }}>
                             <CardContent sx={{ p: 3 }}>
                                 <Typography variant="h6" fontWeight="bold" mb={2}>
-                                    Live Preview
+                                    {t('livePreview')}
                                 </Typography>
                                 {slides.length === 0 ? (
                                     <Box sx={{ 
@@ -369,7 +372,7 @@ return
                                             />
                                         </Box>
                                         <Typography variant="body1" fontWeight="medium">
-                                            Your generated image will appear here
+                                            {t('previewEmpty')}
                                         </Typography>
                                     </Box>
                                 ) : (
@@ -472,7 +475,7 @@ return
                                                 '&:hover': { bgcolor: 'secondary.dark' }
                                             }}
                                         >
-                                            Save Draft
+                                            {tc('common.save')}
                                         </Button>
                                     </Box>
                                 )}
@@ -483,31 +486,31 @@ return
                         <Card variant="outlined" sx={{ borderRadius: 2 }}>
                             <CardContent sx={{ p: 3 }}>
                                 <Typography variant="h6" fontWeight="bold" mb={2}>
-                                    Quick Customization
+                                    {t('customizationTitle')}
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <Typography variant="body2">Edit Text Content</Typography>
+                                        <Typography variant="body2">{t('editContent')}</Typography>
                                         <Button size="small" variant="contained" sx={{ borderRadius: 1.5, bgcolor: '#FF8C42' }}>
-                                            Edit
+                                            {tc('common.edit')}
                                         </Button>
                                     </Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <Typography variant="body2">Change Images</Typography>
+                                        <Typography variant="body2">{t('changeImages')}</Typography>
                                         <Button size="small" variant="contained" sx={{ borderRadius: 1.5, bgcolor: '#FF8C42' }}>
-                                            Replace
+                                            {t('replace')}
                                         </Button>
                                     </Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <Typography variant="body2">Adjust Colors</Typography>
+                                        <Typography variant="body2">{t('adjustColors')}</Typography>
                                         <Button size="small" variant="contained" sx={{ borderRadius: 1.5, bgcolor: '#FF8C42' }}>
-                                            Customize
+                                            {t('customize')}
                                         </Button>
                                     </Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <Typography variant="body2">Reorder Slides</Typography>
+                                        <Typography variant="body2">{t('reorderSlides')}</Typography>
                                         <Button size="small" variant="contained" sx={{ borderRadius: 1.5, bgcolor: '#FF8C42' }}>
-                                            Arrange
+                                            {t('arrange')}
                                         </Button>
                                     </Box>
                                 </Box>
@@ -525,7 +528,7 @@ return
                     ) : history.length === 0 ? (
                         <Box sx={{ py: 8, textAlign: 'center' }}>
                             <i className="tabler-history" style={{ fontSize: 48, opacity: 0.2, marginBottom: 16 }} />
-                            <Typography color="text.secondary">No carousel drafts found</Typography>
+                            <Typography color="text.secondary">{t('historyEmpty')}</Typography>
                         </Box>
                     ) : (
                         <Grid container spacing={3}>
@@ -560,7 +563,7 @@ return
                                                 {draft.topic}
                                             </Typography>
                                             <Button size="small" variant="outlined" fullWidth sx={{ mt: 2 }}>
-                                                Load Draft
+                                                {t('loadDraft')}
                                             </Button>
                                         </CardContent>
                                     </Card>

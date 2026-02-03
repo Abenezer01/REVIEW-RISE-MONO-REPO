@@ -24,10 +24,12 @@ import KeywordRankChart from './KeywordRankChart';
 
 import { SERVICES } from '@/configs/services';
 import apiClient from '@/lib/apiClient';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const API_URL = SERVICES.seo.url;
 
 const VisibilityDashboard = () => {
+  const t = useTranslation('dashboard');
   const { user } = useAuth();
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [businesses, setBusinesses] = useState<any[]>([]);
@@ -54,12 +56,12 @@ const VisibilityDashboard = () => {
           // Auto-select first business
           setBusinessId(responseData[0].id);
         } else {
-          setError('No businesses found for this user.');
+          setError(t('seo.visibility.noBusinessUser'));
           setLoading(false);
         }
       } catch (err) {
         console.error('Error fetching user businesses:', err);
-        setError('Failed to load user businesses.');
+        setError(t('seo.visibility.loadFailed'));
         setLoading(false);
       }
     };
@@ -142,7 +144,7 @@ const VisibilityDashboard = () => {
 
     } catch (err: any) {
       console.error('Error fetching dashboard data:', err);
-      setError(prev => prev || 'Failed to load dashboard data. Please check connection to SEO service.');
+      setError(prev => prev || t('seo.visibility.loadDashboardFailed'));
     } finally {
       setLoading(false);
     }
@@ -198,10 +200,10 @@ const VisibilityDashboard = () => {
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
         <Box>
           <Typography variant="h4" fontWeight="bold" gutterBottom>
-            SERP Visibility
+            {t('seo.visibility.title')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Track your map pack presence and organic ranking performance
+            {t('seo.visibility.subtitle')}
           </Typography>
         </Box>
         <Stack direction="row" spacing={2} alignItems="center">
@@ -220,7 +222,7 @@ const VisibilityDashboard = () => {
           )}
           {businessId && (
             <Button variant="outlined" onClick={handleRefresh}>
-              Refresh Data
+              {t('seo.visibility.refreshData')}
             </Button>
           )}
         </Stack>
@@ -228,13 +230,13 @@ const VisibilityDashboard = () => {
 
       {!businessId && loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-          <Typography>Loading your business profile...</Typography>
+          <Typography>{t('seo.visibility.loadingProfile')}</Typography>
         </Box>
       ) : !businessId ? (
         <Box sx={{ mt: 4, p: 4, border: '1px dashed grey', borderRadius: 2, textAlign: 'center' }}>
-          <Typography variant="h6" gutterBottom>No Business Found</Typography>
+          <Typography variant="h6" gutterBottom>{t('seo.visibility.noBusiness')}</Typography>
           <Typography variant="body2" color="text.secondary">
-            {error || 'Your account does not appear to be linked to any businesses.'}
+            {error || t('seo.visibility.noBusinessDesc')}
           </Typography>
         </Box>
       ) : (
@@ -247,7 +249,7 @@ const VisibilityDashboard = () => {
 
           <Box sx={{ mb: 4 }}>
             <Typography variant="h6" gutterBottom fontWeight="medium">
-              Current Performance
+              {t('seo.visibility.currentPerformance')}
             </Typography>
             <VisibilitySummaryCards metrics={metrics} loading={loading} />
           </Box>
@@ -265,7 +267,7 @@ const VisibilityDashboard = () => {
             <HeatmapGrid
               rows={heatmapRows}
               columns={heatmapData?.dates || []}
-              title="Keyword Ranking History"
+              title={t('seo.visibility.rankingHistory')}
               loading={loading}
               colorMode="ranking"
               height={500}
@@ -274,7 +276,7 @@ const VisibilityDashboard = () => {
 
           <Box>
             <Typography variant="h6" gutterBottom fontWeight="medium">
-              Tracked Keywords
+              {t('seo.visibility.trackedKeywords')}
             </Typography>
             <KeywordsTable keywords={keywords} loading={loading} onViewHistory={handleViewHistory} />
           </Box>

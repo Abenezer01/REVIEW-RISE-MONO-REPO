@@ -1,7 +1,10 @@
 import React from 'react'
 
 import { Box, Card, CardContent, Typography, Divider, IconButton, Tooltip } from '@mui/material'
+
 import { toast } from 'react-toastify'
+
+import { useTranslation } from '@/hooks/useTranslation'
 
 interface CaptionCardProps {
     caption: string
@@ -9,6 +12,8 @@ interface CaptionCardProps {
 }
 
 export default function CaptionCard({ caption, onUseCaption }: CaptionCardProps) {
+    const t = useTranslation('studio')
+
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text)
         toast.success('Copied to clipboard')
@@ -22,15 +27,15 @@ export default function CaptionCard({ caption, onUseCaption }: CaptionCardProps)
                         <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: 'primary.light', color: 'primary.main' }}>
                             <i className="tabler-text-caption" style={{ fontSize: 20 }} />
                         </Box>
-                        <Typography variant="h6" fontWeight="bold">Caption</Typography>
+                        <Typography variant="h6" fontWeight="bold">{t('captions.caption')}</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Tooltip title="Use Caption">
+                        <Tooltip title={t('captions.useCaption')}>
                             <IconButton size="small" onClick={onUseCaption} color="primary">
                                 <i className="tabler-arrow-right" />
                             </IconButton>
                         </Tooltip>
-                        <Tooltip title="Copy Caption">
+                        <Tooltip title={t('captions.copyCaption')}>
                             <IconButton size="small" onClick={() => copyToClipboard(caption)}>
                                 <i className="tabler-copy" />
                             </IconButton>
@@ -46,19 +51,19 @@ export default function CaptionCard({ caption, onUseCaption }: CaptionCardProps)
 
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3.5 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>Words:</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>{t('captions.words')}</Typography>
                         <Typography variant="body2" fontWeight="bold" color="text.primary">{caption.split(' ').length}</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>Characters:</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>{t('captions.characters')}</Typography>
                         <Typography variant="body2" fontWeight="bold" color="text.primary">{caption.length}</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>Emojis:</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>{t('captions.emojis')}</Typography>
                         <Typography variant="body2" fontWeight="bold" color="text.primary">{(caption.match(/[\p{Emoji}]/gu) || []).length}</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>Engagement Score:</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>{t('captions.engagementScore')}</Typography>
                         <Typography variant="body2" fontWeight="bold" color="success.main">94/100</Typography>
                     </Box>
                 </Box>

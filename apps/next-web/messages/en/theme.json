@@ -1,0 +1,28 @@
+{
+  "customizer": {
+    "title": "Theme Customizer",
+    "subtitle": "Customize & Preview in Real Time",
+    "theming": "Theming",
+    "primaryColor": "Primary Color",
+    "typeColor": "Type a color",
+    "mode": "Mode",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "skin": "Skin",
+    "default": "Default",
+    "bordered": "Bordered",
+    "semiDark": "Semi Dark",
+    "layout": "Layout",
+    "layouts": "Layouts",
+    "vertical": "Vertical",
+    "collapsed": "Collapsed",
+    "horizontal": "Horizontal",
+    "content": "Content",
+    "compact": "Compact",
+    "wide": "Wide",
+    "direction": "Direction",
+    "ltr": "Left to Right (English)",
+    "rtl": "Right to Left (Arabic)"
+  }
+}

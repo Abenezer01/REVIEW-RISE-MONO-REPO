@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 
 import {
     Box,
@@ -37,22 +38,24 @@ interface Condition {
     values: string[]
 }
 
-const ATTRIBUTES = [
-    { label: 'Country', value: 'country' },
-    { label: 'User Group', value: 'group' },
-    { label: 'Email Domain', value: 'emailDomain' },
-    { label: 'Browser', value: 'browser' },
-    { label: 'OS', value: 'os' },
-    { label: 'Device Type', value: 'deviceType' },
-    { label: 'Language', value: 'language' },
-]
-
-const OPERATORS = [
-    { label: 'Is one of', value: 'in' },
-    { label: 'Is NOT one of', value: 'not_in' },
-]
-
 export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: CreateFeatureFlagDrawerProps) {
+    const t = useTranslations('admin.featureFlags')
+    const tc = useTranslations('common')
+
+    const ATTRIBUTES = useMemo(() => [
+        { label: t('attributes.country'), value: 'country' },
+        { label: t('attributes.group'), value: 'group' },
+        { label: t('attributes.emailDomain'), value: 'emailDomain' },
+        { label: t('attributes.browser'), value: 'browser' },
+        { label: t('attributes.os'), value: 'os' },
+        { label: t('attributes.deviceType'), value: 'deviceType' },
+        { label: t('attributes.language'), value: 'language' },
+    ], [t])
+
+    const OPERATORS = useMemo(() => [
+        { label: t('operators.in'), value: 'in' },
+        { label: t('operators.not_in'), value: 'not_in' },
+    ], [t])
     const [newFlag, setNewFlag] = useState({
         name: '',
         description: '',
@@ -153,13 +156,13 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
         }
 
         if (!newFlag.name.trim()) {
-            newErrors.name = 'Name is required'
+            newErrors.name = t('validation.nameRequired')
         } else if (newFlag.name.length < 3) {
-            newErrors.name = 'Name must be at least 3 characters'
+            newErrors.name = t('validation.nameMin', { count: 3 })
         }
 
         if (newFlag.description && newFlag.description.length > 500) {
-            newErrors.description = 'Description must be less than 500 characters'
+            newErrors.description = t('validation.descriptionMax', { count: 500 })
         }
 
         setErrors(newErrors)
@@ -237,7 +240,7 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
         <Drawer anchor="right" open={open} onClose={onClose}>
             <Box sx={{ width: 600, p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                    <Typography variant="h6">{editFlag ? 'Edit' : 'Create'} Feature Flag</Typography>
+                    <Typography variant="h6">{editFlag ? t('editTitle') : t('createTitle')}</Typography>
                     <IconButton onClick={onClose} edge="end">
                         <i className="tabler-x" />
                     </IconButton>
@@ -246,7 +249,7 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
                 <Box sx={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {/* Basic Info */}
                     <TextField
-                        label="Name"
+                        label={t('name')}
                         fullWidth
                         value={newFlag.name}
                         onChange={(e) => {
@@ -256,11 +259,11 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
                         onBlur={validateForm}
                         error={!!errors.name}
                         helperText={errors.name}
-                        placeholder="e.g. new-dashboard-v2"
+                        placeholder={t('namePlaceholder')}
                         required
                     />
                     <TextField
-                        label="Description"
+                        label={t('description')}
                         fullWidth
                         multiline
                         rows={2}
@@ -274,7 +277,7 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
                         helperText={errors.description}
                     />
                     <Box sx={{ mt: 1 }}>
-                        <Typography gutterBottom variant="body2">Rollout Percentage: {newFlag.rolloutPercentage}%</Typography>
+                        <Typography gutterBottom variant="body2">{t('rolloutPercentage', { value: newFlag.rolloutPercentage })}</Typography>
                         <Slider
                             value={newFlag.rolloutPercentage}
                             onChange={(_, newValue) =>
@@ -290,7 +293,7 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
 
                     {/* Identity Targeting */}
                     <Typography variant="subtitle2" color="text.secondary">
-                        Specific Identity Targets
+                        {t('identityTargets')}
                     </Typography>
                     <Stack gap={2}>
                         <Autocomplete
@@ -305,7 +308,7 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
                                 ))
                             }
                             renderInput={(params) => (
-                                <TextField {...params} label="Specific User IDs" placeholder="Enter ID & Press Enter" size="small" />
+                                <TextField {...params} label={t('userIds')} placeholder={t('userIdsPlaceholder')} size="small" />
                             )}
                         />
                         <Autocomplete
@@ -320,7 +323,7 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
                                 ))
                             }
                             renderInput={(params) => (
-                                <TextField {...params} label="Specific Emails" placeholder="user@company.com" size="small" />
+                                <TextField {...params} label={t('emails')} placeholder={t('emailsPlaceholder')} size="small" />
                             )}
                         />
                     </Stack>
@@ -330,7 +333,7 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
                     {/* Dynamic Conditions */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="subtitle2" color="text.secondary">
-                            Targeting Rules & Conditions
+                            {t('targetingRules')}
                         </Typography>
                         <Button
                             size="small"
@@ -338,20 +341,20 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
                             onClick={handleAddCondition}
                             variant="outlined"
                         >
-                            Add Condition
+                            {t('addCondition')}
                         </Button>
                     </Box>
 
                     <Stack gap={2}>
                         {conditions.length === 0 && (
                             <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.875rem' }}>
-                                No conditions set. The flag will apply to everyone based on rollout percentage.
+                                {t('noConditions')}
                             </Typography>
                         )}
                         {conditions.map((cond, index) => (
                             <Box key={cond.id} sx={{ p: 2, bgcolor: 'background.default', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                    <Typography variant="caption" sx={{ fontWeight: 'bold' }}>Condition {index + 1}</Typography>
+                                    <Typography variant="caption" sx={{ fontWeight: 'bold' }}>{t('conditionNumber', { number: index + 1 })}</Typography>
                                     <IconButton size="small" color="error" onClick={() => handleRemoveCondition(cond.id)}>
                                         <i className="tabler-trash" />
                                     </IconButton>
@@ -359,10 +362,10 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
 
                                 <Stack spacing={2}>
                                     <FormControl fullWidth size="small">
-                                        <InputLabel>Attribute</InputLabel>
+                                        <InputLabel>{t('attribute')}</InputLabel>
                                         <Select
                                             value={cond.attribute}
-                                            label="Attribute"
+                                            label={t('attribute')}
                                             onChange={(e) => handleConditionChange(cond.id, 'attribute', e.target.value)}
                                         >
                                             {ATTRIBUTES.map((attr) => (
@@ -372,10 +375,10 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
                                     </FormControl>
 
                                     <FormControl fullWidth size="small">
-                                        <InputLabel>Operator</InputLabel>
+                                        <InputLabel>{t('operator')}</InputLabel>
                                         <Select
                                             value={cond.operator}
-                                            label="Operator"
+                                            label={t('operator')}
                                             onChange={(e) => handleConditionChange(cond.id, 'operator', e.target.value)}
                                         >
                                             {OPERATORS.map((op) => (
@@ -399,8 +402,8 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
                                         renderInput={(params) => (
                                             <TextField
                                                 {...params}
-                                                label="Values"
-                                                placeholder="Enter value"
+                                                label={t('values')}
+                                                placeholder={t('valuesPlaceholder')}
                                             />
                                         )}
                                     />
@@ -418,13 +421,13 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
                                 onChange={(e) => setNewFlag({ ...newFlag, isEnabled: e.target.checked })}
                             />
                         }
-                        label="Enabled"
+                        label={t('enabled')}
                     />
                 </Box>
 
                 <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                    <Button onClick={onClose}>Cancel</Button>
-                    <Button onClick={handleSubmit} variant="contained">{editFlag ? 'Update' : 'Create'}</Button>
+                    <Button onClick={onClose}>{tc('cancel')}</Button>
+                    <Button onClick={handleSubmit} variant="contained">{editFlag ? tc('update') : tc('create')}</Button>
                 </Box>
             </Box>
         </Drawer>

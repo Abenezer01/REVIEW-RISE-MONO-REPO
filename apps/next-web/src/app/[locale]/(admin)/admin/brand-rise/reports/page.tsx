@@ -20,8 +20,10 @@ import Typography from '@mui/material/Typography';
 import { useTranslations } from 'next-intl';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
+
 import { SystemMessageCode } from '@platform/contracts';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusinessId } from '@/hooks/useBusinessId';

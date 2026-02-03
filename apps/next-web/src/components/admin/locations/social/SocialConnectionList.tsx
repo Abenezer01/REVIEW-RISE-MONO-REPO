@@ -22,6 +22,8 @@ import {
     CircularProgress,
     Card
 } from '@mui/material';
+import { useTranslations } from 'next-intl';
+
 import {
     Facebook as FacebookIcon,
     Instagram as InstagramIcon,
@@ -45,6 +47,8 @@ import { ConnectionCard } from './ConnectionCard';
 import { PlatformOption } from './PlatformOption';
 
 export const SocialConnectionList = ({ businessId, locationId }: SocialConnectionListProps) => {
+    const t = useTranslations('social.connections');
+
     // State
     const [connections, setConnections] = useState<SocialConnection[]>([]);
     const [loading, setLoading] = useState(true);
@@ -111,7 +115,7 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
                     setShowFbModal(true);
                 } catch (err) {
                     console.error('Failed to list pages', err);
-                    alert('Failed to list Facebook pages');
+                    alert(t('alerts.failedToList', { platform: 'Facebook' }));
                 }
             } else if (event.data?.type === 'LINKEDIN_AUTH_SUCCESS') {
                 const tokenData = {
@@ -132,7 +136,7 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
                     setShowLiModal(true);
                 } catch (err) {
                     console.error('Failed to list orgs', err);
-                    alert('Failed to list LinkedIn organizations');
+                    alert(t('alerts.failedToList', { platform: 'LinkedIn' }));
                 }
             }
         };
@@ -181,13 +185,13 @@ return () => window.removeEventListener('message', handleMessage);
         const fbConn = connections.find(c => c.platform === 'facebook' && c.status === 'active');
 
         if (!fbConn) {
-            alert('Please connect your Facebook Page first. Instagram Business accounts must be connected via their linked Facebook Page.');
+            alert(t('alerts.pleaseConnectFbFirst'));
             
 return;
         }
 
         if (!fbConn.accessToken) {
-            alert('Facebook connection is missing access token. Please reconnect Facebook.');
+            alert(t('alerts.fbMissingToken'));
             
 return;
         }
@@ -204,7 +208,7 @@ return;
             const account = res.data.instagramAccount;
 
             if (!account) {
-                alert(`No Instagram Business Account found linked to Facebook Page "${fbConn.pageName}". Please ensure your Instagram is switched to a Business account and linked to this page in Facebook settings.`);
+                alert(t('alerts.noIgFound', { name: fbConn.pageName }));
             } else {
                 setFoundIgAccount(account);
                 setTargetFbConnection(fbConn);
@@ -213,7 +217,7 @@ return;
 
         } catch (err) {
             console.error('Failed to fetch Instagram account', err);
-            alert('Failed to find linked Instagram account. Please try again.');
+            alert(t('alerts.failedToFindIg'));
         } finally {
             setLoading(false);
         }
@@ -229,7 +233,7 @@ return;
             setShowFbModal(false);
         } catch (err) {
             console.error(err);
-            alert('Failed to connect page');
+            alert(t('alerts.failedToConnect', { platform: 'Facebook' }));
         }
     };
 
@@ -244,7 +248,7 @@ return;
             fetchConnections();
         } catch (err) {
             console.error(err);
-            alert('Failed to connect organization');
+            alert(t('alerts.failedToConnect', { platform: 'LinkedIn' }));
         }
     };
 
@@ -273,14 +277,14 @@ return;
             fetchConnections();
         } catch (err) {
             console.error('Failed to connect Instagram', err);
-            alert('Failed to connect Instagram account');
+            alert(t('alerts.failedToConnect', { platform: 'Instagram' }));
         } finally {
             setConnectingIg(false);
         }
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to disconnect?')) return;
+        if (!confirm(t('alerts.confirmDisconnect'))) return;
 
         try {
             await apiClient.delete(`${SERVICES.social.url}/connections/${id}`);
@@ -304,15 +308,15 @@ return;
             {/* Header */}
             <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Box>
-                    <Typography variant="h4" fontWeight={700}>Social Media Connections</Typography>
-                    <Typography color="text.secondary">Manage your connected social media accounts and sync settings</Typography>
-                    {loading && <Typography variant="caption" color="primary">Refreshing...</Typography>}
+                    <Typography variant="h4" fontWeight={700}>{t('title')}</Typography>
+                    <Typography color="text.secondary">{t('subtitle')}</Typography>
+                    {loading && <Typography variant="caption" color="primary">{t('refreshing')}</Typography>}
                 </Box>
                 <Stack direction="row" spacing={2}>
                     <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchConnections} disabled={loading || refreshing}>
-                        {refreshing ? 'Refreshing...' : 'Refresh All'}
+                        {refreshing ? t('refreshing') : t('refreshAll')}
                     </Button>
-                    <Button variant="contained" startIcon={<AddIcon />} color="warning" onClick={startFacebookConnect}>Connect Account</Button>
+                    <Button variant="contained" startIcon={<AddIcon />} color="warning" onClick={startFacebookConnect}>{t('connectAccount')}</Button>
                 </Stack>
             </Box>
 
@@ -320,27 +324,27 @@ return;
             <Grid container spacing={3}>
                 <Grid size={{ xs: 12, md: 4 }}>
                     <StatCard
-                        title="CONNECTED ACCOUNTS"
+                        title={t('stats.connectedAccounts')}
                         value={connections.length || 3}
-                        subtext="Active social media connections"
+                        subtext={t('stats.activeConnections')}
                         icon={<PublicIcon />}
                         color={theme.palette.info.main}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
                     <StatCard
-                        title="TOTAL REACH"
+                        title={t('stats.totalReach')}
                         value={`${(totalReach / 1000).toFixed(0)}K`}
-                        subtext="Combined followers across platforms"
+                        subtext={t('stats.combinedFollowers')}
                         icon={<PeopleIcon />}
                         color={theme.palette.success.main}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
                     <StatCard
-                        title="TOKEN STATUS"
-                        value={issuesCount === 0 ? "Healthy" : `${issuesCount} Issues`}
-                        subtext={issuesCount === 0 ? "All tokens are valid" : "Account needs reconnection"}
+                        title={t('stats.tokenStatus')}
+                        value={issuesCount === 0 ? t('stats.healthy') : t('stats.issues', { count: issuesCount })}
+                        subtext={issuesCount === 0 ? t('stats.allTokensValid') : t('stats.needsReconnection')}
                         icon={issuesCount === 0 ? <CheckCircleIcon /> : <WarningIcon />}
                         color={issuesCount === 0 ? theme.palette.success.main : theme.palette.warning.main}
                     />
@@ -350,11 +354,11 @@ return;
             {/* Connected Accounts List */}
             <Box>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                    <Typography variant="h6" fontWeight={600}>Connected Accounts</Typography>
+                    <Typography variant="h6" fontWeight={600}>{t('list.title')}</Typography>
                     <Stack direction="row" spacing={1}>
-                        <Chip label="All" color="primary" />
-                        <Chip label="Active" variant="outlined" />
-                        <Chip label="Issues" variant="outlined" />
+                        <Chip label={t('list.all')} color="primary" />
+                        <Chip label={t('list.active')} variant="outlined" />
+                        <Chip label={t('list.issues')} variant="outlined" />
                     </Stack>
                 </Stack>
 
@@ -362,7 +366,7 @@ return;
                     {connections.length === 0 ? (
                         [1, 2, 3].map(i => (
                             <Card key={i} sx={{ border: '1px dashed', borderColor: 'divider', p: 3, textAlign: 'center' }}>
-                                <Typography color="text.secondary">Mock Connection Item {i} (Connect real accounts to see details)</Typography>
+                                <Typography color="text.secondary">{t('list.mockItem', { index: i })}</Typography>
                             </Card>
                         ))
                     ) : (
@@ -380,35 +384,35 @@ return;
 
             {/* Available Platforms */}
             <Box>
-                <Typography variant="h6" fontWeight={600} mb={2}>Available Platforms</Typography>
+                <Typography variant="h6" fontWeight={600} mb={2}>{t('platforms.title')}</Typography>
                 <Grid container spacing={3}>
                     <Grid size={{ xs: 12, md: 4 }}>
                         <PlatformOption
-                            name="Facebook Pages"
-                            description="Connect your Facebook Business Page to schedule posts, track engagement, and manage comments."
+                            name={t('platforms.facebook.name')}
+                            description={t('platforms.facebook.description')}
                             icon={<FacebookIcon />}
                             color="#1877F2"
-                            features={['Post scheduling & publishing', 'Engagement analytics', 'Comment management']}
+                            features={t.raw('platforms.facebook.features')}
                             action={startFacebookConnect}
                         />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
                         <PlatformOption
-                            name="Instagram Business"
-                            description="Link your Instagram Business account via Facebook to publish content and track performance."
+                            name={t('platforms.instagram.name')}
+                            description={t('platforms.instagram.description')}
                             icon={<InstagramIcon />}
                             color="#E4405F"
-                            features={['Photo & video publishing', 'Story scheduling', 'Insights & metrics']}
+                            features={t.raw('platforms.instagram.features')}
                             action={startInstagramConnect}
                         />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
                         <PlatformOption
-                            name="LinkedIn Pages"
-                            description="Connect your LinkedIn Company Page to share professional content and grow your network."
+                            name={t('platforms.linkedin.name')}
+                            description={t('platforms.linkedin.description')}
                             icon={<LinkedInIcon />}
                             color="#0077b5"
-                            features={['Professional content sharing', 'Page analytics', 'Follower insights']}
+                            features={t.raw('platforms.linkedin.features')}
                             action={startLinkedInConnect}
                         />
                     </Grid>
@@ -419,7 +423,7 @@ return;
 
             {/* Facebook Page Modal */}
             <Dialog open={showFbModal} onClose={() => setShowFbModal(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>Select Facebook Page</DialogTitle>
+                <DialogTitle>{t('modals.selectFb')}</DialogTitle>
                 <DialogContent>
                     <List>
                         {fbPages.map(page => (
@@ -430,13 +434,13 @@ return;
                     </List>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setShowFbModal(false)}>Cancel</Button>
+                    <Button onClick={() => setShowFbModal(false)}>{t('modals.cancel')}</Button>
                 </DialogActions>
             </Dialog>
 
             {/* LinkedIn Org Modal */}
             <Dialog open={showLiModal} onClose={() => setShowLiModal(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>Select LinkedIn Page</DialogTitle>
+                <DialogTitle>{t('modals.selectLi')}</DialogTitle>
                 <DialogContent>
                     <List>
                         {liOrgs.map(org => (
@@ -450,13 +454,13 @@ return;
                     </List>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setShowLiModal(false)}>Cancel</Button>
+                    <Button onClick={() => setShowLiModal(false)}>{t('modals.cancel')}</Button>
                 </DialogActions>
             </Dialog>
 
             {/* Instagram Account Modal */}
             <Dialog open={showIgModal} onClose={() => setShowIgModal(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>Connect Instagram Business</DialogTitle>
+                <DialogTitle>{t('modals.connectIg')}</DialogTitle>
                 <DialogContent>
                     {foundIgAccount ? (
                         <Box textAlign="center" py={2}>
@@ -467,23 +471,22 @@ return;
                             <Typography variant="h6">{foundIgAccount.name}</Typography>
                             <Typography color="text.secondary" gutterBottom>@{foundIgAccount.username}</Typography>
                             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                                This Instagram account is linked to your Facebook Page.
-                                Click Connect to enable analytics and publishing.
+                                {t('modals.igLinkedToFb')}
                             </Typography>
                         </Box>
                     ) : (
-                        <Typography>No account found.</Typography>
+                        <Typography>{t('modals.noAccountFound')}</Typography>
                     )}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setShowIgModal(false)}>Cancel</Button>
+                    <Button onClick={() => setShowIgModal(false)}>{t('modals.cancel')}</Button>
                     <Button
                         variant="contained"
                         color="primary"
                         onClick={confirmInstagramConnect}
                         disabled={connectingIg || !foundIgAccount}
                     >
-                        {connectingIg ? 'Connecting...' : 'Connect'}
+                        {connectingIg ? t('modals.connecting') : t('modals.connect')}
                     </Button>
                 </DialogActions>
             </Dialog>

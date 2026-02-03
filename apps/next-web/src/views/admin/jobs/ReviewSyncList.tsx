@@ -17,9 +17,13 @@ import Tooltip from '@mui/material/Tooltip'
 import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
 import Avatar from '@mui/material/Avatar'
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+
 import { SystemMessageCode } from '@platform/contracts'
 import type { GridColDef } from '@mui/x-data-grid'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+
+import { useTranslation } from '@/hooks/useTranslation'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -33,6 +37,7 @@ import ReviewSyncDetailModal from './ReviewSyncDetailModal'
 const ReviewSyncList = () => {
   const { notify } = useSystemMessages()
   const theme = useTheme()
+  const t = useTranslation('dashboard')
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
@@ -130,7 +135,7 @@ const ReviewSyncList = () => {
   const columns: GridColDef[] = [
     {
       field: 'id',
-      headerName: 'Log ID',
+      headerName: t('jobs.reviewSync.columns.logId'),
       minWidth: 100,
       renderCell: (params) => (
         <Tooltip title={params.value}>
@@ -142,7 +147,7 @@ const ReviewSyncList = () => {
     },
     {
       field: 'business',
-      headerName: 'Account',
+      headerName: t('jobs.reviewSync.columns.account'),
       minWidth: 180,
       valueGetter: (value, row) => row?.business?.name || 'N/A',
       renderCell: (params) => (
@@ -167,7 +172,7 @@ const ReviewSyncList = () => {
     },
     {
       field: 'platform',
-      headerName: 'Provider',
+      headerName: t('jobs.reviewSync.columns.provider'),
       minWidth: 140,
       renderCell: (params) => {
         const platform = params.value || 'unknown';
@@ -194,7 +199,7 @@ const ReviewSyncList = () => {
     },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: t('jobs.reviewSync.columns.status'),
       minWidth: 120,
       renderCell: (params) => {
         const isRetrying = params.row.job?.status === 'pending' || params.row.job?.status === 'processing'
@@ -205,7 +210,7 @@ const ReviewSyncList = () => {
               size='small'
               variant='tonal'
               color='warning'
-              label='Retrying'
+              label={t('common.status.processing')}
               icon={<i className='tabler-loader animate-spin' />}
               sx={{ textTransform: 'capitalize', fontWeight: 500 }}
             />
@@ -217,7 +222,7 @@ const ReviewSyncList = () => {
             size='small'
             variant='tonal'
             color={getStatusColor(params.value)}
-            label={params.value}
+            label={t(`common.status.${params.value}`)}
             sx={{ textTransform: 'capitalize', fontWeight: 500 }}
           />
         )
@@ -225,7 +230,7 @@ const ReviewSyncList = () => {
     },
     {
       field: 'reviewsSynced',
-      headerName: 'Synced',
+      headerName: t('jobs.reviewSync.columns.synced'),
       width: 100,
       align: 'center',
       headerAlign: 'center',
@@ -237,7 +242,7 @@ const ReviewSyncList = () => {
     },
     {
       field: 'durationMs',
-      headerName: 'Duration',
+      headerName: t('jobs.reviewSync.columns.duration'),
       width: 100,
       valueGetter: (value) => {
         if (value) {
@@ -254,7 +259,7 @@ const ReviewSyncList = () => {
     },
     {
       field: 'createdAt',
-      headerName: 'Date',
+      headerName: t('jobs.reviewSync.columns.date'),
       minWidth: 180,
       valueGetter: (value, row) => row.createdAt,
       renderCell: (params) => (
@@ -270,7 +275,7 @@ const ReviewSyncList = () => {
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('jobs.reviewSync.columns.actions'),
       sortable: false,
       minWidth: 100,
       align: 'right',
@@ -278,7 +283,7 @@ const ReviewSyncList = () => {
       renderCell: (params) => (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
           {params.row.status === 'failed' && params.row.jobId && (
-            <Tooltip title="Retry Job">
+            <Tooltip title={t('jobs.failed.actions.retryJob')}>
               <IconButton
                 size='small'
                 onClick={(e) => {
@@ -291,7 +296,7 @@ const ReviewSyncList = () => {
               </IconButton>
             </Tooltip>
           )}
-          <Tooltip title="View Details">
+          <Tooltip title={t('jobs.failed.actions.viewDetails')}>
             <IconButton
               size='small'
               onClick={() => {
@@ -330,10 +335,10 @@ const ReviewSyncList = () => {
               </IconButton>
               <Box>
                 <Typography variant='h5' fontWeight={600} sx={{ mb: 0.5 }}>
-                  Review Sync Logs
+                  {t('jobs.reviewSync.title')}
                 </Typography>
                 <Typography variant='body2' color='text.secondary'>
-                  Monitor and debug review synchronization tasks
+                  {t('jobs.reviewSync.subtitle')}
                 </Typography>
               </Box>
             </Box>
@@ -341,7 +346,7 @@ const ReviewSyncList = () => {
           action={
             <Box sx={{ display: 'flex', gap: 1, mt: 1, mr: 1 }}>
               <CustomChip
-                label={`${total} Logs`}
+                label={t('jobs.reviewSync.logsCount', { count: total })}
                 size='small'
                 variant='tonal'
                 color='primary'
@@ -356,8 +361,8 @@ const ReviewSyncList = () => {
             <Grid size={{ xs: 12, md: 3 }}>
               <CustomTextField
                 fullWidth
-                label='Search Account or ID'
-                placeholder='Search...'
+                label={t('jobs.reviewSync.searchLabel')}
+                placeholder={t('jobs.reviewSync.searchPlaceholder')}
                 value={filters.search}
                 onChange={e => handleFilterChange('search', e.target.value)}
                 InputProps={{
@@ -374,14 +379,14 @@ const ReviewSyncList = () => {
               <CustomTextField
                 select
                 fullWidth
-                label='Status'
+                label={t('jobs.reviewSync.columns.status')}
                 value={filters.status}
                 onChange={e => handleFilterChange('status', e.target.value)}
                 SelectProps={{ displayEmpty: true }}
               >
-                <MenuItem value=''>All Statuses</MenuItem>
-                <MenuItem value='success'>Success</MenuItem>
-                <MenuItem value='failed'>Failed</MenuItem>
+                <MenuItem value=''>{t('jobs.reviewSync.allStatuses')}</MenuItem>
+                <MenuItem value='success'>{t('common.status.success')}</MenuItem>
+                <MenuItem value='failed'>{t('common.status.failed')}</MenuItem>
               </CustomTextField>
             </Grid>
 
@@ -389,16 +394,16 @@ const ReviewSyncList = () => {
               <CustomTextField
                 select
                 fullWidth
-                label='Provider'
+                label={t('jobs.reviewSync.columns.provider')}
                 value={filters.platform}
                 onChange={e => handleFilterChange('platform', e.target.value)}
                 SelectProps={{ displayEmpty: true }}
               >
-                <MenuItem value=''>All Providers</MenuItem>
-                <MenuItem value='google'>Google</MenuItem>
-                <MenuItem value='facebook'>Facebook</MenuItem>
-                <MenuItem value='tripadvisor'>TripAdvisor</MenuItem>
-                <MenuItem value='yelp'>Yelp</MenuItem>
+                <MenuItem value=''>{t('jobs.reviewSync.allProviders')}</MenuItem>
+                <MenuItem value='google'>{t('common.channel.google')}</MenuItem>
+                <MenuItem value='facebook'>{t('common.channel.facebook')}</MenuItem>
+                <MenuItem value='tripadvisor'>{t('common.channel.tripadvisor')}</MenuItem>
+                <MenuItem value='yelp'>{t('common.channel.yelp')}</MenuItem>
               </CustomTextField>
             </Grid>
 
@@ -407,7 +412,7 @@ const ReviewSyncList = () => {
                 <CustomTextField
                   fullWidth
                   type="date"
-                  label="Start Date"
+                  label={t('jobs.social.startDate')}
                   value={filters.startDate ? filters.startDate.toISOString().split('T')[0] : ''}
                   onChange={(e) => handleDateChange('start', e.target.value ? new Date(e.target.value) : null)}
                   InputLabelProps={{ shrink: true }}
@@ -415,7 +420,7 @@ const ReviewSyncList = () => {
                 <CustomTextField
                   fullWidth
                   type="date"
-                  label="End Date"
+                  label={t('jobs.social.endDate')}
                   value={filters.endDate ? filters.endDate.toISOString().split('T')[0] : ''}
                   onChange={(e) => handleDateChange('end', e.target.value ? new Date(e.target.value) : null)}
                   InputLabelProps={{ shrink: true }}
@@ -455,8 +460,8 @@ const ReviewSyncList = () => {
           permission: { action: 'read', subject: 'job' }
         }}
         emptyStateConfig={{
-          title: 'No Review Sync Logs',
-          description: 'There are no review sync logs matching your criteria.',
+          title: t('jobs.reviewSync.empty.title'),
+          description: t('jobs.reviewSync.empty.description'),
           icon: 'tabler:clipboard-list'
         }}
       />

@@ -3,6 +3,8 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import StarIcon from '@mui/icons-material/Star';
 import StoreIcon from '@mui/icons-material/Store';
+import { useTranslations } from 'next-intl';
+
 import { Avatar, Box, Button, Card, Grid, LinearProgress, Typography } from '@mui/material';
 
 interface ConnectionSuccessViewProps {
@@ -11,6 +13,8 @@ interface ConnectionSuccessViewProps {
 }
 
 const ConnectionSuccessView = ({ onGoToDashboard, onViewLogs }: ConnectionSuccessViewProps) => {
+    const t = useTranslations('locations.ConnectionSuccess');
+
     return (
         <Box sx={{ maxWidth: 600, mx: 'auto', textAlign: 'center', p: 4, bgcolor: 'background.paper', borderRadius: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
@@ -19,10 +23,9 @@ const ConnectionSuccessView = ({ onGoToDashboard, onViewLogs }: ConnectionSucces
                 </Avatar>
             </Box>
 
-            <Typography variant="h4" fontWeight="bold" gutterBottom>Successfully Connected!</Typography>
+            <Typography variant="h4" fontWeight="bold" gutterBottom>{t('title')}</Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 5, maxWidth: 480, mx: 'auto' }}>
-                Your Google Business Profile is now connected and we are syncing your reviews. 
-                This may take a few minutes depending on the number of reviews.
+                {t('description')}
             </Typography>
 
             {/* Metrics */}
@@ -32,8 +35,8 @@ const ConnectionSuccessView = ({ onGoToDashboard, onViewLogs }: ConnectionSucces
                          <Avatar variant="rounded" sx={{ bgcolor: 'info.main', mb: 1 }}>
                              <StoreIcon />
                          </Avatar>
-                         <Typography variant="h5" fontWeight="bold">2</Typography>
-                         <Typography variant="caption" color="text.secondary">Locations Connected</Typography>
+                         <Typography variant="h5" fontWeight="bold">{t('mockCount')}</Typography>
+                         <Typography variant="caption" color="text.secondary">{t('locationsConnected')}</Typography>
                     </Box>
                 </Grid>
                 <Grid size={4}>
@@ -41,8 +44,8 @@ const ConnectionSuccessView = ({ onGoToDashboard, onViewLogs }: ConnectionSucces
                          <Avatar variant="rounded" sx={{ bgcolor: 'success.main', mb: 1 }}>
                              <StarIcon />
                          </Avatar>
-                         <Typography variant="h5" fontWeight="bold">476</Typography>
-                         <Typography variant="caption" color="text.secondary">Reviews Found</Typography>
+                         <Typography variant="h5" fontWeight="bold">{t('mockReviews')}</Typography>
+                         <Typography variant="caption" color="text.secondary">{t('reviewsFound')}</Typography>
                     </Box>
                 </Grid>
                 <Grid size={4}>
@@ -50,8 +53,8 @@ const ConnectionSuccessView = ({ onGoToDashboard, onViewLogs }: ConnectionSucces
                          <Avatar variant="rounded" sx={{ bgcolor: 'secondary.main', mb: 1 }}> {/* Purple is tough, secondary is orange. Custom color? */}
                              <ScheduleIcon />
                          </Avatar>
-                         <Typography variant="h5" fontWeight="bold">Daily</Typography>
-                         <Typography variant="caption" color="text.secondary">Auto-Sync Enabled</Typography>
+                         <Typography variant="h5" fontWeight="bold">{t('daily')}</Typography>
+                         <Typography variant="caption" color="text.secondary">{t('autoSyncEnabled')}</Typography>
                     </Box>
                 </Grid>
             </Grid>
@@ -59,66 +62,66 @@ const ConnectionSuccessView = ({ onGoToDashboard, onViewLogs }: ConnectionSucces
             {/* Sync Progress */}
             <Card variant="outlined" sx={{ bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', mb: 5, p: 3, textAlign: 'left' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                    <Typography variant="subtitle1" fontWeight="bold">Initial Sync in Progress</Typography>
+                    <Typography variant="subtitle1" fontWeight="bold">{t('syncInProgress')}</Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="caption" color="secondary">Syncing...</Typography>
+                        <Typography variant="caption" color="secondary">{t('syncing')}</Typography>
                     </Box>
                 </Box>
-                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>Importing reviews from Google</Typography>
+                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>{t('importingFromGoogle')}</Typography>
                 
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                     <LinearProgress variant="determinate" value={68} sx={{ flexGrow: 1, height: 8, borderRadius: 4, bgcolor: 'action.hover', '& .MuiLinearProgress-bar': { bgcolor: '#A379F7' } }} />
-                    <Typography variant="body2" fontWeight="bold" sx={{ ml: 2 }}>68%</Typography>
+                    <Typography variant="body2" fontWeight="bold" sx={{ ml: 2 }}>{t('mockProgress')}</Typography>
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                    <Typography variant="caption" color="text.secondary">Reviews Synced</Typography>
-                    <Typography variant="caption" fontWeight="bold">324 / 476</Typography>
+                    <Typography variant="caption" color="text.secondary">{t('reviewsSynced')}</Typography>
+                    <Typography variant="caption" fontWeight="bold">{t('mockSynced')}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                    <Typography variant="caption" color="text.secondary">Estimated Time Remaining</Typography>
-                    <Typography variant="caption" fontWeight="bold">~2 minutes</Typography>
+                    <Typography variant="caption" color="text.secondary">{t('estimatedTimeRemaining')}</Typography>
+                    <Typography variant="caption" fontWeight="bold">{t('minutesRemaining', { minutes: 2 })}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="caption" color="text.secondary">Next Scheduled Sync</Typography>
-                    <Typography variant="caption" fontWeight="bold">Tomorrow at 2:00 AM</Typography>
+                    <Typography variant="caption" color="text.secondary">{t('nextScheduledSync')}</Typography>
+                    <Typography variant="caption" fontWeight="bold">{t('tomorrowAt', { time: '2:00 AM' })}</Typography>
                 </Box>
             </Card>
 
             {/* Recently Synced Reviews (Mock) */}
              <Box sx={{ textAlign: 'left', mb: 5 }}>
-                <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>Recently Synced Reviews</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>{t('recentlySyncedReviews')}</Typography>
                 <Box sx={{ mb: 2 }}>
                      <Box sx={{ display: 'flex', gap: 2, mb: 1 }}>
-                         <Avatar sx={{ bgcolor: 'warning.main' }}>S</Avatar>
+                         <Avatar sx={{ bgcolor: 'warning.main' }}>{t('mockAvatar')}</Avatar>
                          <Box>
-                             <Typography variant="subtitle2">Sarah Johnson</Typography>
-                             <Typography variant="caption" color="text.secondary">2 days ago</Typography>
+                             <Typography variant="subtitle2">{t('mockName')}</Typography>
+                             <Typography variant="caption" color="text.secondary">{t('daysAgo', { days: 2 })}</Typography>
                          </Box>
-                         <Box sx={{ ml: 'auto', color: 'warning.main' }}>★★★★★</Box>
+                         <Box sx={{ ml: 'auto', color: 'warning.main' }}>{t('mockStars')}</Box>
                      </Box>
                      <Typography variant="body2" color="text.secondary" sx={{ ml: 7 }}>
-                         Excellent service! The team was professional...
+                         {t('mockComment')}
                      </Typography>
                 </Box>
              </Box>
 
             <Box sx={{ textAlign: 'left', mb: 5 }}>
-                <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>What is Next?</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>{t('whatIsNext')}</Typography>
                 <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
                     <Box sx={{ p: 0.5, bgcolor: 'warning.dark', borderRadius: 1 }}><CheckCircleIcon fontSize="small" color="inherit" /></Box>
-                    <Typography variant="body2">Your reviews will sync automatically every day at 2:00 AM</Typography>
+                    <Typography variant="body2">{t('autoSyncDesc', { time: '2:00 AM' })}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
                      <Box sx={{ p: 0.5, bgcolor: 'warning.dark', borderRadius: 1 }}><NotificationsIcon fontSize="small"  color="inherit" /></Box>
-                    <Typography variant="body2">Get notified instantly when new reviews are posted</Typography>
+                    <Typography variant="body2">{t('notificationsDesc')}</Typography>
                 </Box>
                  {/* ... more items */}
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-                <Button variant="outlined" color="inherit" onClick={onViewLogs}>View Sync Logs</Button>
-                <Button variant="contained" color="warning" onClick={onGoToDashboard} size="large">Go to Dashboard</Button>
+                <Button variant="outlined" color="inherit" onClick={onViewLogs}>{t('viewSyncLogs')}</Button>
+                <Button variant="contained" color="warning" onClick={onGoToDashboard} size="large">{t('goToDashboard')}</Button>
             </Box>
 
         </Box>

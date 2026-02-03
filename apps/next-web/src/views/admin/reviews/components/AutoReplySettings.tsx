@@ -40,8 +40,11 @@ import {
   AutoGraph as StepIcon,
   RecordVoiceOver as VoiceIcon
 } from '@mui/icons-material';
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
+
 import { SystemMessageCode } from '@platform/contracts';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface AutoReplySettingsProps {
   profile: any;
@@ -51,6 +54,8 @@ interface AutoReplySettingsProps {
 
 const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate, isUpdating }) => {
   const { notify } = useSystemMessages();
+  const t = useTranslation('dashboard');
+
   const [settings, setSettings] = useState(profile.autoReplySettings || {
     enabled: false,
     mode: 'positive', // 'positive' | 'positive_neutral'
@@ -135,16 +140,16 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                   </Avatar>
                   <Box>
                     <Typography variant="h5" fontWeight="700" gutterBottom>
-                      AI Auto-Reply System
+                      {t('autoReply.title')}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 450 }}>
-                      When enabled, our AI will automatically respond to reviews based on your configuration, using your brand voice and tone.
+                      {t('autoReply.description')}
                     </Typography>
                   </Box>
                 </Stack>
                 <Box sx={{ textAlign: 'right' }}>
                   <Typography variant="overline" display="block" color={settings.enabled ? 'primary' : 'text.disabled'} sx={{ mb: 1, fontWeight: 700 }}>
-                    {settings.enabled ? 'System Active' : 'System Paused'}
+                    {settings.enabled ? t('autoReply.systemActive') : t('autoReply.systemPaused')}
                   </Typography>
                   <Switch 
                     checked={settings.enabled} 
@@ -161,8 +166,8 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                 {/* Rules & Logic */}
                 <Card elevation={0} variant="outlined" sx={{ borderRadius: 3 }}>
                   <CardHeader 
-                    title="Response Rules" 
-                    subheader="Define which reviews should trigger an automatic response"
+                    title={t('autoReply.responseRules')}
+                    subheader={t('autoReply.rulesSubtitle')}
                     avatar={<Avatar sx={{ bgcolor: alpha('#4f46e5', 0.1), color: '#4f46e5' }}><SettingsIcon /></Avatar>}
                   />
                   <Divider />
@@ -170,8 +175,8 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                     <Stack spacing={5}>
                       <Box>
                         <Typography variant="subtitle2" fontWeight="700" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-                          Target Sentiment
-                          <Tooltip title="Choose which rating levels should receive automated replies">
+                          {t('autoReply.targetSentiment')}
+                          <Tooltip title={t('autoReply.sentimentTooltip')}>
                             <IconButton size="small"><InfoIcon fontSize="inherit" /></IconButton>
                           </Tooltip>
                         </Typography>
@@ -219,10 +224,10 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                                   
                                   <Box>
                                     <Typography variant="h6" fontWeight="800" sx={{ mb: 0.5 }}>
-                                      Positive Only
+                                      {t('autoReply.positiveOnly')}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
-                                      Best for businesses wanting to only automate high-praise reviews.
+                                      {t('autoReply.positiveOnlyDesc')}
                                     </Typography>
                                     
                                     <Stack direction="row" spacing={1}>
@@ -292,10 +297,10 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                                   
                                   <Box>
                                     <Typography variant="h6" fontWeight="800" sx={{ mb: 0.5 }}>
-                                      Positive + Neutral
+                                      {t('autoReply.positiveNeutral')}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
-                                      Comprehensive coverage including 3-star reviews for maximum efficiency.
+                                      {t('autoReply.positiveNeutralDesc')}
                                     </Typography>
                                     
                                     <Stack direction="row" spacing={1}>
@@ -337,11 +342,11 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                           <Box>
                             <Typography variant="subtitle2" fontWeight="800" color="error.dark" sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                              Negative Review Safeguard
+                              {t('autoReply.negativeSafeguard')}
                               <Avatar sx={{ width: 20, height: 20, bgcolor: 'error.main', fontSize: 10, fontWeight: 900 }}>!</Avatar>
                             </Typography>
                             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                              Always hold 1 & 2 star reviews for manual approval before posting.
+                              {t('autoReply.negativeSafeguardDesc')}
                             </Typography>
                           </Box>
                           <Switch 
@@ -358,8 +363,8 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                 {/* Timing & Capacity */}
                 <Card elevation={0} variant="outlined" sx={{ borderRadius: 3 }}>
                   <CardHeader 
-                    title="Timing & Delivery" 
-                    subheader="Control when and how often replies are sent"
+                    title={t('autoReply.timingDelivery')}
+                    subheader={t('autoReply.timingSubtitle')}
                     avatar={<Avatar sx={{ bgcolor: alpha('#f59e0b', 0.1), color: '#f59e0b' }}><TimerIcon /></Avatar>}
                   />
                   <Divider />
@@ -368,11 +373,11 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                       <Box>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
                           <Box>
-                            <Typography variant="subtitle2" fontWeight="700">Reply Delay</Typography>
-                            <Typography variant="body2" color="text.secondary">Wait time to make AI replies look more natural</Typography>
+                            <Typography variant="subtitle2" fontWeight="700">{t('autoReply.replyDelay')}</Typography>
+                            <Typography variant="body2" color="text.secondary">{t('autoReply.delayDesc')}</Typography>
                           </Box>
                           <Typography variant="h6" color="primary.main" fontWeight="700">
-                            {settings.delayHours} {settings.delayHours === 1 ? 'hour' : 'hours'}
+                            {settings.delayHours} {settings.delayHours === 1 ? t('autoReply.hour') : t('autoReply.hours')}
                           </Typography>
                         </Stack>
                         <Box sx={{ px: 2 }}>
@@ -382,7 +387,7 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                             max={24}
                             step={1}
                             marks={[
-                              { value: 0, label: 'Instant' },
+                              { value: 0, label: t('autoReply.instant') },
                               { value: 6, label: '6h' },
                               { value: 12, label: '12h' },
                               { value: 18, label: '18h' },
@@ -404,8 +409,8 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                                 <SecurityIcon />
                               </Avatar>
                               <Box>
-                                <Typography variant="subtitle2" fontWeight="700">Daily Reply Limit</Typography>
-                                <Typography variant="body2" color="text.secondary">Maximum automated replies per 24-hour period</Typography>
+                                <Typography variant="subtitle2" fontWeight="700">{t('autoReply.dailyLimit')}</Typography>
+                                <Typography variant="body2" color="text.secondary">{t('autoReply.limitDesc')}</Typography>
                               </Box>
                             </Stack>
                           </Grid>
@@ -448,7 +453,7 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                   boxShadow: (theme: Theme) => `0 8px 16px -4px ${alpha(theme.palette.primary.main, 0.3)}`
                 }}
               >
-                {isUpdating ? 'Saving...' : 'Save Settings'}
+                {isUpdating ? t('autoReply.saving') : t('autoReply.saveSettings')}
               </Button>
             </Box>
           </Stack>
@@ -485,8 +490,8 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                     <StepIcon fontSize="small" />
                   </Avatar>
                   <Box>
-                    <Typography variant="h6" fontWeight="800">Quick Guide</Typography>
-                    <Typography variant="caption" color="text.secondary">How the workflow handles reviews</Typography>
+                    <Typography variant="h6" fontWeight="800">{t('autoReply.quickGuide')}</Typography>
+                    <Typography variant="caption" color="text.secondary">{t('autoReply.guideSubtitle')}</Typography>
                   </Box>
                 </Stack>
               </Box>
@@ -505,10 +510,10 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                   }} />
 
                   {[
-                    { step: 1, title: 'Sentiment Analysis', desc: 'New reviews are analyzed for star rating and content sentiment.' },
-                    { step: 2, title: 'AI Generation', desc: 'Replies are crafted using your unique Brand Voice and response patterns.' },
-                    { step: 3, title: 'Natural Delay', desc: 'Replies wait for your configured delay period before being queued for posting.' },
-                    { step: 4, title: 'Manual Review', desc: 'Negative or flagged reviews are always held for your human approval.' }
+                    { step: 1, title: t('autoReply.steps.sentiment.title'), desc: t('autoReply.steps.sentiment.desc') },
+                    { step: 2, title: t('autoReply.steps.ai.title'), desc: t('autoReply.steps.ai.desc') },
+                    { step: 3, title: t('autoReply.steps.delay.title'), desc: t('autoReply.steps.delay.desc') },
+                    { step: 4, title: t('autoReply.steps.manual.title'), desc: t('autoReply.steps.manual.desc') }
                   ].map((item) => (
                     <Box key={item.step} sx={{ 
                       display: 'flex', 
@@ -601,8 +606,8 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                     <VoiceIcon fontSize="small" />
                   </Avatar>
                   <Box>
-                    <Typography variant="h6" fontWeight="800">Brand Voice</Typography>
-                    <Typography variant="caption" color="text.secondary">Personality & Tone</Typography>
+                    <Typography variant="h6" fontWeight="800">{t('autoReply.brandVoice')}</Typography>
+                    <Typography variant="caption" color="text.secondary">{t('autoReply.voiceSubtitle')}</Typography>
                   </Box>
                 </Stack>
               </Box>
@@ -611,10 +616,10 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                 <Stack spacing={4} alignItems="center" textAlign="center">
                   <Box>
                     <Typography variant="subtitle1" fontWeight="800" color="success.dark" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5 }}>
-                      <CheckIcon fontSize="small" /> Status: Active
+                      <CheckIcon fontSize="small" /> {t('autoReply.activeStatus')}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 2, lineHeight: 1.6 }}>
-                      Your responses will automatically reflect your established brand personality and values across all platforms.
+                      {t('autoReply.voiceDesc')}
                     </Typography>
                   </Box>
                   
@@ -635,7 +640,7 @@ const AutoReplySettings: React.FC<AutoReplySettingsProps> = ({ profile, onUpdate
                       }
                     }}
                   >
-                    Configure Brand Voice
+                    {t('autoReply.configureVoice')}
                   </Button>
                 </Stack>
               </CardContent>

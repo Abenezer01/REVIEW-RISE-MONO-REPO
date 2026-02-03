@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { CheckCircle2, Loader2, Zap, Smartphone, Shield } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface AnalysisStep {
   id: string;
@@ -9,15 +10,17 @@ interface AnalysisStep {
   subtext: string;
 }
 
-const steps: AnalysisStep[] = [
-  { id: 'fetch', label: 'Fetching website data...', subtext: 'Connecting to server' },
-  { id: 'technical', label: 'Analyzing technical SEO...', subtext: 'Checking SSL, headers, and structure' },
-  { id: 'content', label: 'Evaluating content quality...', subtext: 'Scanning keywords and readability' },
-  { id: 'mobile', label: 'Testing mobile responsiveness...', subtext: 'Simulating mobile devices' },
-  { id: 'performance', label: 'Measuring performance...', subtext: 'Calculating Core Web Vitals' },
-];
-
 export default function AnalysisLoader() {
+  const t = useTranslations('landing.loader');
+
+  const steps: AnalysisStep[] = [
+    { id: 'fetch', label: t('fetching'), subtext: t('connecting') },
+    { id: 'technical', label: t('technical'), subtext: t('checking') },
+    { id: 'content', label: t('content'), subtext: t('scanning') },
+    { id: 'mobile', label: t('mobile'), subtext: t('simulating') },
+    { id: 'performance', label: t('performance'), subtext: t('calculating') },
+  ];
+
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
 
@@ -37,7 +40,7 @@ export default function AnalysisLoader() {
     const stepDuration = 100 / steps.length;
     const step = Math.floor(progress / stepDuration);
     setCurrentStep(Math.min(step, steps.length - 1));
-  }, [progress]);
+  }, [progress, steps.length]);
 
   return (
     <div className="loader-container">
@@ -52,7 +55,7 @@ export default function AnalysisLoader() {
         </div>
 
         <h3 className="progress-text">
-          {steps[currentStep].label} <span className="percentage">{progress}%</span>
+          {steps[currentStep].label} <span className="percentage">{progress}{'%'}</span>
         </h3>
         
         <div className="progress-bar-bg">
@@ -77,7 +80,7 @@ export default function AnalysisLoader() {
                 </div>
                 <div className="step-content">
                     <span className="step-label">{step.subtext}</span>
-                    {isCompleted && <span className="step-time">✓ Completed</span>}
+                    {isCompleted && <span className="step-time">{'✓'} {t('completed')}</span>}
                 </div>
               </div>
             );
@@ -89,28 +92,28 @@ export default function AnalysisLoader() {
       <div className="insights-card">
         <div className="insights-header">
            <Zap size={20} className="text-purple-400" />
-           <span>Early Insights Detected</span>
+           <span>{t('earlyInsights')}</span>
         </div>
         
         <div className="insight-item">
             <div className="insight-icon bg-purple-500/20 text-purple-400">
                 <Zap size={16} />
             </div>
-            <span>Page load time: 2.4s - Room for improvement detected</span>
+            <span>{t('insightLoadTime')}</span>
         </div>
         
         <div className="insight-item">
             <div className="insight-icon bg-purple-500/20 text-purple-400">
                 <Smartphone size={16} />
             </div>
-            <span>Mobile optimization: Excellent responsive design found</span>
+            <span>{t('insightMobile')}</span>
         </div>
         
         <div className="insight-item">
             <div className="insight-icon bg-purple-500/20 text-purple-400">
                 <Shield size={16} />
             </div>
-            <span>Security: HTTPS properly configured</span>
+            <span>{t('insightSecurity')}</span>
         </div>
       </div>
 
