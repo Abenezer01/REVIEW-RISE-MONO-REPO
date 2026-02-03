@@ -76,11 +76,12 @@ export class ContentStudioController {
         try {
             const schema = z.object({
                 topic: z.string(),
-                businessType: z.string()
+                businessType: z.string(),
+                context: z.any().optional()
             });
-            const { topic, businessType } = schema.parse(req.body);
+            const { topic, businessType, context } = schema.parse(req.body);
 
-            const result = await contentStudioService.generate30DayPlan(topic, businessType);
+            const result = await contentStudioService.generate30DayPlan(topic, businessType, context);
             const response = createSuccessResponse(result, 'Plan generated successfully', 200, { requestId: req.id });
             res.status(response.statusCode).json(response);
         } catch (error: any) {

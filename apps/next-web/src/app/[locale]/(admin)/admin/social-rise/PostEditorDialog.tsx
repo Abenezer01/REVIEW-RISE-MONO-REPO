@@ -76,13 +76,39 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
 
   useEffect(() => {
     if (post) {
+      const ALL_SUPPORTED_PLATFORMS = ['INSTAGRAM', 'FACEBOOK', 'LINKEDIN', 'TWITTER', 'GOOGLE_BUSINESS'];
+
+      const platforms = (post.platforms || []).reduce((acc: string[], curr: string) => {
+        if (typeof curr === 'string' && (curr.toUpperCase() === 'ALL PLATFORMS' || curr.toUpperCase() === 'ALL_PLATFORMS')) {
+          return [...acc, ...ALL_SUPPORTED_PLATFORMS];
+        }
+
+        if (typeof curr === 'string' && curr.includes(',')) {
+          const split = curr.split(',').map(p => p.trim());
+
+          return [...acc, ...split.reduce((pAcc: string[], p) => {
+            if (p.toUpperCase() === 'ALL PLATFORMS' || p.toUpperCase() === 'ALL_PLATFORMS') {
+              return [...pAcc, ...ALL_SUPPORTED_PLATFORMS];
+            }
+
+            const normalized = p.toUpperCase().replace(/\s+/g, '_');
+            const finalPlatform = normalized === 'X' ? 'TWITTER' : normalized;
+
+            return [...pAcc, finalPlatform];
+          }, [])];
+        }
+
+        const normalized = curr.toUpperCase().replace(/\s+/g, '_');
+        const finalPlatform = normalized === 'X' ? 'TWITTER' : normalized;
+
+        return [...acc, finalPlatform];
+      }, []);
+
       setFormData({
         title: post.content.title || '',
         text: post.content.text || '',
         hashtags: post.content.hashtags || '',
-        platforms: (post.platforms || []).map(p => 
-          PLATFORMS.some(plat => plat.value === p) ? p : p.toUpperCase().replace(/\s+/g, '_')
-        ),
+        platforms: Array.from(new Set(platforms)) as string[],
         scheduledAt: new Date(post.scheduledAt),
         status: post.status,
         media: (post.content.media as any) || []
