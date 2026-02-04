@@ -168,7 +168,7 @@ return BrandService.getCompetitor(businessId, competitorId);
                               </Typography>
                           </Box>
                           {competitor.type === 'DIRECT_LOCAL' && (
-                               <Chip label="DIRECT LOCAL" size="small" sx={{ borderRadius: 1, fontWeight: 'bold', bgcolor: theme.palette.success.main, color: 'white', fontSize: '0.7rem' }} />
+                               <Chip label={t('brandRise.competitors.stats.directLocal')} size="small" sx={{ borderRadius: 1, fontWeight: 'bold', bgcolor: theme.palette.success.main, color: 'white', fontSize: '0.7rem' }} />
                           )}
                       </Stack>
 

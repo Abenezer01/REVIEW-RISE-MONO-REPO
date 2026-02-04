@@ -153,13 +153,13 @@ const SeasonalEventsPage = () => {
   const columns: GridColDef[] = useMemo(() => [
     {
       field: 'name',
-      headerName: t('navigation.seasonalEvents.eventName'),
+      headerName: t('seasonalEvents.eventName'),
       flex: 1,
       minWidth: 200
     },
     {
       field: 'date',
-      headerName: t('navigation.seasonalEvents.date'),
+      headerName: t('seasonalEvents.date'),
       flex: 0.8,
       minWidth: 150,
       renderCell: (params) => (
@@ -170,7 +170,7 @@ const SeasonalEventsPage = () => {
     },
     {
       field: 'market',
-      headerName: t('navigation.seasonalEvents.market'),
+      headerName: t('seasonalEvents.market'),
       flex: 0.6,
       minWidth: 120,
       renderCell: (params) => (
@@ -179,7 +179,7 @@ const SeasonalEventsPage = () => {
     },
     {
       field: 'description',
-      headerName: t('navigation.seasonalEvents.description'),
+      headerName: t('seasonalEvents.description'),
       flex: 2,
       minWidth: 300,
       renderCell: (params) => (
@@ -218,10 +218,10 @@ const SeasonalEventsPage = () => {
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={6}>
         <Box>
           <Typography variant="h4" sx={{ mb: 1, fontWeight: 600 }}>
-            {t('navigation.seasonalEvents.title')}
+            {t('seasonalEvents.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {t('navigation.seasonalEvents.subtitle')}
+            {t('seasonalEvents.subtitle')}
           </Typography>
         </Box>
         <Button
@@ -230,7 +230,7 @@ const SeasonalEventsPage = () => {
           startIcon={<Icon icon="tabler-plus" fontSize={20} />}
           sx={{ px: 5, py: 2, borderRadius: 1.5 }}
         >
-          {t('navigation.seasonalEvents.addEvent')}
+          {t('seasonalEvents.addEvent')}
         </Button>
       </Stack>
 
@@ -252,21 +252,21 @@ const SeasonalEventsPage = () => {
         }}
       >
         <DialogTitle sx={{ pb: 2, borderBottom: theme => `1px solid ${theme.palette.divider}` }}>
-          {editingEvent ? t('navigation.seasonalEvents.editEvent') : t('navigation.seasonalEvents.addNewEvent')}
+          {editingEvent ? t('seasonalEvents.editEvent') : t('seasonalEvents.addNewEvent')}
         </DialogTitle>
         <DialogContent sx={{ mt: 4 }}>
           <Stack spacing={4}>
             <TextField
-              label={t('navigation.seasonalEvents.eventName')}
+              label={t('seasonalEvents.eventName')}
               fullWidth
-              placeholder="e.g., Summer Solstice Sale"
+              placeholder={t('seasonalEvents.eventNamePlaceholder')}
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={4}>
               <TextField
-                label={t('navigation.seasonalEvents.date')}
+                label={t('seasonalEvents.date')}
                 type="date"
                 fullWidth
                 value={formData.date}
@@ -275,7 +275,7 @@ const SeasonalEventsPage = () => {
               />
               <TextField
                 select
-                label={t('navigation.seasonalEvents.market')}
+                label={t('seasonalEvents.market')}
                 fullWidth
                 value={formData.market}
                 onChange={(e) => setFormData({ ...formData, market: e.target.value })}
@@ -289,11 +289,11 @@ const SeasonalEventsPage = () => {
             </Stack>
 
             <TextField
-              label={t('navigation.seasonalEvents.description')}
+              label={t('seasonalEvents.description')}
               fullWidth
               multiline
               rows={4}
-              placeholder="Describe the event and its marketing objectives..."
+              placeholder={t('seasonalEvents.descriptionPlaceholder')}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             />
@@ -312,8 +312,8 @@ const SeasonalEventsPage = () => {
         handleClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteDialogOpen(false)}
-        title={t('navigation.seasonalEvents.deleteTitle')}
-        content={t('navigation.seasonalEvents.deleteConfirm')}
+        title={t('seasonalEvents.deleteTitle')}
+        content={t('seasonalEvents.deleteConfirm')}
         type="delete"
       />
     </Box>

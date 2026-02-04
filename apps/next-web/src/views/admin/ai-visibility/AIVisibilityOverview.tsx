@@ -10,7 +10,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Tooltip from '@mui/material/Tooltip'
 import InfoOutlined from '@mui/icons-material/InfoOutlined'
 
-import { useTranslation } from '@/hooks/useTranslation'
+import { useTranslations } from 'next-intl'
 import MetricCard from '@/components/shared/analytics/MetricCard'
 
 // Icons
@@ -47,7 +47,7 @@ interface AIVisibilityOverviewProps {
 }
 
 const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) => {
-  const t = useTranslation('dashboard')
+  const t = useTranslations('dashboard')
 
   if (!metrics) return null
 

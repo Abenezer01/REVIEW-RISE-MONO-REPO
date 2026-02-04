@@ -41,6 +41,7 @@ interface UnifiedResultsProps {
 
 export default function UnifiedResults({ data, initialDate }: UnifiedResultsProps) {
     const t = useTranslations('studio')
+    const tc = useTranslations('common')
     const { notify } = useSystemMessages()
     const { businessId } = useBusinessId()
     const { locationId } = useLocationFilter()
@@ -214,7 +215,7 @@ export default function UnifiedResults({ data, initialDate }: UnifiedResultsProp
                         variant="outlined"
                         color="inherit"
                     >
-                        {t('common.share')}
+                        {tc('common.share')}
                     </Button>
                     <Button
                         variant="contained"
