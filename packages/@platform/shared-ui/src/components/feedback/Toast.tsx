@@ -1,7 +1,5 @@
 import type { ToastOptions } from 'react-hot-toast';
 import toast, { Toaster } from 'react-hot-toast';
-import { systemMessageEvents, SYSTEM_MESSAGE_EVENT } from '@platform/utils';
-import { SystemMessageCode } from '@platform/contracts';
 
 /**
  * @deprecated Use useSystemMessages().notify(code) instead for standardized localized messaging.

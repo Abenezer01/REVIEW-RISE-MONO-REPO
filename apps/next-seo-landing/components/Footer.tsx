@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 
 export default function Footer() {
   const t = useTranslations('landing');
@@ -16,9 +17,9 @@ export default function Footer() {
             <span>{t('common.brandName')}</span>
           </div>
           <div className="links">
-            <a href="#features">{t('footer.features')}</a>
-            <a href="#how-it-works">{t('howItWorks.title')}</a>
-            <a href="https://app.reviewrise.com">{t('footer.login')}</a>
+            <Link href="#features">{t('footer.features')}</Link>
+            <Link href="#how-it-works">{t('howItWorks.title')}</Link>
+            <Link href="https://app.reviewrise.com">{t('footer.login')}</Link>
           </div>
         </div>
         <div className="bottom">
@@ -26,8 +27,8 @@ export default function Footer() {
             {'©'} {new Date().getFullYear()} {t('common.brandName')}{'.'} {t('footer.rights')}
           </p>
           <div className="legal">
-            <a href="/privacy">{t('footer.privacy')}</a>
-            <a href="/terms">{t('footer.terms')}</a>
+            <Link href="/privacy">{t('footer.privacy')}</Link>
+            <Link href="/terms">{t('footer.terms')}</Link>
           </div>
         </div>
       </div>
