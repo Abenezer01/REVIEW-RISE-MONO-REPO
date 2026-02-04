@@ -1,4 +1,14 @@
 {
+  "dashboard": {
+    "kpi": {
+      "title": "Admin KPIs",
+      "refreshedJustNow": "Refreshed just now",
+      "totalAccounts": "Total accounts",
+      "activeLocations": "Active locations",
+      "failedJobs24h": "Failed jobs in the last 24 hours",
+      "subscriptionIssues": "Subscription issues"
+    }
+  },
   "featureFlags": {
     "title": "Feature Flags",
     "subtitle": "Manage global feature flags and toggles",

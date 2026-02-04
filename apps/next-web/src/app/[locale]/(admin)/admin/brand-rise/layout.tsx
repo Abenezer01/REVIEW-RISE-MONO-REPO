@@ -80,7 +80,7 @@ const BrandingRiseLayout = ({ children }: { children: React.ReactNode }) => {
           </Button>
 
           {/* Date Range Toggles */}
-          <ButtonGroup variant="outlined" aria-label="date range" sx={{ bgcolor: 'background.paper' }}>
+          <ButtonGroup variant="outlined" aria-label={t('overview.dateRange')} sx={{ bgcolor: 'background.paper' }}>
             {['7d', '30d', '90d'].map((range) => (
               <Button
                 key={range}
@@ -109,7 +109,7 @@ const BrandingRiseLayout = ({ children }: { children: React.ReactNode }) => {
 
       <TabContext value={value}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-          <TabList onChange={handleChange} aria-label="BrandingRise Navigation">
+          <TabList onChange={handleChange} aria-label={t('navigation.brand-rise')}>
             <Tab label={t('brandRise.tabs.overview')} value="overview" />
             <Tab label={t('brandRise.tabs.recommendations')} value="recommendations" />
             <Tab label={t('brandRise.tabs.visibility')} value="visibility" />

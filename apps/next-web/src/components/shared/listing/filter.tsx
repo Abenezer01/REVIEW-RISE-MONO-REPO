@@ -4,8 +4,8 @@ import { LoadingButton } from "@mui/lab";
 import { Box, Button, Grid } from "@mui/material";
 import type { FormikProps } from "formik";
 import { Formik } from "formik";
+import { useTranslations } from "next-intl";
 
-import { useTranslation } from '@/hooks/useTranslation';
 import CustomSideDrawer from "../drawer/side-drawer";
 
 interface FilterListProps {
@@ -23,7 +23,7 @@ const FilterList: React.FC<FilterListProps> = ({
   FilterComponentItems,
   initialValues = {},
 }) => {
-  const t = useTranslation('common');
+  const t = useTranslations('common');
 
   const handleClose = () => {
     toggle();
@@ -35,7 +35,7 @@ const FilterList: React.FC<FilterListProps> = ({
   };
 
   return (
-    <CustomSideDrawer title="Filter" handleClose={handleClose} open={open}>
+    <CustomSideDrawer title={t('common.filter')} handleClose={handleClose} open={open}>
       {() => (
         <>
           {FilterComponentItems && (

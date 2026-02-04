@@ -28,19 +28,6 @@
     "brand-rise": "BrandRise",
     "content-templates": "Content Templates",
     "seasonal-events": "Seasonal Events",
-    "seasonalEvents": {
-      "title": "Seasonal Events",
-      "subtitle": "Manage your brand's seasonal events and holiday marketing schedule.",
-      "addEvent": "Add Event",
-      "editEvent": "Edit Seasonal Event",
-      "addNewEvent": "Add New Event",
-      "eventName": "Event Name",
-      "date": "Date",
-      "market": "Market",
-      "description": "Description",
-      "deleteTitle": "Delete Seasonal Event",
-      "deleteConfirm": "Are you sure you want to delete this seasonal event? This action cannot be undone."
-    },
     "settings": "Settings",
     "system-settings": "System Settings",
     "feature-flags": "Feature Flags",
@@ -58,6 +45,21 @@
     "passwordMin": "Password must be at least {min} characters"
   },
   "auto-reply": "Auto-Reply Settings",
+  "seasonalEvents": {
+    "title": "Seasonal Events",
+    "subtitle": "Manage your brand's seasonal events and holiday marketing schedule.",
+    "addEvent": "Add Event",
+    "editEvent": "Edit Seasonal Event",
+    "addNewEvent": "Add New Event",
+    "eventName": "Event Name",
+    "eventNamePlaceholder": "e.g., Summer Solstice Sale",
+    "date": "Date",
+    "market": "Market",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe the event and its marketing objectives...",
+    "deleteTitle": "Delete Seasonal Event",
+    "deleteConfirm": "Are you sure you want to delete this seasonal event? This action cannot be undone."
+  },
   "seo": {
     "visibility": {
       "title": "SERP Visibility",
@@ -171,13 +173,18 @@
   },
   "overview": {
     "title": "Dashboard Overview",
+    "activityFeed": {
+      "title": "Recent Activity",
+      "subheader": "Latest updates"
+    },
     "welcome": "Welcome back",
     "totalReviews": "Total Reviews",
     "averageRating": "Average Rating",
     "responseRate": "Response Rate",
     "pendingReviews": "Pending Reviews",
     "loading": "Loading...",
-    "noData": "No data available"
+    "noData": "No data available",
+    "dateRange": "Date Range"
   },
   "stats": {
     "thisWeek": "This Week",
@@ -864,6 +871,14 @@
       "uvp": "UVP",
       "services": "Services",
       "analysis": "Analysis",
+      "notFound": "Competitor not found",
+      "backToList": "Back to List",
+      "stats": {
+        "found": "COMPETITORS FOUND",
+        "directLocal": "DIRECT LOCAL",
+        "content": "CONTENT COMPETITORS",
+        "aggregators": "AGGREGATORS"
+      },
       "listTitle": "Tracked Competitors",
       "addTitle": "Add Competitor",
       "nameLabel": "Competitor Name",
