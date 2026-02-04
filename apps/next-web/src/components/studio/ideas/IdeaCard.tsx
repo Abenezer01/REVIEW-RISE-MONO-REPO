@@ -11,6 +11,8 @@ import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 
+import { useTranslation } from '@/hooks/useTranslation'
+
 interface IdeaCardProps {
     idea: {
         title: string
@@ -27,6 +29,8 @@ interface IdeaCardProps {
 }
 
 export default function IdeaCard({ idea, onUse, onBookmark, onCopy }: IdeaCardProps) {
+    const t = useTranslation('studio')
+
     const getEngagementColor = (level?: string) => {
         switch (level) {
             case 'high': return 'success'
@@ -38,9 +42,9 @@ export default function IdeaCard({ idea, onUse, onBookmark, onCopy }: IdeaCardPr
 
     const getEngagementLabel = (level?: string) => {
         switch (level) {
-            case 'high': return 'High Engagement'
-            case 'medium': return 'Medium Engagement'
-            case 'low': return 'Low Engagement'
+            case 'high': return t('ideas.highEngagement')
+            case 'medium': return t('ideas.mediumEngagement')
+            case 'low': return t('ideas.lowEngagement')
             default: return ''
         }
     }
@@ -130,7 +134,7 @@ export default function IdeaCard({ idea, onUse, onBookmark, onCopy }: IdeaCardPr
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                 <i className="tabler-clock" style={{ fontSize: 16, opacity: 0.6 }} />
                                 <Typography variant="caption" color="text.secondary">
-                                    {idea.readingTime} min read
+                                    {idea.readingTime} {t('ideas.minRead')}
                                 </Typography>
                             </Box>
                         )}
@@ -146,7 +150,7 @@ export default function IdeaCard({ idea, onUse, onBookmark, onCopy }: IdeaCardPr
                             '&:hover': { bgcolor: 'secondary.dark' }
                         }}
                     >
-                        Use This Idea
+                        {t('ideas.useThisIdea')}
                     </Button>
                 </Box>
             </CardContent>

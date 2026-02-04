@@ -1,49 +1,51 @@
 /* eslint-disable import/no-unresolved */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
-import { 
-  Box, 
-  Typography, 
-  Paper, 
-  Grid, 
-  Button, 
-  FormControl, 
-  InputLabel, 
-  Select, 
-  MenuItem, 
-  Card, 
+import {
+  Alert,
+  alpha,
+  Box,
+  Button,
+  Card,
   CardContent,
   Chip,
-  Divider,
   CircularProgress,
-  Alert,
+  Divider,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
   Stack,
-  useTheme,
-  alpha
+  Typography,
+  useTheme
 } from '@mui/material';
 
-import { 
-  CalendarToday, 
-  AutoAwesome, 
-  ContentPaste, 
-  EventNote as EventNoteIcon,
+import {
   ArrowForward,
-  CheckCircle as CheckCircleIcon,
-  Psychology,
+  AutoAwesome,
   AutoGraph,
+  CalendarToday,
+  CheckCircle as CheckCircleIcon,
+  ContentPaste,
+  EventNote as EventNoteIcon,
+  Psychology,
   TipsAndUpdates
 } from '@mui/icons-material';
+
+import { useFormatter, useTranslations } from 'next-intl';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
 import { useLocationFilter } from '@/hooks/useLocationFilter';
 import { BrandService } from '@/services/brand.service';
 
-const Icon = ({ icon, fontSize, color, ...rest }: { icon: string; fontSize?: number | string; color?: string; [key: string]: any }) => {
+const Icon = ({ icon, fontSize, color, ...rest }: { icon: string; fontSize?: number | string; color?: string;[key: string]: any }) => {
   return <i className={icon} style={{ fontSize, color }} {...rest} />;
 };
 
@@ -65,6 +67,11 @@ const PLATFORM_ICONS: Record<string, { icon: string, color: string }> = {
 
 export default function PlannerPage() {
   const theme = useTheme();
+  const t = useTranslations('dashboard');
+  const ts = useTranslations('studio.planner');
+  const tc = useTranslations('common');
+  const tp = useTranslations('social.planner');
+  const format = useFormatter();
   const isDark = theme.palette.mode === 'dark';
   const { businessId } = useBusinessId();
   const { locationId } = useLocationFilter();
@@ -173,22 +180,22 @@ export default function PlannerPage() {
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1400, mx: 'auto' }}>
-      <Box sx={{ 
-        display: 'flex', 
+      <Box sx={{
+        display: 'flex',
         flexDirection: { xs: 'column', sm: 'row' },
-        justifyContent: 'space-between', 
-        alignItems: { xs: 'flex-start', sm: 'center' }, 
+        justifyContent: 'space-between',
+        alignItems: { xs: 'flex-start', sm: 'center' },
         mb: 4,
         gap: 2
       }}>
         <Box>
           <Typography variant="h4" fontWeight="800" sx={{ letterSpacing: '-0.02em', mb: 0.5 }}>
-            Content Planner
+            {ts('title')}
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
             <Icon icon="tabler-sparkles" fontSize={16} color={theme.palette.primary.main} />
             <Typography variant="body2" color="text.secondary" fontWeight="500">
-              AI Strategy for your Brand DNA
+              {t('brandRise.dna.summary')}
             </Typography>
           </Stack>
         </Box>
@@ -203,57 +210,57 @@ export default function PlannerPage() {
               endIcon={<ArrowForward />}
               sx={{ borderRadius: 2, fontWeight: 'bold' }}
             >
-              View Scheduler
+              {t('navigation.social-rise')}
             </Button>
           )}
           {plan && plan.status !== 'converted' && (
-            <Button 
-              variant="contained" 
-              color="secondary" 
+            <Button
+              variant="contained"
+              color="secondary"
               startIcon={converting ? <CircularProgress size={20} color="inherit" /> : <ContentPaste />}
               onClick={handleCreateDrafts}
               disabled={converting}
-              sx={{ 
-                borderRadius: 2, 
+              sx={{
+                borderRadius: 2,
                 fontWeight: 'bold',
                 boxShadow: '0 4px 14px 0 rgba(115, 103, 240, 0.39)',
               }}
             >
-              {converting ? 'Creating...' : 'Create Drafts'}
+              {converting ? tc('common.loading') : ts('savePlan')}
             </Button>
           )}
-          <Button 
-            variant="contained" 
-            color="primary" 
+          <Button
+            variant="contained"
+            color="primary"
             startIcon={generating ? <CircularProgress size={20} color="inherit" /> : <AutoAwesome />}
             onClick={handleGenerate}
             disabled={generating}
-            sx={{ 
-              borderRadius: 2, 
+            sx={{
+              borderRadius: 2,
               fontWeight: 'bold',
               boxShadow: '0 4px 14px 0 rgba(115, 103, 240, 0.39)',
             }}
           >
-            {generating ? 'Generating...' : 'Regenerate'}
+            {generating ? tc('common.generating') : ts('generateNewPlan')}
           </Button>
         </Stack>
       </Box>
 
       {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>{error}</Alert>}
       {success && (
-        <Alert 
-          severity="success" 
+        <Alert
+          severity="success"
           sx={{ mb: 3, borderRadius: 2 }}
           action={
             plan?.status === 'converted' ? (
-              <Button 
-                color="inherit" 
-                size="small" 
-                component={Link} 
+              <Button
+                color="inherit"
+                size="small"
+                component={Link}
                 href={`/${locale}/admin/social-rise`}
                 sx={{ fontWeight: 'bold' }}
               >
-                GO TO SCHEDULER
+                {tp('goToScheduler')}
               </Button>
             ) : null
           }
@@ -266,27 +273,27 @@ export default function PlannerPage() {
         {/* Sidebar Configuration */}
         <Grid size={{ xs: 12, md: 3 }}>
           <Stack spacing={3}>
-            <Paper sx={{ 
-              p: 3, 
-              borderRadius: '20px', 
+            <Paper sx={{
+              p: 3,
+              borderRadius: '20px',
               border: `1px solid ${isDark ? theme.palette.divider : alpha(theme.palette.divider, 0.5)}`,
               boxShadow: isDark ? 'none' : '0 10px 30px 0 rgba(0,0,0,0.04)',
               bgcolor: isDark ? alpha(theme.palette.background.paper, 0.5) : theme.palette.background.paper
             }}>
               <Typography variant="subtitle1" fontWeight="800" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Icon icon="tabler-calendar-event" fontSize={20} color={theme.palette.primary.main} />
-                Timeline
+                {ts('resultsTitle')}
               </Typography>
               <Divider sx={{ mb: 2.5, opacity: 0.6 }} />
-              
+
               <Stack spacing={2.5}>
                 <FormControl fullWidth size="small">
-                  <InputLabel sx={{ fontWeight: 500 }}>Month</InputLabel>
-                  <Select 
-                    value={month} 
-                    label="Month" 
+                  <InputLabel sx={{ fontWeight: 500 }}>{tc('common.search')}</InputLabel>
+                  <Select
+                    value={month}
+                    label={tc('common.search')}
                     onChange={(e) => setMonth(Number(e.target.value))}
-                    sx={{ 
+                    sx={{
                       borderRadius: '12px',
                       bgcolor: isDark ? alpha(theme.palette.common.white, 0.02) : alpha(theme.palette.primary.main, 0.02)
                     }}
@@ -298,12 +305,12 @@ export default function PlannerPage() {
                 </FormControl>
 
                 <FormControl fullWidth size="small">
-                  <InputLabel sx={{ fontWeight: 500 }}>Year</InputLabel>
-                  <Select 
-                    value={year} 
-                    label="Year" 
+                  <InputLabel sx={{ fontWeight: 500 }}>{tc('common.confirm')}</InputLabel>
+                  <Select
+                    value={year}
+                    label={tc('common.confirm')}
                     onChange={(e) => setYear(Number(e.target.value))}
-                    sx={{ 
+                    sx={{
                       borderRadius: '12px',
                       bgcolor: isDark ? alpha(theme.palette.common.white, 0.02) : alpha(theme.palette.primary.main, 0.02)
                     }}
@@ -316,27 +323,27 @@ export default function PlannerPage() {
               </Stack>
             </Paper>
 
-            <Paper sx={{ 
-              p: 3, 
-              borderRadius: '20px', 
+            <Paper sx={{
+              p: 3,
+              borderRadius: '20px',
               border: `1px solid ${isDark ? theme.palette.divider : alpha(theme.palette.divider, 0.5)}`,
               boxShadow: isDark ? 'none' : '0 10px 30px 0 rgba(0,0,0,0.04)',
               bgcolor: isDark ? alpha(theme.palette.background.paper, 0.5) : theme.palette.background.paper
             }}>
               <Typography variant="subtitle1" fontWeight="800" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Psychology sx={{ fontSize: 20, color: theme.palette.primary.main }} />
-                Brand Strategy
+                {t('brandRise.tabs.dna')}
               </Typography>
               <Divider sx={{ mb: 2.5, opacity: 0.6 }} />
-              
+
               <Stack spacing={2.5}>
                 <FormControl fullWidth size="small">
-                  <InputLabel sx={{ fontWeight: 500 }}>Industry</InputLabel>
-                  <Select 
-                    value={industry} 
-                    label="Industry" 
+                  <InputLabel sx={{ fontWeight: 500 }}>{t('brandRise.content.industry')}</InputLabel>
+                  <Select
+                    value={industry}
+                    label={t('brandRise.content.industry')}
                     onChange={(e) => setIndustry(e.target.value)}
-                    sx={{ 
+                    sx={{
                       borderRadius: '12px',
                       bgcolor: isDark ? alpha(theme.palette.common.white, 0.02) : alpha(theme.palette.primary.main, 0.02)
                     }}
@@ -348,12 +355,12 @@ export default function PlannerPage() {
                 </FormControl>
 
                 <FormControl fullWidth size="small">
-                  <InputLabel sx={{ fontWeight: 500 }}>Frequency</InputLabel>
-                  <Select 
-                    value={frequency} 
-                    label="Frequency" 
+                  <InputLabel sx={{ fontWeight: 500 }}>{tc('common.search')}</InputLabel>
+                  <Select
+                    value={frequency}
+                    label={tc('common.search')}
                     onChange={(e) => setFrequency(e.target.value)}
-                    sx={{ 
+                    sx={{
                       borderRadius: '12px',
                       bgcolor: isDark ? alpha(theme.palette.common.white, 0.02) : alpha(theme.palette.primary.main, 0.02)
                     }}
@@ -370,26 +377,26 @@ export default function PlannerPage() {
                 </FormControl>
 
                 <FormControl fullWidth size="small">
-                  <InputLabel sx={{ fontWeight: 500 }}>Platforms</InputLabel>
-                  <Select 
-                    multiple 
-                    value={selectedPlatforms} 
-                    label="Platforms" 
+                  <InputLabel sx={{ fontWeight: 500 }}>{ts('suggestedPlatform')}</InputLabel>
+                  <Select
+                    multiple
+                    value={selectedPlatforms}
+                    label={ts('suggestedPlatform')}
                     onChange={(e) => setSelectedPlatforms(typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value)}
-                    sx={{ 
+                    sx={{
                       borderRadius: '12px',
                       bgcolor: isDark ? alpha(theme.palette.common.white, 0.02) : alpha(theme.palette.primary.main, 0.02)
                     }}
                     renderValue={(selected) => (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                         {selected.map((value) => (
-                          <Chip 
-                            key={value} 
-                            label={value} 
-                            size="small" 
-                            sx={{ 
-                              height: 20, 
-                              fontSize: '0.65rem', 
+                          <Chip
+                            key={value}
+                            label={value}
+                            size="small"
+                            sx={{
+                              height: 20,
+                              fontSize: '0.65rem',
                               fontWeight: 600,
                               borderRadius: '6px',
                               bgcolor: isDark ? alpha(PLATFORM_ICONS[value]?.color || '#7367F0', 0.2) : alpha(PLATFORM_ICONS[value]?.color || '#7367F0', 0.1),
@@ -403,10 +410,10 @@ export default function PlannerPage() {
                     {availablePlatforms.map(platform => (
                       <MenuItem key={platform} value={platform}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Icon 
-                            icon={PLATFORM_ICONS[platform].icon} 
-                            fontSize={16} 
-                            color={PLATFORM_ICONS[platform].color} 
+                          <Icon
+                            icon={PLATFORM_ICONS[platform].icon}
+                            fontSize={16}
+                            color={PLATFORM_ICONS[platform].color}
                           />
                           {platform}
                         </Box>
@@ -417,28 +424,28 @@ export default function PlannerPage() {
               </Stack>
             </Paper>
 
-            <Box sx={{ 
-              p: 2.5, 
-              borderRadius: '20px', 
-              bgcolor: isDark ? alpha(theme.palette.primary.main, 0.08) : alpha(theme.palette.primary.main, 0.04), 
-              border: `1px dashed ${alpha(theme.palette.primary.main, 0.3)}`, 
+            <Box sx={{
+              p: 2.5,
+              borderRadius: '20px',
+              bgcolor: isDark ? alpha(theme.palette.primary.main, 0.08) : alpha(theme.palette.primary.main, 0.04),
+              border: `1px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
               position: 'relative',
               overflow: 'hidden'
             }}>
-              <TipsAndUpdates sx={{ 
-                position: 'absolute', 
-                right: -10, 
-                bottom: -10, 
-                fontSize: 60, 
+              <TipsAndUpdates sx={{
+                position: 'absolute',
+                right: -10,
+                bottom: -10,
+                fontSize: 60,
                 opacity: 0.1,
                 color: 'primary.main'
               }} />
               <Typography variant="caption" fontWeight="800" color="primary" gutterBottom display="flex" alignItems="center" gap={0.5}>
                 <AutoAwesome sx={{ fontSize: 14 }} />
-                AI ADAPTATION ACTIVE
+                {tp('aiAdaptationActive')}
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.4, display: 'block' }}>
-                Strategy is automatically synced with your Brand DNA mission and voice.
+                {tp('aiStrategySync')}
               </Typography>
             </Box>
           </Stack>
@@ -449,28 +456,28 @@ export default function PlannerPage() {
           {loading ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
               <CircularProgress size={40} thickness={4} sx={{ mb: 2, color: 'primary.main' }} />
-              <Typography color="text.secondary" fontWeight="500">Curating your strategy...</Typography>
+              <Typography color="text.secondary" fontWeight="500">{tp('curatingStrategy')}</Typography>
             </Box>
           ) : plan ? (
             <Box>
-              <Paper sx={{ 
-                p: 2.5, 
-                mb: 4, 
-                borderRadius: '20px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between', 
-                background: isDark 
+              <Paper sx={{
+                p: 2.5,
+                mb: 4,
+                borderRadius: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: isDark
                   ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.8)} 0%, ${alpha(theme.palette.primary.dark, 0.9)} 100%)`
-                  : `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`, 
+                  : `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
                 color: 'white',
                 boxShadow: isDark ? 'none' : `0 10px 30px 0 ${alpha(theme.palette.primary.main, 0.3)}`,
                 border: isDark ? `1px solid ${alpha(theme.palette.common.white, 0.1)}` : 'none'
               }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Box sx={{ 
-                    bgcolor: 'rgba(255,255,255,0.2)', 
-                    p: 1, 
+                  <Box sx={{
+                    bgcolor: 'rgba(255,255,255,0.2)',
+                    p: 1,
                     borderRadius: 2,
                     display: 'flex'
                   }}>
@@ -478,41 +485,41 @@ export default function PlannerPage() {
                   </Box>
                   <Box>
                     <Typography variant="h6" fontWeight="800" sx={{ lineHeight: 1.2 }}>
-                      {monthNames[plan.month - 1]} {plan.year}
+                      {format.dateTime(new Date(plan.year, plan.month - 1, 1), { month: 'long' })} {plan.year}
                     </Typography>
                     <Typography variant="caption" sx={{ opacity: 0.8, fontWeight: 500 }}>
-                      Targeting {plan.industry}
+                      {tp('targeting')} {plan.industry}
                     </Typography>
                   </Box>
                 </Box>
-                <Chip 
-                  label={plan.status === 'converted' ? 'DRAFTS CREATED' : 'STRATEGY READY'} 
-                  size="small" 
-                  sx={{ 
-                    bgcolor: 'white', 
-                    color: plan.status === 'converted' ? 'success.main' : 'primary.main', 
+                <Chip
+                  label={plan.status === 'converted' ? tp('scheduled') : ts('resultsTitle')}
+                  size="small"
+                  sx={{
+                    bgcolor: 'white',
+                    color: plan.status === 'converted' ? 'success.main' : 'primary.main',
                     fontWeight: '800',
                     fontSize: '0.65rem',
                     height: 24
-                  }} 
+                  }}
                 />
               </Paper>
 
               {Object.keys(groupedDays).map((week) => (
                 <Box key={week} sx={{ mb: 5 }}>
                   <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: '800', letterSpacing: '0.1em', mb: 2, display: 'block' }}>
-                    WEEK {week}
+                    {tp('week')} {week}
                   </Typography>
-                  
+
                   <Grid container spacing={2}>
                     {groupedDays[week].map((day: any) => (
                       <Grid key={day.day} size={{ xs: 12 }}>
-                        <Card variant="outlined" sx={{ 
-                          borderRadius: '16px', 
+                        <Card variant="outlined" sx={{
+                          borderRadius: '16px',
                           transition: 'all 0.2s ease-in-out',
                           border: `1px solid ${isDark ? theme.palette.divider : alpha(theme.palette.divider, 0.5)}`,
                           bgcolor: isDark ? alpha(theme.palette.background.paper, 0.5) : theme.palette.background.paper,
-                          '&:hover': { 
+                          '&:hover': {
                             boxShadow: isDark ? 'none' : '0 12px 40px 0 rgba(0,0,0,0.06)',
                             borderColor: theme.palette.primary.main,
                             transform: 'translateY(-2px)',
@@ -522,11 +529,11 @@ export default function PlannerPage() {
                           overflow: 'visible'
                         }}>
                           {day.seasonalHook && (
-                            <Box sx={{ 
-                              position: 'absolute', 
-                              top: -10, 
-                              right: 20, 
-                              bgcolor: theme.palette.secondary.main, 
+                            <Box sx={{
+                              position: 'absolute',
+                              top: -10,
+                              right: 20,
+                              bgcolor: theme.palette.secondary.main,
                               color: 'white',
                               px: 2,
                               py: 0.5,
@@ -543,12 +550,12 @@ export default function PlannerPage() {
                               {day.seasonalHook.toUpperCase()}
                             </Box>
                           )}
-                          
+
                           <CardContent sx={{ display: 'flex', gap: { xs: 3, md: 4 }, p: '24px !important' }}>
-                            <Box sx={{ 
-                              minWidth: 64, 
-                              height: 64, 
-                              bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : alpha(theme.palette.primary.main, 0.03), 
+                            <Box sx={{
+                              minWidth: 64,
+                              height: 64,
+                              bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : alpha(theme.palette.primary.main, 0.03),
                               display: 'flex',
                               flexDirection: 'column',
                               alignItems: 'center',
@@ -556,7 +563,7 @@ export default function PlannerPage() {
                               borderRadius: '12px',
                               border: `1px solid ${isDark ? theme.palette.divider : alpha(theme.palette.primary.main, 0.1)}`
                             }}>
-                              <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: '800', color: theme.palette.primary.main, opacity: 0.8, mb: -0.5 }}>DAY</Typography>
+                              <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: '800', color: theme.palette.primary.main, opacity: 0.8, mb: -0.5 }}>{tp('day')}</Typography>
                               <Typography variant="h4" fontWeight="900" sx={{ color: theme.palette.primary.main }}>{day.day}</Typography>
                             </Box>
 
@@ -565,45 +572,45 @@ export default function PlannerPage() {
                                 <Typography variant="h6" fontWeight="700" color="text.primary" sx={{ lineHeight: 1.3, letterSpacing: '-0.2px' }}>
                                   {day.contentIdea}
                                 </Typography>
-                                <Chip 
-                                  label={day.contentType.toUpperCase()} 
-                                  size="small" 
-                                  sx={{ 
-                                    borderRadius: '6px', 
-                                    fontSize: '0.65rem', 
+                                <Chip
+                                  label={day.contentType.toUpperCase()}
+                                  size="small"
+                                  sx={{
+                                    borderRadius: '6px',
+                                    fontSize: '0.65rem',
                                     fontWeight: '800',
                                     bgcolor: isDark ? alpha(theme.palette.secondary.main, 0.2) : alpha(theme.palette.secondary.main, 0.1),
                                     color: theme.palette.secondary.main,
                                     border: 'none'
-                                  }} 
+                                  }}
                                 />
                               </Box>
 
                               <Typography variant="body2" color="text.secondary" sx={{ mb: 4, lineHeight: 1.6, opacity: 0.9 }}>
-                                {day.suggestedCopy || day.caption || "Generating creative adaptation..."}
+                                {day.suggestedCopy || day.caption || tp('curatingStrategy')}
                               </Typography>
 
                               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', justifyContent: 'space-between' }}>
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                   <Typography variant="caption" fontWeight="800" sx={{ color: 'text.disabled', mr: 1, letterSpacing: '0.5px' }}>
-                                    PLATFORMS:
+                                    {tp('platforms')}
                                   </Typography>
                                   {(day.platforms || []).map((p: string) => (
                                     <Box key={p} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                      <Icon 
-                                        icon={PLATFORM_ICONS[p]?.icon || 'tabler-world'} 
-                                        fontSize={16} 
-                                        color={PLATFORM_ICONS[p]?.color || theme.palette.text.secondary} 
+                                      <Icon
+                                        icon={PLATFORM_ICONS[p]?.icon || 'tabler-world'}
+                                        fontSize={16}
+                                        color={PLATFORM_ICONS[p]?.color || theme.palette.text.secondary}
                                       />
                                       <Typography variant="caption" fontWeight="700" sx={{ color: 'text.secondary' }}>{p}</Typography>
                                     </Box>
                                   ))}
                                 </Box>
-                                
+
                                 {plan.status === 'converted' && (
-                                  <Box sx={{ 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
+                                  <Box sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
                                     gap: 1.5,
                                     bgcolor: isDark ? alpha(theme.palette.success.main, 0.15) : alpha(theme.palette.success.main, 0.1),
                                     px: 2,
@@ -612,7 +619,7 @@ export default function PlannerPage() {
                                   }}>
                                     <CheckCircleIcon sx={{ fontSize: 14, color: theme.palette.success.main }} />
                                     <Typography variant="caption" sx={{ color: theme.palette.success.main, fontWeight: '800', fontSize: '0.65rem' }}>
-                                      SCHEDULED
+                                      {tp('scheduled')}
                                     </Typography>
                                   </Box>
                                 )}
@@ -627,22 +634,22 @@ export default function PlannerPage() {
               ))}
             </Box>
           ) : (
-            <Paper sx={{ 
-              p: { xs: 4, md: 10 }, 
-              textAlign: 'center', 
-              borderRadius: 8, 
-              border: '2px dashed', 
-              borderColor: 'divider', 
+            <Paper sx={{
+              p: { xs: 4, md: 10 },
+              textAlign: 'center',
+              borderRadius: 8,
+              border: '2px dashed',
+              borderColor: 'divider',
               bgcolor: 'transparent',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center'
             }}>
-              <Box sx={{ 
-                width: 100, 
-                height: 100, 
-                borderRadius: 4, 
-                bgcolor: 'rgba(115, 103, 240, 0.08)', 
+              <Box sx={{
+                width: 100,
+                height: 100,
+                borderRadius: 4,
+                bgcolor: 'rgba(115, 103, 240, 0.08)',
                 color: 'primary.main',
                 display: 'flex',
                 alignItems: 'center',
@@ -653,27 +660,27 @@ export default function PlannerPage() {
                 <Icon icon="tabler-sparkles" fontSize={48} />
               </Box>
               <Typography variant="h4" fontWeight="900" gutterBottom sx={{ letterSpacing: '-0.02em' }}>
-                Your Brand Strategy Starts Here
+                {ts('generatePlan')}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 5, maxWidth: 520, mx: 'auto', lineHeight: 1.6 }}>
-                Let AI analyze your brand DNA and market trends to generate a high-performing 30-day content calendar tailored to your specific industry.
+                {ts('noActivePlanDesc')}
               </Typography>
-              <Button 
-                variant="contained" 
+              <Button
+                variant="contained"
                 size="large"
                 startIcon={<AutoAwesome />}
                 onClick={handleGenerate}
                 disabled={generating}
-                sx={{ 
-                  px: 6, 
+                sx={{
+                  px: 6,
                   py: 1.5,
-                  borderRadius: 3, 
+                  borderRadius: 3,
                   fontWeight: '800',
                   fontSize: '1rem',
                   boxShadow: '0 8px 20px 0 rgba(115, 103, 240, 0.3)'
                 }}
               >
-                {generating ? 'Crafting Strategy...' : `Generate ${monthNames[month - 1]} Strategy`}
+                {generating ? tc('common.generating') : ts('generatePlan')}
               </Button>
             </Paper>
           )}

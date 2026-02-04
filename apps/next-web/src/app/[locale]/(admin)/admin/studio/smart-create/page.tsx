@@ -30,6 +30,8 @@ function SmartCreateContent() {
 
 export default function SmartCreatePage() {
     const router = useRouter()
+    const t = useTranslations('studio')
+    const tc = useTranslations('common')
 
     return (
         <Grid container spacing={4}>
@@ -39,10 +41,10 @@ export default function SmartCreatePage() {
                     onClick={() => router.push('/admin/studio')} 
                     sx={{ mb: 2 }}
                 >
-                    Back to Studio
+                    {t('page.backToStudio')}
                 </Button>
                 
-                <Suspense fallback={<Box>Loading...</Box>}>
+                <Suspense fallback={<Box>{tc('common.loading')}</Box>}>
                     <SmartCreateContent />
                 </Suspense>
             </Grid>

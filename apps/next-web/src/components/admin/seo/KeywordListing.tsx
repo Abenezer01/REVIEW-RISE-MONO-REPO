@@ -6,6 +6,8 @@ import dynamic from 'next/dynamic'
 
 import { Grid, Select, MenuItem, TextField, Chip, Typography, Box } from '@mui/material'
 import type { GridColDef } from '@mui/x-data-grid'
+import { useTranslations } from 'next-intl'
+
 import type { KeywordDTO } from '@platform/contracts'
 
 import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
@@ -44,6 +46,8 @@ const KeywordListing = ({
   onTagFilter,
   onApplyFilter
 }: KeywordListingProps) => {
+  const t = useTranslations('dashboard')
+  const tc = useTranslations('common')
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [selectedKeyword, setSelectedKeyword] = useState<KeywordDTO | null>(null)
 
@@ -79,7 +83,7 @@ const KeywordListing = ({
   const columns: GridColDef[] = useMemo(() => [
     {
       field: 'primaryLabel',
-      headerName: 'Keyword',
+      headerName: t('seo.keywords.keyword'),
       flex: 1,
       minWidth: 200,
       renderCell: (params: any) => (
@@ -90,7 +94,7 @@ const KeywordListing = ({
     },
     {
       field: 'tags',
-      headerName: 'Tags',
+      headerName: tc('common.tags'),
       flex: 1,
       minWidth: 200,
       renderCell: (params: any) => {
@@ -108,7 +112,7 @@ const KeywordListing = ({
     },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: tc('common.status'),
       width: 120,
       renderCell: (params: any) => (
         <Chip
@@ -120,19 +124,19 @@ const KeywordListing = ({
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: tc('actions'),
       width: 200,
       sortable: false,
       renderCell: (params: any) => (
         <RowOptions item={params.row} options={params.row.actions} />
       )
     }
-  ], [])
+  ], [t, tc])
 
   return (
     <>
       <ItemsListing
-        title="SEO Keywords"
+        title={t('seo.visibility.keywordsTitle')}
         items={formattedItems}
         isLoading={isLoading}
         type={ITEMS_LISTING_TYPE.table.value}
@@ -166,13 +170,13 @@ const KeywordListing = ({
               <Grid container spacing={2}>
                 <Grid size={{ xs: 4 }}>
                   <Select fullWidth value={statusFilter} onChange={e => onStatusFilter(e.target.value as any)}>
-                    <MenuItem value="all">All</MenuItem>
-                    <MenuItem value="active">Active</MenuItem>
-                    <MenuItem value="archived">Archived</MenuItem>
+                    <MenuItem value="all">{tc('common.all')}</MenuItem>
+                    <MenuItem value="active">{tc('status.active')}</MenuItem>
+                    <MenuItem value="archived">{tc('status.archived')}</MenuItem>
                   </Select>
                 </Grid>
                 <Grid size={{ xs: 4 }}>
-                  <TextField label="Tag contains" value={tagFilter} onChange={e => onTagFilter(e.target.value)} fullWidth />
+                  <TextField label={tc('common.tags')} value={tagFilter} onChange={e => onTagFilter(e.target.value)} fullWidth />
                 </Grid>
               </Grid>
             ),

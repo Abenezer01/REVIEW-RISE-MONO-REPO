@@ -3,13 +3,16 @@
 import React from 'react'
 
 import { Card, CardContent, Typography, Box, List, ListItem, ListItemIcon, ListItemText } from '@mui/material'
+import { useTranslations } from 'next-intl'
 
 export default function ProTips() {
+    const t = useTranslations('studio.captions')
+
     const tips = [
-        "Add emojis to increase engagement by up to 47%",
-        "Keep captions under 150 characters for Instagram",
-        "Use questions to encourage comments",
-        "Include clear CTAs for better conversion"
+        t('proTip1'),
+        t('proTip2'),
+        t('proTip3'),
+        t('proTip4')
     ]
 
     return (
@@ -17,7 +20,7 @@ export default function ProTips() {
             <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
                     <i className="tabler-bulb" style={{ color: '#4CAF50' }} />
-                    <Typography variant="subtitle1" fontWeight="bold" color="text.primary">Pro Tips</Typography>
+                    <Typography variant="subtitle1" fontWeight="bold" color="text.primary">{t('proTips')}</Typography>
                 </Box>
                 <List dense disablePadding>
                     {tips.map((tip, idx) => (

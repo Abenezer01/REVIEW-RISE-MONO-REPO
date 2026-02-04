@@ -1,0 +1,98 @@
+
+> @apps/next-web@5.0.0 lint /app/apps/next-web
+> eslint . --ext .js,.jsx,.ts,.tsx
+
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/brand-rise/reports/page.tsx
+  166:51  error  Strings not allowed in JSX files: "..."  react/jsx-no-literals
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/locations/LocationList.client.tsx
+   48:37  error    Strings not allowed in JSX files: "'Loading...'"                                                         react/jsx-no-literals
+   78:8   warning  React Hook useCallback has a missing dependency: 'tc'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  179:8   warning  React Hook useMemo has a missing dependency: 'tc'. Either include it or remove the dependency array      react-hooks/exhaustive-deps
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/profiles/BrandProfilesList.tsx
+  424:22  error  Strings not allowed in JSX files: "Cancel"  react/jsx-no-literals
+  433:22  error  Strings not allowed in JSX files: "Delete"  react/jsx-no-literals
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/profiles/[id]/_components/ExtractionHistoryTab.tsx
+  27:13  error  Strings not allowed in JSX files: "'v'"  react/jsx-no-literals
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/profiles/page.tsx
+  120:26  error  Strings not allowed in JSX files: "`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `"  react/jsx-no-literals
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/reviews/[id]/page.tsx
+  324:56  error  Strings not allowed in JSX files: "'.0'"                         react/jsx-no-literals
+  647:33  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  647:45  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/social-rise/content-templates/page.tsx
+  106:6  warning  React Hook useCallback has an unnecessary dependency: 'industries'. Either exclude it or remove the dependency array. Outer scope values like 'industries' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/social-rise/planner/page.tsx
+  457:57  error  No duplicate props allowed  react/jsx-no-duplicate-props
+
+/app/apps/next-web/src/components/admin/locations/social/FacebookConnectModal.tsx
+   50:7    error  'steps' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  166:102  error  Strings not allowed in JSX files: "ID:"     react/jsx-no-literals
+
+/app/apps/next-web/src/components/admin/locations/social/SocialConnectionList.tsx
+  26:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+
+/app/apps/next-web/src/components/admin/seo/KeywordListing.tsx
+  134:6  warning  React Hook useMemo has missing dependencies: 't' and 'tc'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/app/apps/next-web/src/components/brand-rise/visibility/JobsDashboard.tsx
+  336:105  error  Strings not allowed in JSX files: "'100%'"  react/jsx-no-literals
+
+/app/apps/next-web/src/components/layout/page.tsx
+  27:17  error  Strings not allowed in JSX files: "`${titleId ? transl(titleId) : title} | ${transl('app.name')}`"  react/jsx-no-literals
+
+/app/apps/next-web/src/components/studio/CarouselBuilder.tsx
+  18:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+
+/app/apps/next-web/src/components/studio/HashtagGenerator.tsx
+  8:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+
+/app/apps/next-web/src/components/studio/ScriptWriter.tsx
+  324:60  error  Strings not allowed in JSX files: "'s'"  react/jsx-no-literals
+
+/app/apps/next-web/src/components/studio/captions/ResultCard.tsx
+   7:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+  77:91  error  Strings not allowed in JSX files: "Aa"                react/jsx-no-literals
+
+/app/apps/next-web/src/components/studio/hashtags/HashtagResults.tsx
+  13:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+
+/app/apps/next-web/src/components/studio/images/PromptGenerator.tsx
+  16:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+
+/app/apps/next-web/src/components/studio/unified/SchedulePostDialog.tsx
+  7:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+
+/app/apps/next-web/src/components/studio/unified/UnifiedResults.tsx
+  9:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+
+/app/apps/next-web/src/components/studio/unified/cards/CaptionCard.tsx
+   6:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+  72:92  error  Strings not allowed in JSX files: "94/100"            react/jsx-no-literals
+
+/app/apps/next-web/src/components/studio/unified/cards/HashtagsCard.tsx
+  4:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+
+/app/apps/next-web/src/components/studio/unified/cards/PreviewCard.tsx
+  50:37  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  50:65  error  Strings not allowed in JSX files: "...""                         react/jsx-no-literals
+  50:68  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  70:73  error  Strings not allowed in JSX files: "..."                          react/jsx-no-literals
+
+✖ 35 problems (31 errors, 4 warnings)
+
+/app/apps/next-web:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @apps/next-web@5.0.0 lint: `eslint . --ext .js,.jsx,.ts,.tsx`
+Exit status 1

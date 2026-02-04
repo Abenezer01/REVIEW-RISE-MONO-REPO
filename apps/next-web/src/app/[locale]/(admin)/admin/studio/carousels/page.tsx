@@ -21,7 +21,7 @@ export default function CarouselsPage() {
                     onClick={() => router.push('/admin/studio')} 
                     sx={{ mb: 2 }}
                 >
-                    Back to Studio
+                    {t('page.backToStudio')}
                 </Button>
                 
                 <Box>

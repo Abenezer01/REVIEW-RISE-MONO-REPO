@@ -14,8 +14,11 @@ import Chip from '@mui/material/Chip'
 import Slider from '@mui/material/Slider'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
+import { useTranslations } from 'next-intl'
 
-import { toast } from 'react-toastify'
+import { SystemMessageCode } from '@platform/contracts'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import { useBusinessId } from '@/hooks/useBusinessId'
 import { SERVICES } from '@/configs/services'
@@ -25,20 +28,23 @@ import PromptGenerator from './images/PromptGenerator'
 import StudioGenerateButton from './shared/StudioGenerateButton'
 
 const QUICK_PROMPTS = [
-    'Professional headshot',
-    'Product mockup',
-    'Social media post',
-    'Blog header'
+    'headshot',
+    'mockup',
+    'post',
+    'header'
 ]
 
 const ASPECT_RATIOS = [
-    { value: '1:1', label: '1:1 Square' },
-    { value: '16:9', label: '16:9 Landscape' },
-    { value: '9:16', label: '9:16 Portrait' },
-    { value: '4:3', label: '4:3 Standard' }
+    { value: '1:1', labelKey: 'square' },
+    { value: '16:9', labelKey: 'landscape' },
+    { value: '9:16', labelKey: 'portrait' },
+    { value: '4:3', labelKey: 'standard' }
 ]
 
 export default function ImageStudio() {
+    const t = useTranslations('studio.images')
+    const tc = useTranslations('common')
+    const { notify } = useSystemMessages()
     const { businessId } = useBusinessId()
     const [loading, setLoading] = useState(false)
     const [prompt, setPrompt] = useState('')
@@ -57,7 +63,7 @@ export default function ImageStudio() {
 
     const handleGenerate = async () => {
         if (!prompt) {
-            toast.error('Please enter a description')
+            notify(SystemMessageCode.VALIDATION_ERROR)
             
 return
         }
@@ -79,11 +85,11 @@ return
             if (data.urls && data.urls.length > 0) {
                 setGeneratedImage(data.urls[0])
                 setRecentImages(prev => [data.urls[0], ...prev].slice(0, 6))
-                toast.success('Image generated!')
+                notify(SystemMessageCode.AI_IMAGE_GENERATED)
             }
         } catch (error) {
             console.error(error)
-            toast.error('Failed to generate image')
+            notify(SystemMessageCode.GENERIC_ERROR)
         } finally {
             setLoading(false)
         }
@@ -91,7 +97,7 @@ return
 
     const handleSavePrompt = async () => {
         if (!businessId || !prompt || !generatedImage) {
-            toast.error('No image to save')
+            notify(SystemMessageCode.GENERIC_ERROR)
             
 return
         }
@@ -104,10 +110,10 @@ return
                 aspectRatio,
                 imageUrls: [generatedImage]
             })
-            toast.success('Prompt saved successfully!')
+            notify(SystemMessageCode.SAVE_SUCCESS)
         } catch (error) {
             console.error('Error saving prompt:', error)
-            toast.error('Failed to save prompt')
+            notify(SystemMessageCode.SAVE_FAILED)
         }
     }
 
@@ -123,7 +129,7 @@ return
                             <CardContent sx={{ p: 3 }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                     <Typography variant="h6" fontWeight="bold">
-                                        Describe Your Image
+                                        {t('inputTitle')}
                                     </Typography>
                                     <Button
                                         variant="outlined"
@@ -132,7 +138,7 @@ return
                                         startIcon={<i className="tabler-sparkles" />}
                                         sx={{ borderRadius: 2 }}
                                     >
-                                        {showPromptGenerator ? 'Hide' : 'AI Ideas'}
+                                        {showPromptGenerator ? tc('common.close') : t('aiIdeas')}
                                     </Button>
                                 </Box>
 
@@ -152,21 +158,21 @@ return
                                 </Collapse>
 
                                 <TextField
-                                    placeholder="A futuristic cityscape at sunset with neon lights..."
+                                    placeholder={t('promptPlaceholder')}
                                     multiline
                                     rows={4}
                                     value={prompt}
                                     onChange={(e) => setPrompt(e.target.value)}
                                     fullWidth
-                                    helperText="💡 Include details about style, mood, colors, and composition"
+                                    helperText={t('promptHelper')}
                                     sx={{ mb: 2 }}
                                 />
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                                     {QUICK_PROMPTS.map((qp) => (
                                         <Chip
                                             key={qp}
-                                            label={`+ ${qp}`}
-                                            onClick={() => handleQuickPrompt(qp)}
+                                            label={`+ ${t(`quickPrompts.${qp}`)}`}
+                                            onClick={() => handleQuickPrompt(t(`quickPrompts.${qp}`))}
                                             size="small"
                                             sx={{ 
                                                 bgcolor: 'primary.lightOpacity',
@@ -190,14 +196,14 @@ return
                         <Card variant="outlined" sx={{ borderRadius: 2 }}>
                             <CardContent sx={{ p: 3 }}>
                                 <Typography variant="h6" fontWeight="bold" mb={2}>
-                                    Advanced Settings
+                                    {t('advancedSettings')}
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                     <Box>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                            <Typography variant="body2" fontWeight="medium">Image Quality</Typography>
+                                            <Typography variant="body2" fontWeight="medium">{t('qualityLabel')}</Typography>
                                             <Typography variant="body2" color="primary.main" fontWeight="bold">
-                                                {quality === 100 ? 'High' : quality >= 50 ? 'Medium' : 'Low'}
+                                                {quality === 100 ? t('qualityHigh') : quality >= 50 ? t('qualityMedium') : t('qualityLow')}
                                             </Typography>
                                         </Box>
                                         <Slider
@@ -211,7 +217,7 @@ return
 
                                     <Box>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                            <Typography variant="body2" fontWeight="medium">Creativity Level</Typography>
+                                            <Typography variant="body2" fontWeight="medium">{t('creativityLabel')}</Typography>
                                             <Typography variant="body2" color="primary.main" fontWeight="bold">{creativity}%</Typography>
                                         </Box>
                                         <Slider
@@ -225,9 +231,9 @@ return
 
                                     <Box>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                            <Typography variant="body2" fontWeight="medium">Aspect Ratio</Typography>
+                                            <Typography variant="body2" fontWeight="medium">{t('aspectRatioLabel')}</Typography>
                                             <Typography variant="body2" color="primary.main" fontWeight="bold">
-                                                {ASPECT_RATIOS.find(ar => ar.value === aspectRatio)?.label}
+                                                {t(`aspectRatios.${ASPECT_RATIOS.find(ar => ar.value === aspectRatio)?.labelKey}`)}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -246,8 +252,8 @@ return
 
                                     <Box>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                            <Typography variant="body2" fontWeight="medium">Number of Variations</Typography>
-                                            <Typography variant="body2" color="primary.main" fontWeight="bold">{variations} Images</Typography>
+                                            <Typography variant="body2" fontWeight="medium">{t('variationsLabel')}</Typography>
+                                            <Typography variant="body2" color="primary.main" fontWeight="bold">{t('imagesCount', { count: variations })}</Typography>
                                         </Box>
                                         <Slider
                                             value={variations}
@@ -267,8 +273,8 @@ return
                         <StudioGenerateButton
                             onClick={handleGenerate}
                             loading={loading}
-                            label="✨ Generate Images"
-                            loadingLabel="Generating..."
+                            label={t('submitButton')}
+                            loadingLabel={tc('common.generating')}
                             fullWidth
                             sx={{ 
                                 fontSize: '1rem',
@@ -284,7 +290,7 @@ return
                         <Card variant="outlined" sx={{ borderRadius: 2 }}>
                             <CardContent sx={{ p: 3 }}>
                                 <Typography variant="h6" fontWeight="bold" mb={2}>
-                                    Preview
+                                    {t('previewTitle')}
                                 </Typography>
                                 {!generatedImage && !loading && (
                                     <Box sx={{ 
@@ -299,7 +305,7 @@ return
                                     }}>
                                         <i className="tabler-photo" style={{ fontSize: 48, opacity: 0.3 }} />
                                         <Typography variant="body2" color="text.secondary">
-                                            Your generated image will appear here
+                                            {t('emptyState')}
                                         </Typography>
                                     </Box>
                                 )}
@@ -336,11 +342,11 @@ return
                                                 sx={{ borderRadius: 2, mr: 1 }}
                                                 startIcon={<i className="tabler-device-floppy" />}
                                             >
-                                                Save Prompt
+                                                {t('savePrompt')}
                                             </Button>
                                             <Button variant="contained" fullWidth sx={{ borderRadius: 2 }}>
                                                 <i className="tabler-check" style={{ marginRight: 8 }} />
-                                                Approve
+                                                {t('approve')}
                                             </Button>
                                         </Box>
                                     </Box>
@@ -352,11 +358,11 @@ return
                         <Card variant="outlined" sx={{ borderRadius: 2 }}>
                             <CardContent sx={{ p: 3 }}>
                                 <Typography variant="h6" fontWeight="bold" mb={2}>
-                                    Recent Generations
+                                    {t('recentTitle')}
                                 </Typography>
                                 {recentImages.length === 0 ? (
                                     <Typography variant="body2" color="text.secondary" textAlign="center" py={4}>
-                                        No recent generations yet
+                                        {t('recentEmpty')}
                                     </Typography>
                                 ) : (
                                     <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5 }}>

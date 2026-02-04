@@ -19,18 +19,28 @@ import {
   Tooltip
 } from '@mui/material';
 import type { GridColDef } from '@mui/x-data-grid';
-import toast from 'react-hot-toast';
+
+import { SystemMessageCode } from '@platform/contracts';
+
+import { useTranslations } from 'next-intl';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 
 import { BrandService } from '@/services/brand.service';
 import { useBusinessId } from '@/hooks/useBusinessId';
 import TableListing from '@/components/shared/listing/list-types/table-listing';
 import ConfirmationDialog from '@/components/shared/dialog/confirmation-dialog';
 
-const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [key: string]: any }) => {
+const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number;[key: string]: any }) => {
   return <i className={icon} style={{ fontSize }} {...rest} />;
 };
 
+const markets = ['Global', 'US', 'UK', 'EU', 'Asia', 'Northern Hemisphere', 'Southern Hemisphere'];
+
 const SeasonalEventsPage = () => {
+  const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
+  const { notify } = useSystemMessages();
   const { businessId } = useBusinessId();
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -46,15 +56,7 @@ const SeasonalEventsPage = () => {
     description: ''
   });
 
-  const markets = ['Global', 'US', 'UK', 'EU', 'Asia', 'Northern Hemisphere', 'Southern Hemisphere'];
-
-  useEffect(() => {
-    if (businessId) {
-      fetchEvents();
-    }
-  }, [businessId]);
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     if (!businessId) return;
 
     setLoading(true);
@@ -65,11 +67,17 @@ const SeasonalEventsPage = () => {
       setEvents(data || []);
     } catch (error) {
       console.error('Failed to fetch events', error);
-      toast.error('Failed to load events');
+      notify(SystemMessageCode.GENERIC_ERROR);
     } finally {
       setLoading(false);
     }
-  };
+  }, [businessId, notify]);
+
+  useEffect(() => {
+    if (businessId) {
+      fetchEvents();
+    }
+  }, [businessId, fetchEvents]);
 
   const handleOpen = useCallback((event?: any) => {
     if (event) {
@@ -107,10 +115,10 @@ const SeasonalEventsPage = () => {
     try {
       if (editingEvent) {
         await BrandService.updatePlannerEvent(businessId, editingEvent.id, formData);
-        toast.success('Event updated successfully');
+        notify(SystemMessageCode.ITEM_UPDATED);
       } else {
         await BrandService.createPlannerEvent(businessId, formData);
-        toast.success('Event created successfully');
+        notify(SystemMessageCode.ITEM_CREATED);
       }
 
       handleClose();
@@ -118,7 +126,7 @@ const SeasonalEventsPage = () => {
       fetchEvents();
     } catch (error) {
       console.error('Failed to save event', error);
-      toast.error('Failed to save event');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 
@@ -132,27 +140,27 @@ const SeasonalEventsPage = () => {
 
     try {
       await BrandService.deletePlannerEvent(businessId, itemToDelete);
-      toast.success('Event deleted successfully');
+      notify(SystemMessageCode.ITEM_DELETED);
       setDeleteDialogOpen(false);
       setItemToDelete(null);
       fetchEvents();
     } catch (error) {
       console.error('Failed to delete event', error);
-      toast.error('Failed to delete event');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 
   const columns: GridColDef[] = useMemo(() => [
-    { 
-      field: 'name', 
-      headerName: 'Event Name', 
-      flex: 1, 
-      minWidth: 200 
+    {
+      field: 'name',
+      headerName: t('navigation.seasonalEvents.eventName'),
+      flex: 1,
+      minWidth: 200
     },
-    { 
-      field: 'date', 
-      headerName: 'Date', 
-      flex: 0.8, 
+    {
+      field: 'date',
+      headerName: t('navigation.seasonalEvents.date'),
+      flex: 0.8,
       minWidth: 150,
       renderCell: (params) => (
         <Typography variant="body2">
@@ -160,19 +168,19 @@ const SeasonalEventsPage = () => {
         </Typography>
       )
     },
-    { 
-      field: 'market', 
-      headerName: 'Market', 
-      flex: 0.6, 
+    {
+      field: 'market',
+      headerName: t('navigation.seasonalEvents.market'),
+      flex: 0.6,
       minWidth: 120,
       renderCell: (params) => (
         <Chip label={params.value} size="small" variant="tonal" color="primary" />
       )
     },
-    { 
-      field: 'description', 
-      headerName: 'Description', 
-      flex: 2, 
+    {
+      field: 'description',
+      headerName: t('navigation.seasonalEvents.description'),
+      flex: 2,
       minWidth: 300,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -182,19 +190,19 @@ const SeasonalEventsPage = () => {
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: tc('actions'),
       sortable: false,
       width: 120,
       align: 'right',
       headerAlign: 'right',
       renderCell: (params) => (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Tooltip title="Edit">
+          <Tooltip title={tc('common.edit')}>
             <IconButton onClick={() => handleOpen(params.row)} color="primary" size="small">
               <Icon icon="tabler-edit" fontSize={20} />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title={tc('common.delete')}>
             <IconButton onClick={() => handleDelete(params.row.id)} color="error" size="small">
               <Icon icon="tabler-trash" fontSize={20} />
             </IconButton>
@@ -202,7 +210,7 @@ const SeasonalEventsPage = () => {
         </Box>
       )
     }
-  ], [handleOpen, handleDelete]);
+  ], [handleOpen, handleDelete, t, tc]);
 
   return (
     <Box sx={{ p: 6 }}>
@@ -210,19 +218,19 @@ const SeasonalEventsPage = () => {
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={6}>
         <Box>
           <Typography variant="h4" sx={{ mb: 1, fontWeight: 600 }}>
-            Seasonal Events
+            {t('navigation.seasonalEvents.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Manage your brand&apos;s seasonal events and holiday marketing schedule.
+            {t('navigation.seasonalEvents.subtitle')}
           </Typography>
         </Box>
-        <Button 
-          variant="contained" 
-          onClick={() => handleOpen()} 
+        <Button
+          variant="contained"
+          onClick={() => handleOpen()}
           startIcon={<Icon icon="tabler-plus" fontSize={20} />}
           sx={{ px: 5, py: 2, borderRadius: 1.5 }}
         >
-          Add Event
+          {t('navigation.seasonalEvents.addEvent')}
         </Button>
       </Stack>
 
@@ -234,31 +242,31 @@ const SeasonalEventsPage = () => {
       />
 
       {/* Create/Edit Dialog */}
-      <Dialog 
-        open={open} 
-        onClose={handleClose} 
-        maxWidth="sm" 
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="sm"
         fullWidth
         PaperProps={{
           sx: { borderRadius: 2 }
         }}
       >
         <DialogTitle sx={{ pb: 2, borderBottom: theme => `1px solid ${theme.palette.divider}` }}>
-          {editingEvent ? 'Edit Seasonal Event' : 'Add New Event'}
+          {editingEvent ? t('navigation.seasonalEvents.editEvent') : t('navigation.seasonalEvents.addNewEvent')}
         </DialogTitle>
         <DialogContent sx={{ mt: 4 }}>
           <Stack spacing={4}>
             <TextField
-              label="Event Name"
+              label={t('navigation.seasonalEvents.eventName')}
               fullWidth
               placeholder="e.g., Summer Solstice Sale"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
-            
+
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={4}>
               <TextField
-                label="Date"
+                label={t('navigation.seasonalEvents.date')}
                 type="date"
                 fullWidth
                 value={formData.date}
@@ -267,7 +275,7 @@ const SeasonalEventsPage = () => {
               />
               <TextField
                 select
-                label="Market"
+                label={t('navigation.seasonalEvents.market')}
                 fullWidth
                 value={formData.market}
                 onChange={(e) => setFormData({ ...formData, market: e.target.value })}
@@ -281,7 +289,7 @@ const SeasonalEventsPage = () => {
             </Stack>
 
             <TextField
-              label="Description"
+              label={t('navigation.seasonalEvents.description')}
               fullWidth
               multiline
               rows={4}
@@ -292,9 +300,9 @@ const SeasonalEventsPage = () => {
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 6, py: 4, borderTop: theme => `1px solid ${theme.palette.divider}` }}>
-          <Button onClick={handleClose} color="inherit">Cancel</Button>
+          <Button onClick={handleClose} color="inherit">{tc('common.cancel')}</Button>
           <Button onClick={handleSubmit} variant="contained" sx={{ borderRadius: 1 }}>
-            {editingEvent ? 'Update Event' : 'Create Event'}
+            {editingEvent ? tc('common.save') : tc('common.create')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -304,8 +312,8 @@ const SeasonalEventsPage = () => {
         handleClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteDialogOpen(false)}
-        title="Delete Seasonal Event"
-        content="Are you sure you want to delete this seasonal event? This action cannot be undone."
+        title={t('navigation.seasonalEvents.deleteTitle')}
+        content={t('navigation.seasonalEvents.deleteConfirm')}
         type="delete"
       />
     </Box>

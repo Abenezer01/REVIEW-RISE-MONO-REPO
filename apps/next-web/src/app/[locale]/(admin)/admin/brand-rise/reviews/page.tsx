@@ -23,7 +23,10 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Stack from '@mui/material/Stack';
 import { useTranslations } from 'next-intl';
-import toast from 'react-hot-toast';
+
+import { SystemMessageCode } from '@platform/contracts';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusinessId } from '@/hooks/useBusinessId';
@@ -41,6 +44,7 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
 }
 
 const ReviewsPage = () => {
+  const { notify } = useSystemMessages();
   const theme = useTheme();
   const t = useTranslations('dashboard');
   const { businessId } = useBusinessId();
@@ -121,12 +125,12 @@ const ReviewsPage = () => {
 
       try {
           await BrandService.postReviewReply(businessId, selectedReview.id, replyText);
-          toast.success('Reply posted successfully');
+          notify(SystemMessageCode.REVIEWS_REPLY_POSTED);
           setReplyDialogOpen(false);
           refreshData(); // Refresh list
       } catch (error) {
           console.error('Failed to send reply', error);
-          toast.error('Failed to post reply');
+          notify(SystemMessageCode.GENERIC_ERROR);
       } finally {
           setReplying(false);
       }
@@ -137,11 +141,11 @@ const ReviewsPage = () => {
       
       try {
           await BrandService.rejectReviewReply(businessId, reviewId);
-          toast.success('Reply rejected');
+          notify(SystemMessageCode.REVIEWS_REPLY_REJECTED);
           refreshData();
       } catch (error) {
           console.error('Failed to reject reply', error);
-          toast.error('Failed to reject reply');
+          notify(SystemMessageCode.GENERIC_ERROR);
       }
   };
 
@@ -180,36 +184,36 @@ const ReviewsPage = () => {
       {/* Metrics Row */}
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <MetricCard 
-            title="Total Reviews" 
+            title={t('overview.totalReviews')}
             value={stats.totalReviews.toString()} 
-            trend={{ value: 0, label: 'this month', direction: 'up', suffix: '+' }}
+            trend={{ value: 0, label: t('stats.thisMonth'), direction: 'up', suffix: '+' }}
             icon={<Icon icon="tabler-message-circle" fontSize={24} />}
             iconColor="#7367F0"
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <MetricCard 
-            title="Average Rating" 
+            title={t('overview.averageRating')}
             value={stats.averageRating.toString()} 
-            trend={{ value: 0, label: 'vs last period', direction: 'up', suffix: '+' }}
+            trend={{ value: 0, label: t('brandRise.overview.vsLastPeriod'), direction: 'up', suffix: '+' }}
             icon={<Icon icon="tabler-star" fontSize={24} />}
             iconColor="#FF9F43"
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
          <MetricCard 
-            title="Sentiment Score" 
+            title={t('brandRise.reviews.sentimentScore')}
             value={`${sentimentSeries[0]}%`} 
-            trend={{ value: 'Positive sentiment', label: '', direction: 'up', suffix: '' }}
+            trend={{ value: t('brandRise.reviews.positiveSentiment'), label: '', direction: 'up', suffix: '' }}
             icon={<Icon icon="tabler-mood-smile" fontSize={24} />}
             iconColor="#28C76F"
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
          <MetricCard 
-            title="Response Rate" 
+            title={t('overview.responseRate')}
             value={`${responseRate}%`} 
-            trend={{ value: 0, label: 'vs last period', direction: 'up', suffix: '% +' }}
+            trend={{ value: 0, label: t('brandRise.overview.vsLastPeriod'), direction: 'up', suffix: '% +' }}
             icon={<Icon icon="tabler-arrow-back-up" fontSize={24} />}
             iconColor="#7367F0"
         />
@@ -219,7 +223,7 @@ const ReviewsPage = () => {
       <Grid size={{ xs: 12, md: 8 }}>
         <DashboardLineChart 
             title={t('brandRise.reviews.velocity')} 
-            subtitle="Review volume over time"
+            subtitle={t('brandRise.reviews.volumeOverTime')}
             series={velocitySeries}
             categories={velocityCategories}
         />
@@ -227,9 +231,9 @@ const ReviewsPage = () => {
       <Grid size={{ xs: 12, md: 4 }}>
         <DashboardDonutChart 
             title={t('brandRise.reviews.sentiment')} 
-            subtitle="Sentiment model"
+            subtitle={t('brandRise.reviews.sentimentModel')}
             series={sentimentSeries}
-            labels={sentimentLabels}
+            labels={sentimentLabels.map(l => t(`reviews.${l.toLowerCase()}`))}
         />
       </Grid>
 
@@ -244,12 +248,12 @@ const ReviewsPage = () => {
                 id="reviews-tabs"
               >
                 <Tab 
-                  label="All Reviews" 
+                  label={t('common.all')}
                   id="reviews-tab-all"
                   aria-controls="reviews-tabpanel-all"
                 />
                 <Tab 
-                  label="Pending Approval" 
+                  label={t('status.pending_approval')}
                   id="reviews-tab-pending"
                   aria-controls="reviews-tabpanel-pending"
                 />
@@ -258,12 +262,12 @@ const ReviewsPage = () => {
             <CardContent>
                <Box sx={{ mb: 4 }}>
                   <Typography variant="h6">
-                    {activeTab === 0 ? t('brandRise.reviews.recent') : 'Pending AI Replies'}
+                    {activeTab === 0 ? t('brandRise.reviews.recent') : t('brandRise.reviews.pendingAIReply')}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {activeTab === 0 
-                      ? 'Latest customer feedback across all platforms' 
-                      : 'Reviews waiting for AI reply approval before posting'}
+                      ? t('brandRise.reviews.latestFeedback')
+                      : t('brandRise.reviews.waitingApproval')}
                   </Typography>
                </Box>
 
@@ -273,7 +277,7 @@ const ReviewsPage = () => {
                           <CircularProgress />
                       </Box>
                   ) : reviews.length === 0 ? (
-                      <Typography color="text.secondary" align="center">No reviews found.</Typography>
+                      <Typography color="text.secondary" align="center">{t('reviews.smart.empty.title')}</Typography>
                   ) : (
                       reviews.map((review) => {
                          const sentiment = getSentimentInfo(review.rating);
@@ -322,7 +326,7 @@ const ReviewsPage = () => {
                                        />
                                        {isPending && (
                                          <Chip 
-                                            label="Pending AI Approval" 
+                                            label={t('status.pending_approval')}
                                             size="small" 
                                             color="info"
                                             variant="outlined"
@@ -339,7 +343,7 @@ const ReviewsPage = () => {
                                               color="error"
                                               onClick={() => handleRejectReply(review.id)}
                                             >
-                                              Reject
+                                              {t('reviews.smart.detail.reject')}
                                             </Button>
                                           )}
                                           <Button 
@@ -347,7 +351,7 @@ const ReviewsPage = () => {
                                               variant={review.response ? "outlined" : "contained"} 
                                               onClick={() => handleOpenReply(review)}
                                           >
-                                              {review.response ? 'Edit Reply' : isPending ? 'Review & Post' : 'Reply'}
+                                              {review.response ? t('common.edit') : isPending ? t('brandRise.reviews.reviewPost') : t('reviews.reply')}
                                           </Button>
                                        </Stack>
                                    )}
@@ -355,14 +359,14 @@ const ReviewsPage = () => {
 
                                 {isPending && (review as any).aiSuggestions?.suggestedReply && (
                                     <Box sx={{ mt: 2, pl: 2, borderLeft: `2px solid ${theme.palette.info.main}`, bgcolor: (theme) => alpha(theme.palette.info.main, 0.05), p: 2, borderRadius: 1 }}>
-                                        <Typography variant="caption" fontWeight="bold" color="info.main">AI Suggested Reply:</Typography>
+                                        <Typography variant="caption" fontWeight="bold" color="info.main">{t('reviews.smart.detail.suggestedReplies')}:</Typography>
                                         <Typography variant="body2">{(review as any).aiSuggestions.suggestedReply}</Typography>
                                     </Box>
                                 )}
 
                                 {review.response && (
                                     <Box sx={{ mt: 2, pl: 2, borderLeft: `2px solid ${theme.palette.primary.main}`, bgcolor: 'action.hover', p: 2, borderRadius: 1 }}>
-                                        <Typography variant="caption" fontWeight="bold" color="primary">Your Response:</Typography>
+                                        <Typography variant="caption" fontWeight="bold" color="primary">{t('reviews.smart.detail.yourReply')}:</Typography>
                                         <Typography variant="body2">{review.response}</Typography>
                                     </Box>
                                 )}
@@ -378,11 +382,11 @@ const ReviewsPage = () => {
       {/* Reply Dialog */}
       <Dialog open={replyDialogOpen} onClose={() => setReplyDialogOpen(false)} fullWidth maxWidth="sm">
           <DialogTitle>
-            {selectedReview?.response ? 'Edit Reply' : 'Reply to Review'}
+            {selectedReview?.response ? t('reviews.smart.detail.updateReply') : t('reviews.reply')}
           </DialogTitle>
           <DialogContent>
               <Box sx={{ mt: 2 }}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>Review content:</Typography>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>{t('reviews.smart.detail.reviewContent')}:</Typography>
                   <Typography variant="body2" sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1, mb: 3 }}>
                     {selectedReview?.content}
                   </Typography>
@@ -392,27 +396,27 @@ const ReviewsPage = () => {
                       multiline
                       rows={6}
                       variant="outlined"
-                      placeholder="Type your response here..."
+                      placeholder={t('reviews.smart.detail.writeReply')}
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
                       disabled={replying}
                   />
                   {(selectedReview as any)?.aiSuggestions?.analysis && (
                     <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                      AI Analysis: {(selectedReview as any).aiSuggestions.analysis}
+                      {t('reviews.smart.detail.aiAnalysis')}: {(selectedReview as any).aiSuggestions.analysis}
                     </Typography>
                   )}
               </Box>
           </DialogContent>
           <DialogActions sx={{ p: 3 }}>
-              <Button onClick={() => setReplyDialogOpen(false)} disabled={replying}>Cancel</Button>
+              <Button onClick={() => setReplyDialogOpen(false)} disabled={replying}>{t('common.cancel')}</Button>
               <Button 
                 variant="contained" 
                 onClick={handleSendReply} 
                 disabled={!replyText || replying}
                 startIcon={replying && <CircularProgress size={20} color="inherit" />}
               >
-                {replying ? 'Posting...' : 'Post Reply'}
+                {replying ? t('status.processing') : t('reviews.smart.detail.postReply')}
               </Button>
           </DialogActions>
       </Dialog>

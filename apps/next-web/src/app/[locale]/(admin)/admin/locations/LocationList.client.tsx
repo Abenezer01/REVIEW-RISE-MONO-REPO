@@ -15,12 +15,13 @@ import {
 import Grid from '@mui/material/Grid'
 
 
+import { useTranslations } from 'next-intl'
+
 import CustomSelectBox from '@/components/shared/form/custom-select'
 import { createLocationAdapter } from '@/components/shared/listing/adapters'
 import RowOptions from '@/components/shared/listing/row-options'
 import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 import { usePaginatedList } from '@/hooks/usePaginatedList'
-import useTranslation from '@/hooks/useTranslation'
 import apiClient from '@/lib/apiClient'
 import { SERVICES } from '@/configs/services'
 
@@ -40,16 +41,23 @@ const CustomSideDrawer = dynamic(
     { ssr: false }
 )
 
+const LoadingTypography = () => {
+    const t = useTranslations('common');
+
+return <Typography>{t('common.loading')}</Typography>;
+};
+
 const LocationForm = dynamic(
     () => import('@/components/admin/locations/LocationForm'),
     {
         ssr: false,
-        loading: () => <Typography>Loading...</Typography>
+        loading: () => <LoadingTypography />
     }
 )
 
 export default function LocationListClient() {
-    const t = useTranslation('dashboard')
+    const t = useTranslations('dashboard')
+    const tc = useTranslations('common')
 
     const [search, setSearch] = useState('')
     const [status, setStatus] = useState('all')
@@ -66,14 +74,14 @@ export default function LocationListClient() {
                     label={t('locations.form.status')}
                     name="status"
                     options={[
-                        { value: 'all', label: 'All' },
+                        { value: 'all', label: tc('common.all') },
                         { value: 'active', label: t('locations.form.active') },
                         { value: 'archived', label: t('locations.form.archived') }
                     ]}
                 />
             </Grid>
         </Grid>
-    ), [t])
+    ), [t, tc])
 
 
 
@@ -167,14 +175,14 @@ export default function LocationListClient() {
         },
         {
             field: 'actions',
-            headerName: 'Actions',
+            headerName: tc('actions'),
             width: 200,
             sortable: false,
             renderCell: (params: any) => (
                 <RowOptions item={params.row} options={params.row.actions} />
             )
         }
-    ], [t])
+    ], [t, tc])
 
     return (
         <>

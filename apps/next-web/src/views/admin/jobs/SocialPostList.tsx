@@ -17,8 +17,13 @@ import Tooltip from '@mui/material/Tooltip'
 import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
 import Avatar from '@mui/material/Avatar'
-import { toast } from 'react-toastify'
+
+import { SystemMessageCode } from '@platform/contracts'
 import type { GridColDef } from '@mui/x-data-grid'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+
+import { useTranslation } from '@/hooks/useTranslation'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -30,7 +35,9 @@ import { getJobs } from '@/app/actions/job'
 import SocialPostDetailModal from './SocialPostDetailModal'
 
 const SocialPostList = () => {
+  const { notify } = useSystemMessages()
   const theme = useTheme()
+  const t = useTranslation('dashboard')
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
@@ -66,11 +73,11 @@ const SocialPostList = () => {
       setData(res.data)
       setTotal(res.meta.total)
     } else {
-      toast.error(res.error || 'Failed to fetch social posts')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
 
     setLoading(false)
-  }, [page, rowsPerPage, filters])
+  }, [page, rowsPerPage, filters, notify])
 
   useEffect(() => {
     fetchData()
@@ -105,7 +112,7 @@ const SocialPostList = () => {
   const columns: GridColDef[] = [
     {
       field: 'id',
-      headerName: 'Job ID',
+      headerName: t('jobs.social.columns.id'),
       minWidth: 100,
       renderCell: (params) => (
         <Tooltip title={params.value}>
@@ -117,7 +124,7 @@ const SocialPostList = () => {
     },
     {
       field: 'business',
-      headerName: 'Account',
+      headerName: t('jobs.social.columns.account'),
       minWidth: 180,
       valueGetter: (value, row) => row?.business?.name || 'N/A',
       renderCell: (params) => (
@@ -134,7 +141,7 @@ const SocialPostList = () => {
               {params.row.business?.name || 'N/A'}
             </Typography>
             <Typography variant='caption' color='text.secondary'>
-              {params.row.location?.name || 'All Locations'}
+              {params.row.location?.name || t('jobs.social.locations.all')}
             </Typography>
           </Stack>
         </Stack>
@@ -142,7 +149,7 @@ const SocialPostList = () => {
     },
     {
       field: 'channel',
-      headerName: 'Channel',
+      headerName: t('jobs.social.columns.channel'),
       minWidth: 140,
       valueGetter: (value, row) => row.payload?.platform || 'Unknown',
       renderCell: (params) => {
@@ -160,7 +167,7 @@ const SocialPostList = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <i className={iconMap[platform.toLowerCase()] || 'tabler-world'} style={{ fontSize: '1.2rem' }} />
             <Typography variant='body2' sx={{ textTransform: 'capitalize' }}>
-              {platform}
+              {t(`common.channel.${platform.toLowerCase()}`)}
             </Typography>
           </Box>
         );
@@ -168,7 +175,7 @@ const SocialPostList = () => {
     },
     {
       field: 'postType',
-      headerName: 'Type',
+      headerName: t('jobs.social.columns.type'),
       minWidth: 120,
       valueGetter: (value, row) => row.payload?.type || 'organic',
       renderCell: (params) => (
@@ -176,28 +183,28 @@ const SocialPostList = () => {
           size='small'
           variant='tonal'
           color={params.value === 'paid' ? 'primary' : 'secondary'}
-          label={params.value || 'organic'}
+          label={t(`jobs.social.types.${params.value || 'organic'}`)}
           sx={{ textTransform: 'capitalize' }}
         />
       )
     },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: t('jobs.social.columns.status'),
       minWidth: 140,
       renderCell: (params) => (
         <CustomChip
           size='small'
           variant='tonal'
           color={getStatusColor(params.value)}
-          label={params.value}
+          label={t(`common.status.${params.value}`)}
           sx={{ textTransform: 'capitalize', fontWeight: 500 }}
         />
       )
     },
     {
       field: 'scheduledTime',
-      headerName: 'Scheduled For',
+      headerName: t('jobs.social.columns.scheduledFor'),
       minWidth: 180,
       valueGetter: (value, row) => row.payload?.scheduledTime || row.createdAt,
       renderCell: (params) => (
@@ -208,7 +215,7 @@ const SocialPostList = () => {
     },
     {
       field: 'publishedTime',
-      headerName: 'Published At',
+      headerName: t('jobs.social.columns.publishedAt'),
       minWidth: 180,
       valueGetter: (value, row) => row.completedAt,
       renderCell: (params) => (
@@ -219,7 +226,7 @@ const SocialPostList = () => {
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('jobs.social.columns.actions'),
       sortable: false,
       minWidth: 100,
       align: 'right',
@@ -258,10 +265,10 @@ const SocialPostList = () => {
               </Box>
               <Box>
                 <Typography variant='h5' fontWeight={600} sx={{ mb: 0.5 }}>
-                  Social Media Post Logs
+                  {t('jobs.social.title')}
                 </Typography>
                 <Typography variant='body2' color='text.secondary'>
-                  Monitor and manage social media posting jobs
+                  {t('jobs.social.subtitle')}
                 </Typography>
               </Box>
             </Box>
@@ -269,7 +276,7 @@ const SocialPostList = () => {
           action={
             <Box sx={{ display: 'flex', gap: 1, mt: 1, mr: 1 }}>
               <CustomChip
-                label={`${total} Posts`}
+                label={t('jobs.social.postsCount', { count: total })}
                 size='small'
                 variant='tonal'
                 color='primary'
@@ -284,8 +291,8 @@ const SocialPostList = () => {
             <Grid size={{ xs: 12, md: 3 }}>
               <CustomTextField
                 fullWidth
-                label='Search Account or Location'
-                placeholder='Search Account or Location...'
+                label={t('jobs.social.searchLabel')}
+                placeholder={t('jobs.social.searchPlaceholder')}
                 value={filters.search}
                 onChange={e => handleFilterChange('search', e.target.value)}
                 InputProps={{
@@ -302,16 +309,16 @@ const SocialPostList = () => {
               <CustomTextField
                 select
                 fullWidth
-                label='Status'
+                label={t('jobs.social.columns.status')}
                 value={filters.status}
                 onChange={e => handleFilterChange('status', e.target.value)}
                 SelectProps={{ displayEmpty: true }}
               >
-                <MenuItem value=''>All Statuses</MenuItem>
-                <MenuItem value='completed'>Completed</MenuItem>
-                <MenuItem value='failed'>Failed</MenuItem>
-                <MenuItem value='pending'>Pending</MenuItem>
-                <MenuItem value='processing'>Processing</MenuItem>
+                <MenuItem value=''>{t('jobs.social.allStatuses')}</MenuItem>
+                <MenuItem value='completed'>{t('common.status.completed')}</MenuItem>
+                <MenuItem value='failed'>{t('common.status.failed')}</MenuItem>
+                <MenuItem value='pending'>{t('common.status.pending')}</MenuItem>
+                <MenuItem value='processing'>{t('common.status.processing')}</MenuItem>
               </CustomTextField>
             </Grid>
 
@@ -319,17 +326,17 @@ const SocialPostList = () => {
               <CustomTextField
                 select
                 fullWidth
-                label='Channel'
+                label={t('jobs.social.columns.channel')}
                 value={filters.platform}
                 onChange={e => handleFilterChange('platform', e.target.value)}
                 SelectProps={{ displayEmpty: true }}
               >
-                <MenuItem value=''>All Channels</MenuItem>
-                <MenuItem value='google'>Google</MenuItem>
-                <MenuItem value='facebook'>Facebook</MenuItem>
-                <MenuItem value='instagram'>Instagram</MenuItem>
-                <MenuItem value='twitter'>Twitter</MenuItem>
-                <MenuItem value='linkedin'>LinkedIn</MenuItem>
+                <MenuItem value=''>{t('jobs.social.allChannels')}</MenuItem>
+                <MenuItem value='google'>{t('common.channel.google')}</MenuItem>
+                <MenuItem value='facebook'>{t('common.channel.facebook')}</MenuItem>
+                <MenuItem value='instagram'>{t('common.channel.instagram')}</MenuItem>
+                <MenuItem value='twitter'>{t('common.channel.twitter')}</MenuItem>
+                <MenuItem value='linkedin'>{t('common.channel.linkedin')}</MenuItem>
               </CustomTextField>
             </Grid>
 
@@ -338,7 +345,7 @@ const SocialPostList = () => {
                 <CustomTextField
                   fullWidth
                   type="date"
-                  label="Start Date"
+                  label={t('jobs.social.startDate')}
                   value={filters.startDate ? filters.startDate.toISOString().split('T')[0] : ''}
                   onChange={(e) => handleDateChange('start', e.target.value ? new Date(e.target.value) : null)}
                   InputLabelProps={{ shrink: true }}
@@ -346,7 +353,7 @@ const SocialPostList = () => {
                 <CustomTextField
                   fullWidth
                   type="date"
-                  label="End Date"
+                  label={t('jobs.social.endDate')}
                   value={filters.endDate ? filters.endDate.toISOString().split('T')[0] : ''}
                   onChange={(e) => handleDateChange('end', e.target.value ? new Date(e.target.value) : null)}
                   InputLabelProps={{ shrink: true }}

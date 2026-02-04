@@ -1,6 +1,8 @@
 /* eslint-disable import/no-unresolved */
 import React, { useMemo } from 'react';
 
+import { useTranslations } from 'next-intl';
+
 import { Card, CardContent, Typography, Chip, Tooltip } from '@mui/material';
 import type { GridColDef } from '@mui/x-data-grid';
 
@@ -13,6 +15,8 @@ interface ExtractionHistoryTabProps {
 }
 
 const ExtractionHistoryTab: React.FC<ExtractionHistoryTabProps> = ({ historyVersions }) => {
+  const tc = useTranslations('common');
+
   const columns = useMemo<GridColDef[]>(() => [
     {
       field: 'versionNumber',
@@ -20,7 +24,7 @@ const ExtractionHistoryTab: React.FC<ExtractionHistoryTabProps> = ({ historyVers
       width: 100,
       renderCell: (params) => (
         <Typography variant="body2" fontWeight="700">
-          v{params.value}
+          { 'v' }{params.value}
         </Typography>
       )
     },
@@ -57,13 +61,13 @@ const ExtractionHistoryTab: React.FC<ExtractionHistoryTabProps> = ({ historyVers
     },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: tc('common.status'),
       width: 150,
       renderCell: () => (
-        <Chip label="Completed" size="small" color="success" variant="outlined" />
+        <Chip label={tc('status.completed')} size="small" color="success" variant="outlined" />
       )
     }
-  ], []);
+  ], [tc]);
 
   return (
     <Card variant="outlined" sx={{ borderRadius: 3 }}>

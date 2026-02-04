@@ -11,6 +11,8 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { DataGrid } from '@mui/x-data-grid';
+import { useTranslations } from 'next-intl';
+
 import type { KeywordDTO } from '@platform/contracts';
 
 interface KeywordsTableProps {
@@ -20,13 +22,15 @@ interface KeywordsTableProps {
 }
 
 const KeywordsTable: React.FC<KeywordsTableProps> = ({ keywords, loading, onViewHistory }) => {
+  const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
   const [menuAnchor, setMenuAnchor] = React.useState<null | HTMLElement>(null);
   const [menuKeyword, setMenuKeyword] = React.useState<KeywordDTO | null>(null);
 
   const columns: GridColDef[] = [
     {
       field: 'keyword',
-      headerName: 'Keyword',
+      headerName: t('seo.keywords.keyword'),
       flex: 1,
       minWidth: 200,
       renderCell: (params: GridRenderCellParams) => (
@@ -39,7 +43,7 @@ const KeywordsTable: React.FC<KeywordsTableProps> = ({ keywords, loading, onView
     },
     {
       field: 'currentRank',
-      headerName: 'Rank',
+      headerName: t('seo.keywords.rank'),
       width: 100,
       renderCell: (params: GridRenderCellParams) => {
         const rank = params.value as number | undefined;
@@ -64,7 +68,7 @@ const KeywordsTable: React.FC<KeywordsTableProps> = ({ keywords, loading, onView
     },
     {
       field: 'mapPackPosition',
-      headerName: 'Map Pack',
+      headerName: t('seo.keywords.mapPack'),
       width: 100,
       renderCell: (params: GridRenderCellParams) => {
         const rank = params.value as number | undefined;
@@ -79,7 +83,7 @@ return rank ? (
     },
     {
       field: 'dailyChange',
-      headerName: 'Change',
+      headerName: t('seo.keywords.change'),
       width: 120,
       renderCell: (params: GridRenderCellParams) => {
         const delta = params.value as number | undefined
@@ -104,7 +108,7 @@ return (
     },
     {
       field: 'searchVolume',
-      headerName: 'Volume',
+      headerName: t('seo.keywords.volume'),
       width: 100,
       type: 'number',
       renderCell: (params: GridRenderCellParams) => (
@@ -115,7 +119,7 @@ return (
     },
     {
       field: 'difficulty',
-      headerName: 'KD %',
+      headerName: t('seo.keywords.kd'),
       width: 100,
       type: 'number',
       renderCell: (params: GridRenderCellParams) => {
@@ -134,7 +138,7 @@ return (
     },
     {
       field: 'tags',
-      headerName: 'Tags',
+      headerName: tc('common.tags'),
       flex: 1,
       minWidth: 150,
       renderCell: (params: GridRenderCellParams) => {
@@ -152,7 +156,7 @@ return (
     },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: tc('common.status'),
       width: 100,
       renderCell: (params: GridRenderCellParams) => (
         <Chip
@@ -165,7 +169,7 @@ return (
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: tc('actions'),
       width: 100,
       sortable: false,
       filterable: false,
@@ -222,7 +226,7 @@ return (
             setMenuKeyword(null);
           }}
         >
-          View Ranking History
+          {t('seo.keywords.viewHistory')}
         </MenuItem>
       </Menu>
     </Box>

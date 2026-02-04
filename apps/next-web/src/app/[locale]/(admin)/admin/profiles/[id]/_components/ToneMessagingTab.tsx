@@ -4,6 +4,8 @@
 
 import React, { useState } from 'react';
 
+import { useTranslations } from 'next-intl';
+
 import {
   Box,
   Typography,
@@ -27,7 +29,10 @@ import {
   Close as CloseIcon,
   CheckCircle as CheckIcon,
 } from '@mui/icons-material';
-import toast from 'react-hot-toast';
+
+import { SystemMessageCode } from '@platform/contracts';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 
 import { BrandProfileService } from '@/services/brand-profile.service';
 import type { BrandProfile } from '@/services/brand-profile.service';
@@ -39,6 +44,8 @@ interface ToneMessagingTabProps {
 }
 
 const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, isUpdating }) => {
+  const t = useTranslations('BrandProfiles.tone');
+  const { notify } = useSystemMessages();
   const theme = useTheme();
   const [isGenerating, setIsGenerating] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
@@ -57,10 +64,10 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
       const newTone = await BrandProfileService.generateBrandTone(profile.id);
       
       setEditedTone(newTone);
-      toast.success('Brand tone generated successfully!');
+      notify(SystemMessageCode.BRAND_TONE_GENERATED);
       await onUpdate({ tone: newTone });
     } catch (error) {
-      toast.error('Failed to generate brand tone');
+      notify(SystemMessageCode.GENERIC_ERROR);
     } finally {
       setIsGenerating(false);
     }
@@ -70,9 +77,9 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
     try {
       await onUpdate({ tone: editedTone });
       setEditingSection(null);
-      toast.success('Section updated successfully');
+      notify(SystemMessageCode.SUCCESS);
     } catch (error) {
-      toast.error('Failed to update section');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 
@@ -109,10 +116,9 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
     return (
       <Paper variant="outlined" sx={{ p: 6, textAlign: 'center', borderRadius: 4, borderStyle: 'dashed' }}>
         <MagicIcon sx={{ fontSize: 64, color: 'primary.main', mb: 3, opacity: 0.5 }} />
-        <Typography variant="h5" fontWeight="700" gutterBottom>Generate Brand Tone</Typography>
+        <Typography variant="h5" fontWeight="700" gutterBottom>{t('generateTitle')}</Typography>
         <Typography color="text.secondary" sx={{ mb: 4, maxWidth: 500, mx: 'auto' }}>
-          Our AI can analyze your brand&apos;s extracted data to create a consistent tone of voice, 
-          writing rules, and messaging pillars.
+          {t('generateDesc')}
         </Typography>
         <Button 
           variant="contained" 
@@ -121,7 +127,7 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
           onClick={handleGenerate}
           sx={{ borderRadius: 3, px: 4, py: 1.5 }}
         >
-          Generate with AI
+          {t('generateBtn')}
         </Button>
       </Paper>
     );
@@ -136,7 +142,7 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
             {/* Tone Descriptors */}
             <Card variant="outlined" sx={{ borderRadius: 3 }}>
               <CardContent sx={{ p: 3 }}>
-                {renderSectionHeader('Tone of Voice', 'descriptors')}
+                {renderSectionHeader(t('voiceTitle'), 'descriptors')}
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                   {editingSection === 'descriptors' ? (
                     <TextField
@@ -144,7 +150,7 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
                       multiline
                       rows={2}
                       variant="outlined"
-                      placeholder="Enter descriptors separated by commas"
+                      placeholder={t('voicePlaceholder')}
                       value={editedTone.descriptors.join(', ')}
                       onChange={(e) => updateToneField('descriptors', e.target.value.split(',').map(s => s.trim()))}
                     />
@@ -166,11 +172,11 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
             {/* Writing Rules */}
             <Card variant="outlined" sx={{ borderRadius: 3 }}>
               <CardContent sx={{ p: 3 }}>
-                {renderSectionHeader('Writing Rules', 'writingRules')}
+                {renderSectionHeader(t('rulesTitle'), 'writingRules')}
                 <Grid container spacing={3}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant="subtitle2" fontWeight="700" color="success.main" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <CheckIcon fontSize="small" /> DO
+                      <CheckIcon fontSize="small" /> {t('do')}
                     </Typography>
                     <Stack spacing={1}>
                       {editingSection === 'writingRules' ? (
@@ -191,7 +197,7 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant="subtitle2" fontWeight="700" color="error.main" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <CloseIcon fontSize="small" /> DON&apos;T
+                      <CloseIcon fontSize="small" /> {t('dont')}
                     </Typography>
                     <Stack spacing={1}>
                       {editingSection === 'writingRules' ? (
@@ -217,14 +223,14 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
             {/* Messaging Pillars */}
             <Card variant="outlined" sx={{ borderRadius: 3 }}>
               <CardContent sx={{ p: 3 }}>
-                {renderSectionHeader('Messaging Pillars', 'messagingPillars')}
+                {renderSectionHeader(t('pillarsTitle'), 'messagingPillars')}
                 <Stack spacing={3}>
                   {editingSection === 'messagingPillars' ? (
                     editedTone.messagingPillars.map((pillar, i) => (
                       <Box key={i} sx={{ p: 2, bgcolor: alpha(theme.palette.primary.main, 0.03), borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
                         <TextField
                           fullWidth
-                          label="Pillar Title"
+                          label={t('pillarLabel')}
                           variant="outlined"
                           size="small"
                           sx={{ mb: 2 }}
@@ -238,7 +244,7 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
                         />
                         <TextField
                           fullWidth
-                          label="Description"
+                          label={t('descriptionLabel')}
                           variant="outlined"
                           size="small"
                           multiline
@@ -254,7 +260,7 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
                         />
                         <TextField
                           fullWidth
-                          label="CTAs (comma separated)"
+                          label={t('ctasLabel')}
                           variant="outlined"
                           size="small"
                           value={pillar.ctas.join(', ')}
@@ -292,7 +298,7 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
             {/* Taglines */}
             <Card variant="outlined" sx={{ borderRadius: 3 }}>
               <CardContent sx={{ p: 3 }}>
-                {renderSectionHeader('Tagline Options', 'taglines')}
+                {renderSectionHeader(t('taglinesTitle'), 'taglines')}
                 <Stack spacing={1.5}>
                   {editingSection === 'taglines' ? (
                     <TextField
@@ -321,9 +327,9 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
             {/* Actions Card */}
             <Card variant="outlined" sx={{ borderRadius: 3, bgcolor: alpha(theme.palette.primary.main, 0.02) }}>
               <CardContent sx={{ p: 3 }}>
-                <Typography variant="subtitle1" fontWeight="700" gutterBottom>Actions</Typography>
+                <Typography variant="subtitle1" fontWeight="700" gutterBottom>{t('actionsTitle')}</Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                  Not satisfied with the current tone? You can regenerate it using the latest brand data.
+                  {t('actionsDesc')}
                 </Typography>
                 <Button 
                   fullWidth 
@@ -333,7 +339,7 @@ const ToneMessagingTab: React.FC<ToneMessagingTabProps> = ({ profile, onUpdate, 
                   disabled={isGenerating}
                   sx={{ borderRadius: 2, py: 1.5, fontWeight: 700 }}
                 >
-                  {isGenerating ? 'Regenerating...' : 'Regenerate with AI'}
+                  {isGenerating ? t('regenerating') : t('regenerateBtn')}
                 </Button>
               </CardContent>
             </Card>

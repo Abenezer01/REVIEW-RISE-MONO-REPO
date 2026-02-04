@@ -14,8 +14,13 @@ import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import InputAdornment from '@mui/material/InputAdornment'
-import { toast } from 'react-toastify'
+
+import { SystemMessageCode } from '@platform/contracts'
+
 import type { GridColDef } from '@mui/x-data-grid'
+
+import { useTranslation } from '@/hooks/useTranslation'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 // Core Component Imports
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -36,6 +41,8 @@ const getInitials = (string: string) =>
   string.split(/\s/).reduce((response, word) => (response += word.slice(0, 1)), '')
 
 const AccountList = () => {
+  const { notify } = useSystemMessages()
+  const t = useTranslation('dashboard')
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
@@ -92,10 +99,10 @@ const AccountList = () => {
     const res = await deleteAccount(accountToDelete.id)
 
     if (res.success) {
-      toast.success('Account deleted successfully')
+      notify(SystemMessageCode.ITEM_DELETED)
       fetchData()
     } else {
-      toast.error(res.message || 'Failed to delete account')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
 
     setDeleteDialogOpen(false)
@@ -111,7 +118,7 @@ const AccountList = () => {
   const columns: GridColDef[] = [
     {
       field: 'name',
-      headerName: 'Account',
+      headerName: t('accounts.list.columns.account'),
       flex: 1,
       minWidth: 250,
       renderCell: (params) => (
@@ -138,7 +145,7 @@ const AccountList = () => {
             </Typography>
             <Typography variant='body2' color='text.secondary' sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <i className='tabler-building-skyscraper' style={{ fontSize: 16 }} />
-              {params.row.description || 'No description'}
+              {params.row.description || t('accounts.list.noDescription')}
             </Typography>
           </Box>
         </Box>
@@ -146,7 +153,7 @@ const AccountList = () => {
     },
     {
       field: 'ownerName',
-      headerName: 'Name / Email',
+      headerName: t('accounts.list.columns.nameEmail'),
       flex: 1,
       minWidth: 200,
       renderCell: (params) => (
@@ -172,7 +179,7 @@ const AccountList = () => {
     },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: t('accounts.list.columns.status'),
       minWidth: 120,
       renderCell: (params) => (
         <CustomChip
@@ -180,14 +187,14 @@ const AccountList = () => {
           size='small'
           variant='tonal'
           color={statusColor[params.value] || 'default'}
-          label={params.value}
+          label={t(`common.status.${params.value}`)}
           sx={{ textTransform: 'capitalize' }}
         />
       )
     },
     {
       field: 'plan',
-      headerName: 'Plan',
+      headerName: t('accounts.list.columns.plan'),
       minWidth: 120,
       renderCell: (params) => (
         <CustomChip
@@ -201,7 +208,7 @@ const AccountList = () => {
     },
     {
       field: 'createdAt',
-      headerName: 'Created Date',
+      headerName: t('accounts.list.columns.createdDate'),
       minWidth: 150,
       valueFormatter: (value: string) => new Date(value).toLocaleDateString(),
       renderCell: (params) => (
@@ -212,12 +219,12 @@ const AccountList = () => {
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('accounts.list.columns.actions'),
       sortable: false,
       minWidth: 150,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Tooltip title='View Details'>
+          <Tooltip title={t('accounts.list.tooltips.viewDetails')}>
             <IconButton
               size='small'
               component={Link}
@@ -227,7 +234,7 @@ const AccountList = () => {
               <i className='tabler-eye' />
             </IconButton>
           </Tooltip>
-          <Tooltip title='Edit'>
+          <Tooltip title={t('accounts.list.tooltips.edit')}>
             <IconButton
               size='small'
               onClick={() => {
@@ -239,7 +246,7 @@ const AccountList = () => {
               <i className='tabler-edit' />
             </IconButton>
           </Tooltip>
-          <Tooltip title='Delete'>
+          <Tooltip title={t('accounts.list.tooltips.delete')}>
             <IconButton
               size='small'
               onClick={() => handleDeleteClick(params.row)}
@@ -257,14 +264,14 @@ const AccountList = () => {
     <>
       <Card sx={{ mb: 6 }}>
         <CardHeader
-          title='Accounts'
+          title={t('accounts.list.title')}
           action={
             <Button
               variant='contained'
               onClick={() => setOpenDialog(true)}
               startIcon={<i className='tabler-plus' />}
             >
-              Create Account
+              {t('accounts.list.createAccount')}
             </Button>
           }
         />
@@ -274,7 +281,7 @@ const AccountList = () => {
             <Grid size={{ xs: 12, sm: 4 }}>
               <CustomTextField
                 fullWidth
-                placeholder='Search Account...'
+                placeholder={t('accounts.list.searchPlaceholder')}
                 value={filters.search}
                 onChange={e => handleFilterChange('search', e.target.value)}
                 InputProps={{
@@ -301,10 +308,10 @@ const AccountList = () => {
                   )
                 }}
               >
-                <MenuItem value=''>All Status</MenuItem>
-                <MenuItem value='active'>Active</MenuItem>
-                <MenuItem value='inactive'>Inactive</MenuItem>
-                <MenuItem value='pending'>Pending</MenuItem>
+                <MenuItem value=''>{t('accounts.list.allStatus')}</MenuItem>
+                <MenuItem value='active'>{t('common.status.active')}</MenuItem>
+                <MenuItem value='inactive'>{t('common.status.inactive')}</MenuItem>
+                <MenuItem value='pending'>{t('common.status.pending')}</MenuItem>
               </CustomTextField>
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
@@ -322,10 +329,10 @@ const AccountList = () => {
                   )
                 }}
               >
-                <MenuItem value=''>All Plans</MenuItem>
-                <MenuItem value='free'>Free</MenuItem>
-                <MenuItem value='pro'>Pro</MenuItem>
-                <MenuItem value='enterprise'>Enterprise</MenuItem>
+                <MenuItem value=''>{t('accounts.list.allPlans')}</MenuItem>
+                <MenuItem value='free'>{t('accounts.accountDialog.fields.free')}</MenuItem>
+                <MenuItem value='pro'>{t('accounts.accountDialog.fields.pro')}</MenuItem>
+                <MenuItem value='enterprise'>{t('accounts.accountDialog.fields.enterprise')}</MenuItem>
               </CustomTextField>
             </Grid>
           </Grid>
@@ -371,8 +378,8 @@ const AccountList = () => {
       <ConfirmationDialog
         open={deleteDialogOpen}
         handleClose={() => setDeleteDialogOpen(false)}
-        title='Delete Account'
-        content={`Are you sure you want to delete ${accountToDelete?.name}? This action cannot be undone.`}
+        title={t('accounts.list.deleteDialog.title')}
+        content={t('accounts.list.deleteDialog.confirm', { name: accountToDelete?.name })}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeleteDialogOpen(false)}
         type='delete'

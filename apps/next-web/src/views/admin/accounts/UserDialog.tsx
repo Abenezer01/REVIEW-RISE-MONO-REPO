@@ -117,14 +117,14 @@ const UserDialog = ({ open, onClose, onSuccess, user, businessId: propBusinessId
   }, [open, user, propBusinessId])
 
   const validationSchema = useMemo(() => yup.object({
-    firstName: yup.string().required('First Name is required'),
-    lastName: yup.string().required('Last Name is required'),
-    email: yup.string().email('Enter a valid email').required('Email is required'),
-    role: yup.string().required('Role is required'),
-    businessId: yup.string().required('Business is required'),
-    locationId: locations.length > 0 ? yup.string().required('Location is required') : yup.string().nullable(),
-    password: user ? yup.string() : yup.string().required('Password is required').min(8, 'Password must be at least 8 characters')
-  }), [user, locations.length])
+    firstName: yup.string().required(t('errors.firstNameRequired')),
+    lastName: yup.string().required(t('errors.lastNameRequired')),
+    email: yup.string().email(t('errors.invalidEmail')).required(t('errors.emailRequired')),
+    role: yup.string().required(t('errors.roleRequired')),
+    businessId: yup.string().required(t('errors.businessRequired')),
+    locationId: locations.length > 0 ? yup.string().required(t('errors.locationRequired')) : yup.string().nullable(),
+    password: user ? yup.string() : yup.string().required(t('errors.passwordRequired')).min(8, t('errors.passwordMin', { min: 8 }))
+  }), [user, locations.length, t])
 
   const initialValues = useMemo(
     () => {

@@ -28,12 +28,137 @@
     "brand-rise": "BrandRise",
     "content-templates": "Content Templates",
     "seasonal-events": "Seasonal Events",
+    "seasonalEvents": {
+      "title": "Seasonal Events",
+      "subtitle": "Manage your brand's seasonal events and holiday marketing schedule.",
+      "addEvent": "Add Event",
+      "editEvent": "Edit Seasonal Event",
+      "addNewEvent": "Add New Event",
+      "eventName": "Event Name",
+      "date": "Date",
+      "market": "Market",
+      "description": "Description",
+      "deleteTitle": "Delete Seasonal Event",
+      "deleteConfirm": "Are you sure you want to delete this seasonal event? This action cannot be undone."
+    },
     "settings": "Settings",
     "system-settings": "System Settings",
     "feature-flags": "Feature Flags",
-    "ai-visibility": "AI Visibility"
+    "ai-visibility": "AI Visibility",
+    "subscription-issues": "Subscription Issues"
   },
   "auto-reply": "Auto-Reply Settings",
+  "seo": {
+    "visibility": {
+      "title": "SERP Visibility",
+      "subtitle": "Track your map pack presence and organic ranking performance",
+      "refreshData": "Refresh Data",
+      "loadingProfile": "Loading your business profile...",
+      "noBusiness": "No Business Found",
+      "noBusinessDesc": "Your account does not appear to be linked to any businesses.",
+      "noBusinessUser": "No businesses found for this user.",
+      "loadFailed": "Failed to load user businesses.",
+      "loadDashboardFailed": "Failed to load dashboard data. Please check connection to SEO service.",
+      "currentPerformance": "Current Performance",
+      "mapPack": "Map Pack Visibility",
+      "shareOfVoice": "Share of Voice",
+      "loading": "Loading Chart...",
+      "mapPackAppearances": "{count} appearances",
+      "weightedByVolume": "Weighted by volume",
+      "organicTitle": "Organic Rankings",
+      "top10": "Top 10:",
+      "top20": "Top 20:",
+      "serpFeaturesTitle": "SERP Features",
+      "local": "Local:",
+      "snippets": "Snippets:",
+      "trendsTitle": "Visibility Trends (30 Days)",
+      "rankingHistory": "Keyword Ranking History",
+      "trackedKeywords": "Tracked Keywords",
+      "keywordsTitle": "SEO Keywords",
+      "keywordsSubtitle": "Add, view, and manage tracked keywords for local SEO",
+      "rankings": {
+        "organic": "Organic Rank",
+        "mapPack": "Map Pack",
+        "historyTitle": "Ranking History"
+      }
+    },
+    "keywords": {
+      "formTitle": "SEO Keyword",
+      "keyword": "Keyword",
+      "language": "Language",
+      "device": "Device",
+      "mobile": "Mobile",
+      "desktop": "Desktop",
+      "city": "City",
+      "country": "Country",
+      "tags": "Tags (comma separated)",
+      "autoSuggest": "Auto-suggest",
+      "autoSuggested": "Auto-suggested",
+      "harvestCompetitor": "Harvest Competitor",
+      "competitorHarvest": "Competitor Harvest",
+      "competitorDomain": "Competitor Domain",
+      "use": "Use",
+      "rank": "Rank",
+      "mapPack": "Map Pack",
+      "change": "Change",
+      "volume": "Volume",
+      "kd": "KD %",
+      "viewHistory": "View Ranking History"
+    }
+  },
+  "autoReply": {
+    "title": "AI Auto-Reply System",
+    "description": "When enabled, our AI will automatically respond to reviews based on your configuration, using your brand voice and tone.",
+    "systemActive": "System Active",
+    "systemPaused": "System Paused",
+    "responseRules": "Response Rules",
+    "rulesSubtitle": "Define which reviews should trigger an automatic response",
+    "targetSentiment": "Target Sentiment",
+    "sentimentTooltip": "Choose which rating levels should receive automated replies",
+    "positiveOnly": "Positive Only",
+    "positiveOnlyDesc": "Best for businesses wanting to only automate high-praise reviews.",
+    "positiveNeutral": "Positive + Neutral",
+    "positiveNeutralDesc": "Comprehensive coverage including 3-star reviews for maximum efficiency.",
+    "negativeSafeguard": "Negative Review Safeguard",
+    "negativeSafeguardDesc": "Always hold 1 & 2 star reviews for manual approval before posting.",
+    "timingDelivery": "Timing & Delivery",
+    "timingSubtitle": "Control when and how often replies are sent",
+    "replyDelay": "Reply Delay",
+    "delayDesc": "Wait time to make AI replies look more natural",
+    "hour": "hour",
+    "hours": "hours",
+    "instant": "Instant",
+    "dailyLimit": "Daily Reply Limit",
+    "limitDesc": "Maximum automated replies per 24-hour period",
+    "securitySafeguards": "Safety Safeguards",
+    "saveSettings": "Save Settings",
+    "saving": "Saving...",
+    "quickGuide": "Quick Guide",
+    "guideSubtitle": "How the workflow handles reviews",
+    "brandVoice": "Brand Voice",
+    "voiceSubtitle": "Personality & Tone",
+    "activeStatus": "Status: Active",
+    "voiceDesc": "Your responses will automatically reflect your established brand personality and values across all platforms.",
+    "configureVoice": "Configure Brand Voice",
+    "steps": {
+      "sentiment": {
+        "title": "Sentiment Analysis",
+        "desc": "New reviews are analyzed for star rating and content sentiment."
+      },
+      "ai": {
+        "title": "AI Generation",
+        "desc": "Replies are crafted using your unique Brand Voice and response patterns."
+      },
+      "delay": {
+        "title": "Natural Delay",
+        "desc": "Replies wait for your configured delay period before being queued for posting."
+      },
+      "manual": {
+        "title": "Manual Review",
+        "desc": "Negative or flagged reviews are always held for your human approval."
+      }
+    }
+  },
   "overview": {
     "title": "Dashboard Overview",
     "welcome": "Welcome back",
@@ -48,16 +173,83 @@
     "thisWeek": "This Week",
     "thisMonth": "This Month",
     "thisYear": "This Year",
-    "allTime": "All Time"
+    "allTime": "All Time",
+    "last7Days": "Last 7 Days",
+    "last30Days": "Last 30 Days",
+    "last90Days": "Last 90 Days"
   },
   "reviews": {
     "title": "Reviews",
     "recent": "Recent Reviews",
+      "unrepliedCount": "{count} Unreplied",
+      "recentRepliesCount": "{count} Recent Replies",
+      "noRecent": "No recent reviews",
     "positive": "Positive",
     "negative": "Negative",
     "neutral": "Neutral",
     "reply": "Reply",
-    "viewAll": "View All Reviews"
+    "viewAll": "View All Reviews",
+    "smart": {
+      "title": "Smart Reviews™",
+      "subtitle": "View and manage all your customer reviews in one place",
+      "manageSubtitle": "Manage and monitor your customer reputation across platforms",
+      "runSentiment": "Run Sentiment Analysis",
+      "reviewsCount": "{count} Reviews",
+      "totalCount": "{count} Total",
+      "searchPlaceholder": "Search reviews...",
+      "filterRating": "Filter by Rating",
+      "allRatings": "All Ratings",
+      "stars": "{count} Stars",
+      "filterProvider": "Filter by Provider",
+      "allProviders": "All Providers",
+      "filterSentiment": "Filter by Sentiment",
+      "allSentiments": "All Sentiments",
+      "filterStatus": "Filter by Status",
+      "allStatuses": "All Statuses",
+      "empty": {
+        "title": "No Reviews Found",
+        "description": "Try adjusting your filters to find what you are looking for."
+      },
+      "columns": {
+        "reviewer": "Reviewer",
+        "review": "Review",
+        "sentiment": "Sentiment",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "anonymous": "Anonymous",
+      "noContent": "No content provided",
+      "detail": {
+        "title": "Review Details",
+        "noContent": "No content provided",
+        "subtitle": "View and manage customer feedback",
+        "publishedDate": "Published Date",
+        "source": "Source",
+        "reviewContent": "Review Content",
+        "internalTags": "Internal Tags",
+        "extractedEmotions": "Extracted Emotions & Topics",
+        "noAnalysis": "No analysis available",
+        "keyTopics": "Key Topics",
+        "replyHistory": "Reply History",
+        "aiAutoReply": "AI Auto-Reply",
+        "teamMember": "Team Member",
+        "live": "Live",
+        "aiSuggestions": "AI Smart Suggestions",
+        "aiAnalysis": "AI Analysis",
+        "suggestedReplies": "Suggested Replies",
+        "noSuggestions": "No Suggestions Yet",
+        "noSuggestionsDesc": "Click the \"Generate AI\" button below to get 3 personalized reply variations for this review.",
+        "regenerate": "Regenerate",
+        "generateAI": "Generate AI",
+        "useThis": "Use This",
+        "yourReply": "Your Reply",
+        "writeReply": "Write your reply here...",
+        "reject": "Reject",
+        "updateReply": "Update Reply",
+        "postReply": "Post Reply",
+        "defaultReply": "Dear {author}, thank you so much for your {rating}-star review! We appreciate your feedback and hope to see you again soon."
+      }
+    }
   },
   "actions": {
     "respondToReview": "Respond to Review",
@@ -73,6 +265,8 @@
     "createTitle": "Create Location",
     "editTitle": "Edit Location",
     "detail": {
+      "manageSubtitle": "Manage your business locations and their operational status",
+      "searchPlaceholder": "Search locations",
       "backToAccount": "Back to Account",
       "backToList": "Back to List",
       "notFound": "Location not found",
@@ -99,7 +293,61 @@
       "deleteConfirm": "Are you sure you want to delete this location?"
     }
   },
+  "subscriptionIssues": {
+    "title": "Subscription Issues",
+    "subtitle": "Monitor and manage billing problems",
+    "info": "Showing accounts with expired subscriptions, payment failures, or other billing issues.",
+    "columns": {
+      "business": "Business",
+      "status": "Status",
+      "issueReason": "Issue Reason",
+      "periodEnd": "Period End",
+      "lastContacted": "Last Contacted",
+      "actions": "Actions"
+    },
+    "plan": "{plan} Plan",
+    "expired": "(Expired)",
+    "byAdmin": "by {admin}",
+    "never": "Never",
+    "tooltips": {
+      "pause": "Pause Subscription",
+      "resume": "Resume Subscription",
+      "markContacted": "Mark as Contacted",
+      "viewDetails": "View Account Details"
+    },
+    "detail": {
+      "title": "Billing Issue Detail",
+      "notes": "Notes",
+      "details": "Details",
+      "close": "Close"
+    }
+  },
   "accounts": {
+    "list": {
+      "title": "Accounts",
+      "createAccount": "Create Account",
+      "searchPlaceholder": "Search Account...",
+      "allStatus": "All Status",
+      "allPlans": "All Plans",
+      "noDescription": "No description",
+      "columns": {
+        "account": "Account",
+        "nameEmail": "Name / Email",
+        "status": "Status",
+        "plan": "Plan",
+        "createdDate": "Created Date",
+        "actions": "Actions"
+      },
+      "tooltips": {
+        "viewDetails": "View Details",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "deleteDialog": {
+        "title": "Delete Account",
+        "confirm": "Are you sure you want to delete {name}? This action cannot be undone."
+      }
+    },
     "title": "Account Details",
     "notFound": "Account not found",
     "createdOn": "Created {date}",
@@ -175,7 +423,21 @@
         "status": "Status",
         "plan": "Plan",
         "description": "Description",
-        "descriptionPlaceholder": "Write something about the account..."
+        "descriptionPlaceholder": "Write something about the account...",
+        "active": "Active",
+        "inactive": "Inactive",
+        "pending": "Pending",
+        "free": "Free",
+        "pro": "Pro",
+        "enterprise": "Enterprise"
+      },
+      "validation": {
+        "nameRequired": "Account name is required",
+        "emailRequired": "Email is required",
+        "invalidEmail": "Enter a valid email",
+        "statusRequired": "Status is required",
+        "planRequired": "Plan is required",
+        "descriptionTooLong": "Description too long"
       }
     },
     "userDialog": {
@@ -193,8 +455,310 @@
       }
     }
   },
+  "aiVisibility": {
+    "pageSubtitle": "Analyze how your brand appears in AI-generated answers (GEO/AIO).",
+    "geoTitle": "GEO: Generative Engine Optimization",
+    "geoDesc": "Optimizing content to rank better in AI search engines.",
+    "aioTitle": "AIO: AI Overview",
+    "aioDesc": "The AI-generated summary at the top of search results.",
+    "dashboard": {
+      "starting": "Starting analysis...",
+      "validating": "Validating URL accessibility and robots.txt...",
+      "errorAccessibility": "URL is not publicly accessible. Please ensure it is live and not behind a login or IP restriction.",
+      "errorRobots": "robots.txt disallows AI bots. Please update your robots.txt to allow crawlers.",
+      "errorSeo": "Basic SEO practices not met (e.g., no proper HTML structure). Please ensure your page has valid HTML.",
+      "analyzing": "Analyzing AI visibility and generating insights...",
+      "unexpectedError": "An unexpected error occurred",
+      "initialInfo": "Enter a URL above to analyze its AI visibility and get optimization tips.",
+      "analysisCompleteScore": "Analysis complete! Your brand achieved a visibility score of {score}%.",
+      "analysisComplete": "Analysis complete!"
+    },
+    "validation": {
+      "title": "Technical Readiness Analysis",
+      "subtitle": "Checking how well AI crawlers can access and interpret your site",
+      "readyForAI": "Ready for AI",
+      "perfectOptimized": "Your site is perfectly optimized for AI discovery!",
+      "technicalIssues": "Some technical issues might be preventing AI models from fully indexing your brand.",
+      "accessibility": "Accessibility",
+      "botPermissions": "Bot Permissions",
+      "seoFoundations": "SEO Foundations",
+      "checks": {
+        "publicAccess": "Public Access",
+        "noLoginWall": "No Login Wall",
+        "noIpBlocks": "No IP Blocks",
+        "botFriendly": "Bot Friendly",
+        "robotsTxt": "robots.txt (AI Bots)",
+        "crawlRate": "Crawl Rate Optimized",
+        "validHtml": "Valid HTML5",
+        "semanticSchema": "Semantic Schema",
+        "sitemap": "Sitemap.xml",
+        "cleanUrls": "Clean URL Structure"
+      }
+    },
+    "tips": {
+      "title": "Optimization Tips",
+      "subtitle": "Actionable suggestions to improve AI visibility",
+      "impact": {
+        "High": "High",
+        "Medium": "Medium",
+        "Low": "Low"
+      }
+    },
+    "overview": {
+      "visibilityScore": "Visibility Score",
+      "visibilityTooltip": "Overall presence of your brand across major AI models (ChatGPT, Gemini, etc.) based on mention frequency.",
+      "visibilityFooter": "AI brand presence",
+      "sentiment": "Sentiment",
+      "sentimentTooltip": "The emotional tone of AI-generated responses about your brand, ranging from negative to positive.",
+      "sentimentFooter": "AI brand perception",
+      "shareOfVoice": "Share of Voice",
+      "shareOfVoiceTooltip": "Your brand's percentage of mentions compared to the total industry/context mentions in AI answers.",
+      "shareOfVoiceFooter": "Proportion of mentions",
+      "authority": "Authority",
+      "authorityTooltip": "The quality and trustworthiness of the sources that AI models use to verify information about your brand.",
+      "authorityFooter": "Source trustworthiness",
+      "readiness": "Readiness",
+      "readinessTooltip": "Technical accessibility for AI crawlers (robots.txt, SEO, public access).",
+      "readinessFooter": "AI crawler accessibility"
+    },
+    "input": {
+      "title": "AI Brand Visibility Analysis",
+      "subtitle": "Enter your brand's website URL to analyze its presence across major AI platforms like ChatGPT, Gemini, and Claude.",
+      "label": "Brand Website URL",
+      "placeholder": "e.g., https://yourbrand.com",
+      "helper": "Enter the full URL including https://",
+      "tryExample": "Try an example:",
+      "analyzing": "Analyzing...",
+      "analyze": "Analyze"
+    },
+    "platformBreakdown": {
+      "title": "Performance by AI Platform",
+      "subheader": "How different Large Language Models (LLMs) perceive your brand",
+      "columns": {
+        "platform": "Platform",
+        "status": "Status",
+        "sentiment": "Sentiment",
+        "sourcesCited": "Sources Cited"
+      },
+      "status": {
+        "mentioned": "Mentioned",
+        "notFound": "Not Found"
+      }
+    }
+  },
+  "jobs": {
+    "failed": {
+      "title": "Failed Jobs Management",
+      "subtitle": "Monitor, investigate and retry failed background tasks",
+      "jobsFound": "{count} Jobs Found",
+      "searchPlaceholder": "Search by ID or Error...",
+      "filterByType": "Filter by Type",
+      "allTypes": "All Types",
+      "exportCsv": "Export CSV",
+      "csv": {
+        "jobId": "Job ID",
+        "type": "Type",
+        "business": "Business",
+        "errorDetails": "Error Details",
+        "retries": "Retries",
+        "createdAt": "Created At"
+      },
+      "types": {
+        "reviews": "Reviews",
+        "social_posts": "Social Posts",
+        "seo_crawls": "SEO Crawls",
+        "ai_tasks": "AI Tasks"
+      },
+      "actions": {
+        "viewDetails": "View Details",
+        "retryJob": "Retry Job",
+        "resolvedByAdmin": "Resolved by admin",
+        "ignoredByAdmin": "Ignored by admin"
+      }
+    },
+    "social": {
+      "title": "Social Media Post Logs",
+      "subtitle": "Monitor and manage social media posting jobs",
+      "postsCount": "{count} Posts",
+      "searchPlaceholder": "Search Account or Location...",
+      "searchLabel": "Search Account or Location",
+      "allStatuses": "All Statuses",
+      "allChannels": "All Channels",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "columns": {
+        "id": "Job ID",
+        "account": "Account",
+        "channel": "Channel",
+        "type": "Type",
+        "status": "Status",
+        "scheduledFor": "Scheduled For",
+        "publishedAt": "Published At",
+        "actions": "Actions"
+      },
+      "types": {
+        "organic": "organic",
+        "paid": "paid"
+      },
+      "locations": {
+        "all": "All Locations"
+      },
+      "detail": {
+        "title": "Job Details",
+        "configuration": "Configuration",
+        "jobType": "Job Type",
+        "business": "Business",
+        "location": "Location",
+        "executionTiming": "Execution & Timing",
+        "createdAt": "Created At",
+        "failedAt": "Failed At",
+        "retryCount": "Retry Count",
+        "ofMaxRetries": "of {max} max retries",
+        "errorDetails": "Error Details",
+        "payload": "Payload",
+        "resultMetadata": "Result / Metadata",
+        "close": "Close",
+        "ignore": "Ignore",
+        "resolve": "Resolve",
+        "retryJob": "Retry Job",
+        "id": "ID"
+      },
+      "socialDetail": {
+        "title": "Social Post Details",
+        "jobId": "Job ID",
+        "mobilePreview": "Mobile Preview",
+        "noContent": "No text content",
+        "justNow": "Just now",
+        "jobInfo": "Job Information",
+        "currentStatus": "Current Status",
+        "errorMessage": "Error Message",
+        "unknownError": "Unknown error occurred",
+        "targetPlatform": "Target Platform",
+        "accountDetails": "Account Details",
+        "accountName": "Account Name",
+        "postType": "Post Type",
+        "closeDetail": "Close Detail"
+      }
+    },
+    "reviewSync": {
+      "title": "Review Sync Logs",
+      "subtitle": "Monitor and debug review synchronization tasks",
+      "logsCount": "{count} Logs",
+      "searchLabel": "Search Account or ID",
+      "searchPlaceholder": "Search...",
+      "allStatuses": "All Statuses",
+      "allProviders": "All Providers",
+      "columns": {
+        "logId": "Log ID",
+        "account": "Account",
+        "provider": "Provider",
+        "status": "Status",
+        "synced": "Synced",
+        "duration": "Duration",
+        "date": "Date",
+        "actions": "Actions"
+      },
+      "empty": {
+        "title": "No Review Sync Logs",
+        "description": "There are no review sync logs matching your criteria."
+      },
+      "detail": {
+        "title": "Review Sync Details",
+        "logId": "Log ID",
+        "syncInfo": "Sync Information",
+        "currentStatus": "Current Status",
+        "retryingBackground": "Retrying in background...",
+        "retryJob": "Retry Job",
+        "reviewsSynced": "Reviews Synced",
+        "retryAttempts": "Retry Attempts",
+        "duration": "Duration",
+        "errorDetails": "Error Details",
+        "technicalData": "Technical Data",
+        "accountDetails": "Account Details",
+        "syncResponse": "Sync Response",
+        "requestData": "Request Data",
+        "timestamps": "Timestamps",
+        "created": "Created",
+        "started": "Started",
+        "completed": "Completed",
+        "closeDetail": "Close Detail"
+      }
+    }
+  },
   "brandRise": {
     "subtitle": "Brand performance and visibility insights",
+    "recommendations": {
+      "actionableCount": "{count} actionable recommendations prioritized by impact",
+      "generateNew": "Generate New",
+      "sortPriority": "Sort: Priority Score",
+      "noFound": "No recommendations found matching filter.",
+      "priorityScore": "Priority Score: {score}",
+      "effort": "EFFORT",
+      "targetKPI": "TARGET KPI",
+      "localSEO": "Local SEO",
+      "reputation": "Reputation",
+      "optimization": "Optimization",
+      "whyTitle": "Why This Matters",
+      "actionSteps": "Action Steps",
+      "startTask": "Start Task",
+      "markComplete": "Mark Complete",
+      "hideSteps": "Hide Steps",
+      "viewStepsCount": "View Steps ({count})",
+      "generatedTime": "Generated {time}",
+      "aiStrategist": "AI Strategist"
+    },
+    "overview": {
+      "visibilityScore": "Visibility Score",
+      "trustScore": "Trust Score",
+      "consistencyScore": "Consistency Score",
+      "competitivePosition": "Competitive Position",
+      "vsLastPeriod": "vs last period",
+      "fromLastPeriod": "from last period",
+      "ofCompetitors": "of {count} competitors",
+      "visibilityTrend": "Visibility Trend",
+      "last30Days": "Last 30 days performance",
+      "visibilityBreakdown": "Visibility Breakdown",
+      "byChannel": "By channel",
+      "channels": {
+        "organic": "Organic Search",
+        "maps": "Local Maps",
+        "social": "Social Media",
+        "reviews": "Reviews"
+      },
+      "insights": {
+        "title": "Key Insights",
+        "subtitle": "AI-powered recommendations",
+        "aiGenerated": "AI Generated",
+        "visibilityIncrease": "Your local visibility has increased by 18% this month",
+        "visibilityIncreaseDesc": "Consider investing more in local SEO strategies.",
+        "sentimentPositive": "Review sentiment is trending positively",
+        "sentimentPositiveDesc": "Great job! Keep up the customer engagement."
+      },
+      "activity": {
+        "newReview": "New review received",
+        "competitorAdded": "Competitor added",
+        "scoreUpdated": "Visibility score updated",
+        "hoursAgo": "{count} hours ago",
+        "daysAgo": "{count} days ago"
+      }
+    },
+    "reviews": {
+      "sentimentScore": "Sentiment Score",
+      "positiveSentiment": "Positive sentiment",
+      "velocity": "Review Velocity",
+      "volumeOverTime": "Review volume over time",
+      "sentiment": "Sentiment Distribution",
+      "sentimentModel": "Sentiment model",
+      "pendingAIReply": "Pending AI Replies",
+      "latestFeedback": "Latest customer feedback across all platforms",
+      "waitingApproval": "Reviews waiting for AI reply approval before posting",
+      "reviewPost": "Review & Post",
+      "themesTitle": "Review Themes & Keywords",
+      "themesSubtitle": "Recurring topics in customer feedback",
+      "recent": "Recent Reviews",
+      "velocity": "Review Velocity",
+      "sentiment": "Sentiment Distribution"
+    },
     "tabs": {
       "overview": "Overview",
       "visibility": "Visibility Plan",
@@ -229,30 +793,57 @@
         "strategies": "Differentiation Strategies",
         "gaps": "Market Gaps",
         "taglines": "Suggested Taglines",
-        "roadmap": "Content Roadmap"
+        "roadmap": "Content Roadmap",
+        "confidence": "CONFIDENCE",
+        "premiumEnterprise": "Premium Enterprise",
+        "premiumEnterpriseDesc": "Large agencies targeting Fortune 500 with comprehensive packages.",
+        "midMarketGeneralist": "Mid-Market Generalist",
+        "midMarketGeneralistDesc": "Full-service agencies serving mid-sized businesses with diverse offerings.",
+        "nicheSpecialist": "Niche Specialist",
+        "nicheSpecialistDesc": "Specialized agencies focusing on specific industries with premium positioning.",
+        "highSaturation": "High Saturation",
+        "opportunity": "Opportunity",
+        "xAxisLabel": "X: {label}",
+        "yAxisLabel": "| Y: {label}"
       }
-    },
-    "reviews": {
-      "recent": "Recent Reviews",
-      "velocity": "Review Velocity",
-      "sentiment": "Sentiment Distribution"
     },
     "content": {
       "title": "Content Management",
       "calendar": "Content Calendar",
       "add": "Add Content",
       "ideas": "Content Ideas",
-      "logs": "Publishing Logs"
+      "logs": "Publishing Logs",
+      "templatesDesc": "Manage and customize your brand's AI-powered content generation templates.",
+      "addTemplate": "Add Template",
+      "editTemplate": "Edit Content Template",
+      "createTemplate": "Create New Template",
+      "templateTitle": "Template Title",
+      "templateTitlePlaceholder": "e.g., Weekly Special Highlight",
+      "industry": "Industry",
+      "contentType": "Content Type",
+      "contentStructure": "Content Structure",
+      "contentStructurePlaceholder": "Describe how the content should be structured...",
+      "contentStructureHelper": "Tip: Use [Placeholders] for dynamic content like [Business Name] or [Offer].",
+      "deleteTemplateTitle": "Delete Content Template",
+      "deleteTemplateConfirm": "Are you sure you want to delete this content template? This action cannot be undone."
     },
     "dna": {
       "summary": "Brand Identity Summary",
+      "pageDesc": "Your brand's core identity, voice, and messaging guidelines at a glance",
       "voice": "Brand Voice",
+      "defaultVoice": "Professional yet approachable. We communicate with clarity and confidence, making complex technology accessible to everyone. Our tone is friendly, knowledgeable, and empowering.",
+      "voiceGuidelines": "We avoid jargon and speak directly to our customers' needs, always maintaining authenticity and transparency in our communications.",
       "audience": "Target Audience",
+      "defaultAudience": "Small to medium-sized businesses looking to streamline their operations and scale efficiently. Decision-makers who value innovation, reliability, and exceptional customer support.",
       "messages": "Key Messages",
+      "toneKeywords": "Tone Keywords",
+      "needDetails": "Need More Details?",
+      "accessGuidelines": "Access the complete Brand DNA document with detailed guidelines, examples, and best practices",
       "viewFull": "View Full Brand DNA"
     },
     "competitors": {
       "tracking": "Competitor Tracking",
+      "exportList": "Export List",
       "discoveryTitle": "Competitor Discovery",
       "discoverySubtitle": "Analyze competitor websites to identify gaps, strategies, and opportunities.",
       "inputLabel": "Add keywords (e.g. 'plumber cityname')",
@@ -266,6 +857,11 @@
       "services": "Services",
       "analysis": "Analysis",
       "listTitle": "Tracked Competitors",
+      "addTitle": "Add Competitor",
+      "nameLabel": "Competitor Name",
+      "ratingLabel": "Average Rating (1-5)",
+      "totalReviewsLabel": "Total Reviews",
+      "adding": "Adding...",
       "toast": {
         "discoverySuccess": "Competitors discovered successfully",
         "discoveryError": "Failed to discover competitors",
@@ -274,8 +870,62 @@
         "analysisStarted": "Analysis started",
         "analysisFailed": "Analysis failed"
       },
+      "discoveryProgress": {
+        "title": "Discovery in Progress",
+        "subtitle": "Analyzing SERP data...",
+        "steps": {
+          "keywords": "Keywords analyzed",
+          "domains": "Domains extracted",
+          "classifying": "Classifying competitors",
+          "ranking": "Ranking results"
+        }
+      },
       "strategy": "Strategy: {value}",
-      "learn": "Learn: {value}"
+      "learn": "Learn: {value}",
+      "detail": {
+        "analysisTitle": "Competitor Analysis",
+        "insightsFrom": "Deep insights from {name}",
+        "compare": "Compare",
+        "tabs": {
+          "overview": "Overview",
+          "strategic": "Strategic Analysis",
+          "signals": "Signals & Cues"
+        },
+        "uvpTitle": "Unique Value Proposition",
+        "noUvp": "No UVP extracted yet.",
+        "servicesTitle": "Service Offerings",
+        "noServices": "No services extracted yet.",
+        "pricingTitle": "Pricing Cues",
+        "noPricing": "No pricing info extracted.",
+        "trustSignals": "Trust Signals",
+        "ratingLabel": "RATING",
+        "clientsLabel": "CLIENTS",
+        "awardsLabel": "AWARDS",
+        "ctaTitle": "CTA Styles",
+        "ctaAudit": "Get Your Free Marketing Audit",
+        "toLearn": "What to Learn",
+        "insightNumber": "INSIGHT {number}",
+        "noInsights": "No insights available yet.",
+        "toAvoid": "What to Avoid",
+        "cautionNumber": "CAUTION {number}",
+        "noWarnings": "No warnings available yet.",
+        "techStack": "Tech Stack",
+        "strengths": "Strengths",
+        "noStrengths": "No strengths identified yet.",
+        "weaknesses": "Weaknesses",
+        "noWeaknesses": "No weaknesses identified yet.",
+        "diffTitle": "Unique Differentiators",
+        "diffNumber": "Differentiator {number}",
+        "noDifferentiators": "No differentiators identified yet.",
+        "matrixTitle": "Feature Comparison Matrix",
+        "feature": "FEATURE",
+        "competitor": "Competitor",
+        "growthHub": "Growth Hub",
+        "yourBrand": "Your Brand",
+        "noneFound": "None found.",
+        "noneIdentified": "None identified.",
+        "none": "None"
+      }
     },
     "jobs": {
       "title": "AI Jobs & Reports",
@@ -315,9 +965,12 @@
       "preview": "Preview"
     },
     "visibilityPlan": {
+      "title": "Visibility Plan",
+      "subtitle": "Generate a data-backed, 30-day roadmap tailored to your brand's unique DNA. Outpace competitors with actionable steps.",
       "backToDashboard": "Back to Dashboard",
       "launchTitle": "Boost Your Visibility in 30 Days",
-      "launchSubtitle": "A comprehensive, AI-powered action plan designed to maximize your online presence, increase brand awareness, and drive measurable results across all marketing channels.",
+      "noActivePlan": "No Plan Found",
+      "noActivePlanDesc": "Generate a Visibility Plan from the dashboard to get started.",
       "sharePlan": "Share Plan",
       "exportPlan": "Export Plan",
       "totalTasks": "TOTAL TASKS",
@@ -359,7 +1012,8 @@
       "targetBy": "Target by {timeframe}",
       "metricsInfo": "Metrics help track the effectiveness of this plan.",
       "expectedOutcomes": "Expected Outcomes",
-      "regenerate": "Regenerate Plan"
+      "regenerate": "Regenerate Plan",
+      "mockDateRange": "Feb 1-7, 2024"
     }
   }
 }

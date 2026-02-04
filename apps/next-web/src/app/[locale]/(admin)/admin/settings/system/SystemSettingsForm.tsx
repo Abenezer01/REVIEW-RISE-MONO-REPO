@@ -3,7 +3,9 @@
 
 import { useState } from 'react'
 
-import toast from 'react-hot-toast'
+import { useTranslations } from 'next-intl'
+
+import { SystemMessageCode } from '@platform/contracts'
 import {
     Box,
     Card,
@@ -20,6 +22,8 @@ import {
     Divider,
 } from '@mui/material'
 
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+
 import { type SystemSettingsData, updateSystemSettings } from '@/app/actions/system-settings'
 
 const TIMEZONES = [
@@ -35,6 +39,8 @@ interface SystemSettingsFormProps {
 }
 
 export default function SystemSettingsForm({ initialSettings }: SystemSettingsFormProps) {
+    const t = useTranslations('settings.system')
+    const { notify } = useSystemMessages()
     const [settings, setSettings] = useState(initialSettings)
     const [logoFile, setLogoFile] = useState<File | null>(null)
     const [logoPreview, setLogoPreview] = useState<string | null>(settings.site_logo || null)
@@ -60,7 +66,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
             
             // Validate file size (2MB max)
             if (file.size > 2 * 1024 * 1024) {
-                toast.error('Logo file size must be less than 2MB')
+                notify(SystemMessageCode.VALIDATION_ERROR)
             
                 return
             }
@@ -90,47 +96,47 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
         }
 
         if (!settings.site_name.trim()) {
-            newErrors.site_name = 'Site name is required'
+            newErrors.site_name = t('validation.siteNameRequired')
         } else if (settings.site_name.length < 2) {
-            newErrors.site_name = 'Site name must be at least 2 characters'
+            newErrors.site_name = t('validation.siteNameMin', { count: 2 })
         }
 
         if (!settings.site_title.trim()) {
-            newErrors.site_title = 'Site title is required'
+            newErrors.site_title = t('validation.siteTitleRequired')
         }
 
         if (settings.footer_text && settings.footer_text.length > 200) {
-            newErrors.footer_text = 'Footer text must be less than 200 characters'
+            newErrors.footer_text = t('validation.footerTextMax', { count: 200 })
         }
 
         if (settings.rate_limit_config.max_requests < 1) {
-            newErrors.max_requests = 'Max requests must be at least 1'
+            newErrors.max_requests = t('validation.maxRequestsMin', { count: 1 })
         } else if (settings.rate_limit_config.max_requests > 10000) {
-            newErrors.max_requests = 'Max requests cannot exceed 10,000'
+            newErrors.max_requests = t('validation.maxRequestsMax', { count: 10000 })
         }
 
         if (settings.rate_limit_config.window_ms < 1000) {
-            newErrors.window_ms = 'Window must be at least 1000ms (1 second)'
+            newErrors.window_ms = t('validation.windowMsMin', { count: 1000 })
         } else if (settings.rate_limit_config.window_ms > 3600000) {
-            newErrors.window_ms = 'Window cannot exceed 3,600,000ms (1 hour)'
+            newErrors.window_ms = t('validation.windowMsMax', { count: 3600000 })
         }
 
         // Email validation
         if (settings.email_config.smtp_port < 1 || settings.email_config.smtp_port > 65535) {
-            newErrors.smtp_port = 'Port must be between 1 and 65535'
+            newErrors.smtp_port = t('validation.smtpPortRange')
         }
 
         if (settings.email_config.from_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(settings.email_config.from_email)) {
-            newErrors.from_email = 'Invalid email format'
+            newErrors.from_email = t('validation.invalidEmail')
         }
 
         // Security validation
         if (settings.security_config.session_timeout_minutes < 5 || settings.security_config.session_timeout_minutes > 1440) {
-            newErrors.session_timeout = 'Session timeout must be between 5 and 1440 minutes'
+            newErrors.session_timeout = t('validation.sessionTimeoutRange', { min: 5, max: 1440 })
         }
 
         if (settings.security_config.password_min_length < 6 || settings.security_config.password_min_length > 32) {
-            newErrors.password_min_length = 'Password length must be between 6 and 32 characters'
+            newErrors.password_min_length = t('validation.passwordLengthRange', { min: 6, max: 32 })
         }
 
         setErrors(newErrors)
@@ -140,7 +146,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
 
     const handleSave = async () => {
         if (!validateForm()) {
-            toast.error('Please fix the validation errors before saving')
+            notify(SystemMessageCode.VALIDATION_ERROR)
             
             return
         }
@@ -190,10 +196,10 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
         setSaving(false)
 
         if (res.success) {
-            toast.success('Settings updated successfully')
+            notify(SystemMessageCode.SAVE_SUCCESS)
             setErrors({ site_name: '', site_title: '', footer_text: '', max_requests: '', window_ms: '', smtp_port: '', from_email: '', session_timeout: '', password_min_length: '' })
         } else {
-            toast.error(res.error || 'Failed to update settings')
+            notify(SystemMessageCode.SAVE_FAILED)
         }
     }
 
@@ -202,13 +208,13 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
             {/* Site Settings */}
             <Grid size={{ xs: 12 }}>
                 <Card>
-                    <CardHeader title="Site Configuration" />
+                    <CardHeader title={t('siteConfig')} />
                     <Divider />
                     <CardContent>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                             <TextField
                                 fullWidth
-                                label="Site Name"
+                                label={t('siteName')}
                                 value={settings.site_name}
                                 onChange={(e) => {
                                     setSettings({ ...settings, site_name: e.target.value })
@@ -221,7 +227,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                             />
                             <TextField
                                 fullWidth
-                                label="Site Title"
+                                label={t('siteTitle')}
                                 value={settings.site_title}
                                 onChange={(e) => {
                                     setSettings({ ...settings, site_title: e.target.value })
@@ -234,7 +240,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                             />
                             <TextField
                                 fullWidth
-                                label="Footer Text"
+                                label={t('footerText')}
                                 value={settings.footer_text}
                                 onChange={(e) => {
                                     setSettings({ ...settings, footer_text: e.target.value })
@@ -247,7 +253,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
 
                             <Box>
                                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                                    Site Logo
+                                    {t('siteLogo')}
                                 </Typography>
                                 <Box
                                     component="label"
@@ -286,10 +292,10 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                                 }}
                                             />
                                             <Typography variant="body2" color="primary.main" sx={{ fontWeight: 500 }}>
-                                                Click to replace logo
+                                                {t('clickToReplace')}
                                             </Typography>
                                             <Typography variant="caption" color="text.secondary" display="block">
-                                                Max 2MB
+                                                {t('maxSize', { size: '2MB' })}
                                             </Typography>
                                         </Box>
                                     ) : (
@@ -298,10 +304,10 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                                 <i className="tabler-upload" />
                                             </Box>
                                             <Typography variant="h6" sx={{ mb: 0.5, fontSize: '1rem' }}>
-                                                Upload Logo
+                                                {t('uploadLogo')}
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary">
-                                                Recommended size: 200x60px
+                                                {t('recommendedSize', { size: '200x60px' })}
                                             </Typography>
                                         </Box>
                                     )}
@@ -315,13 +321,13 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
             {/* General Settings */}
             <Grid size={{ xs: 12 }}>
                 <Card>
-                    <CardHeader title="General Settings" />
+                    <CardHeader title={t('generalSettings')} />
                     <Divider />
                     <CardContent>
                         <TextField
                             select
                             fullWidth
-                            label="Default Timezone"
+                            label={t('defaultTimezone')}
                             value={settings.default_timezone}
                             onChange={(e) => setSettings({ ...settings, default_timezone: e.target.value })}
                         >
@@ -338,13 +344,13 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
             {/* Email/SMTP Configuration */}
             <Grid size={{ xs: 12 }}>
                 <Card>
-                    <CardHeader title="Email/SMTP Configuration" />
+                    <CardHeader title={t('emailSmtpConfig')} />
                     <Divider />
                     <CardContent>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                             <TextField
                                 fullWidth
-                                label="SMTP Host"
+                                label={t('smtpHost')}
                                 value={settings.email_config.smtp_host}
                                 onChange={(e) => setSettings({
                                     ...settings,
@@ -355,7 +361,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                             <TextField
                                 fullWidth
                                 type="number"
-                                label="SMTP Port"
+                                label={t('smtpPort')}
                                 value={settings.email_config.smtp_port}
                                 onChange={(e) => {
                                     setSettings({
@@ -366,11 +372,11 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                 }}
                                 onBlur={validateForm}
                                 error={!!errors.smtp_port}
-                                helperText={errors.smtp_port || '587 for TLS, 465 for SSL'}
+                                helperText={errors.smtp_port || t('validation.smtpPortHelper')}
                             />
                             <TextField
                                 fullWidth
-                                label="SMTP Username"
+                                label={t('smtpUsername')}
                                 value={settings.email_config.smtp_user}
                                 onChange={(e) => setSettings({
                                     ...settings,
@@ -380,7 +386,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                             <TextField
                                 fullWidth
                                 type="password"
-                                label="SMTP Password"
+                                label={t('smtpPassword')}
                                 value={settings.email_config.smtp_password}
                                 onChange={(e) => setSettings({
                                     ...settings,
@@ -390,7 +396,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                             <TextField
                                 fullWidth
                                 type="email"
-                                label="From Email"
+                                label={t('fromEmail')}
                                 value={settings.email_config.from_email}
                                 onChange={(e) => {
                                     setSettings({
@@ -406,7 +412,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                             />
                             <TextField
                                 fullWidth
-                                label="From Name"
+                                label={t('fromName')}
                                 value={settings.email_config.from_name}
                                 onChange={(e) => setSettings({
                                     ...settings,
@@ -422,14 +428,14 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
             {/* Security Settings */}
             <Grid size={{ xs: 12 }}>
                 <Card>
-                    <CardHeader title="Security Settings" />
+                    <CardHeader title={t('securitySettings')} />
                     <Divider />
                     <CardContent>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                             <TextField
                                 fullWidth
                                 type="number"
-                                label="Session Timeout (minutes)"
+                                label={t('sessionTimeout')}
                                 value={settings.security_config.session_timeout_minutes}
                                 onChange={(e) => {
                                     setSettings({
@@ -440,12 +446,12 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                 }}
                                 onBlur={validateForm}
                                 error={!!errors.session_timeout}
-                                helperText={errors.session_timeout || 'How long before users are logged out due to inactivity'}
+                                helperText={errors.session_timeout || t('validation.sessionTimeoutHelper')}
                             />
                             <TextField
                                 fullWidth
                                 type="number"
-                                label="Minimum Password Length"
+                                label={t('minPasswordLength')}
                                 value={settings.security_config.password_min_length}
                                 onChange={(e) => {
                                     setSettings({
@@ -460,7 +466,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                             />
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                 <Typography variant="subtitle2" color="text.secondary">
-                                    Password Requirements
+                                    {t('passwordRequirements')}
                                 </Typography>
                                 <FormControlLabel
                                     control={
@@ -472,7 +478,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                             })}
                                         />
                                     }
-                                    label="Require Special Characters"
+                                    label={t('requireSpecialChars')}
                                 />
                                 <FormControlLabel
                                     control={
@@ -484,7 +490,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                             })}
                                         />
                                     }
-                                    label="Require Numbers"
+                                    label={t('requireNumbers')}
                                 />
                                 <FormControlLabel
                                     control={
@@ -496,7 +502,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                             })}
                                         />
                                     }
-                                    label="Require Uppercase Letters"
+                                    label={t('requireUppercase')}
                                 />
                             </Box>
                             <FormControlLabel
@@ -512,9 +518,9 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                 }
                                 label={
                                     <Box>
-                                        <Typography variant="body1">Enable Two-Factor Authentication</Typography>
+                                        <Typography variant="body1">{t('enable2fa')}</Typography>
                                         <Typography variant="caption" color="text.secondary">
-                                            Require users to set up 2FA for enhanced security
+                                            {t('enable2faDesc')}
                                         </Typography>
                                     </Box>
                                 }
@@ -527,7 +533,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
             {/* Maintenance Mode */}
             <Grid size={{ xs: 12 }}>
                 <Card>
-                    <CardHeader title="System Status" />
+                    <CardHeader title={t('systemStatus')} />
                     <Divider />
                     <CardContent>
                         <FormControlLabel
@@ -540,9 +546,9 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                             }
                             label={
                                 <Box>
-                                    <Typography variant="body1">Maintenance Mode</Typography>
+                                    <Typography variant="body1">{t('maintenanceMode')}</Typography>
                                     <Typography variant="caption" color="text.secondary">
-                                        When enabled, the site will be inaccessible to non-admin users.
+                                        {t('maintenanceModeDesc')}
                                     </Typography>
                                 </Box>
                             }
@@ -554,7 +560,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
             {/* Notifications */}
             <Grid size={{ xs: 12 }}>
                 <Card>
-                    <CardHeader title="Notification Defaults" />
+                    <CardHeader title={t('notificationDefaults')} />
                     <Divider />
                     <CardContent>
                         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 3, flexWrap: 'wrap' }}>
@@ -570,7 +576,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                         }
                                     />
                                 }
-                                label="Email Notifications"
+                                label={t('emailNotifications')}
                             />
                             <FormControlLabel
                                 control={
@@ -584,7 +590,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                         }
                                     />
                                 }
-                                label="SMS Notifications"
+                                label={t('smsNotifications')}
                             />
                             <FormControlLabel
                                 control={
@@ -598,7 +604,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                         }
                                     />
                                 }
-                                label="Push Notifications"
+                                label={t('pushNotifications')}
                             />
                         </Box>
                     </CardContent>
@@ -608,13 +614,13 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
             {/* Rate Limits */}
             <Grid size={{ xs: 12 }}>
                 <Card>
-                    <CardHeader title="Global Default Rate Limits" />
+                    <CardHeader title={t('rateLimits')} />
                     <Divider />
                     <CardContent>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                             <TextField
                                 select
-                                label="Rate Limit Strategy"
+                                label={t('rateLimitStrategy')}
                                 fullWidth
                                 value={settings.rate_limit_config.strategy || 'ip'}
                                 onChange={(e) =>
@@ -624,12 +630,12 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                     })
                                 }
                             >
-                                <MenuItem value="ip">IP Address</MenuItem>
-                                <MenuItem value="user">User ID</MenuItem>
-                                <MenuItem value="token">API Token</MenuItem>
+                                <MenuItem value="ip">{t('ipAddress')}</MenuItem>
+                                <MenuItem value="user">{t('userId')}</MenuItem>
+                                <MenuItem value="token">{t('apiToken')}</MenuItem>
                             </TextField>
                             <TextField
-                                label="Max Requests"
+                                label={t('maxRequests')}
                                 type="number"
                                 fullWidth
                                 value={settings.rate_limit_config.max_requests}
@@ -645,7 +651,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                 helperText={errors.max_requests}
                             />
                             <TextField
-                                label="Window (ms)"
+                                label={t('windowMs')}
                                 type="number"
                                 fullWidth
                                 value={settings.rate_limit_config.window_ms}
@@ -668,7 +674,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
             <Grid size={{ xs: 12 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Button variant="contained" size="large" onClick={handleSave} disabled={saving}>
-                        {saving ? 'Saving...' : 'Save Changes'}
+                        {saving ? t('saving') : t('saveChanges')}
                     </Button>
                 </Box>
             </Grid>

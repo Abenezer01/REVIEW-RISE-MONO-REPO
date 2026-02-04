@@ -29,14 +29,17 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import GroupsIcon from '@mui/icons-material/Groups';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
-import { toast } from 'react-hot-toast';
+
+import { SystemMessageCode } from '@platform/contracts';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
 import { BrandService } from '@/services/brand.service';
 import { SERVICES_CONFIG } from '@/configs/services';
 
 // Chart Component
-const PositioningMapChart = ({ data }: { data: any }) => {
+const PositioningMapChart = ({ data, t }: { data: any; t: any }) => {
     // Transform data for Recharts
     // Expected data: { "Brand A": { x: 5, y: 3 }, "You": { x: 8, y: 8 } }
     // Transform to array: [{ name: "Brand A", x: 5, y: 3, fill: "#..." }]
@@ -70,14 +73,16 @@ const PositioningMapChart = ({ data }: { data: any }) => {
                 </ScatterChart>
             </ResponsiveContainer>
             <Typography variant="caption" align="center" display="block" color="text.secondary">
-                X: {data?.axes?.x || 'Price/Speed'} | Y: {data?.axes?.y || 'Quality/Scope'}
+                {t('xAxisLabel', { label: data?.axes?.x || 'Price/Speed' })} {t('yAxisLabel', { label: data?.axes?.y || 'Quality/Scope' })}
             </Typography>
         </Box>
     );
 };
 
 export default function ReportDetailPage() {
+    const { notify } = useSystemMessages();
     const t = useTranslations('dashboard');
+    const tr = useTranslations('dashboard.brandRise.reports.detail');
     const theme = useTheme();
     const params = useParams();
     const reportId = params.reportId as string;
@@ -114,21 +119,21 @@ export default function ReportDetailPage() {
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
-            toast.success('PDF downloaded successfully');
+            notify(SystemMessageCode.DOWNLOAD_SUCCESS);
         } catch (e) {
             console.error(e);
-            toast.error('Failed to download PDF');
+            notify(SystemMessageCode.DOWNLOAD_FAILED);
         }
     };
 
     const handleShare = () => {
         // Copy current URL to clipboard
         navigator.clipboard.writeText(window.location.href);
-        toast.success('Report link copied to clipboard');
+        notify(SystemMessageCode.COPIED_TO_CLIPBOARD);
     };
 
     if (isLoading) return <CircularProgress />;
-    if (error || !report) return <Alert severity="error">Report not found or failed to load</Alert>;
+    if (error || !report) return <Alert severity="error">{t('brandRise.reports.noReports')}</Alert>;
 
     // Debug logging
     console.log('Report data:', report);
@@ -142,19 +147,19 @@ export default function ReportDetailPage() {
             return {
                 id: i,
                 title: gap,
-                description: 'Market opportunity identified via competitor analysis.',
-                impact: i === 0 || i === 1 ? 'High Impact' : 'Medium Impact',
-                tags: ['Strategy']
+                description: tr('positioningDesc'),
+                impact: i === 0 || i === 1 ? t('aiVisibility.tips.impact.High') : t('aiVisibility.tips.impact.Medium'),
+                tags: [tr('strategies')]
             };
         }
 
 
         return {
             id: i,
-            title: gap.title || 'Market Gap',
-            description: gap.description || 'Market opportunity identified.',
-            impact: (gap.priority && gap.priority >= 8) ? 'High Impact' : 'Medium Impact',
-            tags: gap.tags || ['Strategy']
+            title: gap.title || tr('gaps'),
+            description: gap.description || tr('positioningDesc'),
+            impact: (gap.priority && gap.priority >= 8) ? t('aiVisibility.tips.impact.High') : t('aiVisibility.tips.impact.Medium'),
+            tags: gap.tags || [tr('strategies')]
         };
     });
 
@@ -163,7 +168,7 @@ export default function ReportDetailPage() {
             return {
                 id: i,
                 title: strat,
-                description: 'Strategic move to capture market share.',
+                description: tr('positioningDesc'),
                 icon: i === 0 ? <LightbulbIcon fontSize="large" /> : i === 1 ? <TrendingUpIcon fontSize="large" /> : <MapIcon fontSize="large" />
             };
         }
@@ -171,18 +176,18 @@ export default function ReportDetailPage() {
 
         return {
             id: i,
-            title: strat.title || 'Strategy',
-            description: strat.description || 'Strategic move to capture market share.',
+            title: strat.title || tr('strategies'),
+            description: strat.description || tr('positioningDesc'),
             icon: i === 0 ? <LightbulbIcon fontSize="large" /> : i === 1 ? <TrendingUpIcon fontSize="large" /> : <MapIcon fontSize="large" />
         };
     });
 
     const contentIdeas = (Array.isArray(report.contentIdeas) ? report.contentIdeas : []).map((idea: any, i: number) => ({
         ...idea,
-        topic: idea.topic || idea.title || 'Content Idea',
+        topic: idea.topic || idea.title || tr('roadmap'),
         description: idea.description || idea.rationale || '',
         format: idea.format || (i % 2 === 0 ? 'Blog Post' : 'Case Study'),
-        demand: i < 2 ? 'High Demand' : 'Medium Demand'
+        demand: i < 2 ? t('aiVisibility.tips.impact.High') : t('aiVisibility.tips.impact.Medium')
     }));
 
     const mapData = report.positioningMap as any || {};
@@ -211,24 +216,24 @@ export default function ReportDetailPage() {
                     <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={4}>
                         <Box>
                             <Typography variant="overline" color="text.secondary" fontWeight="bold" letterSpacing={1.2}>
-                                AI-GENERATED INTELLIGENCE
+                                {t('brandRise.recommendations.aiStrategist').toUpperCase()}
                             </Typography>
                             <Stack direction="row" spacing={1} alignItems="center" mt={1}>
                                 <Typography variant="h3" fontWeight="800" color="text.primary">
-                                    Brand Opportunities Report
+                                    {tr('title')}
                                 </Typography>
                             </Stack>
                             <Stack direction="row" spacing={3} mt={2} alignItems="center">
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <CalendarMonthIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                                     <Typography variant="body2" color="text.secondary">
-                                        Generated: {new Date(report.generatedAt).toLocaleDateString(undefined, { dateStyle: 'long' })}
+                                        {t('brandRise.recommendations.generatedTime', { time: new Date(report.generatedAt).toLocaleDateString(undefined, { dateStyle: 'long' }) })}
                                     </Typography>
                                 </Stack>
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <GroupsIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                                     <Typography variant="body2" color="text.secondary">
-                                        18 Competitors Analyzed
+                                        {t('brandRise.overview.ofCompetitors', { count: 18 })}
                                     </Typography>
                                 </Stack>
                             </Stack>
@@ -242,7 +247,7 @@ export default function ReportDetailPage() {
                                 sx={{ borderColor: 'divider', color: 'text.primary', textTransform: 'none' }}
                                 onClick={handleShare}
                             >
-                                Share
+                                {t('brandRise.reports.share')}
                             </Button>
                             <Button
                                 startIcon={<DownloadIcon />}
@@ -256,7 +261,7 @@ export default function ReportDetailPage() {
                                 }}
                                 onClick={handleExportPdf}
                             >
-                                Export PDF
+                                {t('brandRise.reports.exportPdf')}
                             </Button>
 
                             {/* Confidence Score */}
@@ -274,8 +279,8 @@ export default function ReportDetailPage() {
                                     ml: 2
                                 }}
                             >
-                                <Typography variant="h5" fontWeight="900" sx={{ color: '#fff', lineHeight: 1 }}>94</Typography>
-                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.6rem', fontWeight: 'bold' }}>CONFIDENCE</Typography>
+                                <Typography variant="h5" fontWeight="900" sx={{ color: '#fff', lineHeight: 1 }}>{94}</Typography>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.6rem', fontWeight: 'bold' }}>{t('brandRise.reports.detail.confidence')}</Typography>
                             </Box>
                         </Stack>
                     </Box>
@@ -286,7 +291,7 @@ export default function ReportDetailPage() {
                 <Grid container spacing={4}>
                     {/* Market Positioning - FULL WIDTH */}
                     <Grid size={{ xs: 12 }}>
-                        <Typography variant="h5" fontWeight="bold" gutterBottom color="text.primary">Market Positioning Map</Typography>
+                        <Typography variant="h5" fontWeight="bold" gutterBottom color="text.primary">{tr('positioning')}</Typography>
                         <Card sx={{
                             bgcolor: 'background.paper',
                             borderRadius: 3,
@@ -298,7 +303,7 @@ export default function ReportDetailPage() {
                             <CardContent sx={{ p: 4 }}>
                                 <Grid container spacing={4}>
                                     <Grid size={{ xs: 12, md: 8 }}>
-                                        <PositioningMapChart data={mapData} />
+                                        <PositioningMapChart data={mapData} t={tr} />
                                     </Grid>
                                     <Grid size={{ xs: 12, md: 4 }} display="flex" flexDirection="column" justifyContent="center">
                                         {/* Insights List */}
@@ -306,10 +311,10 @@ export default function ReportDetailPage() {
                                             <Box>
                                                 <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
                                                     <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }} />
-                                                    <Typography variant="subtitle2" fontWeight="bold" color="text.primary">Premium Enterprise</Typography>
-                                                    <Chip label="HIGH SATURATION" size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(theme.palette.success.main, 0.1), color: 'success.main', fontWeight: 'bold' }} />
+                                                    <Typography variant="subtitle2" fontWeight="bold" color="text.primary">{tr('premiumEnterprise')}</Typography>
+                                                    <Chip label={tr('highSaturation')} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(theme.palette.success.main, 0.1), color: 'success.main', fontWeight: 'bold' }} />
                                                 </Stack>
-                                                <Typography variant="caption" color="text.secondary">Large agencies targeting Fortune 500 with comprehensive packages.</Typography>
+                                                <Typography variant="caption" color="text.secondary">{tr('premiumEnterpriseDesc')}</Typography>
                                                 <Stack direction="row" spacing={1} mt={1}>
                                                     {['Digital Pro', 'Growth Hub', '+3 more'].map(tag => (
                                                         <Chip key={tag} label={tag} size="small" sx={{ bgcolor: 'action.hover', color: 'text.secondary', fontSize: '0.7rem' }} />
@@ -320,10 +325,10 @@ export default function ReportDetailPage() {
                                             <Box>
                                                 <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
                                                     <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'info.main' }} />
-                                                    <Typography variant="subtitle2" fontWeight="bold" color="text.primary">Mid-Market Generalist</Typography>
-                                                    <Chip label="HIGH SATURATION" size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(theme.palette.info.main, 0.1), color: 'info.main', fontWeight: 'bold' }} />
+                                                    <Typography variant="subtitle2" fontWeight="bold" color="text.primary">{tr('midMarketGeneralist')}</Typography>
+                                                    <Chip label={tr('highSaturation')} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(theme.palette.info.main, 0.1), color: 'info.main', fontWeight: 'bold' }} />
                                                 </Stack>
-                                                <Typography variant="caption" color="text.secondary">Full-service agencies serving mid-sized businesses with diverse offerings.</Typography>
+                                                <Typography variant="caption" color="text.secondary">{tr('midMarketGeneralistDesc')}</Typography>
                                                 <Stack direction="row" spacing={1} mt={1}>
                                                     {['Marketing Plus', 'Digital Edge', '+4 more'].map(tag => (
                                                         <Chip key={tag} label={tag} size="small" sx={{ bgcolor: 'action.hover', color: 'text.secondary', fontSize: '0.7rem' }} />
@@ -334,10 +339,10 @@ export default function ReportDetailPage() {
                                             <Box>
                                                 <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
                                                     <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'warning.main' }} />
-                                                    <Typography variant="subtitle2" fontWeight="bold" color="text.primary">Niche Specialist</Typography>
-                                                    <Chip label="OPPORTUNITY" size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(theme.palette.warning.main, 0.1), color: 'warning.main', fontWeight: 'bold' }} />
+                                                    <Typography variant="subtitle2" fontWeight="bold" color="text.primary">{tr('nicheSpecialist')}</Typography>
+                                                    <Chip label={tr('opportunity')} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(theme.palette.warning.main, 0.1), color: 'warning.main', fontWeight: 'bold' }} />
                                                 </Stack>
-                                                <Typography variant="caption" color="text.secondary">Specialized agencies focusing on specific industries with premium positioning.</Typography>
+                                                <Typography variant="caption" color="text.secondary">{tr('nicheSpecialistDesc')}</Typography>
                                                 <Stack direction="row" spacing={1} mt={1}>
                                                     {['Local SEO Pro', '+2 more'].map(tag => (
                                                         <Chip key={tag} label={tag} size="small" sx={{ bgcolor: 'action.hover', color: 'text.secondary', fontSize: '0.7rem' }} />
@@ -356,7 +361,7 @@ export default function ReportDetailPage() {
                         <Card sx={{ border: 'none', boxShadow: theme.shadows[2], borderRadius: 3, bgcolor: 'background.paper' }}>
                             <CardContent sx={{ p: 4 }}>
                                 <Typography variant="h5" fontWeight="bold" color="text.primary" mb={3}>
-                                    Top Market Gaps & Opportunities
+                                    {tr('gaps')}
                                 </Typography>
                                 <Stack spacing={3}>
                                     {gaps.slice(0, 5).map((gap: any, i: number) => ( // limit to 5
@@ -422,7 +427,7 @@ export default function ReportDetailPage() {
                     {/* Differentiation Strategies (3-Column Grid) */}
                     <Grid size={{ xs: 12 }}>
                         <Typography variant="h5" fontWeight="bold" color="text.primary" mb={3} mt={2}>
-                            Differentiation Strategies
+                            {tr('strategies')}
                         </Typography>
                         <Grid container spacing={3}>
                             {strategies.slice(0, 3).map((strat: any, i: number) => (
@@ -480,7 +485,7 @@ export default function ReportDetailPage() {
                     {/* Content Ideas */}
                     {/* Content Ideas (Vertical Roadmap List) */}
                     <Grid size={{ xs: 12 }}>
-                        <Typography variant="h5" fontWeight="bold" sx={{ mb: 3, mt: 4 }} color="text.primary">Content Ideas (Aligned with Competitor Gaps)</Typography>
+                        <Typography variant="h5" fontWeight="bold" sx={{ mb: 3, mt: 4 }} color="text.primary">{tr('roadmap')}</Typography>
                         <Card sx={{ border: 'none', boxShadow: theme.shadows[2], borderRadius: 3, bgcolor: 'background.paper' }}>
                             <CardContent sx={{ p: 0 }}>
                                 <List disablePadding>

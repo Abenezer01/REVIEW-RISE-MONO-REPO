@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import { createSuccessResponse } from '@platform/contracts';
+import { createSuccessResponse, SystemMessageCode } from '@platform/contracts';
 import { requestIdMiddleware, errorHandler } from '@platform/middleware';
 
 dotenv.config();
@@ -21,12 +21,12 @@ import { publishingWorker } from './services/publishing-worker.service';
 app.use('/api/v1', v1Routes);
 
 app.get('/', (req, res) => {
-    const response = createSuccessResponse(null, 'Express Brand Service is running', 200, { requestId: req.id });
+    const response = createSuccessResponse(null, 'Express Brand Service is running', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
     res.status(response.statusCode).json(response);
 });
 
 app.get('/health', (req, res) => {
-    const response = createSuccessResponse({ service: 'express-brand' }, 'Service is healthy', 200, { requestId: req.id });
+    const response = createSuccessResponse({ service: 'express-brand' }, 'Service is healthy', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
     res.status(response.statusCode).json(response);
 });
 

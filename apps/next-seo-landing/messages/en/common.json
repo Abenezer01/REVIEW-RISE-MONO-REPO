@@ -1,0 +1,178 @@
+{
+  "landing": {
+    "common": {
+      "brandName": "ReviewRise"
+    },
+    "header": {
+      "features": "Features"
+    },
+    "hero": {
+      "badge": "AI-Powered SEO Analysis",
+      "title": "Instant SEO Insights for Your Website",
+      "description": "Get a comprehensive SEO analysis in seconds. No signup required.",
+      "inputPlaceholder": "example.com",
+      "analyzeButton": "Analyze",
+      "featuresText": "Free • Instant Results • No Signup",
+      "stats": {
+        "sitesAnalyzed": "50K+",
+        "sitesAnalyzedLabel": "Sites Analyzed",
+        "accuracy": "Accuracy",
+        "rating": "Rating"
+      }
+    },
+    "features": {
+      "title": "Everything you need",
+      "subtitle": "Professional SEO analysis tools at your fingertips",
+      "items": {
+        "instant": {
+          "title": "Instant Analysis",
+          "description": "Get comprehensive SEO insights in seconds, not hours."
+        },
+        "actionable": {
+          "title": "Actionable Insights",
+          "description": "Receive clear, prioritized recommendations you can implement immediately."
+        },
+        "ai": {
+          "title": "AI-Powered",
+          "description": "Leverage advanced AI to uncover opportunities your competitors miss."
+        },
+        "detailed": {
+          "title": "Detailed Reports",
+          "description": "Access in-depth analysis of meta tags, performance, and content quality."
+        },
+        "secure": {
+          "title": "Secure & Private",
+          "description": "Your data is never stored or shared. Complete privacy guaranteed."
+        },
+        "free": {
+          "title": "Always Free",
+          "description": "No hidden fees, no credit card required. Professional SEO analysis for everyone."
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "subtitle": "Three simple steps to optimize your website",
+      "steps": {
+        "step1": {
+          "title": "Enter URL",
+          "description": "Provide your website address to start the analysis."
+        },
+        "step2": {
+          "title": "AI Scan",
+          "description": "Our AI analyzes 80+ SEO factors across your site."
+        },
+        "step3": {
+          "title": "Get Results",
+          "description": "Receive a detailed report with actionable fixes."
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to improve your SEO?",
+      "subtitle": "Join thousands of websites getting better rankings",
+      "button": "Get Started"
+    },
+    "loader": {
+      "fetching": "Fetching website data...",
+      "technical": "Analyzing technical SEO...",
+      "content": "Evaluating content quality...",
+      "mobile": "Testing mobile responsiveness...",
+      "performance": "Measuring performance...",
+      "connecting": "Connecting to server",
+      "checking": "Checking SSL, headers, and structure",
+      "scanning": "Scanning keywords and readability",
+      "simulating": "Simulating mobile devices",
+      "calculating": "Calculating Core Web Vitals",
+      "completed": "Completed",
+      "earlyInsights": "Early Insights Detected",
+      "insightLoadTime": "Page load time: 2.4s - Room for improvement detected",
+      "insightMobile": "Mobile optimization: Excellent responsive design found",
+      "insightSecurity": "Security: HTTPS properly configured"
+    },
+    "results": {
+      "analysisFor": "Analysis for",
+      "scannedAt": "Scanned {date}",
+      "healthScore": "SEO Health Score",
+      "totalIssues": "Total Issues",
+      "critical": "Critical",
+      "loadTime": "Load Time",
+      "getFullReport": "Get Full Report",
+      "share": "Share",
+      "rescan": "Re-scan",
+      "healthBreakdown": "SEO Health Breakdown",
+      "htmlPage": "HTML Page",
+      "aiAnalysis": "AI Analysis",
+      "checks": "Checks",
+      "error": "Error",
+      "warning": "Warning",
+      "tip": "Tip",
+      "impact": "Impact",
+      "criticalIssues": "Critical Issues",
+      "issuesFound": "{count} found",
+      "fixGuide": "Fix Guide",
+      "learnMore": "Learn More",
+      "moreIssuesHidden": "{count} more issues hidden",
+      "unlockFullReport": "Unlock Full Report",
+      "strategicInsights": "AI Strategic Insights",
+      "noInsights": "No AI insights available at this time.",
+      "impactValue": "{value} Impact",
+      "unlockPower": "Unlock Full SEO Power",
+      "upgradeDesc": "Get the complete analysis with advanced features:",
+      "upgradeToPro": "Upgrade to Pro",
+      "upgradeFeatures": {
+        "recs": "40+ detailed recommendations",
+        "competitor": "Competitor analysis",
+        "keywords": "Keyword rank tracking",
+        "support": "Priority support"
+      },
+      "categories": {
+        "technical": {
+          "label": "Technical SEO",
+          "description": "Analysis indicates robust site architecture, but crawlability can be improved. Server response times are optimal."
+        },
+        "content": {
+          "label": "Content Quality",
+          "description": "Content relevance is high, but keyword density is below optimal levels. Readability scores suggest some pages are too complex."
+        },
+        "onPage": {
+          "label": "On-Page SEO",
+          "description": "Meta tags are present but some descriptions are duplicates. HTML header structure needs refinement for better hierarchy."
+        }
+      },
+      "htmlDetails": {
+        "metaTitle": "Meta title",
+        "metaDescription": "Meta description",
+        "url": "URL",
+        "statusCode": "Status code",
+        "responseTime": "Response time",
+        "wordCount": "Word count",
+        "titleDesc": "The title tag is the first thing users see in search results. It should be concise (50-60 characters) and include your primary keyword.",
+        "descDesc": "A brief summary of the page content. Well-written descriptions (150-160 characters) can significantly improve click-through rates.",
+        "urlDesc": "The web address of your page. Short, descriptive URLs are easier for users to read and search engines to crawl.",
+        "statusDesc": "The server response code. A 200 OK status means the page loaded successfully. 4xx or 5xx codes indicate errors.",
+        "timeDesc": "How quickly your server responds. Faster response times (under 500ms) improve user experience and crawl budget.",
+        "countDesc": "The total number of words on the page. Sufficient content length (typically 600+ words) helps cover topics in depth for better ranking."
+      },
+      "verdicts": {
+        "excellent": "Excellent",
+        "good": "Good",
+        "fair": "Fair",
+        "poor": "Poor"
+      },
+      "legend": {
+        "poor": "0-49 Poor",
+        "fair": "50-69 Fair",
+        "good": "70-84 Good",
+        "excellent": "85+ Excellent"
+      }
+    },
+    "footer": {
+      "features": "Features",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "login": "Sign In",
+      "rights": "All rights reserved."
+    }
+  }
+}

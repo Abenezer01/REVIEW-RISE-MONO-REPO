@@ -5,11 +5,13 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import { CircularProgress, Box, Typography, Alert } from '@mui/material';
+import { useTranslations } from 'next-intl';
 
 import apiClient from '@/lib/apiClient';
 import { SERVICES } from '@/configs/services';
 
 export default function FacebookCallbackPage() {
+    const t = useTranslations('social.connections');
     const searchParams = useSearchParams();
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
     const [errorMessage, setErrorMessage] = useState('');
@@ -23,14 +25,14 @@ export default function FacebookCallbackPage() {
 
             if (error) {
                 setStatus('error');
-                setErrorMessage(errorDesc || 'Facebook declined the authorization.');
+                setErrorMessage(errorDesc || t('alerts.failedToConnect', { platform: 'Facebook' }));
                 
 return;
             }
 
             if (!code || !state) {
                 setStatus('error');
-                setErrorMessage('Missing code or state parameter.');
+                setErrorMessage(t('alerts.failedToConnect', { platform: 'Facebook' }));
                 
 return;
             }
@@ -67,7 +69,7 @@ return;
         };
 
         processCallback();
-    }, [searchParams]);
+    }, [searchParams, t]);
 
     return (
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="100vh" p={4}>
@@ -75,23 +77,23 @@ return;
                 <>
                     <CircularProgress size={60} thickness={4} />
                     <Typography variant="h6" sx={{ mt: 3 }}>
-                        Connecting to Facebook...
+                        {t('modals.connecting')}
                     </Typography>
-                    <Typography color="text.secondary">Please wait while we verify your account.</Typography>
+                    <Typography color="text.secondary">{t('fbConnect.connecting')}</Typography>
                 </>
             )}
             {status === 'success' && (
                 <Alert severity="success" sx={{ mt: 2 }}>
-                    Facebook connected successfully! Closing window...
+                    {t('fbConnect.connectedTitle')}
                 </Alert>
             )}
             {status === 'error' && (
                 <Box textAlign="center">
                     <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
-                        {errorMessage || 'Authentication failed'}
+                        {errorMessage || t('alerts.failedToConnect', { platform: 'Facebook' })}
                     </Alert>
                     <Typography variant="body2" onClick={() => window.close()} sx={{ cursor: 'pointer', textDecoration: 'underline' }}>
-                        Close Window
+                        {t('modals.cancel')}
                     </Typography>
                 </Box>
             )}

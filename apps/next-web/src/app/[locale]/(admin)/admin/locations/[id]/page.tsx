@@ -25,11 +25,12 @@ import StarIcon from '@mui/icons-material/Star'
 // Core Components
 import ShareIcon from '@mui/icons-material/Share'
 
+import { useTranslations } from 'next-intl'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTabList from '@core/components/mui/TabList'
 
 import ReviewSourcesDashboard from '@/components/admin/locations/review-sync/ReviewSourcesDashboard'
-import { useTranslation } from '@/hooks/useTranslation'
 import apiClient from '@/lib/apiClient'
 import { SERVICES } from '@/configs/services'
 
@@ -39,7 +40,7 @@ import { SocialConnectionList } from '@/components/admin/locations/social/Social
 
 // Placeholder Components for new tabs
 const LocationOverview = ({ location }: { location: any }) => {
-    const t = useTranslation('dashboard')
+    const t = useTranslations('dashboard')
 
     return (
         <Card>
@@ -62,7 +63,8 @@ const getInitials = (string: string) =>
 const LocationDetailsPage = () => {
     const params = useParams()
     const router = useRouter()
-    const t = useTranslation('dashboard') // Or specific location trans set
+    const t = useTranslations('dashboard')
+    const tr = useTranslations('social')
     const { id } = params
     const [location, setLocation] = useState<any>(null)
     const [loading, setLoading] = useState(true)
@@ -174,9 +176,9 @@ const LocationDetailsPage = () => {
                         </TabPanel>
                         <TabPanel value='social' sx={{ p: 0 }}>
                             <Box sx={{ mb: 3 }}>
-                                <Typography variant="h4">Social Integrations</Typography>
+                                <Typography variant="h4">{tr('connections.title')}</Typography>
                                 <Typography color="textSecondary">
-                                    Connect your social media accounts to sync posts and reviews.
+                                    {tr('connections.subtitle')}
                                 </Typography>
                             </Box>
                             <SocialConnectionList businessId={location.businessId} locationId={id as string} />
