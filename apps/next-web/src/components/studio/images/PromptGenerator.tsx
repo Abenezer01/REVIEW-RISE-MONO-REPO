@@ -11,28 +11,30 @@ import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 
-import { toast } from 'react-toastify'
+import { useTranslations } from 'next-intl'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import { SERVICES } from '@/configs/services'
 import apiClient from '@/lib/apiClient'
 import StudioGenerateButton from '../shared/StudioGenerateButton'
 
 const CATEGORIES = [
-    { value: 'portrait', label: '👤 Portrait', icon: 'tabler-user' },
-    { value: 'landscape', label: '🏞️ Landscape', icon: 'tabler-mountain' },
-    { value: 'product', label: '📦 Product', icon: 'tabler-box' },
-    { value: 'abstract', label: '🎨 Abstract', icon: 'tabler-palette' },
-    { value: 'architecture', label: '🏛️ Architecture', icon: 'tabler-building' },
-    { value: 'food', label: '🍕 Food', icon: 'tabler-pizza' }
+    { value: 'portrait', key: 'portrait', icon: '👤' },
+    { value: 'landscape', key: 'landscape', icon: '🏞️' },
+    { value: 'product', key: 'product', icon: '📦' },
+    { value: 'abstract', key: 'abstract', icon: '🎨' },
+    { value: 'architecture', key: 'architecture', icon: '🏛️' },
+    { value: 'food', key: 'food', icon: '🍕' }
 ]
 
 const MOODS = [
-    { value: 'vibrant', label: 'Vibrant' },
-    { value: 'moody', label: 'Moody' },
-    { value: 'minimalist', label: 'Minimalist' },
-    { value: 'dramatic', label: 'Dramatic' },
-    { value: 'calm', label: 'Calm' },
-    { value: 'energetic', label: 'Energetic' }
+    { value: 'vibrant', key: 'vibrant' },
+    { value: 'moody', key: 'moody' },
+    { value: 'minimalist', key: 'minimalist' },
+    { value: 'dramatic', key: 'dramatic' },
+    { value: 'calm', key: 'calm' },
+    { value: 'energetic', key: 'energetic' }
 ]
 
 interface PromptIdea {
@@ -47,6 +49,8 @@ interface PromptGeneratorProps {
 }
 
 export default function PromptGenerator({ onSelectPrompt, currentStyle }: PromptGeneratorProps) {
+    const t = useTranslations('studio')
+    const { notify } = useSystemMessages()
     const [topic, setTopic] = useState('')
     const [category, setCategory] = useState<string>('')
     const [mood, setMood] = useState<string>('')
@@ -55,7 +59,10 @@ export default function PromptGenerator({ onSelectPrompt, currentStyle }: Prompt
 
     const handleGenerate = async () => {
         if (!topic.trim()) {
-            toast.error('Please enter a topic or idea')
+            notify({
+                messageCode: 'studio.promptTopicPlaceholder' as any,
+                severity: 'ERROR'
+            })
             
 return
         }
@@ -75,13 +82,22 @@ return
 
             if (data.prompts && Array.isArray(data.prompts)) {
                 setPromptIdeas(data.prompts)
-                toast.success(`Generated ${data.prompts.length} prompt ideas!`)
+                notify({
+                    messageCode: 'studio.promptGenerationSuccess' as any,
+                    severity: 'SUCCESS'
+                })
             } else {
-                toast.error('No prompts generated')
+                notify({
+                    messageCode: 'studio.promptGenerationEmpty' as any,
+                    severity: 'ERROR'
+                })
             }
         } catch (error) {
             console.error(error)
-            toast.error('Failed to generate prompt ideas')
+            notify({
+                messageCode: 'studio.promptGenerationError' as any,
+                severity: 'ERROR'
+            })
         } finally {
             setLoading(false)
         }
@@ -89,7 +105,10 @@ return
 
     const handleUsePrompt = (prompt: string) => {
         onSelectPrompt(prompt)
-        toast.success('Prompt applied!')
+        notify({
+            messageCode: 'studio.promptApplied' as any,
+            severity: 'SUCCESS'
+        })
     }
 
     return (
@@ -97,7 +116,7 @@ return
             {/* Topic Input */}
             <Box>
                 <Typography variant="body2" fontWeight="medium" mb={1}>
-                    What do you want to create?
+                    {t('images.promptPlaceholder')}
                 </Typography>
                 <TextField
                     placeholder="e.g., A coffee shop in the morning, A futuristic car, A serene beach..."
@@ -116,13 +135,13 @@ return
             {/* Category Selection */}
             <Box>
                 <Typography variant="body2" fontWeight="medium" mb={1}>
-                    Category (Optional)
+                    {t('images.categoryOptional')}
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                     {CATEGORIES.map((cat) => (
                         <Chip
                             key={cat.value}
-                            label={cat.label}
+                            label={`${cat.icon} ${t(`images.categories.${cat.key}`)}`}
                             onClick={() => setCategory(category === cat.value ? '' : cat.value)}
                             variant={category === cat.value ? 'filled' : 'outlined'}
                             color={category === cat.value ? 'primary' : 'default'}
@@ -135,13 +154,13 @@ return
             {/* Mood Selection */}
             <Box>
                 <Typography variant="body2" fontWeight="medium" mb={1}>
-                    Mood (Optional)
+                    {t('images.moodOptional')}
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                     {MOODS.map((m) => (
                         <Chip
                             key={m.value}
-                            label={m.label}
+                            label={t(`images.moods.${m.key}`)}
                             onClick={() => setMood(mood === m.value ? '' : m.value)}
                             variant={mood === m.value ? 'filled' : 'outlined'}
                             color={mood === m.value ? 'secondary' : 'default'}
@@ -156,8 +175,8 @@ return
                 onClick={handleGenerate}
                 loading={loading}
                 disabled={!topic.trim()}
-                label="✨ Generate Prompt Ideas"
-                loadingLabel="Generating Ideas..."
+                label={t('images.generatePromptIdeas')}
+                loadingLabel={t('images.generatingIdeas')}
                 fullWidth
             />
 
@@ -165,7 +184,7 @@ return
             {promptIdeas.length > 0 && (
                 <Box sx={{ mt: 1 }}>
                     <Typography variant="body2" fontWeight="bold" mb={2} color="text.secondary">
-                        💡 {promptIdeas.length} Prompt Ideas
+                        💡 {promptIdeas.length} {t('images.promptIdeas')}
                     </Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         {promptIdeas.map((idea, index) => (

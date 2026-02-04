@@ -3,6 +3,7 @@ import type { ComponentType} from 'react';
 import { Fragment } from 'react';
 
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Box, Typography, IconButton } from '@mui/material';
+import { useTranslations } from 'next-intl';
 
 // Core Imports
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -26,6 +27,7 @@ const ConfirmationDialog: ComponentType<ConfirmationDialogProps> = ({
   onCancel,
   type = 'warning' 
 }) => {
+  const tc = useTranslations('common');
   
   const getIcon = () => {
     switch (type) {
@@ -99,14 +101,14 @@ const ConfirmationDialog: ComponentType<ConfirmationDialogProps> = ({
             onClick={onCancel}
             sx={{ mr: 2 }}
           >
-            Cancel
+            {tc('common.cancel')}
           </Button>
           <Button 
             variant='contained' 
             color={getColor()} 
             onClick={onConfirm}
           >
-            Confirm
+            {tc('common.confirm')}
           </Button>
         </DialogActions>
       </Dialog>

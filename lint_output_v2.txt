@@ -1,0 +1,184 @@
+
+> @apps/next-web@5.0.0 lint /app/apps/next-web
+> eslint . --ext .js,.jsx,.ts,.tsx
+
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/brand-rise/reports/page.tsx
+  166:51  error  Strings not allowed in JSX files: "..."  react/jsx-no-literals
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/locations/LocationList.client.tsx
+   22:1   error    There should be at least one empty line between import groups                                            import/order
+   23:1   error    There should be at least one empty line between import groups                                            import/order
+   23:1   error    `next-intl` import should occur before import of `@/components/shared/form/custom-select`                import/order
+   47:37  error    Strings not allowed in JSX files: "'Loading...'"                                                         react/jsx-no-literals
+   77:8   warning  React Hook useCallback has a missing dependency: 'tc'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  178:8   warning  React Hook useMemo has a missing dependency: 'tc'. Either include it or remove the dependency array      react-hooks/exhaustive-deps
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/locations/[id]/page.tsx
+  31:1  error  There should be at least one empty line between import groups                   import/order
+  32:1  error  There should be at least one empty line between import groups                   import/order
+  32:1  error  `next-intl` import should occur before import of `@core/components/mui/Avatar`  import/order
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/profiles/BrandProfilesList.tsx
+  424:22  error  Strings not allowed in JSX files: "Cancel"  react/jsx-no-literals
+  433:22  error  Strings not allowed in JSX files: "Delete"  react/jsx-no-literals
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/profiles/[id]/_components/AuditLogTab.tsx
+  2:1  error  There should be at least one empty line between import groups  import/order
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/profiles/[id]/_components/BrandIdentityTab.tsx
+  2:1  error  There should be at least one empty line between import groups  import/order
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/profiles/[id]/_components/ExtractionHistoryTab.tsx
+   2:1   error  There should be at least one empty line between import groups  import/order
+  18:3   error  Expected blank line before this statement                      padding-line-between-statements
+  25:13  error  Strings not allowed in JSX files: "'v'"                        react/jsx-no-literals
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/profiles/[id]/_components/ProfileTabs.tsx
+   1:1  error  There should be at least one empty line between import groups  import/order
+  42:3  error  Expected blank line before this statement                      padding-line-between-statements
+  42:3  error  Expected newline before return statement                       newline-before-return
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/profiles/[id]/_components/ToneMessagingTab.tsx
+  5:1  error  There should be at least one empty line between import groups  import/order
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/profiles/page.tsx
+  120:26  error  Strings not allowed in JSX files: "`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `"  react/jsx-no-literals
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/reviews/[id]/page.tsx
+   42:1   error  There should be at least one empty line between import groups                                 import/order
+   42:1   error  `next-intl` import should occur before import of `@/shared/components/SystemMessageProvider`  import/order
+  323:56  error  Strings not allowed in JSX files: "'.0'"                                                      react/jsx-no-literals
+  646:33  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                               react/no-unescaped-entities
+  646:45  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                               react/no-unescaped-entities
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/settings/feature-flags/CreateFeatureFlagDrawer.tsx
+   3:1  error  There should be at least one empty line between import groups  import/order
+  59:5  error  Expected blank line before this statement                      padding-line-between-statements
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/social-rise/content-templates/page.tsx
+  106:6  warning  React Hook useCallback has an unnecessary dependency: 'industries'. Either exclude it or remove the dependency array. Outer scope values like 'industries' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/app/apps/next-web/src/app/[locale]/(admin)/admin/social-rise/planner/page.tsx
+   42:1   error  There should be at least one empty line between import groups  import/order
+  456:57  error  No duplicate props allowed                                     react/jsx-no-duplicate-props
+
+/app/apps/next-web/src/components/admin/locations/social/FacebookConnectModal.tsx
+   50:7    error  'steps' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  166:102  error  Strings not allowed in JSX files: "ID:"     react/jsx-no-literals
+
+/app/apps/next-web/src/components/admin/locations/social/SocialConnectionList.tsx
+  26:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+
+/app/apps/next-web/src/components/admin/seo/KeywordListing.tsx
+  134:6  warning  React Hook useMemo has missing dependencies: 't' and 'tc'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/app/apps/next-web/src/components/brand-rise/competitors/CompetitorDetailsDialog.tsx
+  1:1  error  There should be at least one empty line between import groups  import/order
+
+/app/apps/next-web/src/components/brand-rise/visibility/JobsDashboard.tsx
+  336:105  error  Strings not allowed in JSX files: "'100%'"  react/jsx-no-literals
+
+/app/apps/next-web/src/components/layout/horizontal/FooterContent.tsx
+  10:1  error  There should be at least one empty line between import groups                    import/order
+  11:1  error  `next-intl` import should occur before import of `@layouts/utils/layoutClasses`  import/order
+
+/app/apps/next-web/src/components/layout/page.tsx
+  27:17  error  Strings not allowed in JSX files: "`${titleId ? transl(titleId) : title} | ${transl('app.name')}`"  react/jsx-no-literals
+
+/app/apps/next-web/src/components/layout/shared/LocationDropdown.tsx
+  24:1  error  There should be at least one empty line between import groups               import/order
+  25:1  error  `next-intl` import should occur before import of `@core/hooks/useSettings`  import/order
+
+/app/apps/next-web/src/components/layout/shared/ModeDropdown.tsx
+  20:1  error  There should be at least one empty line between import groups        import/order
+  21:1  error  `next-intl` import should occur before type import of `@core/types`  import/order
+
+/app/apps/next-web/src/components/layout/shared/NotificationDropdown.tsx
+  23:1  error  There should be at least one empty line between import groups               import/order
+  24:1  error  `next-intl` import should occur before import of `@core/hooks/useSettings`  import/order
+
+/app/apps/next-web/src/components/layout/vertical/FooterContent.tsx
+  10:1  error  There should be at least one empty line between import groups                    import/order
+  11:1  error  `next-intl` import should occur before import of `@layouts/utils/layoutClasses`  import/order
+
+/app/apps/next-web/src/components/studio/CarouselBuilder.tsx
+  18:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+
+/app/apps/next-web/src/components/studio/HashtagGenerator.tsx
+  8:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+
+/app/apps/next-web/src/components/studio/ScriptWriter.tsx
+  324:60  error  Strings not allowed in JSX files: "'s'"  react/jsx-no-literals
+
+/app/apps/next-web/src/components/studio/UnifiedPostGenerator.tsx
+  13:1  error  There should be at least one empty line between import groups                                 import/order
+  14:1  error  `next-intl` import should occur before import of `@/shared/components/SystemMessageProvider`  import/order
+
+/app/apps/next-web/src/components/studio/captions/ProTips.tsx
+  10:5  error  Expected blank line before this statement  padding-line-between-statements
+
+/app/apps/next-web/src/components/studio/captions/ResultCard.tsx
+   7:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+  77:91  error  Strings not allowed in JSX files: "Aa"                react/jsx-no-literals
+
+/app/apps/next-web/src/components/studio/hashtags/HashtagResults.tsx
+  13:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+
+/app/apps/next-web/src/components/studio/hashtags/HashtagSidebar.tsx
+  28:5  error  Expected blank line before this statement  padding-line-between-statements
+
+/app/apps/next-web/src/components/studio/ideas/IdeaCard.tsx
+  12:1  error  There should be at least one empty line between import groups  import/order
+
+/app/apps/next-web/src/components/studio/images/PromptGenerator.tsx
+  16:1   error  There should be at least one empty line between import groups                    import/order
+  17:1   error  `next-intl` import should occur before import of `@/configs/services`            import/order
+  18:1   error  `@platform/shared-ui` import should occur before import of `@/configs/services`  import/order
+  18:10  error  useSystemMessages not found in '@platform/shared-ui'                             import/named
+
+/app/apps/next-web/src/components/studio/unified/SchedulePostDialog.tsx
+  7:10  error  useSystemMessages not found in '@platform/shared-ui'  import/named
+
+/app/apps/next-web/src/components/studio/unified/UnifiedResults.tsx
+  10:1   error  There should be at least one empty line between import groups                       import/order
+  11:1   error  `next-intl` import should occur before import of `@/hooks/useBusinessId`            import/order
+  12:1   error  `@platform/shared-ui` import should occur before import of `@/hooks/useBusinessId`  import/order
+  12:10  error  useSystemMessages not found in '@platform/shared-ui'                                import/named
+
+/app/apps/next-web/src/components/studio/unified/cards/CaptionCard.tsx
+   6:1   error  There should be at least one empty line between import groups                        import/order
+   7:1   error  `@platform/shared-ui` import should occur before import of `@/hooks/useTranslation`  import/order
+   7:10  error  useSystemMessages not found in '@platform/shared-ui'                                 import/named
+  71:92  error  Strings not allowed in JSX files: "94/100"                                           react/jsx-no-literals
+
+/app/apps/next-web/src/components/studio/unified/cards/ContentIdeasCard.tsx
+  3:1  error  There should be at least one empty line between import groups  import/order
+
+/app/apps/next-web/src/components/studio/unified/cards/HashtagsCard.tsx
+  4:1   error  There should be at least one empty line between import groups  import/order
+  4:10  error  useSystemMessages not found in '@platform/shared-ui'           import/named
+
+/app/apps/next-web/src/components/studio/unified/cards/PreviewCard.tsx
+  50:37  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  50:65  error  Strings not allowed in JSX files: "...""                         react/jsx-no-literals
+  50:68  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  70:73  error  Strings not allowed in JSX files: "..."                          react/jsx-no-literals
+
+/app/apps/next-web/src/components/studio/unified/cards/QuickActionsCard.tsx
+  3:1  error  There should be at least one empty line between import groups  import/order
+
+/app/apps/next-web/src/views/Login.tsx
+  32:1  error  `next-intl` import should occur before import of `@/shared/components/SystemMessageProvider`  import/order
+
+✖ 82 problems (78 errors, 4 warnings)
+  47 errors and 0 warnings potentially fixable with the `--fix` option.
+
+/app/apps/next-web:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @apps/next-web@5.0.0 lint: `eslint . --ext .js,.jsx,.ts,.tsx`
+Exit status 1

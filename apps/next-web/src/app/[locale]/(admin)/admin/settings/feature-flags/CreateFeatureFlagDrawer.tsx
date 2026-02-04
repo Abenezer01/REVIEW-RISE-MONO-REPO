@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+
 import { useTranslations } from 'next-intl'
 
 import {
@@ -56,6 +57,7 @@ export default function CreateFeatureFlagDrawer({ open, onClose, editFlag }: Cre
         { label: t('operators.in'), value: 'in' },
         { label: t('operators.not_in'), value: 'not_in' },
     ], [t])
+
     const [newFlag, setNewFlag] = useState({
         name: '',
         description: '',

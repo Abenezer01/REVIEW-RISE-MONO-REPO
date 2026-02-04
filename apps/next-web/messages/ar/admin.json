@@ -1,5 +1,10 @@
 {
   "featureFlags": {
+    "title": "أعلام الميزات",
+    "subtitle": "إدارة أعلام الميزات العالمية والمبدلات",
+    "searchPlaceholder": "البحث في أعلام الميزات...",
+    "rolloutPercent": "نسبة النشر %",
+    "actions": "الإجراءات",
     "createTitle": "إنشاء علامة ميزة",
     "editTitle": "تعديل علامة ميزة",
     "name": "الاسم",

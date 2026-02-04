@@ -47,6 +47,12 @@
     "connectToSync": "Connect a source to start syncing",
     "noSourcesYet": "No sources connected yet.",
     "availableSources": "Available Sources",
+    "facebook": "Facebook Reviews",
+    "facebookDesc": "Sync reviews from Facebook Business Pages",
+    "trustpilot": "Trustpilot",
+    "trustpilotDesc": "Import reviews from Trustpilot",
+    "yelp": "Yelp Business",
+    "yelpDesc": "Sync reviews from Yelp",
     "googleBusiness": "Google Business Profile",
     "connectToSyncReviews": "Connect to sync reviews",
     "connect": "Connect",
@@ -85,7 +91,15 @@
       "selectTitle": "Select Locations to Connect",
       "reviewsCount": "{count} Reviews",
       "secure": "Secure OAuth 2.0 connection",
-      "connectBtn": "Connect with Google"
+      "connectBtn": "Connect with Google",
+      "mockData": {
+        "downtownOffice": "Downtown Office",
+        "downtownAddress": "123 Main St, San Francisco, CA 94102",
+        "westsideBranch": "Westside Branch",
+        "westsideAddress": "456 Oak Ave, San Francisco, CA 94115"
+      },
+      "mockDuration": "2m 34s",
+      "mockTime": "2:00 AM"
     }
   }
 }

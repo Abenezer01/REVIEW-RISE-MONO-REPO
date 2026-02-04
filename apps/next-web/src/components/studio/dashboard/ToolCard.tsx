@@ -3,6 +3,7 @@
 import React from 'react'
 
 import { Card, CardContent, Typography, Box, Button, Chip } from '@mui/material'
+import { useTranslations } from 'next-intl'
 
 interface ToolCardProps {
     title: string
@@ -16,6 +17,8 @@ interface ToolCardProps {
 }
 
 export default function ToolCard({ title, description, icon, stats, color = 'primary.main', isNew, isPopular, onClick }: ToolCardProps) {
+    const t = useTranslations()
+
     return (
         <Card 
             variant="outlined" 
@@ -49,8 +52,8 @@ export default function ToolCard({ title, description, icon, stats, color = 'pri
                         {icon}
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                        {isNew && <Chip label="NEW" size="small" sx={{ bgcolor: '#FF4081', color: 'white', borderRadius: 1, height: 22, fontSize: '0.7rem', fontWeight: 'bold' }} />}
-                        {isPopular && <Chip label="POPULAR" size="small" sx={{ bgcolor: '#7C4DFF', color: 'white', borderRadius: 1, height: 22, fontSize: '0.7rem', fontWeight: 'bold' }} />}
+                        {isNew && <Chip label={t('common.new')} size="small" sx={{ bgcolor: '#FF4081', color: 'white', borderRadius: 1, height: 22, fontSize: '0.7rem', fontWeight: 'bold' }} />}
+                        {isPopular && <Chip label={t('common.popular')} size="small" sx={{ bgcolor: '#7C4DFF', color: 'white', borderRadius: 1, height: 22, fontSize: '0.7rem', fontWeight: 'bold' }} />}
                     </Box>
                 </Box>
 
@@ -78,7 +81,7 @@ export default function ToolCard({ title, description, icon, stats, color = 'pri
                         '&:hover': { bgcolor: color, filter: 'brightness(1.1)' } 
                     }}
                 >
-                    Generate {title.split(' ')[0]}
+                    {t('studio.generateButtonLabel', { type: title.split(' ')[0] })}
                 </Button>
             </CardContent>
         </Card>

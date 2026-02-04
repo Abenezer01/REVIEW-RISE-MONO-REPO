@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react'
 
 import { Box, Button, Card, CardContent, Chip, Grid, Stack, Typography } from '@mui/material'
-import { toast } from 'react-toastify'
+
+import { useTranslations } from 'next-intl'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import { useBusinessId } from '@/hooks/useBusinessId'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
@@ -37,6 +40,8 @@ interface UnifiedResultsProps {
 }
 
 export default function UnifiedResults({ data, initialDate }: UnifiedResultsProps) {
+    const t = useTranslations('studio')
+    const { notify } = useSystemMessages()
     const { businessId } = useBusinessId()
     const { locationId } = useLocationFilter()
     const [isPublishing, setIsPublishing] = useState(false)
@@ -58,29 +63,41 @@ export default function UnifiedResults({ data, initialDate }: UnifiedResultsProp
 
     // Helper to format date relative
     const getRelativeTime = () => {
-        return 'Generated 2 min ago' // Mock for now
+        return t('magic.generatedRelative', { count: 2 }) // Mock for now
     }
 
     const handleUseCaption = () => {
         setPreviewCaption(data.caption)
-        toast.info('Reset preview to original caption')
+        notify({
+            messageCode: 'studio.resetPreview' as any,
+            severity: 'INFO'
+        })
     }
 
     const handleUseHashtags = (tags: string[]) => {
         const tagsString = tags.join(' ')
 
         setPreviewCaption(prev => `${prev}\n\n${tagsString}`)
-        toast.success('Added hashtags to preview')
+        notify({
+            messageCode: 'studio.hashtagsAdded' as any,
+            severity: 'SUCCESS'
+        })
     }
 
     const handleUseIdea = (title: string, description: string) => {
         setPreviewCaption(`${title}\n\n${description}`)
-        toast.success('Updated preview with content idea')
+        notify({
+            messageCode: 'studio.previewUpdated' as any,
+            severity: 'SUCCESS'
+        })
     }
 
     const handleScheduleConfirm = async (date: Date) => {
         if (!businessId) {
-            toast.error('We could not identify your business organization. Please try refreshing the page.')
+            notify({
+                messageCode: 'auth.businessOrgError' as any,
+                severity: 'ERROR'
+            })
 
             return
         }
@@ -103,10 +120,16 @@ export default function UnifiedResults({ data, initialDate }: UnifiedResultsProp
             })
 
             setScheduleOpen(false)
-            toast.success(`Post successfully scheduled for ${date.toLocaleString()}`)
+            notify({
+                messageCode: 'social.postScheduled' as any,
+                severity: 'SUCCESS'
+            })
         } catch (error) {
             console.error('Failed to schedule post:', error)
-            toast.error('Failed to schedule post. Please try again later.')
+            notify({
+                messageCode: 'social.scheduleError' as any,
+                severity: 'ERROR'
+            })
         } finally {
             setIsPublishing(false)
         }
@@ -114,7 +137,10 @@ export default function UnifiedResults({ data, initialDate }: UnifiedResultsProp
 
     const handleInstantPost = async () => {
         if (!businessId) {
-            toast.error('We could not identify your business organization.')
+            notify({
+                messageCode: 'auth.businessOrgError' as any,
+                severity: 'ERROR'
+            })
 
             return
         }
@@ -136,10 +162,16 @@ export default function UnifiedResults({ data, initialDate }: UnifiedResultsProp
                 locationId: locationId || null
             })
 
-            toast.success(`Post successfully scheduled to ${(data.platform || 'Instagram')}!`)
+            notify({
+                messageCode: 'social.postScheduled' as any,
+                severity: 'SUCCESS'
+            })
         } catch (error) {
             console.error('Failed to publish post:', error)
-            toast.error('Failed to publish post. Please check your connection.')
+            notify({
+                messageCode: 'social.publishError' as any,
+                severity: 'ERROR'
+            })
         } finally {
             setIsPublishing(false)
         }
@@ -158,7 +190,7 @@ export default function UnifiedResults({ data, initialDate }: UnifiedResultsProp
             {/* Header Area */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 5, gap: 3 }}>
                 <Box>
-                    <Typography variant="h4" fontWeight="bold" sx={{ mb: 1.5 }}>Your Complete Post Package</Typography>
+                    <Typography variant="h4" fontWeight="bold" sx={{ mb: 1.5 }}>{t('magic.completePackageTitle')}</Typography>
                     <Stack direction="row" spacing={2.5} alignItems="center" flexWrap="wrap">
                         <Chip
                             icon={<i className={`tabler-brand-${(data.platform || 'instagram').toLowerCase()}`} />}
@@ -172,7 +204,7 @@ export default function UnifiedResults({ data, initialDate }: UnifiedResultsProp
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: 'text.secondary', fontSize: '0.875rem' }}>
                             <i className="tabler-target" style={{ fontSize: 16 }} />
-                            <span>Goal: Engagement</span>
+                            <span>{t('magic.goalEngagement')}</span>
                         </Box>
                     </Stack>
                 </Box>
@@ -182,7 +214,7 @@ export default function UnifiedResults({ data, initialDate }: UnifiedResultsProp
                         variant="outlined"
                         color="inherit"
                     >
-                        Share
+                        {t('common.share')}
                     </Button>
                     <Button
                         variant="contained"
@@ -190,7 +222,7 @@ export default function UnifiedResults({ data, initialDate }: UnifiedResultsProp
                         startIcon={<i className="tabler-calendar-plus" />}
                         onClick={() => setScheduleOpen(true)}
                     >
-                        Schedule Post
+                        {t('social.schedulePost')}
                     </Button>
                     <Button
                         variant="contained"
@@ -200,7 +232,7 @@ export default function UnifiedResults({ data, initialDate }: UnifiedResultsProp
                         disabled={isPublishing}
                         sx={{ background: 'linear-gradient(45deg, #FF6F00, #FFCA28)' }}
                     >
-                        {isPublishing ? 'Posting...' : 'Post Now'}
+                        {isPublishing ? t('social.posting') : t('social.postNow')}
                     </Button>
                 </Box>
             </Box>
@@ -231,9 +263,9 @@ export default function UnifiedResults({ data, initialDate }: UnifiedResultsProp
                         {/* Regenerate Cta */}
                         <Card variant="outlined" sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', mt: 2 }}>
                             <CardContent sx={{ p: 3 }}>
-                                <Typography variant="subtitle2" fontWeight="bold" gutterBottom>Need Different Options?</Typography>
+                                <Typography variant="subtitle2" fontWeight="bold" gutterBottom>{t('magic.needDifferentOptions')}</Typography>
                                 <Typography variant="caption" color="text.secondary" paragraph>
-                                    Generate new variations while keeping the same topic.
+                                    {t('magic.generateNewVariations')}
                                 </Typography>
                                 <Button
                                     fullWidth
@@ -241,9 +273,12 @@ export default function UnifiedResults({ data, initialDate }: UnifiedResultsProp
                                     color="secondary"
                                     startIcon={<i className="tabler-refresh" />}
                                     sx={{ background: 'linear-gradient(45deg, #9C27B0, #E040FB)' }}
-                                    onClick={() => toast.info('Regenerate triggered')}
+                                    onClick={() => notify({
+                                        messageCode: 'studio.regenerateTriggered' as any,
+                                        severity: 'INFO'
+                                    })}
                                 >
-                                    Regenerate Package
+                                    {t('magic.regeneratePackage')}
                                 </Button>
                             </CardContent>
                         </Card>

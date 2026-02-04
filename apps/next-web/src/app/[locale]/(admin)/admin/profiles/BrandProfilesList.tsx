@@ -49,6 +49,7 @@ interface BrandProfilesListProps {
 
 const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
     const t = useTranslations('BrandProfiles');
+    const tc = useTranslations('common');
     const theme = useTheme();
     const [profiles, setProfiles] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -422,7 +423,7 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
                         onClick={() => setDeleteModalOpen(false)}
                         sx={{ borderRadius: 2, fontWeight: 700 }}
                     >
-                        Cancel
+                        {tc('common.cancel')}
                     </Button>
                     <Button
                         onClick={handleDeleteConfirm}
@@ -431,7 +432,7 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
                         disableElevation
                         sx={{ borderRadius: 2, fontWeight: 700, px: 3 }}
                     >
-                        Delete
+                        {tc('common.delete')}
                     </Button>
                 </DialogActions>
             </Dialog>

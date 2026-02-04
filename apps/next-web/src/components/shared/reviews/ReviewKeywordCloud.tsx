@@ -10,6 +10,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import FormControl from '@mui/material/FormControl'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
+import { useTranslations } from 'next-intl'
 
 import apiClient from '@/lib/apiClient'
 import KeywordCloud from '../dashboard/KeywordCloud'; // Reusing existing component
@@ -19,6 +20,7 @@ interface ReviewKeywordCloudProps {
 }
 
 const ReviewKeywordCloud = ({ locationId }: ReviewKeywordCloudProps) => {
+  const t = useTranslations('dashboard')
   const [keywords, setKeywords] = useState<{ keyword: string; count: number }[]>([])
   const [loading, setLoading] = useState(true)
   const [timeRange, setTimeRange] = useState('30d')
@@ -51,8 +53,8 @@ const ReviewKeywordCloud = ({ locationId }: ReviewKeywordCloudProps) => {
   return (
     <Card sx={{ height: '100%' }}>
       <CardHeader 
-        title="Review Themes & Keywords" 
-        subheader="Recurring topics in customer feedback"
+        title={t('reviews.themesTitle')}
+        subheader={t('reviews.themesSubtitle')}
         action={
             <FormControl size="small" sx={{ minWidth: 120 }}>
                 {/* <InputLabel>Time Range</InputLabel> */}
@@ -62,9 +64,9 @@ const ReviewKeywordCloud = ({ locationId }: ReviewKeywordCloudProps) => {
                     displayEmpty
                     inputProps={{ 'aria-label': 'Time Range' }}
                 >
-                    <MenuItem value="7d">Last 7 Days</MenuItem>
-                    <MenuItem value="30d">Last 30 Days</MenuItem>
-                    <MenuItem value="90d">Last 90 Days</MenuItem>
+                    <MenuItem value="7d">{t('stats.last7Days')}</MenuItem>
+                    <MenuItem value="30d">{t('stats.last30Days')}</MenuItem>
+                    <MenuItem value="90d">{t('stats.last90Days')}</MenuItem>
                 </Select>
             </FormControl>
         }

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 
 import { Card, CardContent, Typography, Box, Chip, Divider } from '@mui/material'
+import { useTranslations } from 'next-intl'
 
 import type { ListingItem } from '@/types/general/listing-item'
 import RowOptions from '@/components/shared/listing/row-options'
@@ -12,6 +13,8 @@ interface LocationCardProps {
 }
 
 const LocationCard = ({ data }: LocationCardProps) => {
+    const t = useTranslations('dashboard')
+
     return (
         <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <CardContent sx={{ flexGrow: 1, pb: 2 }}>
@@ -40,7 +43,7 @@ const LocationCard = ({ data }: LocationCardProps) => {
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <Box>
                         <Typography variant='caption' sx={{ color: 'text.secondary', display: 'block', mb: 0.5 }}>
-                            Address
+                            {t('locations.form.address')}
                         </Typography>
                         <Typography variant='body2' sx={{ color: 'text.primary' }}>
                             {data.secondaryLabel || 'N/A'}
@@ -49,7 +52,7 @@ const LocationCard = ({ data }: LocationCardProps) => {
 
                     <Box>
                         <Typography variant='caption' sx={{ color: 'text.secondary', display: 'block', mb: 0.5 }}>
-                            Business
+                            {t('accounts.list.columns.account')}
                         </Typography>
                         <Chip
                             label={data.tertiaryLabel || 'N/A'}

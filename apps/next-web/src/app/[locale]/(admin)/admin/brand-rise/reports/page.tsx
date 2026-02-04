@@ -36,6 +36,7 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
 const ReportsPage = () => {
   const { notify } = useSystemMessages();
   const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
   const router = useRouter();
   const { businessId } = useBusinessId();
   const { user } = useAuth();
@@ -154,7 +155,7 @@ return BrandService.generateOpportunitiesReport(businessId);
                     </TableCell>
                     <TableCell>
                       <Chip 
-                          label="Ready" 
+                          label={tc('status.success')}
                           size="small" 
                           color="success"
                           variant="outlined"

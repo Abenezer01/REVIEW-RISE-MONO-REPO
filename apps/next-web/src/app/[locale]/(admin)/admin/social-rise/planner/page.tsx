@@ -40,6 +40,7 @@ import {
 } from '@mui/icons-material';
 
 import { useTranslations } from 'next-intl';
+
 import { useBusinessId } from '@/hooks/useBusinessId';
 import { useLocationFilter } from '@/hooks/useLocationFilter';
 import { BrandService } from '@/services/brand.service';
@@ -453,7 +454,7 @@ export default function PlannerPage() {
         <Grid size={{ xs: 12, md: 9 }}>
           {loading ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
-              <CircularProgress size={40} thickness={4} thickness={4} sx={{ mb: 2, color: 'primary.main' }} />
+              <CircularProgress size={40} thickness={4} sx={{ mb: 2, color: 'primary.main' }} />
               <Typography color="text.secondary" fontWeight="500">{tp('curatingStrategy')}</Typography>
             </Box>
           ) : plan ? (
@@ -483,15 +484,15 @@ export default function PlannerPage() {
                   </Box>
                   <Box>
                     <Typography variant="h6" fontWeight="800" sx={{ lineHeight: 1.2 }}>
-                      {monthNames[plan.month - 1]} {plan.year}
+                      {format.dateTime(new Date(plan.year, plan.month - 1, 1), { month: 'long' })} {plan.year}
                     </Typography>
                     <Typography variant="caption" sx={{ opacity: 0.8, fontWeight: 500 }}>
-                      Targeting {plan.industry}
+                      {tp('targeting')} {plan.industry}
                     </Typography>
                   </Box>
                 </Box>
                 <Chip 
-                  label={plan.status === 'converted' ? 'DRAFTS CREATED' : 'STRATEGY READY'} 
+                  label={plan.status === 'converted' ? tp('scheduled') : ts('resultsTitle')}
                   size="small" 
                   sx={{ 
                     bgcolor: 'white', 
@@ -585,7 +586,7 @@ export default function PlannerPage() {
                               </Box>
 
                               <Typography variant="body2" color="text.secondary" sx={{ mb: 4, lineHeight: 1.6, opacity: 0.9 }}>
-                                {day.suggestedCopy || day.caption || "Generating creative adaptation..."}
+                                {day.suggestedCopy || day.caption || tp('curatingStrategy')}
                               </Typography>
 
                               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', justifyContent: 'space-between' }}>

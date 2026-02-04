@@ -90,7 +90,7 @@ const SmartReviewList = () => {
     }
 
     setLoading(false)
-  }, [page, rowsPerPage, filters, locationId])
+  }, [page, rowsPerPage, filters, locationId, notify])
 
   useEffect(() => {
     setPage(0)

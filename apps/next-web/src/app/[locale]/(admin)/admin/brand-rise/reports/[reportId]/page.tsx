@@ -39,7 +39,7 @@ import { BrandService } from '@/services/brand.service';
 import { SERVICES_CONFIG } from '@/configs/services';
 
 // Chart Component
-const PositioningMapChart = ({ data }: { data: any }) => {
+const PositioningMapChart = ({ data, t }: { data: any; t: any }) => {
     // Transform data for Recharts
     // Expected data: { "Brand A": { x: 5, y: 3 }, "You": { x: 8, y: 8 } }
     // Transform to array: [{ name: "Brand A", x: 5, y: 3, fill: "#..." }]
@@ -73,7 +73,7 @@ const PositioningMapChart = ({ data }: { data: any }) => {
                 </ScatterChart>
             </ResponsiveContainer>
             <Typography variant="caption" align="center" display="block" color="text.secondary">
-                X: {data?.axes?.x || 'Price/Speed'} | Y: {data?.axes?.y || 'Quality/Scope'}
+                {t('xAxisLabel', { label: data?.axes?.x || 'Price/Speed' })} {t('yAxisLabel', { label: data?.axes?.y || 'Quality/Scope' })}
             </Typography>
         </Box>
     );
@@ -279,8 +279,8 @@ export default function ReportDetailPage() {
                                     ml: 2
                                 }}
                             >
-                                <Typography variant="h5" fontWeight="900" sx={{ color: '#fff', lineHeight: 1 }}>{ '94' }</Typography>
-                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.6rem', fontWeight: 'bold' }}>{ 'CONFIDENCE' }</Typography>
+                                <Typography variant="h5" fontWeight="900" sx={{ color: '#fff', lineHeight: 1 }}>{94}</Typography>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.6rem', fontWeight: 'bold' }}>{t('brandRise.reports.detail.confidence')}</Typography>
                             </Box>
                         </Stack>
                     </Box>
@@ -303,7 +303,7 @@ export default function ReportDetailPage() {
                             <CardContent sx={{ p: 4 }}>
                                 <Grid container spacing={4}>
                                     <Grid size={{ xs: 12, md: 8 }}>
-                                        <PositioningMapChart data={mapData} />
+                                        <PositioningMapChart data={mapData} t={tr} />
                                     </Grid>
                                     <Grid size={{ xs: 12, md: 4 }} display="flex" flexDirection="column" justifyContent="center">
                                         {/* Insights List */}
@@ -311,10 +311,10 @@ export default function ReportDetailPage() {
                                             <Box>
                                                 <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
                                                     <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }} />
-                                                    <Typography variant="subtitle2" fontWeight="bold" color="text.primary">{ 'Premium Enterprise' }</Typography>
-                                                    <Chip label={ 'HIGH SATURATION' } size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(theme.palette.success.main, 0.1), color: 'success.main', fontWeight: 'bold' }} />
+                                                    <Typography variant="subtitle2" fontWeight="bold" color="text.primary">{tr('premiumEnterprise')}</Typography>
+                                                    <Chip label={tr('highSaturation')} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(theme.palette.success.main, 0.1), color: 'success.main', fontWeight: 'bold' }} />
                                                 </Stack>
-                                                <Typography variant="caption" color="text.secondary">Large agencies targeting Fortune 500 with comprehensive packages.</Typography>
+                                                <Typography variant="caption" color="text.secondary">{tr('premiumEnterpriseDesc')}</Typography>
                                                 <Stack direction="row" spacing={1} mt={1}>
                                                     {['Digital Pro', 'Growth Hub', '+3 more'].map(tag => (
                                                         <Chip key={tag} label={tag} size="small" sx={{ bgcolor: 'action.hover', color: 'text.secondary', fontSize: '0.7rem' }} />
@@ -325,10 +325,10 @@ export default function ReportDetailPage() {
                                             <Box>
                                                 <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
                                                     <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'info.main' }} />
-                                                    <Typography variant="subtitle2" fontWeight="bold" color="text.primary">{ 'Mid-Market Generalist' }</Typography>
-                                                    <Chip label={ 'HIGH SATURATION' } size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(theme.palette.info.main, 0.1), color: 'info.main', fontWeight: 'bold' }} />
+                                                    <Typography variant="subtitle2" fontWeight="bold" color="text.primary">{tr('midMarketGeneralist')}</Typography>
+                                                    <Chip label={tr('highSaturation')} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(theme.palette.info.main, 0.1), color: 'info.main', fontWeight: 'bold' }} />
                                                 </Stack>
-                                                <Typography variant="caption" color="text.secondary">Full-service agencies serving mid-sized businesses with diverse offerings.</Typography>
+                                                <Typography variant="caption" color="text.secondary">{tr('midMarketGeneralistDesc')}</Typography>
                                                 <Stack direction="row" spacing={1} mt={1}>
                                                     {['Marketing Plus', 'Digital Edge', '+4 more'].map(tag => (
                                                         <Chip key={tag} label={tag} size="small" sx={{ bgcolor: 'action.hover', color: 'text.secondary', fontSize: '0.7rem' }} />
@@ -339,10 +339,10 @@ export default function ReportDetailPage() {
                                             <Box>
                                                 <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
                                                     <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'warning.main' }} />
-                                                    <Typography variant="subtitle2" fontWeight="bold" color="text.primary">{ 'Niche Specialist' }</Typography>
-                                                    <Chip label={ 'OPPORTUNITY' } size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(theme.palette.warning.main, 0.1), color: 'warning.main', fontWeight: 'bold' }} />
+                                                    <Typography variant="subtitle2" fontWeight="bold" color="text.primary">{tr('nicheSpecialist')}</Typography>
+                                                    <Chip label={tr('opportunity')} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(theme.palette.warning.main, 0.1), color: 'warning.main', fontWeight: 'bold' }} />
                                                 </Stack>
-                                                <Typography variant="caption" color="text.secondary">Specialized agencies focusing on specific industries with premium positioning.</Typography>
+                                                <Typography variant="caption" color="text.secondary">{tr('nicheSpecialistDesc')}</Typography>
                                                 <Stack direction="row" spacing={1} mt={1}>
                                                     {['Local SEO Pro', '+2 more'].map(tag => (
                                                         <Chip key={tag} label={tag} size="small" sx={{ bgcolor: 'action.hover', color: 'text.secondary', fontSize: '0.7rem' }} />

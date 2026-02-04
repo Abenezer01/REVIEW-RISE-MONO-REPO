@@ -9,10 +9,9 @@ import CardContent from '@mui/material/CardContent'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
+import { useTranslations } from 'next-intl'
 
-import { toast } from 'react-toastify'
-
-import { useTranslation } from '@/hooks/useTranslation'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 interface HashtagResultsProps {
     results: {
@@ -26,12 +25,16 @@ interface HashtagResultsProps {
 }
 
 export default function HashtagResults({ results, onCopyAll, onExport, onRegenerate }: HashtagResultsProps) {
-    const t = useTranslation('studio')
+    const t = useTranslations('studio')
+    const { notify } = useSystemMessages()
     const [activeTab, setActiveTab] = useState<'all' | 'popular' | 'niche' | 'trending'>('all')
 
     const copyHashtag = (tag: string) => {
         navigator.clipboard.writeText(tag)
-        toast.success('Copied!')
+        notify({
+            messageCode: 'COPIED_TO_CLIPBOARD' as any,
+            severity: 'SUCCESS'
+        })
     }
 
     const totalCount = results ? results.core.length + results.niche.length + results.local.length : 0
@@ -133,7 +136,7 @@ export default function HashtagResults({ results, onCopyAll, onExport, onRegener
                                                         {tag}
                                                     </Typography>
                                                     <Typography variant="caption" sx={{ opacity: 0.6 }}>
-                                                        {Math.floor(Math.random() * 500)}M
+                                                        {Math.floor(Math.random() * 500)}{t('hashtags.millionShort')}
                                                     </Typography>
                                                 </Box>
                                             }
@@ -174,7 +177,7 @@ export default function HashtagResults({ results, onCopyAll, onExport, onRegener
                                                         {tag}
                                                     </Typography>
                                                     <Typography variant="caption" sx={{ opacity: 0.6 }}>
-                                                        {Math.floor(Math.random() * 900)}K
+                                                        {Math.floor(Math.random() * 900)}{t('hashtags.thousandShort')}
                                                     </Typography>
                                                 </Box>
                                             }
@@ -215,7 +218,7 @@ export default function HashtagResults({ results, onCopyAll, onExport, onRegener
                                                         {tag}
                                                     </Typography>
                                                     <Typography variant="caption" sx={{ opacity: 0.6 }}>
-                                                        {Math.floor(Math.random() * 50)}K
+                                                        {Math.floor(Math.random() * 50)}{t('hashtags.thousandShort')}
                                                     </Typography>
                                                 </Box>
                                             }

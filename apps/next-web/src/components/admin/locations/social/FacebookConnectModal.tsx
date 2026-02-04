@@ -47,12 +47,11 @@ interface Props {
     loading: boolean;
 }
 
-const steps = ['Authorize', 'Select Page', 'Complete'];
-
 export const FacebookConnectModal = ({ open, onClose, onStartAuth, onConfirmPage, pages, loading }: Props) => {
     const t = useTranslations('social.connections.fbConnect');
+    const tc = useTranslations('common');
     const theme = useTheme();
-    const steps = t.raw('steps');
+    const steps = t.raw('steps') as string[];
     const [activeStep, setActiveStep] = useState(0);
     const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
 
@@ -164,7 +163,7 @@ export const FacebookConnectModal = ({ open, onClose, onStartAuth, onConfirmPage
                                             primary={<Typography variant="subtitle1" fontWeight={600}>{page.name}</Typography>}
                                             secondary={
                                                 <Typography variant="caption" color="text.secondary">
-                                                    ID: {page.id} • {t('followers', { count: Math.floor(Math.random() * 500) })}
+                                                    {tc('common.id')}: {page.id} • {t('followers', { count: Math.floor(Math.random() * 500) })}
                                                 </Typography>
                                             }
                                         />

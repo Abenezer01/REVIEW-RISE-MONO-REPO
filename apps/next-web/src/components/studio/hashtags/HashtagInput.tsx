@@ -53,7 +53,7 @@ export default function HashtagInput({
                             {t('industryLabel')}
                         </Typography>
                         <TextField
-                            placeholder={ 'e.g., Fitness, Fashion, Tech' }
+                            placeholder={t('industryPlaceholder')}
                             value={niche}
                             onChange={(e) => onNicheChange(e.target.value)}
                             fullWidth
@@ -65,7 +65,7 @@ export default function HashtagInput({
                             {t('audienceLabel')}
                         </Typography>
                         <TextField
-                            placeholder={ 'e.g., Young professionals, Millennials' }
+                            placeholder={t('audiencePlaceholder')}
                             value={audience}
                             onChange={(e) => onAudienceChange(e.target.value)}
                             fullWidth

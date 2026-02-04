@@ -107,8 +107,6 @@ export default function SeoAnalyzerPage() {
         return '#f44336' // Red
     }
 
-    const tc = useTranslations('common.common')
-
     return (
         <Box
             sx={{

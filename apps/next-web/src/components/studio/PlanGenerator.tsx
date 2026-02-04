@@ -122,7 +122,7 @@ return {
         }
 
         fetchPosts()
-    }, [businessId])
+    }, [businessId, t])
 
     const handleGenerate = async () => {
         setLoading(true)

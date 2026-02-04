@@ -127,7 +127,7 @@ const AccountDetail = () => {
     }
 
     setLoading(false)
-  }, [t])
+  }, [notify])
 
   useEffect(() => {
     fetchData()

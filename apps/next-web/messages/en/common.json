@@ -15,6 +15,7 @@
     "profiles": "Profiles"
   },
   "common": {
+    "copyright": "© {year}, all rights reserved",
     "apply": "Apply",
     "save": "Save",
     "cancel": "Cancel",
@@ -23,6 +24,8 @@
     "add": "Add",
     "create": "Create",
     "search": "Search",
+    "tags": "Tags",
+    "status": "Status",
     "filter": "Filter",
     "export": "Export",
     "import": "Import",
@@ -53,7 +56,9 @@
     "selectFields": "Select Fields",
     "search-placeholder": "Search...",
     "all": "All",
+    "days": "Days",
     "found": "Found",
+    "id": "ID",
     "confirmDelete": "Are you sure you want to delete this item?"
   },
   "form": {
@@ -201,6 +206,7 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "thisWeek": "This Week",
-    "older": "Older"
+    "older": "Older",
+    "atTime": "{date}, {time}"
   }
 }

@@ -5,32 +5,33 @@ import React from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Card from '@mui/material/Card'
+import { useTranslations } from 'next-intl'
 
 const ART_STYLES = [
     { 
         value: 'Photorealistic', 
-        label: 'Photorealistic', 
+        key: 'styles.photorealistic',
         gradient: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
         icon: 'tabler-camera',
         color: '#667eea'
     },
     { 
         value: 'Digital Art', 
-        label: 'Digital Art', 
+        key: 'styles.digitalArt',
         gradient: 'linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(245, 87, 108, 0.15) 100%)',
         icon: 'tabler-palette',
         color: '#f093fb'
     },
     { 
         value: '3D Render', 
-        label: '3D Render', 
+        key: 'styles.threeDRender',
         gradient: 'linear-gradient(135deg, rgba(79, 172, 254, 0.15) 0%, rgba(0, 242, 254, 0.15) 100%)',
         icon: 'tabler-box',
         color: '#4facfe'
     },
     { 
         value: 'Illustration', 
-        label: 'Illustration', 
+        key: 'styles.illustration',
         gradient: 'linear-gradient(135deg, rgba(67, 233, 123, 0.15) 0%, rgba(56, 249, 215, 0.15) 100%)',
         icon: 'tabler-pencil',
         color: '#43e97b'
@@ -43,10 +44,12 @@ interface ArtStyleSelectorProps {
 }
 
 export default function ArtStyleSelector({ selected, onChange }: ArtStyleSelectorProps) {
+    const t = useTranslations('studio')
+
     return (
         <Box>
             <Typography variant="h6" fontWeight="bold" mb={2}>
-                Choose Art Style
+                {t('images.styleLabel')}
             </Typography>
             <Box sx={{ 
                 display: 'grid', 
@@ -119,7 +122,7 @@ export default function ArtStyleSelector({ selected, onChange }: ArtStyleSelecto
                             }}
                         >
                             <Typography variant="body2" fontWeight="bold" color="text.primary">
-                                {style.label}
+                                {t(`images.${style.key}`)}
                             </Typography>
                         </Box>
                         

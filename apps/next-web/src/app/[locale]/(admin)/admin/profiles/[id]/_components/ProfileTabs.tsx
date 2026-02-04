@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { useTranslations } from 'next-intl';
 
 import { Box, Tabs, Tab } from '@mui/material';
@@ -39,7 +40,9 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   isLoadingLogs
 }) => {
   const t = useTranslations('BrandProfiles.detail.tabs');
-  return (
+
+
+return (
     <Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
         <Tabs

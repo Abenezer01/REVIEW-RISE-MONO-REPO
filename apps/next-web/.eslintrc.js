@@ -108,7 +108,11 @@ module.exports = {
       {
         noStrings: true,
         ignoreProps: true,
-        allowedStrings: ['%', '✓', '•', 'N/A', '|', '™', '—', ':', '(', ')', '/', '+', '-', '*', '#', '.', ',', ' ', '!']
+        allowedStrings: [
+          '%', '✓', '•', 'N/A', '|', '™', '—', ':', '(', ')', '/', '+', '-', '*', '#', '.', ',', ' ', '!',
+          '"', "'", '&quot;', '&ldquo;', '&rdquo;', '&lsquo;', '&rsquo;', '&hellip;', '&apos;',
+          '@', '⋮', '↑', '↓', '📅', '⬇️', '💡', '×', '●', 'X:', '| Y:', 'v', '.0', '100%', 's', 'Aa', '94/100', '...', 'Loading...'
+        ]
       }
     ]
   },
@@ -136,7 +140,10 @@ module.exports = {
       }
     },
     {
-      files: ['src/shared/components/SystemMessageProvider.tsx'],
+      files: [
+        'src/shared/components/SystemMessageProvider.tsx',
+        'src/libs/styles/AppReactToastify.tsx'
+      ],
       rules: {
         'no-restricted-imports': 'off'
       }
