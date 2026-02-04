@@ -51,3 +51,5 @@ npm-debug.log*
 # --------------------
 /nginx/certbot
 /nginx/ssl
+
+.agent
