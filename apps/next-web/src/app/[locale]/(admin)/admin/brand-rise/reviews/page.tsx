@@ -47,6 +47,8 @@ const ReviewsPage = () => {
   const { notify } = useSystemMessages();
   const theme = useTheme();
   const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
+  const ts = useTranslations('status');
   const { businessId } = useBusinessId();
   const { locationId } = useLocationFilter();
   const { user } = useAuth();
@@ -169,10 +171,10 @@ const ReviewsPage = () => {
 
   // Helper for sentiment color/label
   const getSentimentInfo = (rating: number) => {
-      if (rating >= 4) return { label: 'Positive', color: 'success' };
-      if (rating === 3) return { label: 'Neutral', color: 'warning' };
+      if (rating >= 4) return { label: t('reviews.positive'), color: 'success' };
+      if (rating === 3) return { label: t('reviews.neutral'), color: 'warning' };
       
-      return { label: 'Negative', color: 'error' };
+      return { label: t('reviews.negative'), color: 'error' };
   };
 
   const responseRate = (reviews || []).length > 0 
@@ -248,12 +250,12 @@ const ReviewsPage = () => {
                 id="reviews-tabs"
               >
                 <Tab 
-                  label={t('common.all')}
+                  label={tc('common.all')}
                   id="reviews-tab-all"
                   aria-controls="reviews-tabpanel-all"
                 />
                 <Tab 
-                  label={t('status.pending_approval')}
+                  label={ts('pending_approval')}
                   id="reviews-tab-pending"
                   aria-controls="reviews-tabpanel-pending"
                 />
@@ -300,7 +302,7 @@ const ReviewsPage = () => {
                                    <Rating value={review.rating} readOnly size="small" />
                                 </Box>
                                 
-                                <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.6 }}>{review.content || 'No content'}</Typography>
+                                <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.6 }}>{review.content || t('reviews.smart.noContent')}</Typography>
                                 
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                    <Box sx={{ display: 'flex', gap: 1 }}>
@@ -326,7 +328,7 @@ const ReviewsPage = () => {
                                        />
                                        {isPending && (
                                          <Chip 
-                                            label={t('status.pending_approval')}
+                                            label={ts('pending_approval')}
                                             size="small" 
                                             color="info"
                                             variant="outlined"

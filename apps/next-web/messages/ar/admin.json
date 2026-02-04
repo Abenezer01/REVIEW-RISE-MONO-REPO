@@ -1,4 +1,14 @@
 {
+  "dashboard": {
+    "kpi": {
+      "title": "مؤشرات الأداء الرئيسية للمسؤول",
+      "refreshedJustNow": "تم التحديث الآن",
+      "totalAccounts": "إجمالي الحسابات",
+      "activeLocations": "المواقع النشطة",
+      "failedJobs24h": "الوظائف الفاشلة خلال الـ 24 ساعة الماضية",
+      "subscriptionIssues": "مشاكل الاشتراك"
+    }
+  },
   "featureFlags": {
     "title": "أعلام الميزات",
     "subtitle": "إدارة أعلام الميزات العالمية والمبدلات",

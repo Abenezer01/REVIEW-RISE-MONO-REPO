@@ -25,6 +25,7 @@ interface DiscoveryInputProps {
 
 export const DiscoveryInput = ({ onDiscover, isLoading }: DiscoveryInputProps) => {
   const t = useTranslations('dashboard');
+  const ts = useTranslations('status');
   const theme = useTheme();
   const [inputValue, setInputValue] = useState('');
 
@@ -65,7 +66,7 @@ export const DiscoveryInput = ({ onDiscover, isLoading }: DiscoveryInputProps) =
       {/* AI-Powered Badge */}
       <Badge
         icon={<AutoAwesomeIcon sx={{ fontSize: 16 }} />}
-        label="AI-Powered"
+        label={ts('aiPowered')}
         size="small"
         sx={{
           position: 'absolute',
@@ -162,7 +163,7 @@ export const DiscoveryInput = ({ onDiscover, isLoading }: DiscoveryInputProps) =
           }
         }}
       >
-        {isLoading ? t('brandRise.competitors.discovering') : 'Discover Competitors'}
+        {isLoading ? t('brandRise.competitors.discovering') : t('brandRise.competitors.discoverBtn')}
       </Button>
     </Card>
   );

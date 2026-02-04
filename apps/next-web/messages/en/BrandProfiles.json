@@ -1,6 +1,12 @@
 {
   "title": "Brand Profiles",
   "description": "Manage and extract visual identities from brand websites.",
+  "metrics": {
+    "colors": "Colors",
+    "fonts": "Fonts",
+    "assets": "Assets",
+    "social": "Social Links"
+  },
   "tabs": {
     "allProfiles": "All Profiles",
     "addNew": "Add New"

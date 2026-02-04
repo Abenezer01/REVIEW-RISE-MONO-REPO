@@ -1,5 +1,7 @@
 {
   "system": {
+    "title": "System Settings",
+    "subtitle": "Configure global system parameters",
     "siteConfig": "Site Configuration",
     "siteName": "Site Name",
     "siteTitle": "Site Title",
@@ -13,11 +15,14 @@
     "defaultTimezone": "Default Timezone",
     "emailSmtpConfig": "Email/SMTP Configuration",
     "smtpHost": "SMTP Host",
+    "smtpHostPlaceholder": "smtp.gmail.com",
     "smtpPort": "SMTP Port",
     "smtpUsername": "SMTP Username",
     "smtpPassword": "SMTP Password",
     "fromEmail": "From Email",
+    "fromEmailPlaceholder": "noreply@example.com",
     "fromName": "From Name",
+    "fromNamePlaceholder": "RiseReview",
     "securitySettings": "Security Settings",
     "sessionTimeout": "Session Timeout (minutes)",
     "minPasswordLength": "Minimum Password Length",

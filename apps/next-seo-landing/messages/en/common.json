@@ -1,7 +1,8 @@
 {
   "landing": {
     "common": {
-      "brandName": "ReviewRise"
+      "brandName": "ReviewRise",
+      "toggleTheme": "Toggle theme"
     },
     "header": {
       "features": "Features"
