@@ -15,6 +15,7 @@
     "profiles": "الملفات الشخصية"
   },
   "common": {
+    "copyright": "© {year}، جميع الحقوق محفوظة",
     "apply": "تطبيق",
     "save": "حفظ",
     "cancel": "إلغاء",
@@ -23,6 +24,8 @@
     "add": "إضافة",
     "create": "إنشاء",
     "search": "بحث",
+    "tags": "الوسوم",
+    "status": "الحالة",
     "filter": "تصفية",
     "export": "تصدير",
     "import": "استيراد",
@@ -203,6 +206,7 @@
     "today": "اليوم",
     "yesterday": "أمس",
     "thisWeek": "هذا الأسبوع",
-    "older": "أقدم"
+    "older": "أقدم",
+    "atTime": "{date}، {time}"
   }
 }

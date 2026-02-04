@@ -47,6 +47,12 @@
     "connectToSync": "اتصل بمصدر لبدء المزامنة",
     "noSourcesYet": "لا توجد مصادر متصلة بعد.",
     "availableSources": "المصادر المتاحة",
+    "facebook": "مراجعات فيسبوك",
+    "facebookDesc": "مزامنة المراجعات من صفحات فيسبوك التجارية",
+    "trustpilot": "ترست بايلوت",
+    "trustpilotDesc": "استيراد المراجعات من ترست بايلوت",
+    "yelp": "ييلب للأعمال",
+    "yelpDesc": "مزامنة المراجعات من ييلب",
     "googleBusiness": "ملف Google التجاري",
     "connectToSyncReviews": "اتصل لمزامنة المراجعات",
     "connect": "اتصال",
@@ -85,7 +91,15 @@
       "selectTitle": "اختر المواقع للربط",
       "reviewsCount": "{count} مراجعات",
       "secure": "اتصال OAuth 2.0 آمن",
-      "connectBtn": "الاتصال بـ Google"
+      "connectBtn": "الاتصال بـ Google",
+      "mockData": {
+        "downtownOffice": "مكتب وسط المدينة",
+        "downtownAddress": "123 شارع رئيسي، سان فرانسيسكو، CA 94102",
+        "westsideBranch": "فرع الجانب الغربي",
+        "westsideAddress": "456 شارع أوك، سان فرانسيسكو، CA 94115"
+      },
+      "mockDuration": "دقيقتان و34 ثانية",
+      "mockTime": "2:00 صباحاً"
     }
   }
 }
