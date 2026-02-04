@@ -28,6 +28,19 @@
     "brand-rise": "براند رايز",
     "content-templates": "قوالب المحتوى",
     "seasonal-events": "الأحداث الموسمية",
+    "seasonalEvents": {
+      "title": "الأحداث الموسمية",
+      "subtitle": "إدارة الأحداث الموسمية لعلامتك التجارية وجدول التسويق للعطلات.",
+      "addEvent": "إضافة حدث",
+      "editEvent": "تعديل الحدث الموسمي",
+      "addNewEvent": "إضافة حدث جديد",
+      "eventName": "اسم الحدث",
+      "date": "التاريخ",
+      "market": "السوق",
+      "description": "الوصف",
+      "deleteTitle": "حذف الحدث الموسمي",
+      "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذا الحدث الموسمي؟ لا يمكن التراجع عن هذا الإجراء."
+    },
     "settings": "الإعدادات",
     "system-settings": "إعدادات النظام",
     "feature-flags": "أعلام الميزات",
@@ -49,6 +62,14 @@
       "mapPack": "وضوح Map Pack",
       "shareOfVoice": "حصة الصوت",
       "loading": "جاري تحميل المخطط...",
+      "mapPackAppearances": "{count} ظهور",
+      "weightedByVolume": "مرجح بالحجم",
+      "organicTitle": "التصنيفات العضوية",
+      "top10": "أعلى 10:",
+      "top20": "أعلى 20:",
+      "serpFeaturesTitle": "ميزات SERP",
+      "local": "محلي:",
+      "snippets": "مقتطفات:",
       "trendsTitle": "اتجاهات الظهور (30 يومًا)",
       "rankingHistory": "سجل ترتيب الكلمات الرئيسية",
       "trackedKeywords": "الكلمات الرئيسية المتتبعة",
@@ -59,6 +80,29 @@
         "mapPack": "Map Pack",
         "historyTitle": "سجل الترتيب"
       }
+    },
+    "keywords": {
+      "formTitle": "كلمة سيو الرئيسية",
+      "keyword": "الكلمة الرئيسية",
+      "language": "اللغة",
+      "device": "الجهاز",
+      "mobile": "جوال",
+      "desktop": "سطح المكتب",
+      "city": "المدينة",
+      "country": "البلد",
+      "tags": "الوسوم (مفصولة بفاصلة)",
+      "autoSuggest": "اقتراح تلقائي",
+      "autoSuggested": "مقترح تلقائيًا",
+      "harvestCompetitor": "حصاد المنافس",
+      "competitorHarvest": "حصاد المنافسين",
+      "competitorDomain": "نطاق المنافس",
+      "use": "استخدام",
+      "rank": "الترتيب",
+      "mapPack": "Map Pack",
+      "change": "التغيير",
+      "volume": "الحجم",
+      "kd": "صعوبة الكلمة %",
+      "viewHistory": "عرض سجل الترتيب"
     }
   },
   "autoReply": {
@@ -136,6 +180,9 @@
   "reviews": {
     "title": "المراجعات",
     "recent": "المراجعات الأخيرة",
+    "unrepliedCount": "{count} لم يتم الرد عليه",
+    "recentRepliesCount": "{count} ردود حديثة",
+    "noRecent": "لا توجد مراجعات حديثة",
     "positive": "إيجابي",
     "negative": "سلبي",
     "neutral": "محايد",
@@ -424,11 +471,317 @@
       "initialInfo": "أدخل عنوان URL أعلاه لتحليل ظهور الذكاء الاصطناعي والحصول على نصائح التحسين.",
       "analysisCompleteScore": "اكتمل التحليل! حققت علامتك التجارية درجة ظهور بلغت {score}%.",
       "analysisComplete": "اكتمل التحليل!"
+    },
+    "validation": {
+      "title": "تحليل الجاهزية التقنية",
+      "subtitle": "التحقق من مدى قدرة زواحف الذكاء الاصطناعي على الوصول إلى موقعك وتفسيره",
+      "readyForAI": "جاهز للذكاء الاصطناعي",
+      "perfectOptimized": "موقعك محسّن تمامًا لاكتشاف الذكاء الاصطناعي!",
+      "technicalIssues": "قد تمنع بعض المشكلات التقنية نماذج الذكاء الاصطناعي من فهرسة علامتك التجارية بالكامل.",
+      "accessibility": "سهولة الوصول",
+      "botPermissions": "أذونات البوتات",
+      "seoFoundations": "أساسيات السيو",
+      "checks": {
+        "publicAccess": "الوصول العام",
+        "noLoginWall": "لا يوجد جدار تسجيل دخول",
+        "noIpBlocks": "لا توجد كتل IP",
+        "botFriendly": "صديق للبوتات",
+        "robotsTxt": "robots.txt (بوتات الذكاء الاصطناعي)",
+        "crawlRate": "معدل الزحف محسّن",
+        "validHtml": "HTML5 صالح",
+        "semanticSchema": "مخطط دلالي",
+        "sitemap": "Sitemap.xml",
+        "cleanUrls": "هيكل عناوين URL نظيف"
+      }
+    },
+    "tips": {
+      "title": "نصائح التحسين",
+      "subtitle": "اقتراحات قابلة للتنفيذ لتحسين ظهور الذكاء الاصطناعي",
+      "impact": {
+        "High": "عالٍ",
+        "Medium": "متوسط",
+        "Low": "منخفض"
+      }
+    },
+    "overview": {
+      "visibilityScore": "درجة الظهور",
+      "visibilityTooltip": "الوجود العام لعلامتك التجارية عبر نماذج الذكاء الاصطناعي الرئيسية (ChatGPT، Gemini، إلخ) بناءً على تكرار الذكر.",
+      "visibilityFooter": "وجود العلامة التجارية بالذكاء الاصطناعي",
+      "sentiment": "المشاعر",
+      "sentimentTooltip": "النغمة العاطفية للاستجابات المولدة بالذكاء الاصطناعي حول علامتك التجارية، تتراوح من سلبية إلى إيجابية.",
+      "sentimentFooter": "تصور العلامة التجارية بالذكاء الاصطناعي",
+      "shareOfVoice": "حصة الصوت",
+      "shareOfVoiceTooltip": "النسبة المئوية لذكر علامتك التجارية مقارنة بإجمالي مراجعات الصناعة/السياق في إجابات الذكاء الاصطناعي.",
+      "shareOfVoiceFooter": "نسبة الذكر",
+      "authority": "السلطة",
+      "authorityTooltip": "جودة وموثوقية المصادر التي تستخدمها نماذج الذكاء الاصطناعي للتحقق من المعلومات حول علامتك التجارية.",
+      "authorityFooter": "جدارة المصدر بالثقة",
+      "readiness": "الجاهزية",
+      "readinessTooltip": "إمكانية الوصول التقنية لزواحف الذكاء الاصطناعي (robots.txt، السيو، الوصول العام).",
+      "readinessFooter": "إمكانية الوصول لزواحف الذكاء الاصطناعي"
+    },
+    "input": {
+      "title": "تحليل ظهور العلامة التجارية بالذكاء الاصطناعي",
+      "subtitle": "أدخل عنوان URL لموقع علامتك التجارية لتحليل وجودها عبر منصات الذكاء الاصطناعي الرئيسية مثل ChatGPT وGemini وClaude.",
+      "label": "عنوان URL لموقع العلامة التجارية",
+      "placeholder": "مثلاً https://yourbrand.com",
+      "helper": "أدخل عنوان URL الكامل بما في ذلك https://",
+      "tryExample": "جرب مثالاً:",
+      "analyzing": "جاري التحليل...",
+      "analyze": "تحليل"
+    },
+    "platformBreakdown": {
+      "title": "الأداء حسب منصة الذكاء الاصطناعي",
+      "subheader": "كيف تدرك نماذج اللغة الكبيرة (LLMs) المختلفة علامتك التجارية",
+      "columns": {
+        "platform": "المنصة",
+        "status": "الحالة",
+        "sentiment": "المشاعر",
+        "sourcesCited": "المصادر المذكورة"
+      },
+      "status": {
+        "mentioned": "مذكورة",
+        "notFound": "غير موجودة"
+      }
+    }
+  },
+  "jobs": {
+    "failed": {
+      "title": "إدارة المهام الفاشلة",
+      "subtitle": "مراقبة والتحقيق وإعادة محاولة المهام الخلفية الفاشلة",
+      "jobsFound": "تم العثور على {count} مهام",
+      "searchPlaceholder": "البحث حسب المعرف أو الخطأ...",
+      "filterByType": "تصفية حسب النوع",
+      "allTypes": "كل الأنواع",
+      "exportCsv": "تصدير CSV",
+      "csv": {
+        "jobId": "معرف المهمة",
+        "type": "النوع",
+        "business": "العمل",
+        "errorDetails": "تفاصيل الخطأ",
+        "retries": "المحاولات",
+        "createdAt": "تاريخ الإنشاء"
+      },
+      "types": {
+        "reviews": "المراجعات",
+        "social_posts": "منشورات التواصل الاجتماعي",
+        "seo_crawls": "زحف السيو",
+        "ai_tasks": "مهام الذكاء الاصطناعي"
+      },
+      "actions": {
+        "viewDetails": "عرض التفاصيل",
+        "retryJob": "إعادة محاولة المهمة",
+        "resolvedByAdmin": "تم الحل بواسطة المسؤول",
+        "ignoredByAdmin": "تم التجاهل بواسطة المسؤول"
+      }
+    },
+    "social": {
+      "title": "سجلات منشورات التواصل الاجتماعي",
+      "subtitle": "مراقبة وإدارة مهام النشر على وسائل التواصل الاجتماعي",
+      "postsCount": "{count} منشورات",
+      "searchPlaceholder": "البحث في الحساب أو الموقع...",
+      "searchLabel": "البحث في الحساب أو الموقع",
+      "allStatuses": "كل الحالات",
+      "allChannels": "كل القنوات",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "columns": {
+        "id": "معرف المهمة",
+        "account": "الحساب",
+        "channel": "القناة",
+        "type": "النوع",
+        "status": "الحالة",
+        "scheduledFor": "مجدول لـ",
+        "publishedAt": "نُشر في",
+        "actions": "الإجراءات"
+      },
+      "types": {
+        "organic": "عضوي",
+        "paid": "مدفوع"
+      },
+      "locations": {
+        "all": "كل المواقع"
+      },
+      "detail": {
+        "title": "تفاصيل المهمة",
+        "configuration": "التكوين",
+        "jobType": "نوع المهمة",
+        "business": "العمل",
+        "location": "الموقع",
+        "executionTiming": "التنفيذ والتوقيت",
+        "createdAt": "تاريخ الإنشاء",
+        "failedAt": "فشل في",
+        "retryCount": "عدد المحاولات",
+        "ofMaxRetries": "من {max} حد أقصى",
+        "errorDetails": "تفاصيل الخطأ",
+        "payload": "الحمولة",
+        "resultMetadata": "النتيجة / البيانات الوصفية",
+        "close": "إغلاق",
+        "ignore": "تجاهل",
+        "resolve": "حل",
+        "retryJob": "إعادة محاولة المهمة",
+        "id": "المعرف"
+      },
+      "socialDetail": {
+        "title": "تفاصيل منشور التواصل الاجتماعي",
+        "jobId": "معرف المهمة",
+        "mobilePreview": "معاينة الجوال",
+        "noContent": "لا يوجد محتوى نصي",
+        "justNow": "الآن",
+        "jobInfo": "معلومات المهمة",
+        "currentStatus": "الحالة الحالية",
+        "errorMessage": "رسالة الخطأ",
+        "unknownError": "حدث خطأ غير معروف",
+        "targetPlatform": "المنصة المستهدفة",
+        "accountDetails": "تفاصيل الحساب",
+        "accountName": "اسم الحساب",
+        "postType": "نوع المنشور",
+        "closeDetail": "إغلاق التفاصيل"
+      }
+    },
+    "reviewSync": {
+      "title": "سجلات مزامنة المراجعات",
+      "subtitle": "مراقبة وتصحيح مهام مزامنة المراجعات",
+      "logsCount": "{count} سجلات",
+      "searchLabel": "البحث في الحساب أو المعرف",
+      "searchPlaceholder": "بحث...",
+      "allStatuses": "كل الحالات",
+      "allProviders": "كل المزودين",
+      "columns": {
+        "logId": "معرف السجل",
+        "account": "الحساب",
+        "provider": "المزود",
+        "status": "الحالة",
+        "synced": "تمت المزامنة",
+        "duration": "المدة",
+        "date": "التاريخ",
+        "actions": "الإجراءات"
+      },
+      "empty": {
+        "title": "لا توجد سجلات مزامنة مراجعات",
+        "description": "لا توجد سجلات مزامنة مراجعات تطابق معاييرك."
+      },
+      "detail": {
+        "title": "تفاصيل مزامنة المراجعات",
+        "logId": "معرف السجل",
+        "syncInfo": "معلومات المزامنة",
+        "currentStatus": "الحالة الحالية",
+        "retryingBackground": "إعادة المحاولة في الخلفية...",
+        "retryJob": "إعادة محاولة المهمة",
+        "reviewsSynced": "المراجعات التي تمت مزامنتها",
+        "retryAttempts": "محاولات إعادة المحاولة",
+        "duration": "المدة",
+        "errorDetails": "تفاصيل الخطأ",
+        "technicalData": "البيانات التقنية",
+        "accountDetails": "تفاصيل الحساب",
+        "syncResponse": "استجابة المزامنة",
+        "requestData": "بيانات الطلب",
+        "timestamps": "الطوابع الزمنية",
+        "created": "تم الإنشاء",
+        "started": "بدأ",
+        "completed": "اكتمل",
+        "closeDetail": "إغلاق التفاصيل"
+      }
     }
   },
   "brandRise": {
     "subtitle": "رؤى أداء وظهور العلامة التجارية",
+    "recommendations": {
+      "actionableCount": "{count} توصيات قابلة للتنفيذ مرتبة حسب التأثير",
+      "generateNew": "توليد جديد",
+      "sortPriority": "ترتيب: درجة الأولوية",
+      "noFound": "لم يتم العثور على توصيات تطابق الفلتر.",
+      "priorityScore": "درجة الأولوية: {score}",
+      "effort": "الجهد",
+      "targetKPI": "KPI المستهدف",
+      "localSEO": "السيو المحلي",
+      "reputation": "السمعة",
+      "optimization": "التحسين",
+      "whyTitle": "لماذا هذا مهم",
+      "actionSteps": "خطوات العمل",
+      "startTask": "بدء المهمة",
+      "markComplete": "تحديد كمكتمل",
+      "hideSteps": "إخفاء الخطوات",
+      "viewStepsCount": "عرض الخطوات ({count})",
+      "generatedTime": "تم التوليد {time}",
+      "aiStrategist": "استراتيجي الذكاء الاصطناعي"
+    },
+    "overview": {
+      "visibilityScore": "درجة الظهور",
+      "trustScore": "درجة الثقة",
+      "consistencyScore": "درجة الاتساق",
+      "competitivePosition": "المركز التنافسي",
+      "vsLastPeriod": "مقابل الفترة السابقة",
+      "fromLastPeriod": "من الفترة السابقة",
+      "ofCompetitors": "من {count} منافسين",
+      "visibilityTrend": "اتجاه الظهور",
+      "last30Days": "أداء آخر 30 يومًا",
+      "visibilityBreakdown": "تفاصيل الظهور",
+      "byChannel": "حسب القناة",
+      "channels": {
+        "organic": "البحث العضوي",
+        "maps": "الخرائط المحلية",
+        "social": "وسائل التواصل الاجتماعي",
+        "reviews": "المراجعات"
+      },
+      "insights": {
+        "title": "رؤى رئيسية",
+        "subtitle": "توصيات مدعومة بالذكاء الاصطناعي",
+        "aiGenerated": "مولد بالذكاء الاصطناعي",
+        "visibilityIncrease": "زادت رؤيتك المحلية بنسبة 18% هذا الشهر",
+        "visibilityIncreaseDesc": "فكر في الاستثمار أكثر في استراتيجيات السيو المحلي.",
+        "sentimentPositive": "تتجه مشاعر المراجعات بشكل إيجابي",
+        "sentimentPositiveDesc": "عمل رائع! استمر في مشاركة العملاء."
+      },
+      "activity": {
+        "newReview": "تم استلام مراجعة جديدة",
+        "competitorAdded": "تم إضافة منافس",
+        "scoreUpdated": "تم تحديث درجة الظهور",
+        "hoursAgo": "قبل {count} ساعة",
+        "daysAgo": "قبل {count} يوم"
+      }
+    },
+    "reviews": {
+      "sentimentScore": "درجة المشاعر",
+      "positiveSentiment": "مشاعر إيجابية",
+      "velocity": "سرعة المراجعات",
+      "volumeOverTime": "حجم المراجعات بمرور الوقت",
+      "sentiment": "توزيع المشاعر",
+      "sentimentModel": "نموذج المشاعر",
+      "pendingAIReply": "ردود الذكاء الاصطناعي المعلقة",
+      "latestFeedback": "أحدث ملاحظات العملاء عبر جميع المنصات",
+      "waitingApproval": "المراجعات التي تنتظر الموافقة على رد الذكاء الاصطناعي قبل النشر",
+      "reviewPost": "مراجعة ونشر",
+      "themesTitle": "مواضيع المراجعات والكلمات الرئيسية",
+      "themesSubtitle": "المواضيع المتكررة في ملاحظات العملاء",
+      "recent": "المراجعات الأخيرة"
+    },
+    "tabs": {
+      "overview": "نظرة عامة",
+      "visibility": "خطة الظهور",
+      "recommendations": "التوصيات",
+      "dna": "DNA العلامة التجارية",
+      "competitors": "المنافسون",
+      "planner": "المخطط الشهري",
+      "content": "المحتوى والرسائل",
+      "reviews": "المراجعات والسمعة",
+      "reports": "التقارير"
+    },
     "reports": {
+      "title": "تقارير فرص العلامة التجارية",
+      "subtitle": "تحليل مدفوع بالذكاء الاصطناعي للفجوات والاستراتيجيات والتموضع.",
+      "generate": "توليد تقرير بالذكاء الاصطناعي",
+      "generating": "جاري التوليد...",
+      "viewInsights": "عرض الرؤى",
+      "share": "مشاركة",
+      "exportPdf": "تصدير PDF",
+      "noReports": "لم يتم إنشاء تقارير بعد. انقر فوق \"توليد تقرير بالذكاء الاصطناعي\" للبدء.",
+      "columns": {
+        "date": "تاريخ التقرير",
+        "status": "الحالة",
+        "id": "المعرف",
+        "actions": "الإجراءات"
+      },
       "detail": {
         "title": "تقرير الاستراتيجية",
         "subtitle": "الفرص والرؤى المولدة بالذكاء الاصطناعي",
@@ -451,6 +804,40 @@
         "yAxisLabel": "| ص: {label}"
       }
     },
+    "content": {
+      "title": "إدارة المحتوى",
+      "calendar": "تقويم المحتوى",
+      "add": "إضافة محتوى",
+      "ideas": "أفكار المحتوى",
+      "logs": "سجلات النشر",
+      "templatesDesc": "إدارة وتخصيص قوالب توليد المحتوى المدعومة بالذكاء الاصطناعي لعلامتك التجارية.",
+      "addTemplate": "إضافة قالب",
+      "editTemplate": "تعديل قالب المحتوى",
+      "createTemplate": "إنشاء قالب جديد",
+      "templateTitle": "عنوان القالب",
+      "templateTitlePlaceholder": "مثلاً: تسليط الضوء على عرض الأسبوع",
+      "industry": "الصناعة",
+      "contentType": "نوع المحتوى",
+      "contentStructure": "هيكل المحتوى",
+      "contentStructurePlaceholder": "صف كيف يجب أن يكون هيكل المحتوى...",
+      "contentStructureHelper": "نصيحة: استخدم [Placeholders] للمحتوى الديناميكي مثل [Business Name] أو [Offer].",
+      "deleteTemplateTitle": "حذف قالب المحتوى",
+      "deleteTemplateConfirm": "هل أنت متأكد أنك تريد حذف قالب المحتوى هذا؟ لا يمكن التراجع عن هذا الإجراء."
+    },
+    "dna": {
+      "summary": "ملخص هوية العلامة التجارية",
+      "pageDesc": "هوية علامتك التجارية الأساسية وصوتها وإرشادات الرسائل في لمحة",
+      "voice": "صوت العلامة التجارية",
+      "defaultVoice": "مهني ولكن ودود. نتواصل بوضوح وثقة، مما يجعل التكنولوجيا المعقدة متاحة للجميع. نبرتنا ودودة ومعرفية وتمكينية.",
+      "voiceGuidelines": "نتجنب المصطلحات المعقدة ونتحدث مباشرة إلى احتياجات عملائنا، مع الحفاظ دائمًا على الأصالة والشفافية في اتصالاتنا.",
+      "audience": "الجمهور المستهدف",
+      "defaultAudience": "الشركات الصغيرة إلى المتوسطة التي تتطلع إلى تبسيط عملياتها والتوسع بكفاءة. صناع القرار الذين يقدرون الابتكار والموثوقية ودعم العملاء الاستثنائي.",
+      "messages": "الرسائل الرئيسية",
+      "toneKeywords": "كلمات النبرة الرئيسية",
+      "needDetails": "هل تحتاج إلى مزيد من التفاصيل؟",
+      "accessGuidelines": "الوصول إلى وثيقة Brand DNA الكاملة مع إرشادات مفصلة وأمثلة وأفضل الممارسات",
+      "viewFull": "عرض Brand DNA الكامل"
+    },
     "competitors": {
       "tracking": "تتبع المنافسين",
       "exportList": "تصدير القائمة",
@@ -463,7 +850,35 @@
       "analyzing": "جاري التحليل...",
       "noAnalysis": "لا يوجد تحليل مفصل متاح بعد.",
       "noCompetitors": "لا يوجد منافسون متتبعون بعد. أضف واحداً أعلاه.",
+      "uvp": "UVP",
+      "services": "الخدمات",
+      "analysis": "التحليل",
       "listTitle": "المنافسون المتتبعون",
+      "addTitle": "إضافة منافس",
+      "nameLabel": "اسم المنافس",
+      "ratingLabel": "متوسط التقييم (1-5)",
+      "totalReviewsLabel": "إجمالي المراجعات",
+      "adding": "جاري الإضافة...",
+      "toast": {
+        "discoverySuccess": "تم اكتشاف المنافسين بنجاح",
+        "discoveryError": "فشل في اكتشاف المنافسين",
+        "addedSuccess": "تم تتبع المنافس بنجاح",
+        "removedSuccess": "تمت إزالة المنافس",
+        "analysisStarted": "بدأ التحليل",
+        "analysisFailed": "فشل التحليل"
+      },
+      "discoveryProgress": {
+        "title": "الاكتشاف قيد التنفيذ",
+        "subtitle": "جاري تحليل بيانات SERP...",
+        "steps": {
+          "keywords": "تم تحليل الكلمات الرئيسية",
+          "domains": "تم استخراج النطاقات",
+          "classifying": "تصنيف المنافسين",
+          "ranking": "ترتيب النتائج"
+        }
+      },
+      "strategy": "الاستراتيجية: {value}",
+      "learn": "تعلم: {value}",
       "detail": {
         "analysisTitle": "تحليل المنافسين",
         "insightsFrom": "رؤى عميقة من {name}",
@@ -508,6 +923,94 @@
         "noneIdentified": "لم يتم تحديد شيء.",
         "none": "لا يوجد"
       }
+    },
+    "jobs": {
+      "title": "مهام وتقارير الذكاء الاصطناعي",
+      "subtitle": "مراقبة مهام عمال الذكاء الاصطناعي وتحميل التقارير المولدة",
+      "activeJobs": "المهام النشطة ({count})",
+      "reportsLibrary": "مكتبة التقارير ({count})",
+      "activeJobsTitle": "مهام الذكاء الاصطناعي النشطة",
+      "autoRefresh": "تحديث تلقائي: 30 ثانية",
+      "running": "جاري التشغيل",
+      "completed": "مكتمل",
+      "failed": "فاشل",
+      "analyzing": "جاري تحليل بيانات العلامة التجارية ورؤى المنافسين...",
+      "success": "تم توليد التقرير بنجاح",
+      "started": "بدأ",
+      "estimatedTime": "الوقت المقدر",
+      "brand": "العلامة التجارية",
+      "jobId": "معرف المهمة",
+      "duration": "المدة",
+      "output": "المخرجات",
+      "failedAt": "فشل في",
+      "retryCount": "عدد المحاولات",
+      "target": "الهدف",
+      "viewReport": "عرض التقرير",
+      "clear": "مسح",
+      "retryJob": "إعادة محاولة المهمة",
+      "viewLogs": "عرض السجلات",
+      "availableGenerators": "المولدات المتاحة",
+      "generateBtn": "توليد الخطة",
+      "generatingBtn": "جاري التوليد...",
+      "generatedReports": "التقارير المولدة",
+      "new": "جديد",
+      "generated": "تم التوليد",
+      "version": "الإصدار",
+      "pages": "الصفحات",
+      "pagesCount": "{count} صفحات",
+      "download": "تحميل",
+      "preview": "معاينة"
+    },
+    "visibilityPlan": {
+      "title": "خطة الظهور",
+      "subtitle": "قم بتوليد خارطة طريق مدتها 30 يومًا مدعومة بالبيانات ومصممة خصيصًا لـ DNA علامتك التجارية الفريد. تفوق على المنافسين بخطوات قابلة للتنفيذ.",
+      "backToDashboard": "العودة إلى لوحة القيادة",
+      "launchTitle": "عزز ظهورك في 30 يومًا",
+      "noActivePlan": "لم يتم العثور على خطة",
+      "noActivePlanDesc": "قم بتوليد خطة ظهور من لوحة القيادة للبدء.",
+      "sharePlan": "مشاركة الخطة",
+      "exportPlan": "تصدير الخطة",
+      "totalTasks": "إجمالي المهام",
+      "completed": "مكتمل",
+      "weeks": "أسابيع",
+      "complete": "مكتمل",
+      "daysRemaining": "متبقي {days} يوم",
+      "weeklyActionPlan": "خطة العمل الأسبوعية",
+      "weekHeader": "الأسبوع {number}: {focus}",
+      "statusCompleted": "مكتمل",
+      "statusInProgress": "قيد التنفيذ",
+      "tasksCount": "{completed}/{total} مهام",
+      "goals30Day": "أهداف 30 يومًا",
+      "helpfulResources": "موارد مفيدة",
+      "current": "الحالي: {value}",
+      "target": "المستهدف: {value}",
+      "viewGuide": "عرض الدليل",
+      "resources": {
+        "seo": {
+          "title": "دليل أفضل ممارسات السيو",
+          "desc": "دليل كامل لتحسين المحتوى لمحركات البحث"
+        },
+        "social": {
+          "title": "ماستركلاس وسائل التواصل الاجتماعي",
+          "desc": "دروس فيديو حول إنشاء محتوى اجتماعي جذاب"
+        },
+        "content": {
+          "title": "مولد أفكار المحتوى",
+          "desc": "أداة مدعومة بالذكاء الاصطناعي لتوليد أفكار محتوى لعلامتك التجارية"
+        }
+      },
+      "generateBtn": "توليد المخطط لـ 30 يومًا",
+      "generatingBtn": "جاري صياغة استراتيجيتك...",
+      "dayTimeline": "الجدول الزمني لليوم",
+      "week": "الأسبوع {number}: {focus}",
+      "estHours": "{hours} ساعة مقدرة",
+      "successMetrics": "مقاييس النجاح",
+      "kpiTargets": "أهداف KPI لهذه الخطة",
+      "targetBy": "المستهدف بحلول {timeframe}",
+      "metricsInfo": "تساعد المقاييس في تتبع فعالية هذه الخطة.",
+      "expectedOutcomes": "النتائج المتوقعة",
+      "regenerate": "إعادة توليد الخطة",
+      "mockDateRange": "1-7 فبراير 2024"
     }
   }
 }

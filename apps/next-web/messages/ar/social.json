@@ -83,6 +83,7 @@
       "connectedDaysAgo": "تم الاتصال قبل {days} يوم",
       "lastSyncedHoursAgo": "آخر مزامنة قبل {hours} ساعة",
       "accessTokenExpired": "انتهت صلاحية رمز الوصول. أعد الاتصال لاستعادة الوظائف.",
+      "id": "المعرف:",
       "followers": "المتابعون",
       "posts": "المنشورات",
       "reconnect": "إعادة الاتصال",
@@ -116,6 +117,10 @@
       "connecting": "جاري الاتصال...",
       "connectPage": "ربط الصفحة",
       "done": "تم"
+    },
+    "callback": {
+      "finalizing": "جاري إتمام الاتصال...",
+      "info": "تعالج هذه الصفحة ردود فعل OAuth. تتم إدارة عملية الاتصال عبر نوافذ منبثقة."
     },
     "planner": {
       "goToScheduler": "الذهاب إلى المجدول",
