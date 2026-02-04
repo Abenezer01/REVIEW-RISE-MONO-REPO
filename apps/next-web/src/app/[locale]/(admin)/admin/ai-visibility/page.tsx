@@ -22,14 +22,14 @@ const AdminAIVisibilityPage = () => {
           title={tDashboard('navigation.ai-visibility')}
           subtitle={
             <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
-              Analyze how your brand appears in AI-generated answers (GEO/AIO).
+              {tDashboard('aiVisibility.pageSubtitle')}
               <Tooltip
                 title={
                   <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'inherit' }}>GEO: Generative Engine Optimization</Typography>
-                    <Typography variant="body2" sx={{ mb: 1, color: 'inherit' }}>Optimizing content to rank better in AI search engines.</Typography>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'inherit' }}>AIO: AI Overview</Typography>
-                    <Typography variant="body2" sx={{ color: 'inherit' }}>The AI-generated summary at the top of search results.</Typography>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'inherit' }}>{tDashboard('aiVisibility.geoTitle')}</Typography>
+                    <Typography variant="body2" sx={{ mb: 1, color: 'inherit' }}>{tDashboard('aiVisibility.geoDesc')}</Typography>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'inherit' }}>{tDashboard('aiVisibility.aioTitle')}</Typography>
+                    <Typography variant="body2" sx={{ color: 'inherit' }}>{tDashboard('aiVisibility.aioDesc')}</Typography>
                   </Box>
                 }
                 arrow

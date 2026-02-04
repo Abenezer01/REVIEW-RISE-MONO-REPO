@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import { useTranslations } from 'next-intl';
+
 
 import { 
   Dialog, 
@@ -69,6 +71,7 @@ const TabPanel = (props: TabPanelProps) => {
 };
 
 export const CompetitorDetailsDialog = ({ open, onClose, competitor }: CompetitorDetailsDialogProps) => {
+  const t = useTranslations('dashboard.brandRise.competitors.detail');
   const theme = useTheme();
   const [tabValue, setTabValue] = useState(0);
 
@@ -117,9 +120,9 @@ export const CompetitorDetailsDialog = ({ open, onClose, competitor }: Competito
 
       <Box sx={{ px: 3, borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={tabValue} onChange={handleTabChange} aria-label="competitor details tabs">
-          <Tab label="Overview" sx={{ fontWeight: 600 }} />
-          <Tab label="Strategic Analysis" sx={{ fontWeight: 600 }} />
-          <Tab label="Signals & Cues" sx={{ fontWeight: 600 }} />
+          <Tab label={t('tabs.overview')} sx={{ fontWeight: 600 }} />
+          <Tab label={t('tabs.strategic')} sx={{ fontWeight: 600 }} />
+          <Tab label={t('tabs.signals')} sx={{ fontWeight: 600 }} />
         </Tabs>
       </Box>
 
@@ -130,27 +133,27 @@ export const CompetitorDetailsDialog = ({ open, onClose, competitor }: Competito
             <Stack spacing={3}>
                 {/* UVP Hero Section */}
                 <Paper sx={{ p: 3, borderRadius: 2, background: `linear-gradient(45deg, ${alpha(theme.palette.primary.main, 0.05)}, ${alpha(theme.palette.background.paper, 1)})`, borderLeft: `6px solid ${theme.palette.primary.main}` }}>
-                    <Typography variant="overline" color="primary" fontWeight="bold">Unique Value Proposition</Typography>
+                    <Typography variant="overline" color="primary" fontWeight="bold">{t('uvpTitle')}</Typography>
                     <Typography variant="h6" fontWeight="500" sx={{ mt: 1, fontStyle: 'italic', color: 'text.primary' }}>
-                        &quot;{snapshot.uvp || "No UVP extracted yet."}&quot;
+                        { '"' }{snapshot.uvp || t('noUvp')}{ '"' }
                     </Typography>
                 </Paper>
 
                 <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>
                     {/* Services */}
                     <Box sx={{ flex: 1 }}>
-                        <SectionPaper title="Service Offerings" icon={<VerifiedIcon color="info" />}>
+                        <SectionPaper title={t('servicesTitle')} icon={<VerifiedIcon color="info" />}>
                             <Stack direction="row" flexWrap="wrap" gap={1}>
                                 {snapshot.serviceList?.map((service: string, i: number) => (
                                     <Chip key={i} label={service} size="medium" variant="outlined" sx={{ borderRadius: 1 }} />
-                                )) || <Typography variant="body2" color="text.secondary">No services listed.</Typography>}
+                                )) || <Typography variant="body2" color="text.secondary">{t('noServices')}</Typography>}
                             </Stack>
                         </SectionPaper>
                     </Box>
 
                     {/* Differentiators */}
                     <Box sx={{ flex: 1 }}>
-                        <SectionPaper title="Unique Differentiators" icon={<AutoGraphIcon color="secondary" />}>
+                        <SectionPaper title={t('diffTitle')} icon={<AutoGraphIcon color="secondary" />}>
                              <Stack spacing={1.5}>
                                 {ensureArray(snapshot.differentiators?.unique).map((item, i) => (
                                     <Box key={i} sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
@@ -160,7 +163,7 @@ export const CompetitorDetailsDialog = ({ open, onClose, competitor }: Competito
                                         <Typography variant="body2">{item}</Typography>
                                     </Box>
                                 ))}
-                                {ensureArray(snapshot.differentiators?.unique).length === 0 && <Typography variant="body2" color="text.secondary">None found.</Typography>}
+                                {ensureArray(snapshot.differentiators?.unique).length === 0 && <Typography variant="body2" color="text.secondary">{t('noneFound')}</Typography>}
                              </Stack>
                         </SectionPaper>
                     </Box>
@@ -173,26 +176,26 @@ export const CompetitorDetailsDialog = ({ open, onClose, competitor }: Competito
             <Stack direction="row" flexWrap="wrap" spacing={3} useFlexGap>
                 {/* Strengths */}
                 <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
-                    <SectionPaper title="Strengths" color={theme.palette.success.main} icon={<CheckCircleIcon color="success" />}>
-                        <ListItems items={ensureArray(snapshot.differentiators?.strengths)} icon={<CheckCircleIcon color="success" fontSize="small" />} />
+                    <SectionPaper title={t('strengths')} color={theme.palette.success.main} icon={<CheckCircleIcon color="success" />}>
+                        <ListItems items={ensureArray(snapshot.differentiators?.strengths)} icon={<CheckCircleIcon color="success" fontSize="small" />} tNone={t('noneIdentified')} />
                     </SectionPaper>
                 </Box>
                 {/* Weaknesses */}
                 <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
-                    <SectionPaper title="Weaknesses" color={theme.palette.error.main} icon={<CancelIcon color="error" />}>
-                        <ListItems items={ensureArray(snapshot.differentiators?.weaknesses)} icon={<CancelIcon color="error" fontSize="small" />} />
+                    <SectionPaper title={t('weaknesses')} color={theme.palette.error.main} icon={<CancelIcon color="error" />}>
+                        <ListItems items={ensureArray(snapshot.differentiators?.weaknesses)} icon={<CancelIcon color="error" fontSize="small" />} tNone={t('noneIdentified')} />
                     </SectionPaper>
                 </Box>
                 {/* What to Learn */}
                 <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
-                    <SectionPaper title="What to Learn" color={theme.palette.warning.main} icon={<LightbulbIcon color="warning" />}>
-                        <ListItems items={ensureArray(snapshot.whatToLearn)} icon={<CheckCircleIcon color="warning" fontSize="small" />} />
+                    <SectionPaper title={t('toLearn')} color={theme.palette.warning.main} icon={<LightbulbIcon color="warning" />}>
+                        <ListItems items={ensureArray(snapshot.whatToLearn)} icon={<CheckCircleIcon color="warning" fontSize="small" />} tNone={t('noneIdentified')} />
                     </SectionPaper>
                 </Box>
                 {/* What to Avoid */}
                 <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
-                    <SectionPaper title="What to Avoid" color={theme.palette.error.dark} icon={<CancelIcon sx={{ color: theme.palette.error.dark }} />}>
-                         <ListItems items={ensureArray(snapshot.whatToAvoid)} icon={<CancelIcon sx={{ color: theme.palette.error.dark }} fontSize="small" />} />
+                    <SectionPaper title={t('toAvoid')} color={theme.palette.error.dark} icon={<CancelIcon sx={{ color: theme.palette.error.dark }} />}>
+                         <ListItems items={ensureArray(snapshot.whatToAvoid)} icon={<CancelIcon sx={{ color: theme.palette.error.dark }} fontSize="small" />} tNone={t('noneIdentified')} />
                     </SectionPaper>
                 </Box>
             </Stack>
@@ -202,32 +205,32 @@ export const CompetitorDetailsDialog = ({ open, onClose, competitor }: Competito
         <TabPanel value={tabValue} index={2}>
             <Stack direction="row" flexWrap="wrap" spacing={3} useFlexGap>
                 <Box sx={{ width: { xs: '100%', md: 'calc(33.33% - 16px)' } }}>
-                    <SectionPaper title="Trust Signals" color={theme.palette.info.main} icon={<VerifiedIcon color="info" />}>
+                    <SectionPaper title={t('trustSignals')} color={theme.palette.info.main} icon={<VerifiedIcon color="info" />}>
                         <Stack flexWrap="wrap" gap={1} direction="row">
                             {ensureArray((snapshot as any).trustSignals).map((s: string, i: number) => (
                                 <Chip key={i} label={s} size="small" sx={{ bgcolor: alpha(theme.palette.info.main, 0.1), color: theme.palette.info.dark, fontWeight: 500 }} />
                             ))}
-                            {ensureArray((snapshot as any).trustSignals).length === 0 && <Typography variant="caption" color="text.secondary">None</Typography>}
+                            {ensureArray((snapshot as any).trustSignals).length === 0 && <Typography variant="caption" color="text.secondary">{t('none')}</Typography>}
                         </Stack>
                     </SectionPaper>
                 </Box>
                 <Box sx={{ width: { xs: '100%', md: 'calc(33.33% - 16px)' } }}>
-                    <SectionPaper title="Pricing Cues" color={theme.palette.success.main} icon={<PriceCheckIcon color="success" />}>
+                    <SectionPaper title={t('pricingTitle')} color={theme.palette.success.main} icon={<PriceCheckIcon color="success" />}>
                          <Stack flexWrap="wrap" gap={1} direction="row">
                             {ensureArray((snapshot as any).pricingCues).map((s: string, i: number) => (
                                 <Chip key={i} label={s} size="small" sx={{ bgcolor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.dark, fontWeight: 500 }} />
                             ))}
-                            {ensureArray((snapshot as any).pricingCues).length === 0 && <Typography variant="caption" color="text.secondary">None</Typography>}
+                            {ensureArray((snapshot as any).pricingCues).length === 0 && <Typography variant="caption" color="text.secondary">{t('none')}</Typography>}
                         </Stack>
                     </SectionPaper>
                 </Box>
                 <Box sx={{ width: { xs: '100%', md: 'calc(33.33% - 16px)' } }}>
-                    <SectionPaper title="CTA Styles" color={theme.palette.primary.main} icon={<AdsClickIcon color="primary" />}>
+                    <SectionPaper title={t('ctaTitle')} color={theme.palette.primary.main} icon={<AdsClickIcon color="primary" />}>
                          <Stack flexWrap="wrap" gap={1} direction="row">
                             {ensureArray((snapshot as any).ctaStyles).map((s: string, i: number) => (
                                 <Chip key={i} label={s} size="small" variant="outlined" color="primary" sx={{ fontWeight: 500 }} />
                             ))}
-                            {ensureArray((snapshot as any).ctaStyles).length === 0 && <Typography variant="caption" color="text.secondary">None</Typography>}
+                            {ensureArray((snapshot as any).ctaStyles).length === 0 && <Typography variant="caption" color="text.secondary">{t('none')}</Typography>}
                         </Stack>
                     </SectionPaper>
                 </Box>
@@ -250,8 +253,8 @@ const SectionPaper = ({ title, children, color, icon }: { title: string, childre
     </Paper>
 );
 
-const ListItems = ({ items, icon }: { items?: string[], icon: React.ReactNode }) => {
-    if (!items || items.length === 0) return <Typography variant="body2" color="text.secondary">None identified.</Typography>;
+const ListItems = ({ items, icon, tNone }: { items?: string[], icon: React.ReactNode, tNone: string }) => {
+    if (!items || items.length === 0) return <Typography variant="body2" color="text.secondary">{tNone}</Typography>;
     
 return (
         <Stack spacing={1.5}>

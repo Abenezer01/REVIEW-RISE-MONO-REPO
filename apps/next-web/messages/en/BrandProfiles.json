@@ -67,5 +67,78 @@
       "tryAgainButton": "Start New Extraction",
       "newExtractionButton": "Start New Extraction"
     }
+  },
+  "detail": {
+    "notFound": "Profile not found",
+    "backToList": "Back to List",
+    "cancel": "Cancel",
+    "deleteTitle": "Delete Brand Profile",
+    "deleteConfirm": "Are you sure you want to delete this brand profile? This action will permanently remove all extracted data and assets. This cannot be undone.",
+    "deleting": "Deleting...",
+    "deletePermanently": "Delete Permanently",
+    "tabs": {
+      "identity": "Brand Identity",
+      "tone": "Tone & Messaging",
+      "history": "Activity History"
+    }
+  },
+  "identity": {
+    "descriptionTitle": "Brand Description",
+    "descriptionPlaceholder": "Enter brand description...",
+    "noDescription": "No description available for this brand profile.",
+    "colorsTitle": "Color Palette",
+    "hexLabel": "HEX",
+    "typeLabel": "Type",
+    "addColor": "Add Color",
+    "copyAll": "Copy All",
+    "noColors": "No colors extracted.",
+    "assetsTitle": "Brand Assets",
+    "altTextLabel": "Alt Text",
+    "urlLabel": "URL",
+    "addAsset": "Add Asset",
+    "brandAsset": "Brand Asset",
+    "view": "View",
+    "copyUrl": "Copy URL",
+    "noAssets": "No assets found.",
+    "typographyTitle": "Typography",
+    "fontFamilyLabel": "Font Family",
+    "usageLabel": "Usage",
+    "addFont": "Add Font",
+    "noFonts": "No fonts extracted.",
+    "socialTitle": "Social Presence",
+    "noSocial": "No social links found."
+  },
+  "tone": {
+    "generateTitle": "Generate Brand Tone",
+    "generateDesc": "Our AI can analyze your brand's extracted data to create a consistent tone of voice, writing rules, and messaging pillars.",
+    "generateBtn": "Generate with AI",
+    "regenerateBtn": "Regenerate with AI",
+    "regenerating": "Regenerating...",
+    "voiceTitle": "Tone of Voice",
+    "voicePlaceholder": "Enter descriptors separated by commas",
+    "rulesTitle": "Writing Rules",
+    "do": "DO",
+    "dont": "DON'T",
+    "pillarsTitle": "Messaging Pillars",
+    "pillarLabel": "Pillar Title",
+    "descriptionLabel": "Description",
+    "ctasLabel": "CTAs (comma separated)",
+    "taglinesTitle": "Tagline Options",
+    "actionsTitle": "Actions",
+    "actionsDesc": "Not satisfied with the current tone? You can regenerate it using the latest brand data."
+  },
+  "history": {
+    "columns": {
+      "action": "Action",
+      "user": "User",
+      "details": "Details",
+      "date": "Date",
+      "status": "Status"
+    },
+    "system": "System",
+    "statusLabels": {
+      "failed": "Failed",
+      "success": "Success"
+    }
   }
 }

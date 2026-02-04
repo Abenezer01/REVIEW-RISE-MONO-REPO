@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { contentStudioService } from '../services/content-studio.service';
 import { z } from 'zod';
-import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
+import { createSuccessResponse, createErrorResponse, SystemMessageCode } from '@platform/contracts';
 
 export class ContentStudioController {
 
@@ -16,11 +16,11 @@ export class ContentStudioController {
             const { platform, description, tone } = schema.parse(req.body);
 
             const result = await contentStudioService.generateCaptions(platform, description, tone);
-            const response = createSuccessResponse(result, 'Captions generated successfully', 200, { requestId: req.id });
+            const response = createSuccessResponse(result, 'Captions generated successfully', 200, { requestId: req.id }, SystemMessageCode.AI_CAPTIONS_GENERATED);
             res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error generating captions:', error);
-            const response = createErrorResponse('Failed to generate captions', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            const response = createErrorResponse('Failed to generate captions', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
             res.status(response.statusCode).json(response);
         }
     }
@@ -41,11 +41,11 @@ export class ContentStudioController {
             const location = 'Global'; // Removing explicit location field for now, or inferring it if needed
 
             const result = await contentStudioService.generateHashtags(topic, location, platform || 'Instagram', niche, audience);
-            const response = createSuccessResponse(result, 'Hashtags generated successfully', 200, { requestId: req.id });
+            const response = createSuccessResponse(result, 'Hashtags generated successfully', 200, { requestId: req.id }, SystemMessageCode.AI_HASHTAGS_GENERATED);
             res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error generating hashtags:', error);
-            const response = createErrorResponse('Failed to generate hashtags', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            const response = createErrorResponse('Failed to generate hashtags', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
             res.status(response.statusCode).json(response);
         }
     }
@@ -62,11 +62,11 @@ export class ContentStudioController {
             const { businessType, goal, tone, platform } = schema.parse(req.body);
 
             const result = await contentStudioService.generatePostIdeas(businessType, goal, tone, platform);
-            const response = createSuccessResponse(result, 'Ideas generated successfully', 200, { requestId: req.id });
+            const response = createSuccessResponse(result, 'Ideas generated successfully', 200, { requestId: req.id }, SystemMessageCode.AI_IDEAS_GENERATED);
             res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error generating ideas:', error);
-            const response = createErrorResponse('Failed to generate ideas', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            const response = createErrorResponse('Failed to generate ideas', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
             res.status(response.statusCode).json(response);
         }
     }
@@ -86,7 +86,7 @@ export class ContentStudioController {
             res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error generating plan:', error);
-            const response = createErrorResponse('Failed to generate plan', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            const response = createErrorResponse('Failed to generate plan', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
             res.status(response.statusCode).json(response);
         }
     }
@@ -100,11 +100,11 @@ export class ContentStudioController {
             const { postIdea } = schema.parse(req.body);
 
             const result = await contentStudioService.generateImagePrompt(postIdea);
-            const response = createSuccessResponse(result, 'Image prompt generated successfully', 200, { requestId: req.id });
+            const response = createSuccessResponse(result, 'Image prompt generated successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
             res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error generating image prompt:', error);
-            const response = createErrorResponse('Failed to generate image prompt', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            const response = createErrorResponse('Failed to generate image prompt', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
             res.status(response.statusCode).json(response);
         }
     }
@@ -121,11 +121,11 @@ export class ContentStudioController {
             const { topic, category, mood, style } = schema.parse(req.body);
 
             const result = await contentStudioService.generatePromptIdeas(topic, category, mood, style);
-            const response = createSuccessResponse(result, 'Prompt ideas generated successfully', 200, { requestId: req.id });
+            const response = createSuccessResponse(result, 'Prompt ideas generated successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
             res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error generating prompt ideas:', error);
-            const response = createErrorResponse('Failed to generate prompt ideas', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            const response = createErrorResponse('Failed to generate prompt ideas', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
             res.status(response.statusCode).json(response);
         }
     }
@@ -144,11 +144,11 @@ export class ContentStudioController {
 
             // Note: This endpoint actually calls DALL-E and costs money/credits
             const result = await contentStudioService.generateImage(prompt, style, quality, aspectRatio, variations);
-            const response = createSuccessResponse(result, 'Image generated successfully', 200, { requestId: req.id });
+            const response = createSuccessResponse(result, 'Image generated successfully', 200, { requestId: req.id }, SystemMessageCode.AI_IMAGE_GENERATED);
             res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error generating image:', error);
-            const response = createErrorResponse('Failed to generate image', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            const response = createErrorResponse('Failed to generate image', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
             res.status(response.statusCode).json(response);
         }
     }
@@ -164,11 +164,11 @@ export class ContentStudioController {
             const { topic, tone, platform } = schema.parse(req.body);
 
             const result = await contentStudioService.generateCarousel(topic, tone, platform);
-            const response = createSuccessResponse(result, 'Carousel generated successfully', 200, { requestId: req.id });
+            const response = createSuccessResponse(result, 'Carousel generated successfully', 200, { requestId: req.id }, SystemMessageCode.AI_CAROUSEL_GENERATED);
             res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error generating carousel:', error);
-            const response = createErrorResponse('Failed to generate carousel', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            const response = createErrorResponse('Failed to generate carousel', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
             res.status(response.statusCode).json(response);
         }
     }
@@ -192,11 +192,11 @@ export class ContentStudioController {
 
             // Cast to strictly typed request for service
             const result = await contentStudioService.generateScript(params);
-            const response = createSuccessResponse(result, 'Script generated successfully', 200, { requestId: req.id });
+            const response = createSuccessResponse(result, 'Script generated successfully', 200, { requestId: req.id }, SystemMessageCode.AI_SCRIPT_GENERATED);
             res.status(response.statusCode).json(response);
         } catch (error: any) {
             console.error('Error generating script:', error);
-            const response = createErrorResponse('Failed to generate script', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+            const response = createErrorResponse('Failed to generate script', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
             res.status(response.statusCode).json(response);
         }
     }

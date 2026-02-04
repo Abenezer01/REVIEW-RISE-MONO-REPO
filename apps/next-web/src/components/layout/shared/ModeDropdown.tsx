@@ -14,6 +14,8 @@ import MenuList from '@mui/material/MenuList'
 import MenuItem from '@mui/material/MenuItem'
 
 // Type Imports
+import { useTranslations } from 'next-intl'
+
 import type { Mode } from '@core/types'
 
 // Hook Imports
@@ -29,6 +31,7 @@ const ModeDropdown = () => {
 
   // Hooks
   const { settings, updateSettings } = useSettings()
+  const t = useTranslations('theme')
 
   const handleClose = () => {
     setOpen(false)
@@ -60,7 +63,7 @@ const ModeDropdown = () => {
   return (
     <>
       <Tooltip
-        title={settings.mode + ' Mode'}
+        title={t(`customizer.${settings.mode}` as any) + ' ' + t('customizer.mode')}
         onOpen={() => setTooltipOpen(true)}
         onClose={() => setTooltipOpen(false)}
         open={open ? false : tooltipOpen ? true : false}
@@ -92,7 +95,7 @@ const ModeDropdown = () => {
                     selected={settings.mode === 'light'}
                   >
                     <i className='tabler-sun' />
-                    Light
+                    {t('customizer.light')}
                   </MenuItem>
                   <MenuItem
                     className='gap-3'
@@ -100,7 +103,7 @@ const ModeDropdown = () => {
                     selected={settings.mode === 'dark'}
                   >
                     <i className='tabler-moon-stars' />
-                    Dark
+                    {t('customizer.dark')}
                   </MenuItem>
                   <MenuItem
                     className='gap-3'
@@ -108,7 +111,7 @@ const ModeDropdown = () => {
                     selected={settings.mode === 'system'}
                   >
                     <i className='tabler-device-laptop' />
-                    System
+                    {t('customizer.system')}
                   </MenuItem>
                 </MenuList>
               </ClickAwayListener>

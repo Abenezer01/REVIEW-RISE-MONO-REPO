@@ -37,6 +37,7 @@ const ContentPage = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
+    const tc = useTranslations('common');
     const { businessId } = useBusinessId();
     const { locationId } = useLocationFilter();
     const { user } = useAuth();
@@ -238,14 +239,14 @@ const ContentPage = () => {
                             <Icon icon="tabler-calendar-stats" fontSize={24} />
                         </Box>
                         <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: '1px' }}>
-                            SOCIAL MEDIA STUDIO
+                            {t('navigation.ai-studio').toUpperCase()}
                         </Typography>
                     </Box>
                     <Typography variant="h2" fontWeight="800" sx={{ mb: 1.5, letterSpacing: '-1.5px', lineHeight: 1.1 }}>
-                        {t('navigation.social-content', { defaultValue: 'Calendar & Logs' })}
+                        {t('brandRise.content.title')}
                     </Typography>
                     <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 400, opacity: 0.7, maxWidth: 600, lineHeight: 1.5 }}>
-                        Schedule, manage, and monitor your brand&apos;s digital presence across all social channels from one unified calendar.
+                        {t('aiVisibility.pageSubtitle')}
                     </Typography>
                 </Box>
 
@@ -276,7 +277,7 @@ const ContentPage = () => {
                                 setOpenAddDialog(true);
                             }}
                         >
-                            {t('brandRise.content.add', { defaultValue: 'Create New Post' })}
+                            {t('brandRise.content.add')}
                         </Button>
                     )}
                 </Box>
@@ -338,11 +339,11 @@ const ContentPage = () => {
                         }}
                     >
                         <Tab 
-                            label={t('brandRise.content.calendar', { defaultValue: 'Calendar View' })} 
+                            label={t('brandRise.content.calendar')}
                             value="calendar" 
                         />
                         <Tab 
-                            label={t('brandRise.content.logs', { defaultValue: 'Publishing Logs' })} 
+                            label={t('brandRise.content.logs')}
                             value="logs" 
                         />
                     </Tabs>
@@ -385,37 +386,37 @@ const ContentPage = () => {
                                 <MenuItem value="ALL">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                                         <Icon icon="tabler-world" fontSize={18} />
-                                        <Typography variant="body2" fontWeight="600">All Channels</Typography>
+                                        <Typography variant="body2" fontWeight="600">{tc('channel.all')}</Typography>
                                     </Box>
                                 </MenuItem>
                                 <MenuItem value="INSTAGRAM">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                                         <Icon icon="tabler-brand-instagram" fontSize={18} style={{ color: '#E4405F' }} />
-                                        <Typography variant="body2" fontWeight="600">Instagram</Typography>
+                                        <Typography variant="body2" fontWeight="600">{tc('channel.instagram')}</Typography>
                                     </Box>
                                 </MenuItem>
                                 <MenuItem value="FACEBOOK">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                                         <Icon icon="tabler-brand-facebook" fontSize={18} style={{ color: '#1877F2' }} />
-                                        <Typography variant="body2" fontWeight="600">Facebook</Typography>
+                                        <Typography variant="body2" fontWeight="600">{tc('channel.facebook')}</Typography>
                                     </Box>
                                 </MenuItem>
                                 <MenuItem value="LINKEDIN">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                                         <Icon icon="tabler-brand-linkedin" fontSize={18} style={{ color: '#0A66C2' }} />
-                                        <Typography variant="body2" fontWeight="600">LinkedIn</Typography>
+                                        <Typography variant="body2" fontWeight="600">{tc('channel.linkedin')}</Typography>
                                     </Box>
                                 </MenuItem>
                                 <MenuItem value="TWITTER">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                                         <Icon icon="tabler-brand-x" fontSize={18} />
-                                        <Typography variant="body2" fontWeight="600">Twitter (X)</Typography>
+                                        <Typography variant="body2" fontWeight="600">{tc('channel.twitter')}</Typography>
                                     </Box>
                                 </MenuItem>
                                 <MenuItem value="GOOGLE_BUSINESS">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                                         <Icon icon="tabler-brand-google" fontSize={18} style={{ color: '#4285F4' }} />
-                                        <Typography variant="body2" fontWeight="600">Google Business</Typography>
+                                        <Typography variant="body2" fontWeight="600">{tc('channel.google')}</Typography>
                                     </Box>
                                 </MenuItem>
                             </TextField>

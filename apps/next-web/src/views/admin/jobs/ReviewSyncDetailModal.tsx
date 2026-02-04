@@ -15,6 +15,7 @@ import Paper from '@mui/material/Paper'
 import { useTheme, alpha } from '@mui/material/styles'
 import Fade from '@mui/material/Fade'
 
+import { useTranslation } from '@/hooks/useTranslation'
 import CustomChip from '@core/components/mui/Chip'
 
 interface ReviewSyncDetailModalProps {
@@ -26,6 +27,7 @@ interface ReviewSyncDetailModalProps {
 
 const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetailModalProps) => {
   const theme = useTheme()
+  const t = useTranslation('dashboard')
 
   if (!job) return null
 
@@ -101,17 +103,17 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
                 </Avatar>
                 <Box>
                     <Typography variant='h5' fontWeight={700} sx={{ letterSpacing: -0.5 }}>
-                        Review Sync Details
+                        {t('jobs.reviewSync.detail.title')}
                     </Typography>
                     <Typography component='div' variant='body2' color='text.secondary' sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        Log ID: <Chip label={job.id} size='small' variant='outlined' sx={{ height: 20, fontFamily: 'monospace', fontSize: '0.75rem', borderRadius: 1 }} />
+                        {t('jobs.reviewSync.detail.logId')}: <Chip label={job.id} size='small' variant='outlined' sx={{ height: 20, fontFamily: 'monospace', fontSize: '0.75rem', borderRadius: 1 }} />
                     </Typography>
                 </Box>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 {isRetrying ? (
                     <CustomChip
-                        label="Retrying"
+                        label={t('common.status.processing')}
                         color="warning"
                         variant='tonal'
                         size='medium'
@@ -120,7 +122,7 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
                     />
                 ) : (
                     <CustomChip
-                        label={job.status}
+                        label={t(`common.status.${job.status}`)}
                         color={getStatusColor(job.status)}
                         variant='tonal'
                         size='medium'
@@ -144,7 +146,7 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
                 bgcolor: 'background.paper'
             }}>
                 <Typography variant='overline' color='text.secondary' fontWeight={700} sx={{ mb: 3, display: 'block', letterSpacing: 1 }}>
-                    Sync Information
+                    {t('jobs.reviewSync.detail.syncInfo')}
                 </Typography>
 
                 <Grid container spacing={3}>
@@ -160,9 +162,9 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
                                 <i className={`tabler-${isRetrying ? 'loader animate-spin' : job.status === 'success' || job.status === 'completed' ? 'check' : job.status === 'failed' ? 'alert-triangle' : 'clock'}`} style={{ fontSize: '1.5rem' }} />
                             </Box>
                             <Box sx={{ flex: 1 }}>
-                                <Typography variant='subtitle2' color='text.secondary'>Current Status</Typography>
+                                <Typography variant='subtitle2' color='text.secondary'>{t('jobs.reviewSync.detail.currentStatus')}</Typography>
                                 <Typography variant='h6' sx={{ textTransform: 'capitalize' }}>
-                                    {isRetrying ? 'Retrying in background...' : job.status}
+                                    {isRetrying ? t('jobs.reviewSync.detail.retryingBackground') : t(`common.status.${job.status}`)}
                                 </Typography>
                             </Box>
                             {job.status === 'failed' && !isRetrying && (
@@ -174,7 +176,7 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
                                     onClick={onRetry}
                                     disabled={!job.jobId}
                                 >
-                                    Retry Job
+                                    {t('jobs.reviewSync.detail.retryJob')}
                                 </Button>
                             )}
                         </Paper>
@@ -184,8 +186,8 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
                     <Grid size={{ xs: 12, sm: 6 }}>
                          <InfoCard 
                             icon={`tabler-brand-${platform.toLowerCase()}`}
-                            title='Provider'
-                            value={platform}
+                            title={t('jobs.reviewSync.columns.provider')}
+                            value={t(`common.channel.${platform.toLowerCase()}`)}
                             color='info'
                             isCapitalized
                         />
@@ -195,7 +197,7 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
                     <Grid size={{ xs: 12, sm: 6 }}>
                          <InfoCard 
                             icon='tabler-star'
-                            title='Reviews Synced'
+                            title={t('jobs.reviewSync.detail.reviewsSynced')}
                             value={job.reviewsSynced || 0}
                             color='success'
                         />
@@ -205,7 +207,7 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
                     <Grid size={{ xs: 12, sm: 6 }}>
                          <InfoCard 
                             icon='tabler-rotate-clockwise'
-                            title='Retry Attempts'
+                            title={t('jobs.reviewSync.detail.retryAttempts')}
                             value={`${retryCount} / ${maxRetries}`}
                             color={retryCount > 0 ? 'warning' : 'secondary'}
                         />
@@ -215,7 +217,7 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
                      <Grid size={{ xs: 12, sm: 6 }}>
                          <InfoCard 
                             icon='tabler-clock'
-                            title='Duration'
+                            title={t('jobs.reviewSync.detail.duration')}
                             value={job.durationMs ? `${(job.durationMs / 1000).toFixed(2)}s` : '-'}
                             color='secondary'
                         />
@@ -226,7 +228,7 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
                         <Grid size={{ xs: 12 }}>
                             <Box sx={{ mt: 2, p: 3, borderRadius: 2, bgcolor: alpha(theme.palette.error.main, 0.05), border: `1px solid ${alpha(theme.palette.error.main, 0.2)}` }}>
                                 <Typography variant='subtitle2' color='error.main' sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <i className='tabler-alert-circle' /> Error Details
+                                    <i className='tabler-alert-circle' /> {t('jobs.reviewSync.detail.errorDetails')}
                                 </Typography>
                                 <Typography variant='body2' sx={{ fontFamily: 'monospace', mb: 2 }}>
                                     {job.errorMessage}
@@ -254,12 +256,12 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
             {/* Right Column: Technical Data */}
             <Grid size={{ xs: 12, md: 5 }} sx={{ p: 5, bgcolor: alpha(theme.palette.action.hover, 0.3) }}>
                 <Typography variant='overline' color='text.secondary' fontWeight={700} sx={{ mb: 3, display: 'block', letterSpacing: 1 }}>
-                    Technical Data
+                    {t('jobs.reviewSync.detail.technicalData')}
                 </Typography>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <Box>
-                        <Typography variant='subtitle2' sx={{ mb: 1 }}>Account Details</Typography>
+                        <Typography variant='subtitle2' sx={{ mb: 1 }}>{t('jobs.reviewSync.detail.accountDetails')}</Typography>
                         <Paper variant='outlined' sx={{ p: 2, bgcolor: 'background.paper' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
                                 <Avatar src={job.business?.logo} sx={{ width: 32, height: 32 }}>
@@ -275,7 +277,7 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
 
                     {Object.keys(responseData).length > 0 && (
                         <Box>
-                            <Typography variant='subtitle2' sx={{ mb: 1 }}>Sync Response</Typography>
+                            <Typography variant='subtitle2' sx={{ mb: 1 }}>{t('jobs.reviewSync.detail.syncResponse')}</Typography>
                             <Paper variant='outlined' sx={{ p: 0, overflow: 'hidden', bgcolor: 'background.paper' }}>
                                 <Box component="pre" sx={{ m: 0, p: 2, fontSize: '0.75rem', overflow: 'auto', maxHeight: 300 }}>
                                     {JSON.stringify(responseData, null, 2)}
@@ -286,7 +288,7 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
 
                     {Object.keys(requestData).length > 0 && (
                         <Box>
-                            <Typography variant='subtitle2' sx={{ mb: 1 }}>Request Data</Typography>
+                            <Typography variant='subtitle2' sx={{ mb: 1 }}>{t('jobs.reviewSync.detail.requestData')}</Typography>
                             <Paper variant='outlined' sx={{ p: 0, overflow: 'hidden', bgcolor: 'background.paper' }}>
                                 <Box component="pre" sx={{ m: 0, p: 2, fontSize: '0.75rem', overflow: 'auto', maxHeight: 300 }}>
                                     {JSON.stringify(requestData, null, 2)}
@@ -296,21 +298,21 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
                     )}
 
                     <Box>
-                         <Typography variant='subtitle2' sx={{ mb: 1 }}>Timestamps</Typography>
+                         <Typography variant='subtitle2' sx={{ mb: 1 }}>{t('jobs.reviewSync.detail.timestamps')}</Typography>
                          <Paper variant='outlined' sx={{ p: 2, bgcolor: 'background.paper' }}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                <Typography variant='caption' color='text.secondary'>Created</Typography>
+                                <Typography variant='caption' color='text.secondary'>{t('jobs.reviewSync.detail.created')}</Typography>
                                 <Typography variant='caption' fontWeight={500}>{new Date(job.createdAt).toLocaleString()}</Typography>
                             </Box>
                             {job.startedAt && (
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                    <Typography variant='caption' color='text.secondary'>Started</Typography>
+                                    <Typography variant='caption' color='text.secondary'>{t('jobs.reviewSync.detail.started')}</Typography>
                                     <Typography variant='caption' fontWeight={500}>{new Date(job.startedAt).toLocaleString()}</Typography>
                                 </Box>
                             )}
                             {job.completedAt && (
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <Typography variant='caption' color='text.secondary'>Completed</Typography>
+                                    <Typography variant='caption' color='text.secondary'>{t('jobs.reviewSync.detail.completed')}</Typography>
                                     <Typography variant='caption' fontWeight={500}>{new Date(job.completedAt).toLocaleString()}</Typography>
                                 </Box>
                             )}
@@ -331,11 +333,11 @@ const ReviewSyncDetailModal = ({ open, onClose, onRetry, job }: ReviewSyncDetail
                 startIcon={<i className='tabler-refresh' />}
                 sx={{ borderRadius: 2, px: 3, mr: 1 }}
             >
-                Retry Job
+                {t('jobs.reviewSync.detail.retryJob')}
             </Button>
         )}
         <Button onClick={onClose} variant='contained' color='secondary' sx={{ borderRadius: 2, px: 4 }}>
-            Close Detail
+            {t('jobs.reviewSync.detail.closeDetail')}
         </Button>
       </DialogActions>
     </Dialog>

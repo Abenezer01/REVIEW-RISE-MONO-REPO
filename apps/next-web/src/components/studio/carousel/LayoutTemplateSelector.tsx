@@ -5,6 +5,7 @@ import React from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Card from '@mui/material/Card'
+import { useTranslations } from 'next-intl'
 
 const LAYOUT_TEMPLATES = [
     { value: 'modern', label: 'Modern', icon: 'tabler-layout-grid' },
@@ -18,10 +19,12 @@ interface LayoutTemplateSelectorProps {
 }
 
 export default function LayoutTemplateSelector({ selected, onChange }: LayoutTemplateSelectorProps) {
+    const t = useTranslations('studio.carousels')
+
     return (
         <Box>
             <Typography variant="body2" fontWeight="bold" mb={1.5}>
-                Layout Template
+                {t('layoutTemplate')}
             </Typography>
             <Box sx={{ display: 'flex', gap: 2 }}>
                 {LAYOUT_TEMPLATES.map((template) => (

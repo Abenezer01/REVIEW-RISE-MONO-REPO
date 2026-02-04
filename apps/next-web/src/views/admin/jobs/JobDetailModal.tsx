@@ -15,6 +15,7 @@ import Slide from '@mui/material/Slide'
 import { useTheme } from '@mui/material/styles'
 import { type TransitionProps } from '@mui/material/transitions'
 
+import { useTranslation } from '@/hooks/useTranslation'
 import CustomChip from '@core/components/mui/Chip'
 
 const Transition = forwardRef(function Transition(
@@ -35,6 +36,7 @@ interface JobDetailModalProps {
 
 const JobDetailModal = ({ open, onClose, job, onRetry, onResolve, onIgnore }: JobDetailModalProps) => {
   const theme = useTheme()
+  const t = useTranslation('dashboard')
 
   if (!job) return null
 
@@ -104,18 +106,18 @@ const JobDetailModal = ({ open, onClose, job, onRetry, onResolve, onIgnore }: Jo
           </Box>
           <Box>
             <Typography variant='h5' sx={{ fontWeight: 600, mb: 0.5 }}>
-              Job Details
+              {t('jobs.failed.detail.title')}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <CustomChip
-                    label={job.status}
+                    label={t(`common.status.${job.status}`)}
                     color={colorKey}
                     size='small'
                     variant='tonal'
                     sx={{ textTransform: 'capitalize', fontWeight: 500 }}
                 />
                 <Typography variant='body2' color='text.secondary'>
-                    ID: <Box component="span" sx={{ fontFamily: 'monospace', fontWeight: 500 }}>{job.id}</Box>
+                    {t('jobs.failed.detail.id')}: <Box component="span" sx={{ fontFamily: 'monospace', fontWeight: 500 }}>{job.id}</Box>
                 </Typography>
             </Box>
           </Box>
@@ -130,13 +132,13 @@ const JobDetailModal = ({ open, onClose, job, onRetry, onResolve, onIgnore }: Jo
             <Grid container spacing={4}>
             <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant='overline' color='text.secondary' sx={{ fontWeight: 600, display: 'block', mb: 2 }}>
-                    Configuration
+                    {t('jobs.failed.detail.configuration')}
                 </Typography>
 
                 <Box sx={{ mb: 3 }}>
-                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>Job Type</Typography>
+                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>{t('jobs.failed.detail.jobType')}</Typography>
                     <CustomChip
-                        label={job.type.replace('_', ' ')}
+                        label={t(`jobs.failed.types.${job.type}`)}
                         color='primary'
                         size='small'
                         variant='outlined'
@@ -145,14 +147,14 @@ const JobDetailModal = ({ open, onClose, job, onRetry, onResolve, onIgnore }: Jo
                 </Box>
 
                 <Box sx={{ mb: 3 }}>
-                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>Business</Typography>
+                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>{t('jobs.failed.detail.business')}</Typography>
                     <Typography variant='body1' sx={{ fontWeight: 500 }}>
                         {job.business?.name || 'N/A'}
                     </Typography>
                 </Box>
 
                 <Box>
-                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>Location</Typography>
+                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>{t('jobs.failed.detail.location')}</Typography>
                     <Typography variant='body1'>
                         {job.location?.name || 'N/A'}
                     </Typography>
@@ -161,31 +163,31 @@ const JobDetailModal = ({ open, onClose, job, onRetry, onResolve, onIgnore }: Jo
 
             <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant='overline' color='text.secondary' sx={{ fontWeight: 600, display: 'block', mb: 2 }}>
-                    Execution & Timing
+                    {t('jobs.failed.detail.executionTiming')}
                 </Typography>
 
                 <Box sx={{ mb: 3 }}>
-                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>Created At</Typography>
+                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>{t('jobs.failed.detail.createdAt')}</Typography>
                     <Typography variant='body1'>
                         {new Date(job.createdAt).toLocaleString()}
                     </Typography>
                 </Box>
 
                 <Box sx={{ mb: 3 }}>
-                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>Failed At</Typography>
+                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>{t('jobs.failed.detail.failedAt')}</Typography>
                     <Typography variant='body1' color={job.failedAt ? 'error.main' : 'text.primary'}>
                         {job.failedAt ? new Date(job.failedAt).toLocaleString() : '-'}
                     </Typography>
                 </Box>
 
                 <Box>
-                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>Retry Count</Typography>
+                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>{t('jobs.failed.detail.retryCount')}</Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                          <Typography variant='body1' fontWeight={500}>
                             {job.retryCount}
                          </Typography>
                          <Typography variant='body2' color='text.secondary'>
-                            of {job.maxRetries} max retries
+                            {t('jobs.failed.detail.ofMaxRetries', { max: job.maxRetries })}
                          </Typography>
                     </Box>
                 </Box>
@@ -199,7 +201,7 @@ const JobDetailModal = ({ open, onClose, job, onRetry, onResolve, onIgnore }: Jo
             <Box sx={{ p: 4, bgcolor: (theme) => `rgba(${theme.palette.error.mainChannel} / 0.02)` }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
                     <i className='tabler-alert-circle' style={{ color: theme.palette.error.main }} />
-                    <Typography variant='h6' sx={{ color: 'error.main' }}>Error Details</Typography>
+                    <Typography variant='h6' sx={{ color: 'error.main' }}>{t('jobs.failed.detail.errorDetails')}</Typography>
                 </Box>
                 <Box sx={{
                     bgcolor: 'background.paper',
@@ -225,7 +227,7 @@ const JobDetailModal = ({ open, onClose, job, onRetry, onResolve, onIgnore }: Jo
                     <Grid container spacing={4}>
                         <Grid size={{ xs: 12 }}>
                             <Typography variant='h6' sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <i className='tabler-code' /> Payload
+                                <i className='tabler-code' /> {t('jobs.failed.detail.payload')}
                             </Typography>
                             <Box sx={{
                                 bgcolor: 'action.hover',
@@ -246,7 +248,7 @@ const JobDetailModal = ({ open, onClose, job, onRetry, onResolve, onIgnore }: Jo
                         {job.result && (
                             <Grid size={{ xs: 12 }}>
                                 <Typography variant='h6' sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <i className='tabler-file-check' /> Result / Metadata
+                                    <i className='tabler-file-check' /> {t('jobs.failed.detail.resultMetadata')}
                                 </Typography>
                                 <Box sx={{
                                     bgcolor: 'action.hover',
@@ -273,7 +275,7 @@ const JobDetailModal = ({ open, onClose, job, onRetry, onResolve, onIgnore }: Jo
 
       <DialogActions sx={{ p: 4, pt: 2, borderTop: `1px solid ${theme.palette.divider}`, justifyContent: 'space-between' }}>
         <Button onClick={onClose} variant='outlined' color='secondary'>
-            Close
+            {t('jobs.failed.detail.close')}
         </Button>
         <Box sx={{ display: 'flex', gap: 2 }}>
             {job.status === 'failed' && (
@@ -284,7 +286,7 @@ const JobDetailModal = ({ open, onClose, job, onRetry, onResolve, onIgnore }: Jo
                 onClick={() => onIgnore(job.id)}
                 startIcon={<i className='tabler-eye-off' />}
                 >
-                Ignore
+                {t('jobs.failed.detail.ignore')}
                 </Button>
                 <Button
                 variant='outlined'
@@ -292,7 +294,7 @@ const JobDetailModal = ({ open, onClose, job, onRetry, onResolve, onIgnore }: Jo
                 onClick={() => onResolve(job.id)}
                 startIcon={<i className='tabler-check' />}
                 >
-                Resolve
+                {t('jobs.failed.detail.resolve')}
                 </Button>
                 <Button
                 variant='contained'
@@ -301,7 +303,7 @@ const JobDetailModal = ({ open, onClose, job, onRetry, onResolve, onIgnore }: Jo
                 startIcon={<i className='tabler-refresh' />}
                 sx={{ px: 4 }}
                 >
-                Retry Job
+                {t('jobs.failed.detail.retryJob')}
                 </Button>
             </>
             )}

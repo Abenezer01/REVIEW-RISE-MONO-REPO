@@ -105,6 +105,8 @@ const MOCK_REPORTS = [
 export const JobsDashboard = ({ onViewReport }: JobsDashboardProps) => {
     const theme = useTheme();
     const t = useTranslations('dashboard.brandRise.jobs');
+    const tv = useTranslations('dashboard.brandRise.visibilityPlan');
+    const tc = useTranslations('common');
     const { businessId } = useBusinessId();
     const [reports, setReports] = useState<any[]>([]);
     const [generatingPlan, setGeneratingPlan] = useState(false);
@@ -231,10 +233,10 @@ return 'secondary';
                                 }}>
                                     <Icon icon="tabler-wand" fontSize={24} />
                                 </Box>
-                                <Typography variant="h6" fontWeight="bold">Visibility Plan</Typography>
+                                <Typography variant="h6" fontWeight="bold">{tv('title')}</Typography>
                             </Stack>
                             <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flex: 1 }}>
-                                Generate a data-backed, 30-day roadmap tailored to your brand&apos;s unique DNA. Outpace competitors with actionable steps.
+                                {tv('subtitle')}
                             </Typography>
                             <Button 
                                 variant="contained" 
@@ -331,7 +333,7 @@ return 'secondary';
                             <Box sx={{ mb: 3 }}>
                                 <Stack direction="row" justifyContent="space-between" mb={1}>
                                     <Typography variant="body2" color="text.secondary">{t('success')}</Typography>
-                                    <Typography variant="body2" fontWeight="bold" color="success.main">100%</Typography>
+                                    <Typography variant="body2" fontWeight="bold" color="success.main">{'100%'}</Typography>
                                 </Stack>
                                 <LinearProgress variant="determinate" value={100} color="success" sx={{ height: 6, borderRadius: 3 }} />
                             </Box>
@@ -339,7 +341,7 @@ return 'secondary';
 
                         {job.status === 'failed' && (
                              <Box sx={{ mb: 3, p: 2, bgcolor: alpha(theme.palette.error.main, 0.1), borderRadius: 1, border: `1px solid ${alpha(theme.palette.error.main, 0.2)}` }}>
-                                <Typography variant="body2" color="error.main">Error: {job.error}</Typography>
+                                <Typography variant="body2" color="error.main">{tc('common.error')}: {job.error}</Typography>
                              </Box>
                         )}
 
@@ -354,7 +356,7 @@ return 'secondary';
                                 </>
                             ) : job.status === 'completed' ? (
                                 <>
-                                    <Grid size={3}><Typography variant="caption" display="block" color="text.secondary">COMPLETED</Typography><Typography variant="body2">{job.completedAt}</Typography></Grid>
+                                    <Grid size={3}><Typography variant="caption" display="block" color="text.secondary">{t('completed').toUpperCase()}</Typography><Typography variant="body2">{job.completedAt}</Typography></Grid>
                                     <Grid size={2}><Typography variant="caption" display="block" color="text.secondary">{t('duration')}</Typography><Typography variant="body2">{job.duration}</Typography></Grid>
                                     <Grid size={3}><Typography variant="caption" display="block" color="text.secondary">{t('output')}</Typography><Typography variant="body2">{job.output}</Typography></Grid>
                                     <Grid size={2}><Typography variant="caption" display="block" color="text.secondary">{t('jobId')}</Typography><Typography variant="body2">{job.id}</Typography></Grid>

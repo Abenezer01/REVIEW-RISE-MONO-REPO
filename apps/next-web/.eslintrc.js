@@ -59,6 +59,21 @@ module.exports = {
         count: 1
       }
     ],
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: 'react-hot-toast',
+            message: 'Please use SystemMessageProvider and notify() from @platform/shared-ui instead.'
+          },
+          {
+            name: 'react-toastify',
+            message: 'Please use SystemMessageProvider and notify() from @platform/shared-ui instead.'
+          }
+        ]
+      }
+    ],
     'import/order': [
       'error',
       {
@@ -87,6 +102,18 @@ module.exports = {
         pathGroupsExcludedImportTypes: ['react', 'type'],
         'newlines-between': 'always-and-inside-groups'
       }
+    ],
+    'react/jsx-no-literals': [
+      'error',
+      {
+        noStrings: true,
+        ignoreProps: true,
+        allowedStrings: [
+          '%', '✓', '•', 'N/A', '|', '™', '—', ':', '(', ')', '/', '+', '-', '*', '#', '.', ',', ' ', '!',
+          '"', "'", '&quot;', '&ldquo;', '&rdquo;', '&lsquo;', '&rsquo;', '&hellip;', '&apos;',
+          '@', '⋮', '↑', '↓', '📅', '⬇️', '💡', '×', '●', 'X:', '| Y:', 'v', '.0', '100%', 's', 'Aa', '94/100', '...', 'Loading...'
+        ]
+      }
     ]
   },
   settings: {
@@ -110,6 +137,15 @@ module.exports = {
       rules: {
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/no-var-requires': 'off'
+      }
+    },
+    {
+      files: [
+        'src/shared/components/SystemMessageProvider.tsx',
+        'src/libs/styles/AppReactToastify.tsx'
+      ],
+      rules: {
+        'no-restricted-imports': 'off'
       }
     }
   ]

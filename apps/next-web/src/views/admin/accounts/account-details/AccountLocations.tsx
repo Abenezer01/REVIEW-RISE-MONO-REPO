@@ -45,7 +45,7 @@ const AccountLocations = () => {
           setStatus(e.target.value)
         }}
       >
-        <MenuItem value='all'>All</MenuItem>
+        <MenuItem value='all'>{t('common.all')}</MenuItem>
         <MenuItem value='active'>{t('locations.form.active')}</MenuItem>
         <MenuItem value='archived'>{t('locations.form.archived')}</MenuItem>
       </CustomTextField>
@@ -153,7 +153,7 @@ const AccountLocations = () => {
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('common.actions'),
       width: 250,
       sortable: false,
       renderCell: params => <RowOptions item={params.row} options={params.row.actions} />
@@ -185,7 +185,7 @@ const AccountLocations = () => {
 
         <ItemsListing
           title={t('locations.listTitle')}
-          subtitle='Manage your business locations and their operational status'
+          subtitle={t('locations.detail.manageSubtitle')}
           items={formattedItems}
           isLoading={isLoading}
           type={viewMode === 'table' ? ITEMS_LISTING_TYPE.table.value : ITEMS_LISTING_TYPE.grid.value}
@@ -217,7 +217,7 @@ const AccountLocations = () => {
               searchKeys: ['name'],
               onSearch: (term: string) => setSearch(term),
               permission: { action: 'manage', subject: 'all' },
-              placeholder: 'Search locations'
+              placeholder: t('locations.detail.searchPlaceholder')
             },
             filter: {
               enabled: true,

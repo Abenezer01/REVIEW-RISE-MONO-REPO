@@ -1,0 +1,47 @@
+{
+  "featureFlags": {
+    "title": "Feature Flags",
+    "subtitle": "Manage global feature flags and toggles",
+    "searchPlaceholder": "Search feature flags...",
+    "rolloutPercent": "Rollout %",
+    "actions": "Actions",
+    "createTitle": "Create Feature Flag",
+    "editTitle": "Edit Feature Flag",
+    "name": "Name",
+    "namePlaceholder": "e.g. new-dashboard-v2",
+    "description": "Description",
+    "rolloutPercentage": "Rollout Percentage: {value}%",
+    "identityTargets": "Specific Identity Targets",
+    "userIds": "Specific User IDs",
+    "userIdsPlaceholder": "Enter ID & Press Enter",
+    "emails": "Specific Emails",
+    "emailsPlaceholder": "user@company.com",
+    "targetingRules": "Targeting Rules & Conditions",
+    "addCondition": "Add Condition",
+    "noConditions": "No conditions set. The flag will apply to everyone based on rollout percentage.",
+    "conditionNumber": "Condition {number}",
+    "attribute": "Attribute",
+    "operator": "Operator",
+    "values": "Values",
+    "valuesPlaceholder": "Enter value",
+    "enabled": "Enabled",
+    "validation": {
+      "nameRequired": "Name is required",
+      "nameMin": "Name must be at least {count} characters",
+      "descriptionMax": "Description must be less than {count} characters"
+    },
+    "attributes": {
+      "country": "Country",
+      "group": "User Group",
+      "emailDomain": "Email Domain",
+      "browser": "Browser",
+      "os": "OS",
+      "deviceType": "Device Type",
+      "language": "Language"
+    },
+    "operators": {
+      "in": "Is one of",
+      "not_in": "Is NOT one of"
+    }
+  }
+}

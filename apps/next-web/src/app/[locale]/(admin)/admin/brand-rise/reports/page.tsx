@@ -18,9 +18,12 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { useTranslations } from 'next-intl';
-import toast from 'react-hot-toast';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { SystemMessageCode } from '@platform/contracts';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusinessId } from '@/hooks/useBusinessId';
@@ -31,7 +34,9 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
 }
 
 const ReportsPage = () => {
+  const { notify } = useSystemMessages();
   const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
   const router = useRouter();
   const { businessId } = useBusinessId();
   const { user } = useAuth();
@@ -60,7 +65,7 @@ return res; // Assuming service returns array
 return BrandService.generateOpportunitiesReport(businessId);
       },
       onSuccess: () => {
-          toast.success('Report generation started...');
+          notify(SystemMessageCode.SUCCESS);
 
           // In real implementation, this might be async job. 
           // If sync, we invalidate queries.
@@ -69,7 +74,7 @@ return BrandService.generateOpportunitiesReport(businessId);
           }, 2000); 
       },
       onError: (err) => {
-          toast.error('Failed to generate report');
+          notify(SystemMessageCode.GENERIC_ERROR);
           console.error(err);
       }
   });
@@ -150,7 +155,7 @@ return BrandService.generateOpportunitiesReport(businessId);
                     </TableCell>
                     <TableCell>
                       <Chip 
-                          label="Ready" 
+                          label={tc('status.success')}
                           size="small" 
                           color="success"
                           variant="outlined"

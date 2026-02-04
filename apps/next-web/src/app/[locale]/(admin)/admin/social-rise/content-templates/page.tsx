@@ -20,7 +20,12 @@ import {
   Grid
 } from '@mui/material';
 import type { GridColDef } from '@mui/x-data-grid';
-import toast from 'react-hot-toast';
+
+import { useTranslations } from 'next-intl';
+
+import { SystemMessageCode } from '@platform/contracts';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 
 import { BrandService } from '@/services/brand.service';
 import { useBusinessId } from '@/hooks/useBusinessId';
@@ -31,7 +36,13 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
   return <i className={icon} style={{ fontSize }} {...rest} />;
 };
 
+const industries = ['restaurant', 'salon', 'agency', 'realestate'];
+const contentTypes = ['image', 'video', 'carousel', 'text'];
+
 const ContentTemplatesPage = () => {
+  const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
+  const { notify } = useSystemMessages();
   const { businessId } = useBusinessId();
   const [templates, setTemplates] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -48,9 +59,6 @@ const ContentTemplatesPage = () => {
     objective: 'Engagement'
   });
 
-  const industries = ['Local Restaurant', 'Salon', 'Agency', 'Real Estate'];
-  const contentTypes = ['image', 'video', 'carousel', 'text'];
-
   const fetchTemplates = useCallback(async () => {
     if (!businessId) return;
     setLoading(true);
@@ -61,11 +69,11 @@ const ContentTemplatesPage = () => {
       setTemplates(data || []); 
     } catch (error) {
       console.error('Failed to fetch templates', error);
-      toast.error('Failed to load templates');
+      notify(SystemMessageCode.GENERIC_ERROR);
     } finally {
       setLoading(false);
     }
-  }, [businessId]);
+  }, [businessId, notify]);
 
   useEffect(() => {
     if (businessId) {
@@ -95,7 +103,7 @@ const ContentTemplatesPage = () => {
     }
 
     setOpen(true);
-  }, [industries]);
+  }, []);
 
   const handleClose = useCallback(() => {
     setOpen(false);
@@ -112,26 +120,26 @@ const ContentTemplatesPage = () => {
 
     try {
       await BrandService.deletePlannerTemplate(businessId, itemToDelete);
-      toast.success('Template deleted successfully');
+      notify(SystemMessageCode.ITEM_DELETED);
       setDeleteDialogOpen(false);
       setItemToDelete(null);
       fetchTemplates();
     } catch (error) {
       console.error('Failed to delete template', error);
-      toast.error('Failed to delete template');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 
   const columns: GridColDef[] = useMemo(() => [
     {
       field: 'title',
-      headerName: 'Title',
+      headerName: t('brandRise.content.templateTitle'),
       flex: 1,
       minWidth: 200,
     },
     {
       field: 'industry',
-      headerName: 'Industry',
+      headerName: t('brandRise.content.industry'),
       flex: 0.8,
       minWidth: 150,
       renderCell: (params) => (
@@ -146,7 +154,7 @@ const ContentTemplatesPage = () => {
     },
     {
       field: 'contentType',
-      headerName: 'Type',
+      headerName: tc('common.tags'),
       flex: 0.6,
       minWidth: 120,
       renderCell: (params) => (
@@ -160,7 +168,7 @@ const ContentTemplatesPage = () => {
     },
     {
       field: 'content',
-      headerName: 'Content Preview',
+      headerName: t('brandRise.content.contentStructure'),
       flex: 2,
       minWidth: 300,
       renderCell: (params) => (
@@ -180,19 +188,19 @@ const ContentTemplatesPage = () => {
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: tc('actions'),
       sortable: false,
       width: 120,
       align: 'right',
       headerAlign: 'right',
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', justifyContent: 'flex-end' }}>
-          <Tooltip title="Edit">
+          <Tooltip title={tc('common.edit')}>
             <IconButton onClick={() => handleOpen(params.row)} color="primary" size="small">
               <Icon icon="tabler-edit" fontSize={20} />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title={tc('common.delete')}>
             <IconButton onClick={() => handleDelete(params.row.id)} color="error" size="small">
               <Icon icon="tabler-trash" fontSize={20} />
             </IconButton>
@@ -200,7 +208,7 @@ const ContentTemplatesPage = () => {
         </Box>
       ),
     },
-  ], [handleOpen, handleDelete]);
+  ], [handleOpen, handleDelete, t, tc]);
 
   const handleSubmit = async () => {
     if (!businessId) return;
@@ -208,17 +216,17 @@ const ContentTemplatesPage = () => {
     try {
       if (editingTemplate) {
         await BrandService.updatePlannerTemplate(businessId, editingTemplate.id, formData);
-        toast.success('Template updated successfully');
+        notify(SystemMessageCode.ITEM_UPDATED);
       } else {
         await BrandService.createPlannerTemplate(businessId, formData);
-        toast.success('Template created successfully');
+        notify(SystemMessageCode.ITEM_CREATED);
       }
       
       handleClose();
       fetchTemplates();
     } catch (error) {
       console.error('Failed to save template', error);
-      toast.error('Failed to save template');
+      notify(SystemMessageCode.GENERIC_ERROR);
     }
   };
 
@@ -228,10 +236,10 @@ const ContentTemplatesPage = () => {
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={6}>
         <Box>
           <Typography variant="h4" sx={{ mb: 1, fontWeight: 600 }}>
-            Content Templates
+            {t('navigation.content-templates')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Manage and customize your brand&apos;s AI-powered content generation templates.
+            {t('brandRise.content.templatesDesc')}
           </Typography>
         </Box>
         <Button 
@@ -240,7 +248,7 @@ const ContentTemplatesPage = () => {
           startIcon={<Icon icon="tabler-plus" fontSize={20} />}
           sx={{ px: 5, py: 2, borderRadius: 1.5 }}
         >
-          Add Template
+          {t('brandRise.content.addTemplate')}
         </Button>
       </Stack>
 
@@ -262,14 +270,14 @@ const ContentTemplatesPage = () => {
         }}
       >
         <DialogTitle sx={{ pb: 2, borderBottom: theme => `1px solid ${theme.palette.divider}` }}>
-          {editingTemplate ? 'Edit Content Template' : 'Create New Template'}
+          {editingTemplate ? t('brandRise.content.editTemplate') : t('brandRise.content.createTemplate')}
         </DialogTitle>
         <DialogContent sx={{ mt: 4 }}>
           <Stack spacing={4}>
             <TextField
-              label="Template Title"
+              label={t('brandRise.content.templateTitle')}
               fullWidth
-              placeholder="e.g., Weekly Special Highlight"
+              placeholder={t('brandRise.content.templateTitlePlaceholder')}
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             />
@@ -278,7 +286,7 @@ const ContentTemplatesPage = () => {
               <Grid size={{ xs: 6 }}>
                 <TextField
                   select
-                  label="Industry"
+                  label={t('brandRise.content.industry')}
                   fullWidth
                   value={formData.industry}
                   onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
@@ -293,7 +301,7 @@ const ContentTemplatesPage = () => {
               <Grid size={{ xs: 6 }}>
                 <TextField
                   select
-                  label="Content Type"
+                  label={t('brandRise.content.contentType')}
                   fullWidth
                   value={formData.contentType}
                   onChange={(e) => setFormData({ ...formData, contentType: e.target.value })}
@@ -308,25 +316,25 @@ const ContentTemplatesPage = () => {
             </Grid>
 
             <TextField
-              label="Content Structure"
+              label={t('brandRise.content.contentStructure')}
               fullWidth
               multiline
               rows={6}
-              placeholder="Describe how the content should be structured..."
+              placeholder={t('brandRise.content.contentStructurePlaceholder')}
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              helperText="Tip: Use [Placeholders] for dynamic content like [Business Name] or [Offer]."
+              helperText={t('brandRise.content.contentStructureHelper')}
             />
           </Stack>
         </DialogContent>
         <DialogActions sx={{ p: 4, pt: 2 }}>
-          <Button onClick={handleClose} color="inherit">Cancel</Button>
+          <Button onClick={handleClose} color="inherit">{tc('common.cancel')}</Button>
           <Button 
             onClick={handleSubmit} 
             variant="contained"
             disabled={!formData.title || !formData.content}
           >
-            {editingTemplate ? 'Save Changes' : 'Create Template'}
+            {editingTemplate ? tc('common.save') : tc('common.create')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -336,8 +344,8 @@ const ContentTemplatesPage = () => {
         handleClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteDialogOpen(false)}
-        title="Delete Content Template"
-        content="Are you sure you want to delete this content template? This action cannot be undone."
+        title={t('brandRise.content.deleteTemplateTitle')}
+        content={t('brandRise.content.deleteTemplateConfirm')}
         type="delete"
       />
     </Box>

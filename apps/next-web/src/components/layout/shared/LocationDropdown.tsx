@@ -19,6 +19,8 @@ import TextField from '@mui/material/TextField'
 import CircularProgress from '@mui/material/CircularProgress'
 
 // Hook Imports
+import { useTranslations } from 'next-intl'
+
 import { useSettings } from '@core/hooks/useSettings'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
@@ -33,6 +35,9 @@ interface Location {
 }
 
 const LocationDropdown = () => {
+  const t = useTranslations('dashboard')
+  const tc = useTranslations('common.common')
+
   // States
   const [open, setOpen] = useState(false)
   const [locations, setLocations] = useState<Location[]>([])
@@ -139,7 +144,7 @@ const LocationDropdown = () => {
         <i className='tabler-map-pin text-primary' />
         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
           <Typography variant='body2' fontWeight={600} noWrap sx={{ maxWidth: 150 }}>
-            {selectedLocation?.name || 'Select Location'}
+            {selectedLocation?.name || t('locations.detail.tabs.overview')}
           </Typography>
         </Box>
         <i className='tabler-chevron-down text-textSecondary' style={{ fontSize: '1rem' }} />
@@ -167,7 +172,7 @@ const LocationDropdown = () => {
                     <TextField
                       fullWidth
                       size='small'
-                      placeholder='Search locations...'
+                      placeholder={t('locations.detail.searchPlaceholder')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       InputProps={{
@@ -187,7 +192,7 @@ const LocationDropdown = () => {
 
                   {locations.length === 0 && !loading ? (
                     <Box sx={{ p: 2, textAlign: 'center' }}>
-                      <Typography variant="body2" color="text.secondary">No locations found</Typography>
+                      <Typography variant="body2" color="text.secondary">{tc('no-items')}</Typography>
                     </Box>
                   ) : (
                     locations.map((location) => (

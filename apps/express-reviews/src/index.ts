@@ -4,7 +4,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import routes from './routes/v1';
-import { createSuccessResponse } from '@platform/contracts';
+import { createSuccessResponse, SystemMessageCode } from '@platform/contracts';
 import { requestIdMiddleware, errorHandler } from '@platform/middleware';
 
 dotenv.config();
@@ -23,12 +23,12 @@ app.use(express.json());
 app.use('/api/v1', routes);
 
 app.get('/', (req, res) => {
-    const response = createSuccessResponse(null, 'Express Reviews Service is running', 200, { requestId: req.id });
+    const response = createSuccessResponse(null, 'Express Reviews Service is running', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
     res.status(response.statusCode).json(response);
 });
 
 app.get('/health', (req, res) => {
-    const response = createSuccessResponse({ service: 'express-reviews' }, 'Service is healthy', 200, { requestId: req.id });
+    const response = createSuccessResponse({ service: 'express-reviews' }, 'Service is healthy', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
     res.status(response.statusCode).json(response);
 });
 

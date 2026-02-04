@@ -10,6 +10,7 @@ import DialogContent from '@mui/material/DialogContent'
 import Card from '@mui/material/Card'
 import type { ApexOptions } from 'apexcharts'
 
+import { useTranslation } from '@/hooks/useTranslation'
 import apiClient from '@/lib/apiClient'
 import { SERVICES_CONFIG } from '@/configs/services';
 
@@ -27,6 +28,7 @@ const API_URL = SERVICES_CONFIG.seo.url;
 export default function KeywordRankChart({ keywordId, keywordText, open, onClose }: Props) {
   const [series, setSeries] = useState<any[]>([])
   const [categories, setCategories] = useState<string[]>([])
+  const t = useTranslation('dashboard')
 
   useEffect(() => {
     if (!open || !keywordId) return
@@ -50,16 +52,16 @@ export default function KeywordRankChart({ keywordId, keywordText, open, onClose
       setCategories(sorted.map((r: any) => r.capturedAt.split('T')[0]))
       setSeries([
         {
-          name: 'Organic Rank',
+          name: t('seo.rankings.organic'),
           data: sorted.map((r: any) => r.rankPosition ?? null)
         },
         {
-          name: 'Map Pack',
+          name: t('seo.rankings.mapPack'),
           data: sorted.map((r: any) => r.mapPackPosition ?? null)
         }
       ])
     })
-  }, [open, keywordId])
+  }, [open, keywordId, t])
 
   const options: ApexOptions = {
     chart: { parentHeightOffset: 0, toolbar: { show: false } },
@@ -72,7 +74,7 @@ export default function KeywordRankChart({ keywordId, keywordText, open, onClose
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Ranking History — {keywordText}</DialogTitle>
+      <DialogTitle>{t('seo.rankings.historyTitle')} — {keywordText}</DialogTitle>
       <DialogContent>
         <Card sx={{ p: 2 }}>
           <AppReactApexCharts type='line' height={360} width='100%' series={series} options={options} />

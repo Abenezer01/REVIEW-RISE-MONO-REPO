@@ -20,9 +20,13 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 
 // Hook Imports
+import { useTranslations } from 'next-intl'
+
 import { useSettings } from '@core/hooks/useSettings'
 
 const NotificationDropdown = () => {
+  const t = useTranslations('common')
+
   // States
   const [open, setOpen] = useState(false)
 
@@ -75,32 +79,32 @@ const NotificationDropdown = () => {
               <ClickAwayListener onClickAway={handleDropdownClose}>
                 <MenuList sx={{ p: 0 }}>
                   <Box sx={{ p: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Typography variant='h6'>Notifications</Typography>
+                    <Typography variant='h6'>{t('notifications.title')}</Typography>
                     <Badge color='primary' badgeContent={3} sx={{ '& .MuiBadge-badge': { position: 'relative', transform: 'none' } }} />
                   </Box>
                   <Divider />
                   <MenuItem onClick={handleDropdownClose} sx={{ p: 3, gap: 3 }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Typography variant='subtitle2' fontWeight={600}>New Review Received</Typography>
+                        <Typography variant='subtitle2' fontWeight={600}>{t('notifications.newReview')}</Typography>
                         <Typography variant='body2' color='text.secondary'>
-                            You received a 5-star review from John Doe.
+                            {t('notifications.mockReview', { rating: 5, name: 'John Doe' })}
                         </Typography>
-                        <Typography variant='caption' color='text.disabled'>Today, 10:30 AM</Typography>
+                        <Typography variant='caption' color='text.disabled'>{t('dates.atTime', { date: t('dates.today'), time: '10:30 AM' })}</Typography>
                     </Box>
                   </MenuItem>
                   <MenuItem onClick={handleDropdownClose} sx={{ p: 3, gap: 3 }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Typography variant='subtitle2' fontWeight={600}>System Alert</Typography>
+                        <Typography variant='subtitle2' fontWeight={600}>{t('notifications.systemAlert')}</Typography>
                         <Typography variant='body2' color='text.secondary'>
-                            Your daily SEO report is ready to view.
+                            {t('notifications.mockSeoReport')}
                         </Typography>
-                        <Typography variant='caption' color='text.disabled'>Yesterday, 2:15 PM</Typography>
+                        <Typography variant='caption' color='text.disabled'>{t('dates.atTime', { date: t('dates.yesterday'), time: '2:15 PM' })}</Typography>
                     </Box>
                   </MenuItem>
                   <Divider />
                   <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
                     <Button fullWidth variant='contained' size='small' onClick={() => setOpen(false)}>
-                      View All Notifications
+                      {t('notifications.viewAll')}
                     </Button>
                   </Box>
                 </MenuList>

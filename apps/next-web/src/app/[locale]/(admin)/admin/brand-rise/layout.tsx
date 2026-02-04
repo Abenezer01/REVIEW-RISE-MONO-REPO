@@ -76,7 +76,7 @@ const BrandingRiseLayout = ({ children }: { children: React.ReactNode }) => {
               justifyContent: 'space-between'
             }}
           >
-            Acme Corporation
+            {t('accounts.accountDialog.fields.namePlaceholder')}
           </Button>
 
           {/* Date Range Toggles */}

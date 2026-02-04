@@ -18,7 +18,9 @@ import { CardHeader, Divider } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import type { GridColDef } from '@mui/x-data-grid'
 
-import { toast } from 'react-toastify'
+import { SystemMessageCode } from '@platform/contracts'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -30,9 +32,12 @@ import { getReviews } from '@/app/actions/review'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
 import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
 import { Link } from '@/i18n/routing'
+import { useTranslation } from '@/hooks/useTranslation'
 
 const SmartReviewList = () => {
+  const { notify } = useSystemMessages()
   const theme = useTheme()
+  const t = useTranslation('dashboard')
   const { locationId } = useLocationFilter()
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -81,11 +86,11 @@ const SmartReviewList = () => {
       setData(res.data)
       setTotal(res.meta.total)
     } else {
-      toast.error(res.error || 'Failed to fetch reviews')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
 
     setLoading(false)
-  }, [page, rowsPerPage, filters, locationId])
+  }, [page, rowsPerPage, filters, locationId, notify])
 
   useEffect(() => {
     setPage(0)
@@ -115,7 +120,7 @@ const SmartReviewList = () => {
   const columns: GridColDef[] = [
     {
       field: 'author',
-      headerName: 'Reviewer',
+      headerName: t('reviews.smart.columns.reviewer'),
       minWidth: 220,
       renderCell: (params) => {
         const { author, platform } = params.row
@@ -154,7 +159,7 @@ const SmartReviewList = () => {
     },
     {
       field: 'content',
-      headerName: 'Review',
+      headerName: t('reviews.smart.columns.review'),
       minWidth: 350,
       flex: 1,
       renderCell: (params) => (
@@ -186,7 +191,7 @@ const SmartReviewList = () => {
     },
     {
       field: 'sentiment',
-      headerName: 'Sentiment',
+      headerName: t('reviews.smart.columns.sentiment'),
       minWidth: 120,
       renderCell: (params) => {
         return (
@@ -199,18 +204,18 @@ const SmartReviewList = () => {
     },
     {
       field: 'replyStatus',
-      headerName: 'Status',
+      headerName: t('reviews.smart.columns.status'),
       minWidth: 160,
       renderCell: (params) => {
         const status = params.value || (params.row.response ? 'posted' : 'none')
 
         const statusConfig: Record<string, { color: any; label: string; icon: string }> = {
-          posted: { color: 'success', label: 'Replied', icon: 'tabler-circle-check' },
-          approved: { color: 'info', label: 'Approved', icon: 'tabler-thumb-up' },
-          pending_approval: { color: 'warning', label: 'Pending', icon: 'tabler-clock' },
-          failed: { color: 'error', label: 'Failed', icon: 'tabler-alert-circle' },
-          skipped: { color: 'secondary', label: 'Skipped', icon: 'tabler-player-skip-forward' },
-          none: { color: 'error', label: 'Not Replied', icon: 'tabler-x' }
+          posted: { color: 'success', label: t('common.status.replied'), icon: 'tabler-circle-check' },
+          approved: { color: 'info', label: t('common.status.approved'), icon: 'tabler-thumb-up' },
+          pending_approval: { color: 'warning', label: t('common.status.pending'), icon: 'tabler-clock' },
+          failed: { color: 'error', label: t('common.status.failed'), icon: 'tabler-alert-circle' },
+          skipped: { color: 'secondary', label: t('common.status.skipped'), icon: 'tabler-player-skip-forward' },
+          none: { color: 'error', label: t('common.status.none'), icon: 'tabler-x' }
         }
 
         const config = statusConfig[status] || statusConfig.none
@@ -231,7 +236,7 @@ const SmartReviewList = () => {
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('reviews.smart.columns.actions'),
       minWidth: 80,
       sortable: false,
       renderCell: (params) => (
@@ -269,10 +274,10 @@ const SmartReviewList = () => {
               </IconButton>
               <Box>
                 <Typography variant='h5' fontWeight={600} sx={{ mb: 0.5 }}>
-                  Smart Reviews™
+                  {t('reviews.smart.title')}
                 </Typography>
                 <Typography variant='body2' color='text.secondary'>
-                  View and manage all your customer reviews in one place
+                  {t('reviews.smart.subtitle')}
                 </Typography>
               </Box>
             </Box>
@@ -284,25 +289,25 @@ const SmartReviewList = () => {
                     color="primary"
                     startIcon={<i className="tabler-wand" />}
                     onClick={async () => {
-                        toast.info('Starting sentiment analysis...');
+                        notify(SystemMessageCode.SUCCESS);
 
                         // Dynamic import to avoid server-side issues if any
                         const { triggerSentimentAnalysis } = await import('@/app/actions/job');
                         const res = await triggerSentimentAnalysis();
 
                         if (res.success) {
-                            toast.success('Sentiment analysis started via background job');
+                            notify(SystemMessageCode.SUCCESS);
                             setTimeout(fetchData, 2000); // Reload after a bit
                         } else {
-                            toast.error(res.error || 'Failed to start analysis');
+                            notify(SystemMessageCode.GENERIC_ERROR);
                         }
                     }}
                     size="small"
                 >
-                    Run Sentiment Analysis
+                    {t('reviews.smart.runSentiment')}
                 </Button>
               <CustomChip
-                label={`${total} Reviews`}
+                label={t('reviews.smart.reviewsCount', { count: total })}
                 size='small'
                 variant='tonal'
                 color='primary'
@@ -336,10 +341,10 @@ const SmartReviewList = () => {
                 <Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 1 }}>
                     <Typography variant='h5' fontWeight={800} sx={{ letterSpacing: '-0.5px' }}>
-                      Smart Reviews™
+                      {t('reviews.smart.title')}
                     </Typography>
                     <CustomChip
-                      label={`${total} Total`}
+                      label={t('reviews.smart.totalCount', { count: total })}
                       size='small'
                       variant='tonal'
                       color='primary'
@@ -347,7 +352,7 @@ const SmartReviewList = () => {
                     />
                   </Box>
                   <Typography variant='body2' color='text.secondary' sx={{ fontWeight: 500 }}>
-                    Manage and monitor your customer reputation across platforms
+                    {t('reviews.smart.manageSubtitle')}
                   </Typography>
                 </Box>
               </Box>
@@ -356,7 +361,7 @@ const SmartReviewList = () => {
               <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 3 }}>
                 <CustomTextField
                   id="review-search-filter"
-                  placeholder='Search reviews...'
+                  placeholder={t('reviews.smart.searchPlaceholder')}
                   value={filters.search}
                   onChange={e => handleFilterChange('search', e.target.value)}
                   sx={{ width: { xs: '100%', sm: 300 } }}
@@ -391,7 +396,7 @@ const SmartReviewList = () => {
                 id="review-rating-filter"
                 select
                 fullWidth
-                label='Filter by Rating'
+                label={t('reviews.smart.filterRating')}
                 value={filters.rating}
                 onChange={e => handleFilterChange('rating', e.target.value)}
                 SelectProps={{ 
@@ -401,7 +406,7 @@ const SmartReviewList = () => {
                       return (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, color: 'text.secondary' }}>
                           <i className='tabler-star' style={{ fontSize: '1.2rem' }} />
-                          <Typography variant="body2" color="inherit" sx={{ fontWeight: 500 }}>All Ratings</Typography>
+                          <Typography variant="body2" color="inherit" sx={{ fontWeight: 500 }}>{t('reviews.smart.allRatings')}</Typography>
                         </Box>
                       )
                     }
@@ -409,15 +414,15 @@ const SmartReviewList = () => {
                     return (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                         <i className='tabler-star' style={{ fontSize: '1.2rem', color: theme.palette.warning.main }} />
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{selected as string} Stars</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{t('reviews.smart.stars', { count: selected as string })}</Typography>
                       </Box>
                     )
                   }
                 }}
               >
-                <MenuItem value=''>All Ratings</MenuItem>
+                <MenuItem value=''>{t('reviews.smart.allRatings')}</MenuItem>
                 {[5, 4, 3, 2, 1].map(num => (
-                  <MenuItem key={num} value={num.toString()}>{num} Stars</MenuItem>
+                  <MenuItem key={num} value={num.toString()}>{t('reviews.smart.stars', { count: num })}</MenuItem>
                 ))}
               </CustomTextField>
             </Grid>
@@ -427,7 +432,7 @@ const SmartReviewList = () => {
                 id="review-provider-filter"
                 select
                 fullWidth
-                label='Filter by Provider'
+                label={t('reviews.smart.filterProvider')}
                 value={filters.platform}
                 onChange={e => handleFilterChange('platform', e.target.value)}
                 SelectProps={{ 
@@ -437,26 +442,24 @@ const SmartReviewList = () => {
                       return (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, color: 'text.secondary' }}>
                           <i className='tabler-world' style={{ fontSize: '1.2rem' }} />
-                          <Typography variant="body2" color="inherit" sx={{ fontWeight: 500 }}>All Providers</Typography>
+                          <Typography variant="body2" color="inherit" sx={{ fontWeight: 500 }}>{t('reviews.smart.allProviders')}</Typography>
                         </Box>
                       )
                     }
 
-                    const labels: Record<string, string> = { gbp: 'Google', facebook: 'Facebook', yelp: 'Yelp' }
-
                     return (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                         <i className='tabler-world' style={{ fontSize: '1.2rem', color: theme.palette.primary.main }} />
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{labels[selected as string] || (selected as string)}</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{t(`common.channel.${selected as string}`)}</Typography>
                       </Box>
                     )
                   }
                 }}
               >
-                <MenuItem value=''>All Providers</MenuItem>
-                <MenuItem value='gbp'>Google</MenuItem>
-                <MenuItem value='facebook'>Facebook</MenuItem>
-                <MenuItem value='yelp'>Yelp</MenuItem>
+                <MenuItem value=''>{t('reviews.smart.allProviders')}</MenuItem>
+                <MenuItem value='gbp'>{t('common.channel.google')}</MenuItem>
+                <MenuItem value='facebook'>{t('common.channel.facebook')}</MenuItem>
+                <MenuItem value='yelp'>{t('common.channel.yelp')}</MenuItem>
               </CustomTextField>
             </Grid>
 
@@ -465,7 +468,7 @@ const SmartReviewList = () => {
                 id="review-sentiment-filter"
                 select
                 fullWidth
-                label='Filter by Sentiment'
+                label={t('reviews.smart.filterSentiment')}
                 value={filters.sentiment}
                 onChange={e => handleFilterChange('sentiment', e.target.value)}
                 SelectProps={{ 
@@ -475,7 +478,7 @@ const SmartReviewList = () => {
                       return (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, color: 'text.secondary' }}>
                           <i className='tabler-mood-smile' style={{ fontSize: '1.2rem' }} />
-                          <Typography variant="body2" color="inherit" sx={{ fontWeight: 500 }}>All Sentiments</Typography>
+                          <Typography variant="body2" color="inherit" sx={{ fontWeight: 500 }}>{t('reviews.smart.allSentiments')}</Typography>
                         </Box>
                       )
                     }
@@ -489,10 +492,10 @@ const SmartReviewList = () => {
                   }
                 }}
               >
-                <MenuItem value=''>All Sentiments</MenuItem>
-                <MenuItem value='Positive'>Positive</MenuItem>
-                <MenuItem value='Neutral'>Neutral</MenuItem>
-                <MenuItem value='Negative'>Negative</MenuItem>
+                <MenuItem value=''>{t('reviews.smart.allSentiments')}</MenuItem>
+                <MenuItem value='Positive'>{t('dashboard.reviews.positive')}</MenuItem>
+                <MenuItem value='Neutral'>{t('dashboard.reviews.neutral')}</MenuItem>
+                <MenuItem value='Negative'>{t('dashboard.reviews.negative')}</MenuItem>
               </CustomTextField>
             </Grid>
 
@@ -501,7 +504,7 @@ const SmartReviewList = () => {
                 id="review-status-filter"
                 select
                 fullWidth
-                label='Filter by Status'
+                label={t('reviews.smart.filterStatus')}
                 value={filters.replyStatus}
                 onChange={e => handleFilterChange('replyStatus', e.target.value)}
                 SelectProps={{ 
@@ -511,34 +514,26 @@ const SmartReviewList = () => {
                       return (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, color: 'text.secondary' }}>
                           <i className='tabler-circle-check' style={{ fontSize: '1.2rem' }} />
-                          <Typography variant="body2" color="inherit" sx={{ fontWeight: 500 }}>All Statuses</Typography>
+                          <Typography variant="body2" color="inherit" sx={{ fontWeight: 500 }}>{t('reviews.smart.allStatuses')}</Typography>
                         </Box>
                       )
-                    }
-
-                    const labels: Record<string, string> = {
-                      posted: 'Replied',
-                      approved: 'Approved',
-                      pending_approval: 'Pending',
-                      failed: 'Failed',
-                      skipped: 'Skipped'
                     }
 
                     return (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                         <i className='tabler-circle-check' style={{ fontSize: '1.2rem', color: theme.palette.success.main }} />
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{labels[selected as string] || (selected as string)}</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{t(`common.status.${selected as string}`)}</Typography>
                       </Box>
                     )
                   }
                 }}
               >
-                <MenuItem value=''>All Statuses</MenuItem>
-                <MenuItem value='posted'>Replied</MenuItem>
-                <MenuItem value='approved'>Approved</MenuItem>
-                <MenuItem value='pending_approval'>Pending</MenuItem>
-                <MenuItem value='failed'>Failed</MenuItem>
-                <MenuItem value='skipped'>Skipped</MenuItem>
+                <MenuItem value=''>{t('reviews.smart.allStatuses')}</MenuItem>
+                <MenuItem value='posted'>{t('common.status.replied')}</MenuItem>
+                <MenuItem value='approved'>{t('common.status.approved')}</MenuItem>
+                <MenuItem value='pending_approval'>{t('common.status.pending')}</MenuItem>
+                <MenuItem value='failed'>{t('common.status.failed')}</MenuItem>
+                <MenuItem value='skipped'>{t('common.status.skipped')}</MenuItem>
               </CustomTextField>
             </Grid>
           </Grid>
@@ -570,8 +565,8 @@ const SmartReviewList = () => {
           permission: { action: 'read', subject: 'review' }
         }}
         emptyStateConfig={{
-          title: 'No Reviews Found',
-          description: 'Try adjusting your filters to find what you are looking for.',
+          title: t('reviews.smart.empty.title'),
+          description: t('reviews.smart.empty.description'),
           icon: 'tabler-message-off'
         }}
       />

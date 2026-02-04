@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Download,
   Share2,
@@ -27,6 +28,7 @@ interface ResultsDisplayProps {
 }
 
 export default function ResultsDisplay({ result }: ResultsDisplayProps) {
+  const t = useTranslations('landing.results');
   const [expandedIssue, setExpandedIssue] = useState<number | null>(null);
   const [showStickyBar, setShowStickyBar] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
@@ -41,10 +43,10 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
 
   // Determine score verdict
   const getScoreVerdict = (score: number) => {
-    if (score >= 85) return { label: 'Excellent', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' };
-    if (score >= 70) return { label: 'Good', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' };
-    if (score >= 50) return { label: 'Fair', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' };
-    return { label: 'Poor', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)' };
+    if (score >= 85) return { label: t('verdicts.excellent'), color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' };
+    if (score >= 70) return { label: t('verdicts.good'), color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' };
+    if (score >= 50) return { label: t('verdicts.fair'), color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' };
+    return { label: t('verdicts.poor'), color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)' };
   };
 
   const verdict = getScoreVerdict(result.healthScore);
@@ -55,24 +57,24 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
   const sortedCategories = [
     {
       key: 'technical',
-      label: 'Technical SEO',
+      label: t('categories.technical.label'),
       data: result.categoryScores.technical,
       icon: Zap,
-      description: 'Analysis indicates robust site architecture, but crawlability can be improved. Server response times are optimal.'
+      description: t('categories.technical.description')
     },
     {
       key: 'content',
-      label: 'Content Quality',
+      label: t('categories.content.label'),
       data: result.categoryScores.content,
       icon: FileText,
-      description: 'Content relevance is high, but keyword density is below optimal levels. Readability scores suggest some pages are too complex.'
+      description: t('categories.content.description')
     },
     {
       key: 'onPage',
-      label: 'On-Page SEO',
+      label: t('categories.onPage.label'),
       data: result.categoryScores.onPage,
       icon: Layout,
-      description: 'Meta tags are present but some descriptions are duplicates. HTML header structure needs refinement for better hierarchy.'
+      description: t('categories.onPage.description')
     },
   ].sort((a, b) => (a.data?.percentage || 0) - (b.data?.percentage || 0));
 
@@ -83,26 +85,26 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
         {/* Result Context Bar */}
         <div className="context-bar">
           <div className="context-info">
-            <div className="context-label">Analysis for</div>
+            <div className="context-label">{t('analysisFor')}</div>
             <div className="context-url">{result.url.replace('https://', '').replace('http://', '')}</div>
             <div className="context-meta">
               <Clock size={14} />
-              <span>Scanned {new Date(result.timestamp).toLocaleString()}</span>
+              <span>{t('scannedAt', { date: new Date(result.timestamp).toLocaleString() })}</span>
             </div>
           </div>
           <button className="btn-rescan">
             <RefreshCw size={16} />
-            Re-scan
+            {t('rescan')}
           </button>
         </div>
 
         {/* Score Hero Section */}
         <div className="score-hero">
           <div className="score-left">
-            <div className="score-label">SEO Health Score</div>
+            <div className="score-label">{t('healthScore')}</div>
             <div className="score-display">
               <div className="score-number">{result.healthScore}</div>
-              <div className="score-total">/ 100</div>
+              <div className="score-total">{'/ 100'}</div>
             </div>
             <div className="score-verdict" style={{ background: verdict.bg }}>
               <span style={{ color: verdict.color }}>{verdict.label}</span>
@@ -111,19 +113,19 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
             <div className="score-legend">
               <div className="legend-item">
                 <div className="legend-bar poor"></div>
-                <span>0-49 Poor</span>
+                <span>{t('legend.poor')}</span>
               </div>
               <div className="legend-item">
                 <div className="legend-bar fair"></div>
-                <span>50-69 Fair</span>
+                <span>{t('legend.fair')}</span>
               </div>
               <div className="legend-item">
                 <div className="legend-bar good"></div>
-                <span>70-84 Good</span>
+                <span>{t('legend.good')}</span>
               </div>
               <div className="legend-item">
                 <div className="legend-bar excellent"></div>
-                <span>85+ Excellent</span>
+                <span>{t('legend.excellent')}</span>
               </div>
             </div>
           </div>
@@ -132,26 +134,26 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
             <div className="score-stats">
               <div className="stat-box">
                 <div className="stat-number">{issuesFound}</div>
-                <div className="stat-label">Total Issues</div>
+                <div className="stat-label">{t('totalIssues')}</div>
               </div>
               <div className="stat-box critical">
                 <div className="stat-number">{criticalIssues}</div>
-                <div className="stat-label">Critical</div>
+                <div className="stat-label">{t('critical')}</div>
               </div>
               <div className="stat-box">
-                <div className="stat-number">{result.technicalAnalysis.pageSpeed.loadTime}ms</div>
-                <div className="stat-label">Load Time</div>
+                <div className="stat-number">{result.technicalAnalysis.pageSpeed.loadTime}{'ms'}</div>
+                <div className="stat-label">{t('loadTime')}</div>
               </div>
             </div>
 
             <div className="cta-group">
               <button className="btn-primary-cta">
                 <Download size={18} />
-                Get Full Report
+                {t('getFullReport')}
               </button>
               <button className="btn-secondary-cta">
                 <Share2 size={16} />
-                Share
+                {t('share')}
               </button>
             </div>
           </div>
@@ -165,7 +167,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
 
             {/* SEO Breakdown */}
             <section className="section">
-              <h2 className="section-title">SEO Health Breakdown</h2>
+              <h2 className="section-title">{t('healthBreakdown')}</h2>
 
               {/* HTML Page Details Card */}
               <div className="html-page-details">
@@ -174,7 +176,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                   onClick={() => setIsHtmlDetailsExpanded(!isHtmlDetailsExpanded)}
                   style={{ cursor: 'pointer', marginBottom: isHtmlDetailsExpanded ? '20px' : '0' }}
                 >
-                  <h3 className="details-title" style={{ marginBottom: 0 }}>HTML Page</h3>
+                  <h3 className="details-title" style={{ marginBottom: 0 }}>{t('htmlPage')}</h3>
                   <button className="expand-toggle">
                     {isHtmlDetailsExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
                   </button>
@@ -184,8 +186,8 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                   <div className="details-grid">
                     <div className="detail-item">
                       <div className="detail-header-group">
-                        <span className="detail-label">Meta title</span>
-                        <div className="ai-badge">AI Analysis</div>
+                        <span className="detail-label">{t('htmlDetails.metaTitle')}</span>
+                        <div className="ai-badge">{t('aiAnalysis')}</div>
                       </div>
                       <span className="detail-value">
                         {typeof result.seoElements?.title === 'object' && result.seoElements.title !== null
@@ -193,13 +195,13 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                           : result.seoElements?.title || '-'}
                       </span>
                       <p className="detail-description">
-                        The title tag is the first thing users see in search results. It should be concise (50-60 characters) and include your primary keyword.
+                        {t('htmlDetails.titleDesc')}
                       </p>
                     </div>
                     <div className="detail-item">
                       <div className="detail-header-group">
-                        <span className="detail-label">Meta description</span>
-                        <div className="ai-badge">AI Analysis</div>
+                        <span className="detail-label">{t('htmlDetails.metaDescription')}</span>
+                        <div className="ai-badge">{t('aiAnalysis')}</div>
                       </div>
                       <span className="detail-value">
                         {typeof result.seoElements?.description === 'object' && result.seoElements.description !== null
@@ -207,43 +209,43 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                           : result.seoElements?.description || 'Not set'}
                       </span>
                       <p className="detail-description">
-                        A brief summary of the page content. Well-written descriptions (150-160 characters) can significantly improve click-through rates.
+                        {t('htmlDetails.descDesc')}
                       </p>
                     </div>
                     <div className="detail-item">
                       <div className="detail-header-group">
-                        <span className="detail-label">URL</span>
-                        <div className="ai-badge">AI Analysis</div>
+                        <span className="detail-label">{t('htmlDetails.url')}</span>
+                        <div className="ai-badge">{t('aiAnalysis')}</div>
                       </div>
                       <span className="detail-value url-value">{result.url}</span>
                       <p className="detail-description">
-                        The web address of your page. Short, descriptive URLs are easier for users to read and search engines to crawl.
+                        {t('htmlDetails.urlDesc')}
                       </p>
                     </div>
                     <div className="detail-item">
                       <div className="detail-header-group">
-                        <span className="detail-label">Status code</span>
-                        <div className="ai-badge">AI Analysis</div>
+                        <span className="detail-label">{t('htmlDetails.statusCode')}</span>
+                        <div className="ai-badge">{t('aiAnalysis')}</div>
                       </div>
                       <span className="detail-value">{result.technicalAnalysis?.pageSpeed?.status || '200'}</span>
                       <p className="detail-description">
-                        The server response code. A 200 OK status means the page loaded successfully. 4xx or 5xx codes indicate errors.
+                        {t('htmlDetails.statusDesc')}
                       </p>
                     </div>
                     <div className="detail-item">
                       <div className="detail-header-group">
-                        <span className="detail-label">Response time</span>
-                        <div className="ai-badge">AI Analysis</div>
+                        <span className="detail-label">{t('htmlDetails.responseTime')}</span>
+                        <div className="ai-badge">{t('aiAnalysis')}</div>
                       </div>
-                      <span className="detail-value">{(result.technicalAnalysis?.pageSpeed?.loadTime / 1000).toFixed(2)} sec</span>
+                      <span className="detail-value">{(result.technicalAnalysis?.pageSpeed?.loadTime / 1000).toFixed(2)} {'sec'}</span>
                       <p className="detail-description">
-                        How quickly your server responds. Faster response times (under 500ms) improve user experience and crawl budget.
+                        {t('htmlDetails.timeDesc')}
                       </p>
                     </div>
                     <div className="detail-item">
                       <div className="detail-header-group">
-                        <span className="detail-label">Word count</span>
-                        <div className="ai-badge">AI Analysis</div>
+                        <span className="detail-label">{t('htmlDetails.wordCount')}</span>
+                        <div className="ai-badge">{t('aiAnalysis')}</div>
                       </div>
                       <span className="detail-value">
                         {typeof result.seoElements?.wordCount === 'number'
@@ -251,7 +253,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                           : '-'}
                       </span>
                       <p className="detail-description">
-                        The total number of words on the page. Sufficient content length (typically 600+ words) helps cover topics in depth for better ranking.
+                        {t('htmlDetails.countDesc')}
                       </p>
                     </div>
                   </div>
@@ -279,13 +281,13 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                           <div className="breakdown-title-group">
                             <h3>{cat.label}</h3>
                             <span className="breakdown-percentage" style={{ color: scoreColor }}>
-                              {Math.round(percentage)}%
+                            {Math.round(percentage)}{'%'}
                             </span>
                           </div>
                           <div className="breakdown-meta-group">
                             {categoryRecs.length > 0 && (
                               <span className="issues-badge">
-                                {categoryRecs.length} issue{categoryRecs.length !== 1 ? 's' : ''}
+                              {categoryRecs.length} {'issue'}{categoryRecs.length !== 1 ? 's' : ''}
                                 {criticalCount > 0 && ` • ${criticalCount} critical`}
                               </span>
                             )}
@@ -296,7 +298,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                         </div>
 
                         <div className="detail-header-group" style={{ marginBottom: '6px' }}>
-                          <div className="ai-badge">AI Analysis</div>
+                          <div className="ai-badge">{t('aiAnalysis')}</div>
                         </div>
                         <p className="breakdown-desc">{cat.description}</p>
 
@@ -307,7 +309,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                         {/* Expanded Details */}
                         {expanded && categoryRecs.length > 0 && (
                           <div className="breakdown-details">
-                            <h4 className="details-subtitle">Checks</h4>
+                            <h4 className="details-subtitle">{t('checks')}</h4>
                             <div className="checks-list">
                               {categoryRecs.map((rec, i) => {
                                 const checkStatus = rec.priority === 'high' ? 'error' : rec.priority === 'medium' ? 'warning' : 'tip';
@@ -323,14 +325,14 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                                         <span className="check-title">{rec.issue}</span>
                                       </div>
                                       <span className={`check-badge ${checkStatus}`}>
-                                        {checkStatus === 'error' ? 'Error' : checkStatus === 'warning' ? 'Warning' : 'Tip'}
+                                        {t(checkStatus)}
                                       </span>
                                     </div>
                                     <div className="check-body">
                                       <p className="check-recommendation">{rec.recommendation}</p>
                                       {rec.impact && (
                                         <p className="check-impact">
-                                          <strong>Impact:</strong> {rec.impact}
+                                        <strong>{t('impact')}{':'}</strong> {rec.impact}
                                         </p>
                                       )}
                                     </div>
@@ -350,8 +352,8 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
             {/* Critical Issues */}
             <section className="section">
               <div className="section-header">
-                <h2 className="section-title">Critical Issues</h2>
-                <span className="issues-count">{criticalIssues} found</span>
+                <h2 className="section-title">{t('criticalIssues')}</h2>
+                <span className="issues-count">{t('issuesFound', { count: criticalIssues })}</span>
               </div>
 
               <div className="issues-list">
@@ -368,7 +370,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                               <h3 className="issue-title" style={{ marginBottom: 0 }}>{issue.issue}</h3>
-                              <div className="ai-badge" style={{ fontSize: '9px', padding: '1px 6px' }}>AI</div>
+                              <div className="ai-badge" style={{ fontSize: '9px', padding: '1px 6px' }}>{'AI'}</div>
                             </div>
                             <p className="issue-desc">{issue.recommendation}</p>
                           </div>
@@ -379,18 +381,18 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                       </div>
 
                       <div className="issue-meta">
-                        <span className="meta-tag critical">Critical</span>
-                        <span className="meta-tag impact">+15-20% CTR</span>
-                        <span className="meta-tag difficulty">Easy Fix</span>
+                        <span className="meta-tag critical">{t('critical')}</span>
+                        <span className="meta-tag impact">{'+15-20% CTR'}</span>
+                        <span className="meta-tag difficulty">{'Easy Fix'}</span>
                       </div>
 
                       {expandedIssue === idx && (
                         <div className="issue-actions">
                           <button className="action-btn primary">
                             <ExternalLink size={14} />
-                            Fix Guide
+                            {t('fixGuide')}
                           </button>
-                          <button className="action-btn">Learn More</button>
+                          <button className="action-btn">{t('learnMore')}</button>
                         </div>
                       )}
                     </div>
@@ -400,8 +402,8 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
               {issuesFound > 3 && (
                 <div className="locked-content">
                   <Lock size={16} />
-                  <span>{issuesFound - 3} more issues hidden</span>
-                  <button className="unlock-btn">Unlock Full Report</button>
+                  <span>{t('moreIssuesHidden', { count: issuesFound - 3 })}</span>
+                  <button className="unlock-btn">{t('unlockFullReport')}</button>
                 </div>
               )}
             </section>
@@ -413,18 +415,18 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
 
             {/* AI Strategic Insights */}
             <section className="section">
-              <h2 className="section-title">AI Strategic Insights</h2>
+              <h2 className="section-title">{t('strategicInsights')}</h2>
 
               {result.strategicRecommendations && result.strategicRecommendations.length > 0 ? (
                 <div className="recommendations-list">
                   {result.strategicRecommendations.map((rec, idx) => (
                     <div key={rec.id} className="rec-card">
-                      <div className="rec-number">#{idx + 1}</div>
+                      <div className="rec-number">{'#'}{idx + 1}</div>
                       <div className="rec-content">
                         <h3 className="rec-title">{rec.title}</h3>
                         <p className="rec-description">{rec.description}</p>
                         <div className="rec-meta">
-                          <span className={`rec-badge ${rec.impact.toLowerCase()}`}>{rec.impact} Impact</span>
+                          <span className={`rec-badge ${rec.impact.toLowerCase()}`}>{t('impactValue', { value: rec.impact })}</span>
                           <span className="rec-badge type">{rec.type}</span>
                         </div>
                       </div>
@@ -433,7 +435,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                 </div>
               ) : (
                 <div className="no-insights">
-                  <p>No AI insights available at this time.</p>
+                  <p>{t('noInsights')}</p>
                 </div>
               )}
             </section>
@@ -442,16 +444,16 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
             <div className="upgrade-card">
               <div className="upgrade-header">
                 <Zap size={24} fill="currentColor" />
-                <h3>Unlock Full SEO Power</h3>
+                <h3>{t('unlockPower')}</h3>
               </div>
-              <p>Get the complete analysis with advanced features:</p>
+              <p>{t('upgradeDesc')}</p>
               <ul className="upgrade-features">
-                <li><CheckCircle2 size={16} /> 40+ detailed recommendations</li>
-                <li><CheckCircle2 size={16} /> Competitor analysis</li>
-                <li><CheckCircle2 size={16} /> Keyword rank tracking</li>
-                <li><CheckCircle2 size={16} /> Priority support</li>
+                <li><CheckCircle2 size={16} /> {t('upgradeFeatures.recs')}</li>
+                <li><CheckCircle2 size={16} /> {t('upgradeFeatures.competitor')}</li>
+                <li><CheckCircle2 size={16} /> {t('upgradeFeatures.keywords')}</li>
+                <li><CheckCircle2 size={16} /> {t('upgradeFeatures.support')}</li>
               </ul>
-              <button className="btn-upgrade">Upgrade to Pro</button>
+              <button className="btn-upgrade">{t('upgradeToPro')}</button>
             </div>
 
           </div>
@@ -464,15 +466,15 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
       <div className="sticky-cta">
         <div className="sticky-content">
           <div className="sticky-left">
-            <div className="sticky-score">{result.healthScore}/100</div>
+            <div className="sticky-score">{result.healthScore}{'/100'}</div>
             <div className="sticky-info">
-              <span className="sticky-label">SEO Score</span>
-              <span className="sticky-issues">{criticalIssues} critical issues</span>
+              <span className="sticky-label">{t('healthScore')}</span>
+              <span className="sticky-issues">{t('criticalIssuesFound', { count: criticalIssues })}</span>
             </div>
           </div>
           <button className="sticky-btn">
             <Download size={16} />
-            Get Full Report
+            {t('getFullReport')}
           </button>
         </div>
       </div>

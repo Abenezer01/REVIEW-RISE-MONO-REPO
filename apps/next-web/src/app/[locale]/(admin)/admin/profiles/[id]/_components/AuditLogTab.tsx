@@ -1,6 +1,8 @@
 /* eslint-disable import/no-unresolved */
 import React, { useMemo } from 'react';
 
+import { useTranslations, useFormatter } from 'next-intl';
+
 import {
   Box,
   Card,
@@ -20,8 +22,6 @@ import {
   Refresh as RefreshIcon,
   Error as ErrorIcon
 } from '@mui/icons-material';
-
-import { formatDynamicDate } from '@platform/utils';
 
 import { ListingProvider, ListingContent } from '@/components/shared/listing/listing';
 
@@ -58,10 +58,13 @@ const formatActionName = (action: string) => {
 };
 
 const AuditLogTab: React.FC<AuditLogTabProps> = ({ logs, isLoading }) => {
+  const t = useTranslations('BrandProfiles.history');
+  const format = useFormatter();
+
   const columns = useMemo<GridColDef[]>(() => [
     {
       field: 'action',
-      headerName: 'Action',
+      headerName: t('columns.action'),
       flex: 1.5,
       renderCell: (params) => (
         <Stack direction="row" spacing={1} alignItems="center">
@@ -74,12 +77,12 @@ const AuditLogTab: React.FC<AuditLogTabProps> = ({ logs, isLoading }) => {
     },
     {
       field: 'user',
-      headerName: 'User',
+      headerName: t('columns.user'),
       flex: 1,
       renderCell: (params) => {
         const user = params.value;
 
-        if (!user) return <Typography variant="body2" color="text.secondary">System</Typography>;
+        if (!user) return <Typography variant="body2" color="text.secondary">{t('system')}</Typography>;
 
         return (
           <Stack direction="row" spacing={1} alignItems="center">
@@ -98,7 +101,7 @@ const AuditLogTab: React.FC<AuditLogTabProps> = ({ logs, isLoading }) => {
     },
     {
       field: 'details',
-      headerName: 'Details',
+      headerName: t('columns.details'),
       flex: 2,
       renderCell: (params) => {
         const details = params.value;
@@ -126,17 +129,23 @@ const AuditLogTab: React.FC<AuditLogTabProps> = ({ logs, isLoading }) => {
     },
     {
       field: 'createdAt',
-      headerName: 'Date',
+      headerName: t('columns.date'),
       flex: 1,
       renderCell: (params) => (
         <Typography variant="body2" color="text.secondary">
-          {formatDynamicDate(params.value, 'MMM DD, YYYY HH:mm')}
+          {format.dateTime(new Date(params.value), {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}
         </Typography>
       )
     },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: t('columns.status'),
       width: 120,
       renderCell: (params) => {
         const action = params.row.action;
@@ -144,7 +153,7 @@ const AuditLogTab: React.FC<AuditLogTabProps> = ({ logs, isLoading }) => {
 
         return (
           <Chip
-            label={action.includes('FAILED') ? 'Failed' : 'Success'}
+            label={action.includes('FAILED') ? t('statusLabels.failed') : t('statusLabels.success')}
             size="small"
             color={color as any}
             variant="outlined"
@@ -152,7 +161,7 @@ const AuditLogTab: React.FC<AuditLogTabProps> = ({ logs, isLoading }) => {
         );
       }
     }
-  ], []);
+  ], [t, format]);
 
   if (isLoading) {
     return (

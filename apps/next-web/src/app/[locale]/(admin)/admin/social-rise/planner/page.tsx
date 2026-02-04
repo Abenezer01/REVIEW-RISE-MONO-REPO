@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -18,31 +18,38 @@ import {
   Card, 
   CardContent,
   Chip,
-  Divider,
   CircularProgress,
-  Alert,
+  Divider,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
   Stack,
-  useTheme,
-  alpha
+  Typography,
+  useTheme
 } from '@mui/material';
 
-import { 
-  CalendarToday, 
-  AutoAwesome, 
-  ContentPaste, 
-  EventNote as EventNoteIcon,
+import {
   ArrowForward,
-  CheckCircle as CheckCircleIcon,
-  Psychology,
+  AutoAwesome,
   AutoGraph,
+  CalendarToday,
+  CheckCircle as CheckCircleIcon,
+  ContentPaste,
+  EventNote as EventNoteIcon,
+  Psychology,
   TipsAndUpdates
 } from '@mui/icons-material';
+
+import { useFormatter, useTranslations } from 'next-intl';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
 import { useLocationFilter } from '@/hooks/useLocationFilter';
 import { BrandService } from '@/services/brand.service';
 
-const Icon = ({ icon, fontSize, color, ...rest }: { icon: string; fontSize?: number | string; color?: string; [key: string]: any }) => {
+const Icon = ({ icon, fontSize, color, ...rest }: { icon: string; fontSize?: number | string; color?: string;[key: string]: any }) => {
   return <i className={icon} style={{ fontSize, color }} {...rest} />;
 };
 
@@ -64,6 +71,11 @@ const PLATFORM_ICONS: Record<string, { icon: string, color: string }> = {
 
 export default function PlannerPage() {
   const theme = useTheme();
+  const t = useTranslations('dashboard');
+  const ts = useTranslations('studio.planner');
+  const tc = useTranslations('common');
+  const tp = useTranslations('social.planner');
+  const format = useFormatter();
   const isDark = theme.palette.mode === 'dark';
   const { businessId } = useBusinessId();
   const { locationId } = useLocationFilter();
@@ -218,7 +230,7 @@ export default function PlannerPage() {
                 '&:hover': { borderWidth: 2 }
               }}
             >
-              View Scheduler
+              {t('navigation.social-rise')}
             </Button>
           )}
           {plan && plan.status !== 'converted' && (
@@ -281,14 +293,14 @@ export default function PlannerPage() {
           sx={{ mb: 4, borderRadius: '16px', fontWeight: 600 }}
           action={
             plan?.status === 'converted' ? (
-              <Button 
-                color="inherit" 
-                size="small" 
-                component={Link} 
+              <Button
+                color="inherit"
+                size="small"
+                component={Link}
                 href={`/${locale}/admin/social-rise`}
                 sx={{ fontWeight: '900', border: '1px solid white', borderRadius: '8px', ml: 2 }}
               >
-                GO TO SCHEDULER
+                {tp('goToScheduler')}
               </Button>
             ) : null
           }
@@ -793,8 +805,8 @@ export default function PlannerPage() {
               <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 450, mb: 5, fontWeight: 500, lineHeight: 1.6 }}>
                 Our AI strategist is ready to create a high-converting content calendar based on your Brand DNA and the upcoming seasonal landscape.
               </Typography>
-              <Button 
-                variant="contained" 
+              <Button
+                variant="contained"
                 size="large"
                 startIcon={<AutoAwesome />}
                 onClick={handleGenerate}
