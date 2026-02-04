@@ -28,7 +28,7 @@ export type MessageVariant = 'TOAST' | 'INLINE' | 'MODAL';
 
 export interface NotifyOptions {
   variant?: MessageVariant;
-  severity?: SystemMessageSeverity;
+  severity?: SystemMessageSeverity | string;
   params?: Record<string, any>;
   title?: string;
   onConfirm?: () => void;
@@ -37,7 +37,10 @@ export interface NotifyOptions {
 }
 
 interface SystemMessageContextType {
-  notify: (code: SystemMessageCode, options?: NotifyOptions) => void;
+  notify: (
+    codeOrConfig: SystemMessageCode | string | ({ messageCode: SystemMessageCode | string } & NotifyOptions),
+    options?: NotifyOptions
+  ) => void;
 }
 
 const SystemMessageContext = createContext<SystemMessageContextType | undefined>(undefined);
@@ -75,11 +78,22 @@ export const SystemMessageProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [t]);
 
-  const notify = useCallback((code: SystemMessageCode, options: NotifyOptions = {}) => {
-    const severity = options.severity || DefaultSeverityMap[code] || SystemMessageSeverity.INFO;
-    const variant = options.variant || 'TOAST';
-    const message = getMessage(code, options.params);
-    const toastId = `${code}-${JSON.stringify(options.params || {})}`;
+  const notify = useCallback((codeOrConfig: any, options: NotifyOptions = {}) => {
+    let code: string;
+    let finalOptions: NotifyOptions;
+
+    if (typeof codeOrConfig === 'object' && codeOrConfig !== null && 'messageCode' in codeOrConfig) {
+      code = codeOrConfig.messageCode;
+      finalOptions = { ...codeOrConfig, ...options };
+    } else {
+      code = codeOrConfig;
+      finalOptions = options;
+    }
+
+    const severity = finalOptions.severity || DefaultSeverityMap[code as SystemMessageCode] || SystemMessageSeverity.INFO;
+    const variant = finalOptions.variant || 'TOAST';
+    const message = getMessage(code as any, finalOptions.params);
+    const toastId = `${code}-${JSON.stringify(finalOptions.params || {})}`;
 
     if (variant === 'TOAST') {
       // Deduplication
@@ -113,13 +127,13 @@ export const SystemMessageProvider: React.FC<{ children: React.ReactNode }> = ({
           toast(message, toastOptions);
       }
     } else if (variant === 'MODAL') {
-      setModal({ isOpen: true, code, options });
+      setModal({ isOpen: true, code: code as any, options: finalOptions });
     } else if (variant === 'INLINE') {
       const id = Math.random().toString(36).substring(7);
 
-      setInlineMessages(prev => [...prev, { id, code, options }]);
+      setInlineMessages(prev => [...prev, { id, code: code as any, options: finalOptions }]);
 
-      if (!options.persist) {
+      if (!finalOptions.persist) {
         setTimeout(() => {
           setInlineMessages(prev => prev.filter(m => m.id !== id));
         }, 5000);
@@ -129,13 +143,13 @@ export const SystemMessageProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Listen to global events
   useEffect(() => {
-    const handler = (event: { code: SystemMessageCode; options?: NotifyOptions }) => {
+    const handler = (event: { code: SystemMessageCode | string; options?: NotifyOptions }) => {
       notify(event.code, event.options);
     };
 
     systemMessageEvents.on(SYSTEM_MESSAGE_EVENT, handler);
 
-return () => systemMessageEvents.off(SYSTEM_MESSAGE_EVENT, handler);
+    return () => systemMessageEvents.off(SYSTEM_MESSAGE_EVENT, handler);
   }, [notify]);
 
   const handleModalClose = () => {

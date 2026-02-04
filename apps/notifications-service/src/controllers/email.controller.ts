@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { createSuccessResponse, createErrorResponse, SystemMessageCode } from '@platform/contracts';
+import { createSuccessResponse, createErrorResponse, SystemMessageCode, ErrorCode } from '@platform/contracts';
 import { sendVerificationEmail } from '../services/email.service';
 
 /**
