@@ -15,6 +15,8 @@
     "profiles": "Profiles"
   },
   "common": {
+    "new": "New",
+    "popular": "Popular",
     "copyright": "© {year}, all rights reserved",
     "apply": "Apply",
     "save": "Save",

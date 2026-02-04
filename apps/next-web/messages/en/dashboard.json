@@ -44,8 +44,18 @@
     "settings": "Settings",
     "system-settings": "System Settings",
     "feature-flags": "Feature Flags",
-    "ai-visibility": "AI Visibility",
-    "subscription-issues": "Subscription Issues"
+    "ai-visibility": "AI Visibility"
+  },
+  "errors": {
+    "firstNameRequired": "First name is required",
+    "lastNameRequired": "Last name is required",
+    "invalidEmail": "Invalid email address",
+    "emailRequired": "Email is required",
+    "roleRequired": "Role is required",
+    "businessRequired": "Business is required",
+    "locationRequired": "Location is required",
+    "passwordRequired": "Password is required",
+    "passwordMin": "Password must be at least {min} characters"
   },
   "auto-reply": "Auto-Reply Settings",
   "seo": {
@@ -751,7 +761,10 @@
       "pendingAIReply": "Pending AI Replies",
       "latestFeedback": "Latest customer feedback across all platforms",
       "waitingApproval": "Reviews waiting for AI reply approval before posting",
-      "reviewPost": "Review & Post"
+      "reviewPost": "Review & Post",
+      "themesTitle": "Review Themes & Keywords",
+      "themesSubtitle": "Recurring topics in customer feedback",
+      "recent": "Recent Reviews"
     },
     "tabs": {
       "overview": "Overview",
@@ -801,13 +814,7 @@
         "yAxisLabel": "| Y: {label}"
       }
     },
-    "reviews": {
-      "themesTitle": "Review Themes & Keywords",
-      "themesSubtitle": "Recurring topics in customer feedback",
-      "recent": "Recent Reviews",
-      "velocity": "Review Velocity",
-      "sentiment": "Sentiment Distribution"
-    },
+
     "content": {
       "title": "Content Management",
       "calendar": "Content Calendar",
