@@ -132,6 +132,35 @@
       "day": "DAY",
       "platforms": "PLATFORMS:",
       "scheduled": "SCHEDULED"
+    },
+    "overview": {
+      "studio": "SOCIAL MEDIA STUDIO",
+      "description": "Your centralized command center for Social Rise visibility, performance metrics, and strategy reports.",
+      "stats": {
+        "scheduledPosts": "Scheduled Posts",
+        "published30d": "Published (30d)",
+        "failedPosts": "Failed Posts"
+      },
+      "charts": {
+        "performanceTitle": "Publishing Performance",
+        "performanceSubtitle": "Successful vs Failed posts over the last 14 days",
+        "distributionTitle": "Platform Distribution",
+        "distributionSubtitle": "Posts by social platform",
+        "successful": "Successful",
+        "failed": "Failed"
+      },
+      "upcoming": {
+        "title": "Upcoming Posts",
+        "contentMessaging": "Content & Messaging",
+        "scheduledFor": "Scheduled for {date} at {time}",
+        "noPosts": "No upcoming posts scheduled."
+      },
+      "logs": {
+        "title": "Recent Logs",
+        "logs": "Logs",
+        "publishing": "{platform} Publishing",
+        "noLogs": "No recent publishing activity."
+      }
     }
   }
 }

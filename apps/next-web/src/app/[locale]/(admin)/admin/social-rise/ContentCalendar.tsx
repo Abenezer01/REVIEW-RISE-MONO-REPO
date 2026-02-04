@@ -26,6 +26,7 @@ const PLATFORM_ICONS: Record<string, { icon: string; color: string }> = {
   FACEBOOK: { icon: 'tabler-brand-facebook', color: '#1877F2' },
   LINKEDIN: { icon: 'tabler-brand-linkedin', color: '#0A66C2' },
   TWITTER: { icon: 'tabler-brand-x', color: '#000000' },
+  X: { icon: 'tabler-brand-x', color: '#000000' },
   GOOGLE_BUSINESS: { icon: 'tabler-brand-google', color: '#4285F4' },
 
   // Map mixed case names from planner/other services
@@ -51,6 +52,31 @@ const ContentCalendar = ({ scheduledPosts, onEventDrop, onDateClick, onEventClic
   const postEvents = scheduledPosts.map(post => {
     let color = '';
     let className = '';
+
+    const ALL_SUPPORTED_PLATFORMS = ['INSTAGRAM', 'FACEBOOK', 'LINKEDIN', 'TWITTER', 'GOOGLE_BUSINESS'];
+
+    // Normalize platforms array to handle comma-separated strings if they exist
+    const normalizedPlatforms = (post.platforms || []).reduce((acc: string[], curr: string) => {
+      if (typeof curr === 'string' && (curr.toUpperCase() === 'ALL PLATFORMS' || curr.toUpperCase() === 'ALL_PLATFORMS')) {
+        return [...acc, ...ALL_SUPPORTED_PLATFORMS];
+      }
+
+      if (typeof curr === 'string' && curr.includes(',')) {
+        const split = curr.split(',').map(p => p.trim());
+
+        return [...acc, ...split.reduce((pAcc: string[], p) => {
+          if (p.toUpperCase() === 'ALL PLATFORMS' || p.toUpperCase() === 'ALL_PLATFORMS') {
+            return [...pAcc, ...ALL_SUPPORTED_PLATFORMS];
+          }
+
+          return [...pAcc, p];
+        }, [])];
+      }
+
+      return [...acc, curr];
+    }, []);
+
+    const uniquePlatforms = Array.from(new Set(normalizedPlatforms)) as string[];
 
     // Color based on status - using softer background colors with high contrast text/border
     switch(post.status) {
@@ -85,6 +111,7 @@ const ContentCalendar = ({ scheduledPosts, onEventDrop, onDateClick, onEventClic
       classNames: [className, 'modern-event'],
       extendedProps: {
         ...post,
+        platforms: uniquePlatforms,
         type: 'post',
         statusColor: color
       }
@@ -147,6 +174,7 @@ const ContentCalendar = ({ scheduledPosts, onEventDrop, onDateClick, onEventClic
           textTransform: 'capitalize',
           fontSize: '0.85rem',
           transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          margin: '0 4px !important',
           '&:hover': {
             transform: 'translateY(-1px)'
           }
@@ -156,6 +184,21 @@ const ContentCalendar = ({ scheduledPosts, onEventDrop, onDateClick, onEventClic
           fontWeight: 600,
           color: alpha(theme.palette.text.primary, 0.7),
           fontSize: '0.9rem'
+        },
+        '& .fc-day-has-events': {
+          backgroundColor: isDark ? alpha(theme.palette.primary.main, 0.03) : alpha(theme.palette.primary.main, 0.01),
+          position: 'relative',
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            backgroundColor: theme.palette.primary.main,
+            opacity: 0.5
+          }
         }
       }}>
         <AppFullCalendar className='app-calendar'>
@@ -172,12 +215,95 @@ const ContentCalendar = ({ scheduledPosts, onEventDrop, onDateClick, onEventClic
           selectMirror={true}
           dayMaxEvents={3}
           height={800}
+          dayCellClassNames={(arg) => {
+            const hasEvents = scheduledPosts.some(post => {
+              const postDate = new Date(post.scheduledAt);
+
+              return postDate.toDateString() === arg.date.toDateString();
+            });
+
+            return hasEvents ? ['fc-day-has-events'] : [];
+          }}
           eventContent={(eventInfo) => {
             const platforms = eventInfo.event.extendedProps.platforms || [];
             const statusColor = eventInfo.event.extendedProps.statusColor || theme.palette.primary.main;
             const isDark = theme.palette.mode === 'dark';
             const status = eventInfo.event.extendedProps.status || 'scheduled';
+            const viewType = eventInfo.view.type;
 
+            // Compact view for Month Grid
+            if (viewType === 'dayGridMonth') {
+              return (
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  px: 2,
+                  py: 1,
+                  width: '100%',
+                  borderRadius: '10px',
+                  backgroundColor: isDark ? alpha(statusColor, 0.12) : alpha(statusColor, 0.08),
+                  borderLeft: `3px solid ${statusColor}`,
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    backgroundColor: isDark ? alpha(statusColor, 0.2) : alpha(statusColor, 0.15),
+                    transform: 'translateX(2px)'
+                  },
+                  cursor: 'pointer',
+                  overflow: 'hidden'
+                }}>
+                  <Box sx={{ display: 'flex', gap: 0.5, flexShrink: 0 }}>
+                    {platforms.slice(0, 2).map((p: string) => {
+                      let platformKey = p.toUpperCase().replace(/\s+/g, '_');
+
+                      if (platformKey === 'X') platformKey = 'TWITTER';
+
+                      const platform = PLATFORM_ICONS[platformKey] || PLATFORM_ICONS[p] || { icon: 'tabler-world', color: theme.palette.text.secondary };
+
+                      return (
+                        <Icon
+                          key={p}
+                          icon={platform.icon}
+                          fontSize={12}
+                          style={{ color: platform.color }}
+                        />
+                      );
+                    })}
+                    {platforms.length > 2 && (
+                      <Typography variant="caption" sx={{ fontSize: '0.6rem', fontWeight: 700, opacity: 0.7 }}>
+                        +{platforms.length - 2}
+                      </Typography>
+                    )}
+                  </Box>
+
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 700,
+                      color: isDark ? 'text.primary' : 'text.primary',
+                      fontSize: '0.75rem',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      flexGrow: 1
+                    }}
+                  >
+                    {eventInfo.event.title}
+                  </Typography>
+
+                  <Box sx={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    bgcolor: statusColor,
+                    flexShrink: 0,
+                    boxShadow: `0 0 4px ${statusColor}`
+                  }} />
+                </Box>
+              );
+            }
+
+            // Detailed view for Week, Day, and List views
             return (
               <Box sx={{ 
                 display: 'flex', 
@@ -206,8 +332,11 @@ const ContentCalendar = ({ scheduledPosts, onEventDrop, onDateClick, onEventClic
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
                   <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
                     {platforms.map((p: string) => {
-                      const platformKey = PLATFORM_ICONS[p] ? p : p.toUpperCase().replace(/\s+/g, '_');
-                      const platform = PLATFORM_ICONS[platformKey] || { icon: 'tabler-world', color: theme.palette.text.secondary };
+                      let platformKey = p.toUpperCase().replace(/\s+/g, '_');
+
+                      if (platformKey === 'X') platformKey = 'TWITTER';
+
+                      const platform = PLATFORM_ICONS[platformKey] || PLATFORM_ICONS[p] || { icon: 'tabler-world', color: theme.palette.text.secondary };
 
                       return (
                         <Box
