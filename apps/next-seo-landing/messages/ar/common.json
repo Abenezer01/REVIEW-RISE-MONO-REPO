@@ -1,8 +1,15 @@
 {
+  "theme": {
+    "light": "فاتح",
+    "dark": "داكن",
+    "system": "النظام"
+  },
   "landing": {
     "common": {
       "brandName": "ReviewRise",
-      "toggleTheme": "تبديل المظهر"
+      "toggleTheme": "تبديل المظهر",
+      "switchToLight": "التبديل إلى الوضع الفاتح",
+      "switchToDark": "التبديل إلى الوضع الداكن"
     },
     "header": {
       "features": "المميزات"

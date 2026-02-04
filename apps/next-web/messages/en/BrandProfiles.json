@@ -1,6 +1,8 @@
 {
   "title": "Brand Profiles",
   "description": "Manage and extract visual identities from brand websites.",
+  "addFirstBrand": "Add your first Brand Profile to get started.",
+  "loadingBrands": "Loading your brand profiles...",
   "metrics": {
     "colors": "Colors",
     "fonts": "Fonts",

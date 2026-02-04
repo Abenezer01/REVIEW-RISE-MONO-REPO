@@ -1,8 +1,15 @@
 {
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
   "landing": {
     "common": {
       "brandName": "ReviewRise",
-      "toggleTheme": "Toggle theme"
+      "toggleTheme": "Toggle theme",
+      "switchToLight": "Switch to light mode",
+      "switchToDark": "Switch to dark mode"
     },
     "header": {
       "features": "Features"

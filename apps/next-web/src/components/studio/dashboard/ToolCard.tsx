@@ -17,7 +17,8 @@ interface ToolCardProps {
 }
 
 export default function ToolCard({ title, description, icon, stats, color = 'primary.main', isNew, isPopular, onClick }: ToolCardProps) {
-    const t = useTranslations()
+    const t = useTranslations('studio')
+    const tc = useTranslations('common')
 
     return (
         <Card 
@@ -52,8 +53,8 @@ export default function ToolCard({ title, description, icon, stats, color = 'pri
                         {icon}
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                        {isNew && <Chip label={t('common.new')} size="small" sx={{ bgcolor: '#FF4081', color: 'white', borderRadius: 1, height: 22, fontSize: '0.7rem', fontWeight: 'bold' }} />}
-                        {isPopular && <Chip label={t('common.popular')} size="small" sx={{ bgcolor: '#7C4DFF', color: 'white', borderRadius: 1, height: 22, fontSize: '0.7rem', fontWeight: 'bold' }} />}
+                        {isNew && <Chip label={tc('common.new')} size="small" sx={{ bgcolor: '#FF4081', color: 'white', borderRadius: 1, height: 22, fontSize: '0.7rem', fontWeight: 'bold' }} />}
+                        {isPopular && <Chip label={tc('common.popular')} size="small" sx={{ bgcolor: '#7C4DFF', color: 'white', borderRadius: 1, height: 22, fontSize: '0.7rem', fontWeight: 'bold' }} />}
                     </Box>
                 </Box>
 

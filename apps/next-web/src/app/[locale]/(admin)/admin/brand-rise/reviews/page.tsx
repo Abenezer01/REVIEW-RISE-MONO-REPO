@@ -48,7 +48,7 @@ const ReviewsPage = () => {
   const theme = useTheme();
   const t = useTranslations('dashboard');
   const tc = useTranslations('common');
-  const ts = useTranslations('status');
+  const ts = useTranslations('common.status');
   const { businessId } = useBusinessId();
   const { locationId } = useLocationFilter();
   const { user } = useAuth();

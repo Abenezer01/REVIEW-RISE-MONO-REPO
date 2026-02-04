@@ -12,7 +12,8 @@ export default function ThemeToggle() {
     <button
       onClick={toggleTheme}
       className="theme-toggle"
-      aria-label={t('toggleTheme')}
+      aria-label={theme === 'light' ? t('switchToDark') : t('switchToLight')}
+      title={theme === 'light' ? t('switchToDark') : t('switchToLight')}
     >
       {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
       <style jsx>{`

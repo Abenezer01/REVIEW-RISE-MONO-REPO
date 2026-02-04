@@ -19,7 +19,7 @@ interface SentimentBadgeProps {
 const SentimentBadge = ({ sentiment, size = 'small', showIcon = true }: SentimentBadgeProps) => {
   const theme = useTheme()
   const t = useTranslations('dashboard')
-  const ts = useTranslations('status')
+  const ts = useTranslations('common.status')
 
   if (!sentiment) {
     return (

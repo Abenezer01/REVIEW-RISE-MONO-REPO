@@ -1,4 +1,8 @@
 {
+  "common": {
+    "export": "Export",
+    "share": "Share"
+  },
   "page": {
     "title": "AI Content Studio",
     "description": "Generate AI-powered content including captions, hashtags, ideas, and more.",
@@ -297,6 +301,7 @@
       "planOverview": "Plan Overview",
       "totalPosts": "Total Posts"
     },
+    "suggestedPlatform": "Suggested Platform",
     "scheduled": {
       "noPosts": "No posts scheduled for this day."
     }
@@ -451,6 +456,7 @@
     "statDuration": "DURATION",
     "statScenes": "SCENES",
     "statWords": "WORDS",
+    "untitledPost": "Untitled Post",
     "inputTitle": "Video Settings",
     "styleLabel": "Video Style",
     "loading": "Writing...",

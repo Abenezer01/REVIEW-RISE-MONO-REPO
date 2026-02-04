@@ -117,43 +117,43 @@
       "connecting": "جاري الاتصال...",
       "connectPage": "ربط الصفحة",
       "done": "تم"
-    },
-    "callback": {
-      "finalizing": "جاري إتمام الاتصال...",
-      "info": "تعالج هذه الصفحة ردود فعل OAuth. تتم إدارة عملية الاتصال عبر نوافذ منبثقة."
-    },
-    "publishingLogs": {
-      "published": "تم النشر",
-      "failed": "فشل",
-      "processing": "جاري المعالجة",
-      "pending": "قيد الانتظار",
-      "time": "الوقت",
-      "platform": "المنصة",
-      "postContent": "محتوى المنشور",
-      "status": "الحالة",
-      "detailsErrors": "التفاصيل / الأخطاء",
-      "publishedSuccessfully": "تم النشر بنجاح",
-      "attempt": "محاولة {count}",
-      "waitingToStart": "في انتظار البدء",
-      "actions": "الإجراءات",
-      "viewOriginalPost": "عرض المنشور الأصلي",
-      "allPlatforms": "جميع المنصات",
-      "twitterX": "تويتر (X)",
-      "googleBusiness": "جوجل للأعمال",
-      "allStatuses": "جميع الحالات",
-      "startDate": "تاريخ البدء",
-      "endDate": "تاريخ الانتهاء"
-    },
-    "planner": {
-      "goToScheduler": "الذهاب إلى المجدول",
-      "aiAdaptationActive": "تكييف الذكاء الاصطناعي نشط",
-      "aiStrategySync": "تتم مزامنة الاستراتيجية تلقائيًا مع مهمة وصوت Brand DNA الخاص بك.",
-      "curatingStrategy": "تنسيق استراتيجيتك...",
-      "targeting": "الاستهداف",
-      "week": "أسبوع",
-      "day": "يوم",
-      "platforms": "المنصات:",
-      "scheduled": "مجدول"
     }
+  },
+  "callback": {
+    "finalizing": "جاري إتمام الاتصال...",
+    "info": "تعالج هذه الصفحة ردود فعل OAuth. تتم إدارة عملية الاتصال عبر نوافذ منبثقة."
+  },
+  "publishingLogs": {
+    "published": "تم النشر",
+    "failed": "فشل",
+    "processing": "جاري المعالجة",
+    "pending": "قيد الانتظار",
+    "time": "الوقت",
+    "platform": "المنصة",
+    "postContent": "محتوى المنشور",
+    "status": "الحالة",
+    "detailsErrors": "التفاصيل / الأخطاء",
+    "publishedSuccessfully": "تم النشر بنجاح",
+    "attempt": "محاولة {count}",
+    "waitingToStart": "في انتظار البدء",
+    "actions": "الإجراءات",
+    "viewOriginalPost": "عرض المنشور الأصلي",
+    "allPlatforms": "جميع المنصات",
+    "twitterX": "تويتر (X)",
+    "googleBusiness": "جوجل للأعمال",
+    "allStatuses": "جميع الحالات",
+    "startDate": "تاريخ البدء",
+    "endDate": "تاريخ الانتهاء"
+  },
+  "planner": {
+    "goToScheduler": "الذهاب إلى المجدول",
+    "aiAdaptationActive": "تكييف الذكاء الاصطناعي نشط",
+    "aiStrategySync": "تتم مزامنة الاستراتيجية تلقائيًا مع مهمة وصوت Brand DNA الخاص بك.",
+    "curatingStrategy": "تنسيق استراتيجيتك...",
+    "targeting": "الاستهداف",
+    "week": "أسبوع",
+    "day": "يوم",
+    "platforms": "المنصات:",
+    "scheduled": "مجدول"
   }
 }

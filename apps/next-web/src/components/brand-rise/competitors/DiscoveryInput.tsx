@@ -25,7 +25,7 @@ interface DiscoveryInputProps {
 
 export const DiscoveryInput = ({ onDiscover, isLoading }: DiscoveryInputProps) => {
   const t = useTranslations('dashboard');
-  const ts = useTranslations('status');
+  const ts = useTranslations('common.status');
   const theme = useTheme();
   const [inputValue, setInputValue] = useState('');
 
