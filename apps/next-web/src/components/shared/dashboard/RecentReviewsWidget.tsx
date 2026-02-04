@@ -12,6 +12,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
 import Rating from '@mui/material/Rating'
+import { useTranslations } from 'next-intl'
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt'
 import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral'
 import SentimentDissatisfiedIcon from '@mui/icons-material/SentimentDissatisfied'
@@ -35,6 +36,8 @@ interface RecentReviewsWidgetProps {
 
 const RecentReviewsWidget = ({ reviews, unrepliedCount, recentRepliesCount }: RecentReviewsWidgetProps) => {
   const theme = useTheme()
+  const t = useTranslations('dashboard')
+  const tc = useTranslations('common')
 
   const getSentimentIcon = (sentiment?: string | null) => {
     const sent = sentiment?.toLowerCase()
@@ -67,17 +70,17 @@ return text.substring(0, maxLength) + '...'
   return (
     <Card sx={{ height: '100%' }}>
       <CardHeader
-        title="Recent Reviews"
+        title={t('reviews.recent')}
         action={
           <Box display="flex" gap={1}>
             <Chip
-              label={`${unrepliedCount} Unreplied`}
+              label={t('reviews.unrepliedCount', { count: unrepliedCount })}
               color="error"
               size="small"
               variant="outlined"
             />
             <Chip
-              label={`${recentRepliesCount} Recent Replies`}
+              label={t('reviews.recentRepliesCount', { count: recentRepliesCount })}
               color="success"
               size="small"
               variant="outlined"
@@ -88,7 +91,7 @@ return text.substring(0, maxLength) + '...'
       <CardContent sx={{ pt: 0, maxHeight: 500, overflow: 'auto' }}>
         {reviews.length === 0 ? (
           <Box display="flex" alignItems="center" justifyContent="center" minHeight={200}>
-            <Typography color="text.secondary">No recent reviews</Typography>
+            <Typography color="text.secondary">{t('reviews.noRecent')}</Typography>
           </Box>
         ) : (
           <List sx={{ p: 0 }}>
@@ -125,7 +128,7 @@ return text.substring(0, maxLength) + '...'
                         {new Date(review.publishedAt).toLocaleDateString()}
                         {review.response && (
                           <Chip
-                            label="Replied"
+                            label={tc('status.replied')}
                             size="small"
                             color="success"
                             variant="outlined"

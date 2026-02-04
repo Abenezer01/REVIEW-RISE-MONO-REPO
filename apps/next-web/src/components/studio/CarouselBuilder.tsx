@@ -16,7 +16,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import IconButton from '@mui/material/IconButton'
 import { useTranslations } from 'next-intl'
 
-import { toast } from 'react-toastify'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import { useBusinessId } from '@/hooks/useBusinessId'
 import { SERVICES } from '@/configs/services'
@@ -30,6 +30,7 @@ import PlatformSelector from './selectors/PlatformSelector'
 export default function CarouselBuilder() {
     const t = useTranslations('studio.carousels')
     const tc = useTranslations('common')
+    const { notify } = useSystemMessages()
     const { businessId } = useBusinessId()
     const [loading, setLoading] = useState(false)
     const [topic, setTopic] = useState('')
@@ -75,12 +76,18 @@ export default function CarouselBuilder() {
         setTopic(draft.topic || '')
         setSlides(draft.slides || [])
         setViewMode('generator')
-        toast.info(t('draftLoaded'))
+        notify({
+            messageCode: 'studio.draftLoaded' as any,
+            severity: 'INFO'
+        })
     }
 
     const handleGenerate = async () => {
         if (!topic) {
-            toast.error(t('topicError'))
+            notify({
+                messageCode: 'studio.topicError' as any,
+                severity: 'ERROR'
+            })
             
 return
         }
@@ -104,10 +111,16 @@ return
 
             setSlides(data.slides || [])
             setCurrentSlide(0)
-            toast.success(t('slidesGenerated', { count: data.slides?.length || 0 }))
+            notify({
+                messageCode: 'studio.slidesGenerated' as any,
+                severity: 'SUCCESS'
+            })
         } catch (error) {
             console.error(error)
-            toast.error(t('generateError'))
+            notify({
+                messageCode: 'studio.generateError' as any,
+                severity: 'ERROR'
+            })
         } finally {
             setLoading(false)
         }
@@ -123,7 +136,10 @@ return
 
     const handleSaveDraft = async () => {
         if (!businessId || !topic || slides.length === 0) {
-            toast.error(t('noCarouselToSave'))
+            notify({
+                messageCode: 'studio.noCarouselToSave' as any,
+                severity: 'ERROR'
+            })
             
 return
         }
@@ -138,10 +154,16 @@ return
                     imagePrompt: slide.visualDescription
                 }))
             })
-            toast.success(t('saveDraftSuccess'))
+            notify({
+                messageCode: 'studio.saveDraftSuccess' as any,
+                severity: 'SUCCESS'
+            })
         } catch (error) {
             console.error('Error saving carousel draft:', error)
-            toast.error(t('saveDraftError'))
+            notify({
+                messageCode: 'studio.saveDraftError' as any,
+                severity: 'ERROR'
+            })
         }
     }
 

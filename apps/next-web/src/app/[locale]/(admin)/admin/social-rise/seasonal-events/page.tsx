@@ -33,7 +33,11 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
   return <i className={icon} style={{ fontSize }} {...rest} />;
 };
 
+const markets = ['Global', 'US', 'UK', 'EU', 'Asia', 'Northern Hemisphere', 'Southern Hemisphere'];
+
 const SeasonalEventsPage = () => {
+  const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
   const { notify } = useSystemMessages();
   const { businessId } = useBusinessId();
   const [events, setEvents] = useState<any[]>([]);
@@ -50,15 +54,7 @@ const SeasonalEventsPage = () => {
     description: ''
   });
 
-  const markets = ['Global', 'US', 'UK', 'EU', 'Asia', 'Northern Hemisphere', 'Southern Hemisphere'];
-
-  useEffect(() => {
-    if (businessId) {
-      fetchEvents();
-    }
-  }, [businessId]);
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     if (!businessId) return;
 
     setLoading(true);
@@ -73,7 +69,13 @@ const SeasonalEventsPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [businessId, notify]);
+
+  useEffect(() => {
+    if (businessId) {
+      fetchEvents();
+    }
+  }, [businessId, fetchEvents]);
 
   const handleOpen = useCallback((event?: any) => {
     if (event) {
@@ -149,13 +151,13 @@ const SeasonalEventsPage = () => {
   const columns: GridColDef[] = useMemo(() => [
     { 
       field: 'name', 
-      headerName: 'Event Name', 
+      headerName: t('navigation.seasonalEvents.eventName'),
       flex: 1, 
       minWidth: 200 
     },
     { 
       field: 'date', 
-      headerName: 'Date', 
+      headerName: t('navigation.seasonalEvents.date'),
       flex: 0.8, 
       minWidth: 150,
       renderCell: (params) => (
@@ -166,7 +168,7 @@ const SeasonalEventsPage = () => {
     },
     { 
       field: 'market', 
-      headerName: 'Market', 
+      headerName: t('navigation.seasonalEvents.market'),
       flex: 0.6, 
       minWidth: 120,
       renderCell: (params) => (
@@ -175,7 +177,7 @@ const SeasonalEventsPage = () => {
     },
     { 
       field: 'description', 
-      headerName: 'Description', 
+      headerName: t('navigation.seasonalEvents.description'),
       flex: 2, 
       minWidth: 300,
       renderCell: (params) => (
@@ -186,19 +188,19 @@ const SeasonalEventsPage = () => {
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: tc('actions'),
       sortable: false,
       width: 120,
       align: 'right',
       headerAlign: 'right',
       renderCell: (params) => (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Tooltip title="Edit">
+          <Tooltip title={tc('common.edit')}>
             <IconButton onClick={() => handleOpen(params.row)} color="primary" size="small">
               <Icon icon="tabler-edit" fontSize={20} />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title={tc('common.delete')}>
             <IconButton onClick={() => handleDelete(params.row.id)} color="error" size="small">
               <Icon icon="tabler-trash" fontSize={20} />
             </IconButton>
@@ -206,7 +208,7 @@ const SeasonalEventsPage = () => {
         </Box>
       )
     }
-  ], [handleOpen, handleDelete]);
+  ], [handleOpen, handleDelete, t, tc]);
 
   return (
     <Box sx={{ p: 6 }}>
@@ -214,10 +216,10 @@ const SeasonalEventsPage = () => {
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={6}>
         <Box>
           <Typography variant="h4" sx={{ mb: 1, fontWeight: 600 }}>
-            Seasonal Events
+            {t('navigation.seasonalEvents.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Manage your brand&apos;s seasonal events and holiday marketing schedule.
+            {t('navigation.seasonalEvents.subtitle')}
           </Typography>
         </Box>
         <Button 
@@ -226,7 +228,7 @@ const SeasonalEventsPage = () => {
           startIcon={<Icon icon="tabler-plus" fontSize={20} />}
           sx={{ px: 5, py: 2, borderRadius: 1.5 }}
         >
-          Add Event
+          {t('navigation.seasonalEvents.addEvent')}
         </Button>
       </Stack>
 
@@ -248,12 +250,12 @@ const SeasonalEventsPage = () => {
         }}
       >
         <DialogTitle sx={{ pb: 2, borderBottom: theme => `1px solid ${theme.palette.divider}` }}>
-          {editingEvent ? 'Edit Seasonal Event' : 'Add New Event'}
+          {editingEvent ? t('navigation.seasonalEvents.editEvent') : t('navigation.seasonalEvents.addNewEvent')}
         </DialogTitle>
         <DialogContent sx={{ mt: 4 }}>
           <Stack spacing={4}>
             <TextField
-              label="Event Name"
+              label={t('navigation.seasonalEvents.eventName')}
               fullWidth
               placeholder="e.g., Summer Solstice Sale"
               value={formData.name}
@@ -262,7 +264,7 @@ const SeasonalEventsPage = () => {
             
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={4}>
               <TextField
-                label="Date"
+                label={t('navigation.seasonalEvents.date')}
                 type="date"
                 fullWidth
                 value={formData.date}
@@ -271,7 +273,7 @@ const SeasonalEventsPage = () => {
               />
               <TextField
                 select
-                label="Market"
+                label={t('navigation.seasonalEvents.market')}
                 fullWidth
                 value={formData.market}
                 onChange={(e) => setFormData({ ...formData, market: e.target.value })}
@@ -285,7 +287,7 @@ const SeasonalEventsPage = () => {
             </Stack>
 
             <TextField
-              label="Description"
+              label={t('navigation.seasonalEvents.description')}
               fullWidth
               multiline
               rows={4}
@@ -296,9 +298,9 @@ const SeasonalEventsPage = () => {
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 6, py: 4, borderTop: theme => `1px solid ${theme.palette.divider}` }}>
-          <Button onClick={handleClose} color="inherit">Cancel</Button>
+          <Button onClick={handleClose} color="inherit">{tc('common.cancel')}</Button>
           <Button onClick={handleSubmit} variant="contained" sx={{ borderRadius: 1 }}>
-            {editingEvent ? 'Update Event' : 'Create Event'}
+            {editingEvent ? tc('common.save') : tc('common.create')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -308,8 +310,8 @@ const SeasonalEventsPage = () => {
         handleClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteDialogOpen(false)}
-        title="Delete Seasonal Event"
-        content="Are you sure you want to delete this seasonal event? This action cannot be undone."
+        title={t('navigation.seasonalEvents.deleteTitle')}
+        content={t('navigation.seasonalEvents.deleteConfirm')}
         type="delete"
       />
     </Box>

@@ -117,6 +117,7 @@ const Profiles = () => {
         </Box>
       </Paper>
 
+      {/* eslint-disable-next-line react/jsx-no-literals */}
       <style jsx global>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }

@@ -19,10 +19,11 @@ import TextField from '@mui/material/TextField'
 import CircularProgress from '@mui/material/CircularProgress'
 
 // Hook Imports
+import { useTranslations } from 'next-intl'
+
 import { useSettings } from '@core/hooks/useSettings'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
-import { useTranslations } from 'next-intl'
 
 import apiClient from '@/lib/apiClient'
 import { SERVICES } from '@/configs/services'

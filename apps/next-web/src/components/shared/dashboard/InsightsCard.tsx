@@ -10,6 +10,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import { useTranslations } from 'next-intl'
 
 interface Insight {
   id: string
@@ -24,14 +25,16 @@ interface InsightsCardProps {
 }
 
 const InsightsCard = ({ insights }: InsightsCardProps) => {
+  const t = useTranslations('dashboard.brandRise.overview.insights')
+
   return (
     <Card sx={{ height: '100%' }}>
       <CardHeader 
-        title="Key Insights" 
-        subheader="AI-powered recommendations"
+        title={t('title')}
+        subheader={t('subtitle')}
         action={
             <Typography variant="caption" sx={{ bgcolor: 'secondary.light', color: 'secondary.dark', px: 1, py: 0.5, borderRadius: 1 }}>
-                AI Generated
+                {t('aiGenerated')}
             </Typography>
         }
       />

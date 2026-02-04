@@ -8,9 +8,12 @@ import {
     CircularProgress // Added missing import
 } from '@mui/material';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import { useTranslations } from 'next-intl';
 
 
 export const DiscoveryProgress = () => {
+    const t = useTranslations('dashboard.brandRise.competitors.discoveryProgress');
+
     return (
         <Paper 
             elevation={0}
@@ -23,10 +26,10 @@ export const DiscoveryProgress = () => {
         >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="subtitle1" fontWeight={700} sx={{ color: 'white' }}>
-                    Discovery in Progress
+                    {t('title')}
                 </Typography>
                 <Typography variant="body2" fontWeight={600} sx={{ color: '#9E69FD' }}>
-                    Analyzing SERP data...
+                    {t('subtitle')}
                 </Typography>
             </Box>
 
@@ -45,10 +48,10 @@ export const DiscoveryProgress = () => {
             />
 
             <Stack direction="row" justifyContent="space-between">
-                <Step label="Keywords analyzed" completed />
-                <Step label="Domains extracted" completed />
-                <Step label="Classifying competitors" active />
-                <Step label="Ranking results" />
+                <Step label={t('steps.keywords')} completed />
+                <Step label={t('steps.domains')} completed />
+                <Step label={t('steps.classifying')} active />
+                <Step label={t('steps.ranking')} />
             </Stack>
         </Paper>
     );

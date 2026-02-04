@@ -14,6 +14,7 @@ import ListItem from '@mui/material/ListItem'
 import StarIcon from '@mui/icons-material/Star'
 import BusinessIcon from '@mui/icons-material/Store'
 import { useTheme } from '@mui/material/styles'
+import { useTranslations } from 'next-intl'
 
 interface CompetitorComparisonProps {
   businessStats: {
@@ -29,11 +30,13 @@ interface CompetitorComparisonProps {
 
 const CompetitorComparison = ({ businessStats, competitors }: CompetitorComparisonProps) => {
   const theme = useTheme()
+  const t = useTranslations('dashboard.brandRise.competitors')
+  const td = useTranslations('dashboard')
 
   // Ensure we display correctly even if API returns numbers or strings
   const stats = [
     {
-      name: 'Your Business',
+      name: t('detail.yourBrand'),
       rating: Number(businessStats.averageRating),
       reviews: Number(businessStats.totalReviews),
       isSelf: true
@@ -51,7 +54,7 @@ const CompetitorComparison = ({ businessStats, competitors }: CompetitorComparis
 
   return (
     <Card sx={{ height: '100%' }}>
-      <CardHeader title="Competitor Comparison" />
+      <CardHeader title={t('detail.compare')} />
       <CardContent sx={{ pt: 1 }}>
         <List disablePadding>
           {stats.map((item, index) => (
@@ -74,7 +77,7 @@ const CompetitorComparison = ({ businessStats, competitors }: CompetitorComparis
                  </Avatar>
                  <Box flex={1}>
                     <Typography variant="subtitle2" fontWeight={item.isSelf ? 700 : 500}>
-                        {item.name} {item.isSelf && '(You)'}
+                        {item.name} {item.isSelf && `(${t('detail.yourBrand')})`}
                     </Typography>
                     <Box display="flex" alignItems="center" gap={0.5}>
                         <StarIcon sx={{ fontSize: 16, color: 'warning.main' }} />
@@ -82,7 +85,7 @@ const CompetitorComparison = ({ businessStats, competitors }: CompetitorComparis
                             {item.rating.toFixed(1)}
                         </Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                            ({item.reviews.toLocaleString()} reviews)
+                            {'('}{item.reviews.toLocaleString()} {td('overview.totalReviews').toLowerCase()}{')'}
                         </Typography>
                     </Box>
                  </Box>

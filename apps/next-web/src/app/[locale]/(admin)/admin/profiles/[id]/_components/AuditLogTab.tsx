@@ -1,5 +1,6 @@
 /* eslint-disable import/no-unresolved */
 import React, { useMemo } from 'react';
+
 import { useTranslations, useFormatter } from 'next-intl';
 
 import {
@@ -21,8 +22,6 @@ import {
   Refresh as RefreshIcon,
   Error as ErrorIcon
 } from '@mui/icons-material';
-
-import { formatDynamicDate } from '@platform/utils';
 
 import { ListingProvider, ListingContent } from '@/components/shared/listing/listing';
 

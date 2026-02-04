@@ -128,7 +128,10 @@
     "thisWeek": "هذا الأسبوع",
     "thisMonth": "هذا الشهر",
     "thisYear": "هذه السنة",
-    "allTime": "كل الوقت"
+    "allTime": "كل الوقت",
+    "last7Days": "آخر 7 أيام",
+    "last30Days": "آخر 30 يوم",
+    "last90Days": "آخر 90 يوم"
   },
   "reviews": {
     "title": "المراجعات",
@@ -425,6 +428,29 @@
   },
   "brandRise": {
     "subtitle": "رؤى أداء وظهور العلامة التجارية",
+    "reports": {
+      "detail": {
+        "title": "تقرير الاستراتيجية",
+        "subtitle": "الفرص والرؤى المولدة بالذكاء الاصطناعي",
+        "positioning": "تموضع السوق",
+        "positioningDesc": "علامتك التجارية مقابل المنافسين في الأبعاد الرئيسية.",
+        "strategies": "استراتيجيات التمايز",
+        "gaps": "فجوات السوق",
+        "taglines": "الشعارات المقترحة",
+        "roadmap": "خارطة طريق المحتوى",
+        "confidence": "مستوى الثقة",
+        "premiumEnterprise": "مؤسسات متميزة",
+        "premiumEnterpriseDesc": "وكالات كبيرة تستهدف شركات فورتشن 500 مع حزم شاملة.",
+        "midMarketGeneralist": "عامة للسوق المتوسطة",
+        "midMarketGeneralistDesc": "وكالات كاملة الخدمات تخدم الشركات متوسطة الحجم بعروض متنوعة.",
+        "nicheSpecialist": "متخصص في نيش",
+        "nicheSpecialistDesc": "وكالات متخصصة تركز على صناعات محددة مع مكانة متميزة.",
+        "highSaturation": "تشبع عالٍ",
+        "opportunity": "فرصة",
+        "xAxisLabel": "س: {label}",
+        "yAxisLabel": "| ص: {label}"
+      }
+    },
     "competitors": {
       "tracking": "تتبع المنافسين",
       "exportList": "تصدير القائمة",

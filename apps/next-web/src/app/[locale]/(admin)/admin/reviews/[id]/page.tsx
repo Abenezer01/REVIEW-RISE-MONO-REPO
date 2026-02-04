@@ -31,6 +31,8 @@ import TimelineDot from '@mui/lab/TimelineDot'
 
 import { SystemMessageCode } from '@platform/contracts'
 
+import { useTranslations, useFormatter } from 'next-intl'
+
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -39,7 +41,6 @@ import CustomTextField from '@core/components/mui/TextField'
 import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
 import EmotionChips from '@/components/shared/reviews/EmotionChips'
 
-import { useTranslations, useFormatter } from 'next-intl'
 import { updateReviewReply, regenerateAISuggestion, rejectReviewReply, getReviewWithHistory } from '@/app/actions/review'
 import { getBrandProfileByBusinessId } from '@/app/actions/brand-profile'
 

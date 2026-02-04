@@ -2,6 +2,8 @@ import React from 'react'
 
 import { Box, Card, CardContent, Typography, IconButton, Tooltip } from '@mui/material'
 
+import { useTranslation } from '@/hooks/useTranslation'
+
 interface ContentIdeasCardProps {
     contentIdeas: Array<{
         title: string
@@ -12,6 +14,8 @@ interface ContentIdeasCardProps {
 }
 
 export default function ContentIdeasCard({ contentIdeas, onUseIdea }: ContentIdeasCardProps) {
+    const t = useTranslation('studio')
+
     return (
         <Card variant="outlined" sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
             <CardContent sx={{ p: 3.5 }}>
@@ -20,7 +24,7 @@ export default function ContentIdeasCard({ contentIdeas, onUseIdea }: ContentIde
                         <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: '#FFF8E1', color: '#FFC107' }}>
                             <i className="tabler-bulb" style={{ fontSize: 20 }} />
                         </Box>
-                        <Typography variant="h6" fontWeight="bold">Content Ideas</Typography>
+                    <Typography variant="h6" fontWeight="bold">{t('ideas.title')}</Typography>
                     </Box>
                     <IconButton size="small">
                             <i className="tabler-plus" />

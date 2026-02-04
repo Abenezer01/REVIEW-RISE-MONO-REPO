@@ -24,7 +24,7 @@ const Page = forwardRef<HTMLDivElement, Props>(({ children, title = '', titleId,
   return (
     <>
       <Head>
-        <title>{`${titleId ? transl(titleId) : title} | ECDMS`}</title>
+        <title>{titleId ? transl(titleId) : title} | {transl('app.name')}</title>
         {meta}
       </Head>
 

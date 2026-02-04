@@ -32,6 +32,14 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
   return <i className={icon} style={{ fontSize }} {...rest} />;
 };
 
+const PLATFORMS = [
+  { value: 'INSTAGRAM', key: 'instagram', icon: 'tabler-brand-instagram', color: '#E4405F' },
+  { value: 'FACEBOOK', key: 'facebook', icon: 'tabler-brand-facebook', color: '#1877F2' },
+  { value: 'LINKEDIN', key: 'linkedin', icon: 'tabler-brand-linkedin', color: '#0A66C2' },
+  { value: 'TWITTER', key: 'twitter', icon: 'tabler-brand-x', color: '#000000' },
+  { value: 'GOOGLE_BUSINESS', key: 'google', icon: 'tabler-brand-google', color: '#4285F4' }
+];
+
 interface PostEditorDialogProps {
   open: boolean;
   onClose: () => void;
@@ -42,36 +50,13 @@ interface PostEditorDialogProps {
   onDuplicate?: (postId: string) => Promise<void>;
 }
 
-const PLATFORMS = [
-  { value: 'INSTAGRAM', label: 'Instagram', icon: 'tabler-brand-instagram', color: '#E4405F' },
-  { value: 'FACEBOOK', label: 'Facebook', icon: 'tabler-brand-facebook', color: '#1877F2' },
-  { value: 'LINKEDIN', label: 'LinkedIn', icon: 'tabler-brand-linkedin', color: '#0A66C2' },
-  { value: 'TWITTER', label: 'Twitter (X)', icon: 'tabler-brand-x', color: '#000000' },
-  { value: 'GOOGLE_BUSINESS', label: 'Google Business', icon: 'tabler-brand-google', color: '#4285F4' }
-];
-
-const STATUS_OPTIONS = [
-  { value: 'draft', label: 'Draft' },
-  { value: 'scheduled', label: 'Scheduled' },
-  { value: 'published', label: 'Published' },
-  { value: 'failed', label: 'Failed' },
-  { value: 'cancelled', label: 'Cancelled' }
-];
-
 const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, onDuplicate }: PostEditorDialogProps) => {
   const t = useTranslations('studio.editor');
+  const tc = useTranslations('common');
   const theme = useTheme();
   const router = useRouter();
   const isDark = theme.palette.mode === 'dark';
   const [loading, setLoading] = useState(false);
-
-  const PLATFORMS = useMemo(() => [
-    { value: 'INSTAGRAM', label: 'Instagram', icon: 'tabler-brand-instagram', color: '#E4405F' },
-    { value: 'FACEBOOK', label: 'Facebook', icon: 'tabler-brand-facebook', color: '#1877F2' },
-    { value: 'LINKEDIN', label: 'LinkedIn', icon: 'tabler-brand-linkedin', color: '#0A66C2' },
-    { value: 'TWITTER', label: 'Twitter (X)', icon: 'tabler-brand-x', color: '#000000' },
-    { value: 'GOOGLE_BUSINESS', label: 'Google Business', icon: 'tabler-brand-google', color: '#4285F4' }
-  ], []);
 
   const STATUS_OPTIONS = useMemo(() => [
     { value: 'draft', label: t('status.draft') },
@@ -335,7 +320,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                         return (
                           <Chip 
                             key={value} 
-                            label={platform?.label || value} 
+                            label={platform ? tc(`channel.${platform.key}`) : value}
                             size="small" 
                             icon={<Icon icon={platform?.icon || 'tabler-world'} fontSize={16} style={{ color: platform?.color }} />}
                             sx={{ 
@@ -377,7 +362,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                         <Icon icon={platform.icon} fontSize={18} />
                       </Box>
                       <ListItemText 
-                        primary={platform.label} 
+                        primary={tc(`channel.${platform.key}`)}
                         primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
                       />
                     </Box>

@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import * as Yup from 'yup'
 import { Grid, Stack, Button, TextField, Typography, Card, CardContent } from '@mui/material'
+import { useTranslations } from 'next-intl'
 
 import type { KeywordDTO } from '@platform/contracts'
 
@@ -25,6 +26,8 @@ interface KeywordFormProps {
 }
 
 const KeywordForm = ({ businessId, initialData, onCancel, onSuccess }: KeywordFormProps) => {
+  const t = useTranslations('dashboard')
+  const tc = useTranslations('common')
   const [competitorDomain, setCompetitorDomain] = useState('')
   const [suggestions, setSuggestions] = useState<{ keyword: string; tags: string[] }[]>([])
   const [harvested, setHarvested] = useState<{ keyword: string; tags: string[] }[]>([])
@@ -78,8 +81,8 @@ const KeywordForm = ({ businessId, initialData, onCancel, onSuccess }: KeywordFo
         country: initialData?.country || '',
         tags: initialData?.tags || []
       } as any}
-      title="SEO Keyword"
-      translatedTitle="SEO Keyword"
+      title={t('seo.keywords.formTitle')}
+      translatedTitle={t('seo.keywords.formTitle')}
       edit={!!initialData}
       onCancel={onCancel}
       getPayload={(values: any) => ({
@@ -105,38 +108,38 @@ return res.data
       {(formik) => (
         <Grid container spacing={2}>
           <Grid size={{ xs: 12 }}>
-            <CustomTextBox name="keyword" label="Keyword" fullWidth />
+            <CustomTextBox name="keyword" label={t('seo.keywords.keyword')} fullWidth />
           </Grid>
           <Grid size={{ xs: 6 }}>
             <CustomSelectBox
               name="language"
-              label="Language"
-              options={[{ value: 'en', label: 'English' }, { value: 'ar', label: 'Arabic' }]}
+              label={t('seo.keywords.language')}
+              options={[{ value: 'en', label: tc('language.english') }, { value: 'ar', label: tc('language.arabic') }]}
               fullWidth
             />
           </Grid>
           <Grid size={{ xs: 6 }}>
             <CustomSelectBox
               name="deviceType"
-              label="Device"
-              options={[{ value: 'mobile', label: 'Mobile' }, { value: 'desktop', label: 'Desktop' }]}
+              label={t('seo.keywords.device')}
+              options={[{ value: 'mobile', label: t('seo.keywords.mobile') }, { value: 'desktop', label: t('seo.keywords.desktop') }]}
               fullWidth
             />
           </Grid>
           <Grid size={{ xs: 6 }}>
-            <CustomTextBox name="city" label="City" fullWidth />
+            <CustomTextBox name="city" label={t('seo.keywords.city')} fullWidth />
           </Grid>
           <Grid size={{ xs: 6 }}>
-            <CustomTextBox name="country" label="Country" fullWidth />
+            <CustomTextBox name="country" label={t('seo.keywords.country')} fullWidth />
           </Grid>
           <Grid size={{ xs: 12 }}>
-            <CustomTagsInput name="tags" label="Tags (comma separated)" fullWidth multiline />
+            <CustomTagsInput name="tags" label={t('seo.keywords.tags')} fullWidth multiline />
           </Grid>
           <Grid size={{ xs: 12 }}>
             <Stack direction="row" spacing={2} alignItems="center">
-              <Button variant="outlined" onClick={handleSuggest} disabled={!businessId}>Auto-suggest</Button>
-              <TextField label="Competitor Domain" value={competitorDomain} onChange={e => setCompetitorDomain(e.target.value)} sx={{ minWidth: 240 }} />
-              <Button variant="outlined" onClick={handleHarvest} disabled={!businessId || !competitorDomain}>Harvest Competitor</Button>
+              <Button variant="outlined" onClick={handleSuggest} disabled={!businessId}>{t('seo.keywords.autoSuggest')}</Button>
+              <TextField label={t('seo.keywords.competitorDomain')} value={competitorDomain} onChange={e => setCompetitorDomain(e.target.value)} sx={{ minWidth: 240 }} />
+              <Button variant="outlined" onClick={handleHarvest} disabled={!businessId || !competitorDomain}>{t('seo.keywords.harvestCompetitor')}</Button>
             </Stack>
           </Grid>
           {(suggestions.length > 0 || harvested.length > 0) && (
@@ -144,7 +147,7 @@ return res.data
               <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} mt={2}>
                 <Card sx={{ flex: 1 }}>
                   <CardContent>
-                    <Typography variant="h6">Auto-suggested</Typography>
+                    <Typography variant="h6">{t('seo.keywords.autoSuggested')}</Typography>
                     <Stack spacing={1} mt={2}>
                       {suggestions.map((s, i) => (
                         <Stack key={i} direction="row" spacing={1} alignItems="center">
@@ -156,7 +159,7 @@ return res.data
                               formik.setFieldValue('tags', s.tags)
                             }}
                           >
-                            Use
+                            {t('seo.keywords.use')}
                           </Button>
                         </Stack>
                       ))}
@@ -165,7 +168,7 @@ return res.data
                 </Card>
                 <Card sx={{ flex: 1 }}>
                   <CardContent>
-                    <Typography variant="h6">Competitor Harvest</Typography>
+                    <Typography variant="h6">{t('seo.keywords.competitorHarvest')}</Typography>
                     <Stack spacing={1} mt={2}>
                       {harvested.map((s, i) => (
                         <Stack key={i} direction="row" spacing={1} alignItems="center">
@@ -177,7 +180,7 @@ return res.data
                               formik.setFieldValue('tags', s.tags)
                             }}
                           >
-                            Use
+                            {t('seo.keywords.use')}
                           </Button>
                         </Stack>
                       ))}

@@ -77,7 +77,7 @@ const ReviewSyncList = () => {
     }
 
     setLoading(false)
-  }, [page, rowsPerPage, filters])
+  }, [page, rowsPerPage, filters, notify])
 
   useEffect(() => {
     fetchData()

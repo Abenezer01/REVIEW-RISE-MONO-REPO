@@ -47,7 +47,7 @@ export default function PreviewCard({ platform, previewCaption, imagePrompt }: P
                             <>
                                 <i className="tabler-photo" style={{ fontSize: 48, opacity: 0.3 }} />
                                 <Typography variant="caption" sx={{ fontStyle: 'italic', opacity: 0.7 }}>
-                                    &ldquo;{imagePrompt.slice(0, 100)}...&rdquo;
+                                    {'"'}{imagePrompt.slice(0, 100)}...{'"'}
                                 </Typography>
                             </>
                         ) : (

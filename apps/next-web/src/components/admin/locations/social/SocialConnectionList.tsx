@@ -36,6 +36,9 @@ import {
     People as PeopleIcon
 } from '@mui/icons-material';
 
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
+
+
 import apiClient from '@/lib/apiClient';
 import { SERVICES } from '@/configs/services';
 
@@ -48,6 +51,7 @@ import { PlatformOption } from './PlatformOption';
 
 export const SocialConnectionList = ({ businessId, locationId }: SocialConnectionListProps) => {
     const t = useTranslations('social.connections');
+    const { notify } = useSystemMessages();
 
     // State
     const [connections, setConnections] = useState<SocialConnection[]>([]);
@@ -144,7 +148,7 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
         window.addEventListener('message', handleMessage);
         
 return () => window.removeEventListener('message', handleMessage);
-    }, [businessId, locationId]);
+    }, [businessId, locationId, t, notify]);
 
     // Handlers
 

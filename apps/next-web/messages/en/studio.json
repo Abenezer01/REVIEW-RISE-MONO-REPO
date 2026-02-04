@@ -12,7 +12,10 @@
     "recentTitle": "Recent Generations",
     "creditsTitle": "Credit Usage",
     "upgrade": "Upgrade",
-    "credits": "Credits"
+    "credits": "Credits",
+    "aiToolsCount": "8 AI Tools",
+    "multiPlatform": "Multi-Platform",
+    "instantResults": "Instant Results"
   },
   "tabs": {
     "magic": "Smart Create",
@@ -27,6 +30,17 @@
   "magic": {
     "title": "Smart Create",
     "subtitle": "Generate captions, hashtags, and ideas in one go.",
+    "completePackageTitle": "Your Complete Post Package",
+    "goalEngagement": "Goal: Engagement",
+    "needDifferentOptions": "Need Different Options?",
+    "generateNewVariations": "Generate new variations while keeping the same topic.",
+    "regeneratePackage": "Regenerate Package",
+    "generatedRelative": "Generated {count} min ago",
+    "quickActionsTitle": "Quick Actions",
+    "postInstantly": "Post Instantly",
+    "scheduleToSocial": "Schedule to Social",
+    "downloadPdf": "Download as PDF",
+    "shareWithTeam": "Share with Team",
     "heroTitle": "Create Complete Posts Instantly",
     "heroSubtitle": "One AI brain. One prompt. Caption + Hashtags + Content Ideas in seconds.",
     "backToStudio": "Back to Studio",
@@ -70,6 +84,9 @@
     "outputs": "OUTPUTS",
     "generation": "GENERATION",
     "accuracy": "ACCURACY",
+    "outputCount": "3-in-1",
+    "generationTime": "10s",
+    "accuracyRate": "98%",
     "readyTitle": "Ready to Create Magic?",
     "readyDesc": "Fill in the form and hit generate to get your complete post package.",
     "quickStart": "Quick Start Templates",
@@ -118,6 +135,11 @@
     "regenerate": "Regenerate",
     "variations": "3 variations",
     "resultsTitle": "Generated Captions",
+    "proTips": "Pro Tips",
+    "proTip1": "Add emojis to increase engagement by up to 47%",
+    "proTip2": "Keep captions under 150 characters for Instagram",
+    "proTip3": "Use questions to encourage comments",
+    "proTip4": "Include clear CTAs for better conversion",
     "generatedLabel": "Generated ({count})",
     "historyLabel": "History ({count})",
     "historyTitle": "Generation History",
@@ -135,9 +157,17 @@
   "hashtags": {
     "title": "Hashtag Generator",
     "subtitle": "Generate targeted hashtags for maximum reach",
+    "titleWithCount": "Hashtags ({count})",
+    "highVolumeTitle": "High-Volume Hashtags",
+    "nicheTitle": "Niche Hashtags",
+    "brandedTitle": "Branded Hashtags",
+    "thousandShort": "K",
+    "millionShort": "M",
     "inputTitle": "Hashtag Details",
     "industryLabel": "Industry / Niche",
+    "industryPlaceholder": "e.g., Fitness, Fashion, Tech",
     "audienceLabel": "Target Audience",
+    "audiencePlaceholder": "e.g., Young professionals, Millennials",
     "descriptionLabel": "Content Description",
     "topicLabel": "Topic / Keyword",
     "topicPlaceholder": "e.g. specialized coffee",
@@ -301,9 +331,37 @@
     "recentTitle": "Recent Generations",
     "recentEmpty": "No recent generations yet",
     "promptLabel": "Image Description",
+    "promptPlaceholder": "e.g., A futuristic cityscape at sunset with neon lights...",
+    "categoryOptional": "Category (Optional)",
+    "moodOptional": "Mood (Optional)",
+    "generatePromptIdeas": "Generate Prompt Ideas",
+    "generatingIdeas": "Generating Ideas...",
+    "promptIdeas": "Prompt Ideas",
     "enhanceButton": "Enhance Prompt",
     "optimizedPromptLabel": "Optimized Prompt",
     "styleLabel": "Art Style",
+    "styles": {
+      "photorealistic": "Photorealistic",
+      "digitalArt": "Digital Art",
+      "threeDRender": "3D Render",
+      "illustration": "Illustration"
+    },
+    "categories": {
+      "portrait": "Portrait",
+      "landscape": "Landscape",
+      "product": "Product",
+      "abstract": "Abstract",
+      "architecture": "Architecture",
+      "food": "Food"
+    },
+    "moods": {
+      "vibrant": "Vibrant",
+      "moody": "Moody",
+      "minimalist": "Minimalist",
+      "dramatic": "Dramatic",
+      "calm": "Calm",
+      "energetic": "Energetic"
+    },
     "sizeLabel": "Dimensions",
     "loading": "Generating...",
     "loadingState": "Creating pixel perfect art...",
@@ -314,6 +372,7 @@
     "title": "Carousel Builder",
     "subtitle": "Outline educational carousels efficiently.",
     "inputTitle": "Carousel Settings",
+    "layoutTemplate": "Layout Template",
     "topicLabel": "Topic or Theme",
     "topicPlaceholder": "10 social media tips for 2025...",
     "topicHelper": "What should your carousel be about?",
@@ -424,5 +483,22 @@
       "failed": "Failed",
       "cancelled": "Cancelled"
     }
+  },
+  "studio": {
+    "generateButtonLabel": "Generate {type}",
+    "resetPreview": "Reset preview to original caption",
+    "hashtagsAdded": "Added hashtags to preview",
+    "previewUpdated": "Updated preview with content idea",
+    "regenerateTriggered": "Regenerate triggered",
+    "promptTopicPlaceholder": "Please enter a topic or idea",
+    "promptGenerationSuccess": "Generated prompt ideas!",
+    "promptGenerationEmpty": "No prompts generated",
+    "promptGenerationError": "Failed to generate prompt ideas",
+    "promptApplied": "Prompt applied!"
+  },
+  "social": {
+    "schedulePost": "Schedule Post",
+    "posting": "Posting...",
+    "postNow": "Post Now"
   }
 }

@@ -32,7 +32,6 @@ import { getBrandProfileByBusinessId, updateAutoReplySettings } from '@/app/acti
 const AutoReplySettingsPage = () => {
   const { notify } = useSystemMessages()
   const t = useTranslations('dashboard')
-  const tc = useTranslations('common')
   const [businesses, setBusinesses] = useState<any[]>([])
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('')
   const [brandProfile, setBrandProfile] = useState<any>(null)
@@ -71,7 +70,7 @@ const AutoReplySettingsPage = () => {
     }
 
     fetchInitialData()
-  }, [])
+  }, [notify])
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -98,7 +97,7 @@ const AutoReplySettingsPage = () => {
     }
 
     fetchProfile()
-  }, [selectedBusinessId])
+  }, [selectedBusinessId, notify])
 
   const handleUpdateSettings = async (data: any) => {
     if (!selectedBusinessId || isUpdating) return

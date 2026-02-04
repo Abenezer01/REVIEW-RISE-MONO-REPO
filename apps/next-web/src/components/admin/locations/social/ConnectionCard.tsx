@@ -71,7 +71,7 @@ export const ConnectionCard = ({ connection, onRefresh, onDisconnect }: Connecti
                             />
                         </Stack>
                         <Typography variant="caption" color="text.secondary" display="block">
-                            {t(`platformLabels.${connection.platform as keyof typeof t.raw}`)} • { 'ID:' } {connection.pageId}
+                            {t(`platformLabels.${connection.platform as keyof typeof t.raw}`)} • { t('id') } {connection.pageId}
                         </Typography>
 
                         <Stack direction="row" spacing={3} mt={2}>

@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import GoogleIcon from '@mui/icons-material/Google';
 import StarIcon from '@mui/icons-material/Star';
 import { Avatar, Box, Button, Card, CardContent, CircularProgress, Grid, Rating, Typography } from '@mui/material';
+import { useTranslations } from 'next-intl';
 
 import apiClient from '@/lib/apiClient';
 
@@ -28,6 +29,7 @@ const PlatformIcon = ({ platform }: { platform: string }) => {
 };
 
 const LocationReviews = () => {
+    const t = useTranslations('dashboard');
     const params = useParams();
     const { id: locationId } = params;
     const [reviews, setReviews] = useState<Review[]>([]);
@@ -63,8 +65,8 @@ const LocationReviews = () => {
             <Card>
                 <CardContent sx={{ textAlign: 'center', py: 5 }}>
                     <StarIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
-                    <Typography variant="h6" color="text.secondary">No reviews found</Typography>
-                    <Typography variant="body2" color="text.secondary">Connect a review source to start syncing reviews.</Typography>
+                    <Typography variant="h6" color="text.secondary">{t('reviews.smart.empty.title')}</Typography>
+                    <Typography variant="body2" color="text.secondary">{t('reviews.smart.empty.description')}</Typography>
                 </CardContent>
             </Card>
         );
@@ -105,7 +107,7 @@ const LocationReviews = () => {
 
                             {review.response && (
                                 <Box sx={{ mt: 2, p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2, borderLeft: '3px solid', borderColor: 'primary.main' }}>
-                                    <Typography variant="caption" color="primary.main" fontWeight="bold">Response</Typography>
+                                    <Typography variant="caption" color="primary.main" fontWeight="bold">{t('reviews.smart.detail.yourReply')}</Typography>
                                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                                         {review.response}
                                     </Typography>
@@ -115,7 +117,7 @@ const LocationReviews = () => {
                              <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
                                     {!review.response && (
                                         <Button size="small" variant="outlined" color="primary">
-                                            Reply
+                                            {t('reviews.reply')}
                                         </Button>
                                     )}
                              </Box>

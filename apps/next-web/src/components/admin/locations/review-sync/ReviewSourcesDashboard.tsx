@@ -68,7 +68,7 @@ const ReviewSourcesDashboard = () => {
         } else if (searchParams.get('google_error')) {
             setSnackbar({ open: true, message: t('failedToConnect'), severity: 'error' });
         }
-    }, [searchParams, router]);
+    }, [searchParams, router, t]);
 
     const fetchData = useCallback(async () => {
         if (!locationId) return;
@@ -91,7 +91,7 @@ const ReviewSourcesDashboard = () => {
         } finally {
             setLoading(false);
         }
-    }, [locationId]);
+    }, [locationId, t]);
 
     useEffect(() => {
         fetchData();
@@ -319,11 +319,11 @@ const ReviewSourcesDashboard = () => {
                             </Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                 <Typography variant="caption" color="text.secondary">{t('syncFrequency')}</Typography>
-                                <Typography variant="caption" fontWeight="bold">{t('dailyAt', { time: '2:00 AM' })}</Typography>
+                                <Typography variant="caption" fontWeight="bold">{t('dailyAt', { time: t('googleModal.mockTime') })}</Typography>
                             </Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
                                 <Typography variant="caption" color="text.secondary">{t('lastSyncDuration')}</Typography>
-                                <Typography variant="caption" fontWeight="bold">{'2m 34s'}</Typography>
+                                <Typography variant="caption" fontWeight="bold">{t('googleModal.mockDurationValue')}</Typography>
                             </Box>
 
                             <Typography variant="caption" color="text.secondary" gutterBottom>{t('currentSyncProgress')}</Typography>

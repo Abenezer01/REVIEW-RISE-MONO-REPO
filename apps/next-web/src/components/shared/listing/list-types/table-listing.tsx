@@ -3,6 +3,8 @@ import { useState, useMemo, memo, useEffect } from 'react';
 import { Box, Card } from '@mui/material';
 import type { GridColDef, GridPaginationModel, GridRowParams } from '@mui/x-data-grid';
 import { DataGrid } from '@mui/x-data-grid';
+import { useTranslations } from 'next-intl';
+
 import type { Pagination } from '@platform/contracts';
 
 // Make T a generic type parameter
@@ -17,6 +19,7 @@ interface TableListingProps<T> {
 }
 
 const TableListing = memo(<T,>({ columns, items, pagination, onPagination, isLoading, getRowClassName, onRowClick }: TableListingProps<T>) => {
+  const tc = useTranslations('common');
   const [isMounted, setIsMounted] = useState(false);
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
@@ -74,7 +77,7 @@ const TableListing = memo(<T,>({ columns, items, pagination, onPagination, isLoa
       <Box sx={{ width: '100%', mb: 6 }}>
         <Card sx={{ height: 400, borderRadius: 2, border: (theme) => `1px solid ${theme.palette.divider}`, boxShadow: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {/* Skeleton or loading indicator while mounting */}
-          <Box sx={{ color: 'text.secondary' }}>Loading...</Box>
+          <Box sx={{ color: 'text.secondary' }}>{tc('common.loading')}</Box>
         </Card>
       </Box>
     );

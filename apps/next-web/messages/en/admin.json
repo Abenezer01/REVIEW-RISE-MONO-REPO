@@ -1,5 +1,10 @@
 {
   "featureFlags": {
+    "title": "Feature Flags",
+    "subtitle": "Manage global feature flags and toggles",
+    "searchPlaceholder": "Search feature flags...",
+    "rolloutPercent": "Rollout %",
+    "actions": "Actions",
     "createTitle": "Create Feature Flag",
     "editTitle": "Edit Feature Flag",
     "name": "Name",

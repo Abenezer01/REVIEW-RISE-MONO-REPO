@@ -19,6 +19,8 @@ import classnames from 'classnames'
 
 import { SystemMessageCode } from '@platform/contracts'
 
+import { useTranslations } from 'next-intl'
+
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 // Type Imports
@@ -29,7 +31,6 @@ import Link from '@components/Link'
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
 
-import { useTranslations } from 'next-intl'
 
 // Config Imports
 import themeConfig from '@configs/themeConfig'
