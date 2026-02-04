@@ -259,7 +259,8 @@
     "minRead": "min read"
   },
   "planner": {
-    "title": "30-Day Content Plan",
+    "title": "Content Planner",
+    "description": "Generate a comprehensive 30-day social media strategy tailored to your Brand DNA and seasonal events.",
     "subtitle": "Generate a full month of content strategy.",
     "inputTitle": "Plan Settings",
     "topicLabel": "Focus Topic",
@@ -280,9 +281,17 @@
       "startup": "Tech Startup"
     },
     "submitButton": "Generate 30-Day Plan",
-    "loading": "Planning...",
+    "loading": {
+      "title": "Curating your content strategy",
+      "description": "We're analyzing your brand and upcoming events to generate the perfect plan...",
+      "text": "Planning..."
+    },
     "resultsTitle": "Content Calendar",
-    "emptyState": "Create a roadmap for your content.",
+    "emptyState": {
+      "title": "Smart Adaptation",
+      "description": "Our AI considers your Brand DNA, target industry, and global seasonal events to craft a unique strategy that resonates with your audience.",
+      "placeholder": "Create a roadmap for your content."
+    },
     "day": "Day",
     "savePlan": "Save Plan",
     "noActivePlan": "No Active Plan",
@@ -292,6 +301,69 @@
     "analyzingMarket": "Analyzing market trends and best times to post.",
     "generateNewPlan": "Generate New Plan",
     "untitledPost": "Untitled Post",
+    "controls": {
+      "title": "Strategy Controls",
+      "targetPeriod": "TARGET PERIOD",
+      "brandContext": "BRAND CONTEXT",
+      "publishingFrequency": "PUBLISHING FREQUENCY",
+      "activeChannels": "ACTIVE CHANNELS"
+    },
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    },
+    "actions": {
+      "generate": "Generate Monthly Strategy",
+      "regenerate": "Regenerate Strategy",
+      "generating": "Generating...",
+      "syncToScheduler": "Sync to Scheduler",
+      "syncing": "Creating...",
+      "loadError": "Failed to load plan",
+      "generateSuccess": "Content plan generated successfully!",
+      "generateError": "Failed to generate plan. Make sure templates are seeded.",
+      "syncSuccess": "Draft posts created in Scheduler!",
+      "syncError": "Failed to create draft posts"
+    },
+    "summary": "Strategy Summary",
+    "pillars": "Content Pillars",
+    "calendar": "Calendar",
+    "upcoming": "Upcoming Posts",
+    "dayPlan": "Day Plan",
+    "strategyLabel": "Strategy",
+    "week": "WEEK",
+    "dayLabel": "DAY",
+    "contentIdea": "CONTENT IDEA",
+    "draftCaption": "DRAFT CAPTION",
+    "optimalTime": "OPTIMAL TIME",
+    "defaultTime": "10:00 AM",
+    "status": {
+      "synced": "SYNCED TO SCHEDULER",
+      "ready": "STRATEGY READY"
+    },
+    "contentType": {
+      "post": "Post"
+    },
+    "industries": {
+      "restaurant": "Local Restaurant",
+      "salon": "Salon",
+      "agency": "Agency",
+      "realEstate": "Real Estate"
+    },
+    "frequencies": {
+      "low": "Low (2x/week)",
+      "medium": "Medium (3x/week)",
+      "high": "High (Daily)"
+    },
     "sidebar": {
       "aiSuggestions": "AI Suggestions",
       "engagementTip": "Post engagement is 3x higher on Tuesday-Thursday between 2-4 PM. Consider rescheduling weekend posts.",

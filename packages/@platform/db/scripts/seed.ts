@@ -812,7 +812,6 @@ async function main() {
         { industry: 'Real Estate', title: 'Home Maintenance Tip', contentType: 'image', content: 'Keep your home in top shape with these quick maintenance tips. #HomeTips #RealEstateExpert' }
     ];
 
-    /*
     for (const t of templates) {
         const existing = await (prisma as any).contentTemplate.findFirst({
             where: {
@@ -840,7 +839,9 @@ async function main() {
     const events = [
         { name: 'Valentine\'s Day', date: new Date(2026, 1, 14), market: 'Global', description: 'Celebration of love and affection.', tags: ['love', 'romance', 'gifts'] },
         { name: 'President\'s Day', date: new Date(2026, 1, 16), market: 'US', description: 'Honoring US Presidents.', tags: ['holiday', 'history', 'usa'] },
+        { name: 'International Women\'s Day', date: new Date(2026, 2, 8), market: 'Global', description: 'Celebrating women\'s achievements and raising awareness about women\'s equality.', tags: ['women', 'equality', 'empowerment'] },
         { name: 'St. Patrick\'s Day', date: new Date(2026, 2, 17), market: 'Global', description: 'Celebration of Irish culture.', tags: ['irish', 'green', 'culture'] },
+        { name: 'International Day of Happiness', date: new Date(2026, 2, 20), market: 'Global', description: 'A day to recognize the importance of happiness in the lives of people around the world.', tags: ['happiness', 'joy', 'wellbeing'] },
         { name: 'First Day of Spring', date: new Date(2026, 2, 20), market: 'Northern Hemisphere', description: 'Vernal equinox.', tags: ['spring', 'nature', 'renewal'] }
     ];
 
@@ -865,7 +866,6 @@ async function main() {
         }
     }
     console.log(`✅ Created ${events.length} seasonal events\n`);
-    */
 
     console.log('✨ Seed completed successfully!\n');
     console.log('Summary:');

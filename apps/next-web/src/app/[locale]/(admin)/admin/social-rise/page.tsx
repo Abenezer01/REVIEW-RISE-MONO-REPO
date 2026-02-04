@@ -3,6 +3,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -32,10 +34,17 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
 const ContentPage = () => {
     const theme = useTheme();
     const t = useTranslations('dashboard');
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
     const tc = useTranslations('common');
     const { businessId } = useBusinessId();
     const { locationId } = useLocationFilter();
     const { user } = useAuth();
+
+    const tabFromUrl = searchParams.get('tab');
+    const [activeTab, setActiveTab] = useState(tabFromUrl || 'calendar');
+
     const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
     const [filteredPosts, setFilteredPosts] = useState<ScheduledPost[]>([]);
     const [selectedPost, setSelectedPost] = useState<ScheduledPost | null>(null);
@@ -43,7 +52,22 @@ const ContentPage = () => {
 
     const [platformFilter, setPlatformFilter] = useState<string>('ALL');
     const [openAddDialog, setOpenAddDialog] = useState(false);
-    const [activeTab, setActiveTab] = useState('calendar');
+
+    useEffect(() => {
+        if (tabFromUrl && tabFromUrl !== activeTab) {
+            setActiveTab(tabFromUrl);
+        }
+    }, [tabFromUrl, activeTab]);
+
+    const handleTabChange = (_: any, newValue: string) => {
+        setActiveTab(newValue);
+
+        const params = new URLSearchParams(searchParams.toString());
+
+        params.set('tab', newValue);
+
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
     const canAdd = user?.role === 'ADMIN' || user?.role === 'MANAGER';
     const isDark = theme.palette.mode === 'dark';
@@ -70,12 +94,44 @@ const ContentPage = () => {
     }, [fetchData]);
 
     useEffect(() => {
-        if (platformFilter === 'ALL') {
-            setFilteredPosts(scheduledPosts);
-        } else {
-            setFilteredPosts(scheduledPosts.filter(post => post.platforms.includes(platformFilter)));
-        }
-    }, [platformFilter, scheduledPosts]);
+    if (platformFilter === 'ALL') {
+      setFilteredPosts(scheduledPosts);
+    } else {
+      setFilteredPosts(scheduledPosts.filter(post => {
+        const ALL_SUPPORTED_PLATFORMS = ['INSTAGRAM', 'FACEBOOK', 'LINKEDIN', 'TWITTER', 'GOOGLE_BUSINESS'];
+
+        const normalizedPlatforms = (post.platforms || []).reduce((acc: string[], curr: string) => {
+          if (typeof curr === 'string' && (curr.toUpperCase() === 'ALL PLATFORMS' || curr.toUpperCase() === 'ALL_PLATFORMS')) {
+            return [...acc, ...ALL_SUPPORTED_PLATFORMS];
+          }
+
+          if (typeof curr === 'string' && curr.includes(',')) {
+            const split = curr.split(',').map(p => p.trim());
+
+            return [...acc, ...split.reduce((pAcc: string[], p) => {
+              if (p.toUpperCase() === 'ALL PLATFORMS' || p.toUpperCase() === 'ALL_PLATFORMS') {
+                return [...pAcc, ...ALL_SUPPORTED_PLATFORMS];
+              }
+
+              const normalized = p.toUpperCase().replace(/\s+/g, '_');
+              const finalPlatform = normalized === 'X' ? 'TWITTER' : normalized;
+
+              return [...pAcc, finalPlatform];
+            }, [])];
+          }
+
+          const normalized = curr.toUpperCase().replace(/\s+/g, '_');
+          const finalPlatform = normalized === 'X' ? 'TWITTER' : normalized;
+
+          return [...acc, finalPlatform];
+        }, []);
+
+        const uniquePlatforms = Array.from(new Set(normalizedPlatforms));
+
+        return uniquePlatforms.includes(platformFilter);
+      }));
+    }
+  }, [platformFilter, scheduledPosts]);
 
     const handleSavePost = async (data: Partial<ScheduledPost>) => {
         if (!businessId) return;
@@ -247,7 +303,7 @@ const ContentPage = () => {
                 }}>
                     <Tabs 
                         value={activeTab} 
-                        onChange={(_, newValue) => setActiveTab(newValue)} 
+                        onChange={handleTabChange} 
                         aria-label="content management tabs"
                         sx={{
                             minHeight: 'auto',

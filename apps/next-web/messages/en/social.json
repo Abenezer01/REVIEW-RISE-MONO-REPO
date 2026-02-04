@@ -117,6 +117,50 @@
       "connecting": "Connecting...",
       "connectPage": "Connect Page",
       "done": "Done"
+    },
+    "callback": {
+      "finalizing": "Finalizing connection...",
+      "info": "This page handles OAuth callbacks. The connection process is managed via popup windows."
+    },
+    "planner": {
+      "goToScheduler": "GO TO SCHEDULER",
+      "aiAdaptationActive": "AI ADAPTATION ACTIVE",
+      "aiStrategySync": "Strategy is automatically synced with your Brand DNA mission and voice.",
+      "curatingStrategy": "Curating your strategy...",
+      "targeting": "Targeting",
+      "week": "WEEK",
+      "day": "DAY",
+      "platforms": "PLATFORMS:",
+      "scheduled": "SCHEDULED"
+    },
+    "overview": {
+      "studio": "SOCIAL MEDIA STUDIO",
+      "description": "Your centralized command center for Social Rise visibility, performance metrics, and strategy reports.",
+      "stats": {
+        "scheduledPosts": "Scheduled Posts",
+        "published30d": "Published (30d)",
+        "failedPosts": "Failed Posts"
+      },
+      "charts": {
+        "performanceTitle": "Publishing Performance",
+        "performanceSubtitle": "Successful vs Failed posts over the last 14 days",
+        "distributionTitle": "Platform Distribution",
+        "distributionSubtitle": "Posts by social platform",
+        "successful": "Successful",
+        "failed": "Failed"
+      },
+      "upcoming": {
+        "title": "Upcoming Posts",
+        "contentMessaging": "Content & Messaging",
+        "scheduledFor": "Scheduled for {date} at {time}",
+        "noPosts": "No upcoming posts scheduled."
+      },
+      "logs": {
+        "title": "Recent Logs",
+        "logs": "Logs",
+        "publishing": "{platform} Publishing",
+        "noLogs": "No recent publishing activity."
+      }
     }
   },
   "callback": {
