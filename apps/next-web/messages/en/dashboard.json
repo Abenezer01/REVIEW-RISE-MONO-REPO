@@ -221,6 +221,7 @@
       "noContent": "No content provided",
       "detail": {
         "title": "Review Details",
+        "noContent": "No content provided",
         "subtitle": "View and manage customer feedback",
         "publishedDate": "Published Date",
         "source": "Source",
@@ -751,7 +752,12 @@
       "pendingAIReply": "Pending AI Replies",
       "latestFeedback": "Latest customer feedback across all platforms",
       "waitingApproval": "Reviews waiting for AI reply approval before posting",
-      "reviewPost": "Review & Post"
+      "reviewPost": "Review & Post",
+      "themesTitle": "Review Themes & Keywords",
+      "themesSubtitle": "Recurring topics in customer feedback",
+      "recent": "Recent Reviews",
+      "velocity": "Review Velocity",
+      "sentiment": "Sentiment Distribution"
     },
     "tabs": {
       "overview": "Overview",
@@ -800,13 +806,6 @@
         "xAxisLabel": "X: {label}",
         "yAxisLabel": "| Y: {label}"
       }
-    },
-    "reviews": {
-      "themesTitle": "Review Themes & Keywords",
-      "themesSubtitle": "Recurring topics in customer feedback",
-      "recent": "Recent Reviews",
-      "velocity": "Review Velocity",
-      "sentiment": "Sentiment Distribution"
     },
     "content": {
       "title": "Content Management",
