@@ -1,6 +1,7 @@
-import { CampaignSimulator } from '@/components/ad-rise/simulator/CampaignSimulator';
 import { Box, Typography, Breadcrumbs, Link } from '@mui/material';
 import { useTranslations } from 'next-intl';
+
+import { CampaignSimulator } from '@/components/ad-rise/simulator/CampaignSimulator';
 
 export default function SimulatorPage() {
     const t = useTranslations('simulator');
@@ -10,12 +11,12 @@ export default function SimulatorPage() {
             <Box mb={3}>
                 <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 1 }}>
                     <Link underline="hover" color="inherit" href="/admin/dashboard">
-                        Admin
+                        {t('breadcrumb.admin')}
                     </Link>
                     <Link underline="hover" color="inherit" href="/admin/ad-rise">
-                        Ad Rise
+                        {t('breadcrumb.ad_rise')}
                     </Link>
-                    <Typography color="text.primary">Simulator</Typography>
+                    <Typography color="text.primary">{t('breadcrumb.simulator')}</Typography>
                 </Breadcrumbs>
                 <Typography variant="h4" fontWeight="bold">
                     {t('title')}

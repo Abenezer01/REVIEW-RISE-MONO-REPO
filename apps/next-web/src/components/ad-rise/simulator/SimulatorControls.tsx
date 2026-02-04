@@ -2,20 +2,18 @@
 
 import {
     Box,
-    Typography,
     FormControl,
     InputLabel,
-    Select,
     MenuItem,
+    Paper,
+    Select,
     Slider,
+    Stack,
     ToggleButton,
     ToggleButtonGroup,
-    Stack,
-    Paper
+    Typography
 } from '@mui/material';
-import { useTranslations } from 'next-intl';
-import { useFormatter } from 'next-intl';
-import * as CampaignEngine from '@platform/campaign-engine';
+import { useFormatter, useTranslations } from 'next-intl';
 
 interface SimulatorControlsProps {
     vertical: string;

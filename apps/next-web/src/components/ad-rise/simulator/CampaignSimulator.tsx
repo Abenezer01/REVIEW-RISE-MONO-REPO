@@ -1,8 +1,11 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+
 import { Box, Grid } from '@mui/material';
-import { generateCampaignPlan, CampaignInput, CampaignPlan } from '@platform/campaign-engine';
+import type { CampaignInput, CampaignPlan } from '@platform/campaign-engine';
+import { generateCampaignPlan } from '@platform/campaign-engine';
+
 import { SimulatorControls } from './SimulatorControls';
 import { SimulatorResults } from './SimulatorResults';
 
@@ -20,6 +23,7 @@ export const CampaignSimulator = () => {
     useEffect(() => {
         try {
             const newPlan = generateCampaignPlan(input as CampaignInput);
+
             setPlan(newPlan);
         } catch (error) {
             console.error("Plan generation failed", error);

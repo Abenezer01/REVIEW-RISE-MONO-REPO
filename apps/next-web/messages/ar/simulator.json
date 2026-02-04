@@ -33,5 +33,10 @@
   },
   "checklist": {
     "title": "Execution Checklist"
+  },
+  "breadcrumb": {
+    "admin": "Admin",
+    "ad_rise": "Ad Rise",
+    "simulator": "Simulator"
   }
 }

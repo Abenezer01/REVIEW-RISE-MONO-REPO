@@ -16,7 +16,6 @@ import {
     CardContent
 } from '@mui/material';
 import { useTranslations } from 'next-intl';
-import { useFormatter } from 'next-intl';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from 'recharts';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -30,7 +29,6 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 export const SimulatorResults = ({ plan }: SimulatorResultsProps) => {
     const t = useTranslations('simulator');
-    const format = useFormatter();
 
     return (
         <Paper sx={{ p: 4, height: '100%', bgcolor: 'background.default', borderRadius: 2 }}>
