@@ -31,8 +31,18 @@
     "settings": "Settings",
     "system-settings": "System Settings",
     "feature-flags": "Feature Flags",
-    "ai-visibility": "AI Visibility",
-    "subscription-issues": "Subscription Issues"
+    "ai-visibility": "AI Visibility"
+  },
+  "errors": {
+    "firstNameRequired": "First name is required",
+    "lastNameRequired": "Last name is required",
+    "invalidEmail": "Invalid email address",
+    "emailRequired": "Email is required",
+    "roleRequired": "Role is required",
+    "businessRequired": "Business is required",
+    "locationRequired": "Location is required",
+    "passwordRequired": "Password is required",
+    "passwordMin": "Password must be at least {min} characters"
   },
   "auto-reply": "Auto-Reply Settings",
   "seasonalEvents": {
@@ -752,9 +762,7 @@
     "reviews": {
       "sentimentScore": "Sentiment Score",
       "positiveSentiment": "Positive sentiment",
-      "velocity": "Review Velocity",
       "volumeOverTime": "Review volume over time",
-      "sentiment": "Sentiment Distribution",
       "sentimentModel": "Sentiment model",
       "pendingAIReply": "Pending AI Replies",
       "latestFeedback": "Latest customer feedback across all platforms",
