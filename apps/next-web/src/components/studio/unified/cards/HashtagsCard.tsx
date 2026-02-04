@@ -2,9 +2,8 @@ import React from 'react'
 
 import { Box, Card, CardContent, Typography, Chip, Stack, IconButton, Tooltip } from '@mui/material'
 
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
-
 import { useTranslations } from 'next-intl'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 interface HashtagsCardProps {
     hashtags: {

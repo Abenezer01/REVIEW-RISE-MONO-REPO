@@ -10,8 +10,8 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Tooltip from '@mui/material/Tooltip'
 import InfoOutlined from '@mui/icons-material/InfoOutlined'
 
-import { useTranslations } from 'next-intl'
 import MetricCard from '@/components/shared/analytics/MetricCard'
+import { useTranslations } from 'next-intl'
 
 // Icons
 const VisibilityIcon = () => (

@@ -20,18 +20,17 @@ import type { GridColDef } from '@mui/x-data-grid'
 
 import { SystemMessageCode } from '@platform/contracts'
 
-import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
-
-import CustomChip from '@core/components/mui/Chip'
 import CustomAvatar from '@core/components/mui/Avatar'
+import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import ItemsListing from '@components/shared/listing'
 
-import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 import { getReviews } from '@/app/actions/review'
-import { useLocationFilter } from '@/hooks/useLocationFilter'
 import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
+import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
+import { useLocationFilter } from '@/hooks/useLocationFilter'
 import { Link } from '@/i18n/routing'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 import { useTranslations } from 'next-intl'
 
 const SmartReviewList = () => {
