@@ -30,6 +30,7 @@ const SocialRiseOverviewPage = () => {
     const theme = useTheme();
     const router = useRouter();
     const t = useTranslations('dashboard');
+    const ts = useTranslations('social.overview');
     const { businessId } = useBusinessId();
     
     const [stats, setStats] = useState({
@@ -138,8 +139,8 @@ const SocialRiseOverviewPage = () => {
 
             setChartData({
                 activitySeries: [
-                    { name: 'Successful', data: completedData },
-                    { name: 'Failed', data: failedData }
+                    { name: ts('charts.successful'), data: completedData },
+                    { name: ts('charts.failed'), data: failedData }
                 ],
                 activityCategories: last14Days.map(d => new Date(d).toLocaleDateString([], { month: 'short', day: 'numeric' })),
                 platformSeries: Object.values(platformCounts),
@@ -153,7 +154,7 @@ const SocialRiseOverviewPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [businessId]);
+    }, [businessId, ts]);
 
     useEffect(() => {
         fetchData();
@@ -233,14 +234,14 @@ const SocialRiseOverviewPage = () => {
                             <Icon icon="tabler-chart-pie" fontSize={24} />
                         </Box>
                         <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: '1px' }}>
-                            SOCIAL MEDIA STUDIO
+                            {ts('studio')}
                         </Typography>
                     </Box>
                     <Typography variant="h2" fontWeight="800" sx={{ mb: 1.5, letterSpacing: '-1.5px', lineHeight: 1.1 }}>
                         {t('navigation.social-overview', { defaultValue: 'Overview' })}
                     </Typography>
                     <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 400, opacity: 0.7, maxWidth: 600, lineHeight: 1.5 }}>
-                        Your centralized command center for Social Rise visibility, performance metrics, and strategy reports.
+                        {ts('description')}
                     </Typography>
                 </Box>
             </Box>
@@ -249,7 +250,7 @@ const SocialRiseOverviewPage = () => {
             <Grid container spacing={6} sx={{ mb: 8 }}>
                 <Grid size={{ xs: 12, sm: 4 }}>
                     <StatCard 
-                        title="Scheduled Posts" 
+                        title={ts('stats.scheduledPosts')} 
                         value={stats.totalScheduled} 
                         icon="tabler-calendar-check" 
                         color={theme.palette.primary.main} 
@@ -257,7 +258,7 @@ const SocialRiseOverviewPage = () => {
                 </Grid>
                 <Grid size={{ xs: 12, sm: 4 }}>
                     <StatCard 
-                        title="Published (30d)" 
+                        title={ts('stats.published30d')} 
                         value={stats.publishedLast30} 
                         icon="tabler-circle-check" 
                         color={theme.palette.success.main} 
@@ -265,7 +266,7 @@ const SocialRiseOverviewPage = () => {
                 </Grid>
                 <Grid size={{ xs: 12, sm: 4 }}>
                     <StatCard 
-                        title="Failed Posts" 
+                        title={ts('stats.failedPosts')} 
                         value={stats.failedLast30} 
                         icon="tabler-alert-circle" 
                         color={theme.palette.error.main} 
@@ -277,16 +278,16 @@ const SocialRiseOverviewPage = () => {
             <Grid container spacing={6} sx={{ mb: 8 }}>
                 <Grid size={{ xs: 12, lg: 8 }}>
                     <DashboardLineChart 
-                        title="Publishing Performance"
-                        subtitle="Successful vs Failed posts over the last 14 days"
+                        title={ts('charts.performanceTitle')}
+                        subtitle={ts('charts.performanceSubtitle')}
                         series={chartData.activitySeries}
                         categories={chartData.activityCategories}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, lg: 4 }}>
                     <DashboardDonutChart 
-                        title="Platform Distribution"
-                        subtitle="Posts by social platform"
+                        title={ts('charts.distributionTitle')}
+                        subtitle={ts('charts.distributionSubtitle')}
                         series={chartData.platformSeries}
                         labels={chartData.platformLabels}
                     />
@@ -306,14 +307,14 @@ const SocialRiseOverviewPage = () => {
                     }}>
                         <CardContent sx={{ p: 8 }}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={6}>
-                                <Typography variant="h4" fontWeight="800">Upcoming Posts</Typography>
+                                <Typography variant="h4" fontWeight="800">{ts('upcoming.title')}</Typography>
                                 <Typography 
                                     variant="button" 
                                     color="primary" 
                                     sx={{ cursor: 'pointer', fontWeight: 700 }}
                                     onClick={() => router.push('../social-rise?tab=calendar')}
                                 >
-                                    Content & Messaging
+                                    {ts('upcoming.contentMessaging')}
                                 </Typography>
                             </Stack>
 
@@ -341,7 +342,10 @@ const SocialRiseOverviewPage = () => {
                                                         {post.content.title || post.content.text.substring(0, 50)}
                                                     </Typography>
                                                     <Typography variant="caption" color="text.secondary">
-                                                        Scheduled for {new Date(post.scheduledAt).toLocaleDateString()} at {new Date(post.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        {ts('upcoming.scheduledFor', {
+                                                            date: new Date(post.scheduledAt).toLocaleDateString(),
+                                                            time: new Date(post.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                                        })}
                                                     </Typography>
                                                 </Box>
                                                 <Stack direction="row" spacing={1}>
@@ -360,7 +364,7 @@ const SocialRiseOverviewPage = () => {
                                     ))
                                 ) : (
                                     <Typography variant="body2" color="text.secondary" textAlign="center" py={4}>
-                                        No upcoming posts scheduled.
+                                        {ts('upcoming.noPosts')}
                                     </Typography>
                                 )}
                             </Stack>
@@ -380,14 +384,14 @@ const SocialRiseOverviewPage = () => {
                     }}>
                         <CardContent sx={{ p: 8 }}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={6}>
-                                <Typography variant="h4" fontWeight="800">Recent Logs</Typography>
+                                <Typography variant="h4" fontWeight="800">{ts('logs.title')}</Typography>
                                 <Typography 
                                     variant="button" 
                                     color="primary" 
                                     sx={{ cursor: 'pointer', fontWeight: 700 }}
                                     onClick={() => router.push('../social-rise?tab=logs')}
                                 >
-                                    Logs
+                                    {ts('logs.logs')}
                                 </Typography>
                             </Stack>
 
@@ -406,7 +410,7 @@ const SocialRiseOverviewPage = () => {
                                                 }} />
                                                 <Box>
                                                     <Typography variant="subtitle2" fontWeight="700" sx={{ mb: 0.5 }}>
-                                                        {log.platform} Publishing
+                                                        {ts('logs.publishing', { platform: log.platform })}
                                                     </Typography>
                                                     <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
                                                         {new Date(log.updatedAt).toLocaleDateString()}
@@ -424,7 +428,7 @@ const SocialRiseOverviewPage = () => {
                                     ))
                                 ) : (
                                     <Typography variant="body2" color="text.secondary" textAlign="center" py={4}>
-                                        No recent publishing activity.
+                                        {ts('logs.noLogs')}
                                     </Typography>
                                 )}
                             </Stack>

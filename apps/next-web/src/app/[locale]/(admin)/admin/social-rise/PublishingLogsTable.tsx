@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useState, useMemo } from 'react';
 
-import { useTranslations, useFormatter } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -32,7 +32,6 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
   const t = useTranslations('social.publishingLogs');
   const tc = useTranslations('common');
   const theme = useTheme();
-  const format = useFormatter();
   const isDark = theme.palette.mode === 'dark';
   const [logs, setLogs] = useState<PublishingLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -242,7 +241,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
         </Tooltip>
       ),
     },
-  ], [onViewPost, t, format, getStatusChip, getPlatformIcon]);
+  ], [onViewPost, t, getStatusChip, getPlatformIcon, theme.palette.mode, theme.palette.primary.main]);
 
   return (
     <Box>
