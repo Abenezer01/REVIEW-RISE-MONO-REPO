@@ -44,7 +44,7 @@ const alerts: Theme['components'] = {
             }
           },
           {
-            props: { variant: 'standard', severity: 'info' },
+            props: { variant: 'standard', severity: 'INFO' },
             style: {
               '& .MuiAlert-icon': {
                 backgroundColor: 'var(--mui-palette-info-main)',
@@ -82,7 +82,7 @@ const alerts: Theme['components'] = {
             }
           },
           {
-            props: { variant: 'outlined', severity: 'info' },
+            props: { variant: 'outlined', severity: 'INFO' },
             style: {
               borderColor: 'var(--mui-palette-info-main)',
               '& .MuiAlert-icon': {
@@ -122,7 +122,7 @@ const alerts: Theme['components'] = {
             }
           },
           {
-            props: { variant: 'filled', severity: 'info' },
+            props: { variant: 'filled', severity: 'INFO' },
             style: {
               '& .MuiAlert-icon': {
                 backgroundColor: 'var(--mui-palette-common-white)',

@@ -48,15 +48,19 @@ import { SystemMessageCode } from '@platform/contracts';
 
 const { notify } = useSystemMessages();
 
-const handleSave = () => {
-  notify(SystemMessageCode.SAVE_SUCCESS);
-};
+// 1. Simple enum-based notification (standard)
+notify(SystemMessageCode.SAVE_SUCCESS);
 
-// With options
-notify(SystemMessageCode.DELETE_SUCCESS, {
+// 2. Configuration object style (recommended for overrides)
+notify({
+  messageCode: SystemMessageCode.DELETE_SUCCESS,
+  severity: 'WARNING',
   variant: 'MODAL',
-  onConfirm: () => console.log('Confirmed')
+  onConfirm: () => handleDelete()
 });
+
+// 3. String-based code (useful for feature-specific modules)
+notify('studio.draftLoaded', { severity: 'INFO' });
 ```
 
 ### Global Interceptor
