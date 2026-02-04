@@ -158,15 +158,15 @@ return Array.from(platforms).map(platform => ({
             }}
           >
             <Typography variant="caption" fontWeight={600}>
-              { '📅' } {t('brandRise.visibilityPlan.dayTimeline')} {period} {tc('common.loading')}
+              { '📅' } {t('brandRise.visibilityPlan.dayTimeline')} {period} {tc('common.days')}
             </Typography>
           </Box>
 
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>{tc('common.search')}</InputLabel>
             <Select value={period} onChange={handlePeriodChange} label={tc('common.search')}>
-              <MenuItem value={30}>{t('brandRise.visibilityPlan.dayTimeline')} 30</MenuItem>
-              <MenuItem value={90}>{t('brandRise.visibilityPlan.dayTimeline')} 90</MenuItem>
+              <MenuItem value={30}>{t('brandRise.visibilityPlan.dayTimeline')} {30}</MenuItem>
+              <MenuItem value={90}>{t('brandRise.visibilityPlan.dayTimeline')} {90}</MenuItem>
             </Select>
           </FormControl>
 

@@ -283,7 +283,7 @@ return
                                                     </Typography>
                                                 </Box>
                                                 <Typography variant="subtitle2" fontWeight="bold" mb={1}>
-                                                    {scene.title || `Hook - Opening Shot`}
+                                                    {scene.title || t('untitledPost')}
                                                 </Typography>
                                                 <Typography variant="body2" color="text.secondary" mb={1.5}>
                                                     {scene.description || scene.content}
@@ -321,7 +321,7 @@ return
                                     <Box sx={{ display: 'flex', justifyContent: 'space-around' }}>
                                         <Box sx={{ textAlign: 'center' }}>
                                             <Typography variant="h4" color="primary.main" fontWeight="bold">
-                                                {duration}s
+                                                {duration}{'s'}
                                             </Typography>
                                             <Typography variant="caption" color="text.secondary">
                                                 {t('statDuration')}

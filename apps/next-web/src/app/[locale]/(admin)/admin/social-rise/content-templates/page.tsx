@@ -36,6 +36,9 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
   return <i className={icon} style={{ fontSize }} {...rest} />;
 };
 
+const industries = ['restaurant', 'salon', 'agency', 'realestate'];
+const contentTypes = ['image', 'video', 'carousel', 'text'];
+
 const ContentTemplatesPage = () => {
   const t = useTranslations('dashboard');
   const tc = useTranslations('common');
@@ -56,9 +59,6 @@ const ContentTemplatesPage = () => {
     objective: 'Engagement'
   });
 
-  const industries = ['restaurant', 'salon', 'agency', 'realestate'];
-  const contentTypes = ['image', 'video', 'carousel', 'text'];
-
   const fetchTemplates = useCallback(async () => {
     if (!businessId) return;
     setLoading(true);
@@ -73,7 +73,7 @@ const ContentTemplatesPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [businessId]);
+  }, [businessId, notify]);
 
   useEffect(() => {
     if (businessId) {
@@ -103,7 +103,7 @@ const ContentTemplatesPage = () => {
     }
 
     setOpen(true);
-  }, [industries]);
+  }, []);
 
   const handleClose = useCallback(() => {
     setOpen(false);
@@ -133,13 +133,13 @@ const ContentTemplatesPage = () => {
   const columns: GridColDef[] = useMemo(() => [
     {
       field: 'title',
-      headerName: 'Title',
+      headerName: t('brandRise.content.templateTitle'),
       flex: 1,
       minWidth: 200,
     },
     {
       field: 'industry',
-      headerName: 'Industry',
+      headerName: t('brandRise.content.industry'),
       flex: 0.8,
       minWidth: 150,
       renderCell: (params) => (
@@ -154,7 +154,7 @@ const ContentTemplatesPage = () => {
     },
     {
       field: 'contentType',
-      headerName: 'Type',
+      headerName: tc('common.tags'),
       flex: 0.6,
       minWidth: 120,
       renderCell: (params) => (
@@ -168,7 +168,7 @@ const ContentTemplatesPage = () => {
     },
     {
       field: 'content',
-      headerName: 'Content Preview',
+      headerName: t('brandRise.content.contentStructure'),
       flex: 2,
       minWidth: 300,
       renderCell: (params) => (
@@ -188,7 +188,7 @@ const ContentTemplatesPage = () => {
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: tc('actions'),
       sortable: false,
       width: 120,
       align: 'right',
@@ -208,7 +208,7 @@ const ContentTemplatesPage = () => {
         </Box>
       ),
     },
-  ], [handleOpen, handleDelete]);
+  ], [handleOpen, handleDelete, t, tc]);
 
   const handleSubmit = async () => {
     if (!businessId) return;

@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Tooltip from '@mui/material/Tooltip';
 import { useTheme, alpha } from '@mui/material/styles';
+import { useTranslations } from 'next-intl';
 
 export interface HeatmapRow {
   id: string;
@@ -32,13 +33,14 @@ const HeatmapGrid: React.FC<HeatmapGridProps> = ({
   height 
 }) => {
   const theme = useTheme();
+  const tc = useTranslations('common');
 
   if (loading) {
-    return <Paper sx={{ p: 2, height: height || 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</Paper>;
+    return <Paper sx={{ p: 2, height: height || 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{tc('common.loading')}</Paper>;
   }
 
   if (!rows.length) {
-    return <Paper sx={{ p: 2, height: height || 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>No data</Paper>;
+    return <Paper sx={{ p: 2, height: height || 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{tc('common.no-data')}</Paper>;
   }
 
   const getCellColor = (val: number | null) => {
@@ -112,7 +114,7 @@ return alpha(theme.palette.primary.main, opacity);
               </Tooltip>
 
               {row.values.map((val, i) => (
-                <Tooltip key={i} title={val !== null ? `Value: ${val}` : 'No Data'}>
+                <Tooltip key={i} title={val !== null ? `${tc('common.info')}: ${val}` : tc('common.no-data')}>
                   <Box
                     sx={{
                       width: cellWidth - 2,

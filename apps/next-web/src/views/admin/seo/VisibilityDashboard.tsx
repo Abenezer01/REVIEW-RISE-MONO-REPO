@@ -67,7 +67,7 @@ const VisibilityDashboard = () => {
     };
 
     fetchUserBusinesses();
-  }, [user?.id]);
+  }, [user?.id, t]);
 
   const fetchData = useCallback(async (id: string) => {
     setLoading(true);
@@ -148,7 +148,7 @@ const VisibilityDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   // Fetch data when businessId changes
   useEffect(() => {

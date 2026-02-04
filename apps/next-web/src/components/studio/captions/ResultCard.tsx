@@ -3,8 +3,9 @@
 import React from 'react'
 
 import { Box, Typography, Card, CardContent, IconButton, Button } from '@mui/material'
-import { toast } from 'react-toastify'
 import { useTranslations } from 'next-intl'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 interface ResultCardProps {
     index: number
@@ -14,11 +15,15 @@ interface ResultCardProps {
 
 export default function ResultCard({ index, text, onSave }: ResultCardProps) {
     const t = useTranslations('studio')
-    const tc = useTranslations('common.common')
+    const tc = useTranslations('common')
+    const { notify } = useSystemMessages()
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(text)
-        toast.success(tc('success'))
+        notify({
+            messageCode: 'COPIED_TO_CLIPBOARD' as any,
+            severity: 'SUCCESS'
+        })
     }
 
     const charCount = text.length

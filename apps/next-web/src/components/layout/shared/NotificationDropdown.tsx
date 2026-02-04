@@ -20,8 +20,9 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 
 // Hook Imports
-import { useSettings } from '@core/hooks/useSettings'
 import { useTranslations } from 'next-intl'
+
+import { useSettings } from '@core/hooks/useSettings'
 
 const NotificationDropdown = () => {
   const t = useTranslations('common')
@@ -88,7 +89,7 @@ const NotificationDropdown = () => {
                         <Typography variant='body2' color='text.secondary'>
                             {t('notifications.mockReview', { rating: 5, name: 'John Doe' })}
                         </Typography>
-                        <Typography variant='caption' color='text.disabled'>{t('dates.today')}{ ', 10:30 AM' }</Typography>
+                        <Typography variant='caption' color='text.disabled'>{t('dates.atTime', { date: t('dates.today'), time: '10:30 AM' })}</Typography>
                     </Box>
                   </MenuItem>
                   <MenuItem onClick={handleDropdownClose} sx={{ p: 3, gap: 3 }}>
@@ -97,7 +98,7 @@ const NotificationDropdown = () => {
                         <Typography variant='body2' color='text.secondary'>
                             {t('notifications.mockSeoReport')}
                         </Typography>
-                        <Typography variant='caption' color='text.disabled'>{t('dates.yesterday')}{ ', 2:15 PM' }</Typography>
+                        <Typography variant='caption' color='text.disabled'>{t('dates.atTime', { date: t('dates.yesterday'), time: '2:15 PM' })}</Typography>
                     </Box>
                   </MenuItem>
                   <Divider />

@@ -114,9 +114,9 @@ export const VisibilityPlanDetails = ({ onBack, reportId }: VisibilityPlanDetail
             <Box sx={{ p: 3, borderRadius: '50%', bgcolor: 'action.hover', color: 'text.secondary', mb: 2 }}>
                 <Icon icon="tabler-search" fontSize={48} />
             </Box>
-            <Typography variant="h5" fontWeight="bold" gutterBottom>No Plan Found</Typography>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>{t('noActivePlan')}</Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                Generate a Visibility Plan from the dashboard to get started.
+                {t('noActivePlanDesc')}
             </Typography>
             <Button variant="outlined" onClick={onBack} startIcon={<Icon icon="tabler-arrow-left" />}>
                 {t('backToDashboard')}
@@ -184,7 +184,7 @@ export const VisibilityPlanDetails = ({ onBack, reportId }: VisibilityPlanDetail
                                         <Typography variant="caption" sx={{ opacity: 0.8, letterSpacing: 1, color: 'inherit', fontSize: '0.65rem' }}>{t('totalTasks')}</Typography>
                                     </Box>
                                     <Box>
-                                        <Typography variant="h3" fontWeight="bold" sx={{ color: 'inherit' }}>12</Typography>
+                                        <Typography variant="h3" fontWeight="bold" sx={{ color: 'inherit' }}>{12}</Typography>
                                         <Typography variant="caption" sx={{ opacity: 0.8, letterSpacing: 1, color: 'inherit', fontSize: '0.65rem' }}>{t('completed')}</Typography>
                                     </Box>
                                     <Box>
@@ -219,7 +219,7 @@ export const VisibilityPlanDetails = ({ onBack, reportId }: VisibilityPlanDetail
                                         top: 0, left: 0, bottom: 0, right: 0, position: 'absolute',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column'
                                     }}>
-                                        <Typography variant="h3" fontWeight="bold" sx={{ color: 'inherit' }}>26%</Typography>
+                                        <Typography variant="h3" fontWeight="bold" sx={{ color: 'inherit' }}>{26}{'%'}</Typography>
                                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.65rem', letterSpacing: 1 }}>{t('complete')}</Typography>
                                     </Box>
                                 </Box>
@@ -262,10 +262,10 @@ export const VisibilityPlanDetails = ({ onBack, reportId }: VisibilityPlanDetail
                                 }}>
                                     <Box>
                                         <Typography variant="h6" fontWeight="bold" color="text.primary">
-                                            Week {week.weekNumber}: {week.focus}
+                                            {t('weekHeader', { number: week.weekNumber, focus: week.focus })}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
-                                            Feb 1-7, 2024
+                                            {t('mockDateRange')}
                                         </Typography>
                                     </Box>
                                     <Stack direction="row" spacing={2} alignItems="center">
@@ -339,7 +339,7 @@ export const VisibilityPlanDetails = ({ onBack, reportId }: VisibilityPlanDetail
                                                                     <Typography variant="body2" fontWeight="500">{task.title}</Typography>
                                                                     {task.estimatedHours && (
                                                                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                                                                             {task.estimatedHours}h
+                                                                             {t('estHours', { hours: task.estimatedHours })}
                                                                          </Typography>
                                                                     )}
                                                                 </Box>

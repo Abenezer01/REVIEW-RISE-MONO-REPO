@@ -83,6 +83,7 @@
       "connectedDaysAgo": "Connected {days} days ago",
       "lastSyncedHoursAgo": "Last synced {hours} hours ago",
       "accessTokenExpired": "Access token expired. Reconnect to restore functionality.",
+      "id": "ID:",
       "followers": "FOLLOWERS",
       "posts": "POSTS",
       "reconnect": "Reconnect",
@@ -116,6 +117,10 @@
       "connecting": "Connecting...",
       "connectPage": "Connect Page",
       "done": "Done"
+    },
+    "callback": {
+      "finalizing": "Finalizing connection...",
+      "info": "This page handles OAuth callbacks. The connection process is managed via popup windows."
     },
     "planner": {
       "goToScheduler": "GO TO SCHEDULER",

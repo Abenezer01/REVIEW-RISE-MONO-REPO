@@ -3,7 +3,9 @@
 import React, { useState } from 'react'
 
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Typography } from '@mui/material'
-import { toast } from 'react-toastify'
+import { useTranslations } from 'next-intl'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 interface SchedulePostDialogProps {
     open: boolean
@@ -13,6 +15,10 @@ interface SchedulePostDialogProps {
 }
 
 export default function SchedulePostDialog({ open, onClose, onSchedule, initialDate }: SchedulePostDialogProps) {
+    const t = useTranslations('studio.magic')
+    const tc = useTranslations('common')
+    const { notify } = useSystemMessages()
+
     // Default to tomorrow at 9 AM
     const getDefaultDate = (date?: Date) => {
         if (date) {
@@ -57,7 +63,10 @@ return localIso
 
     const handleSchedule = () => {
         if (!scheduleDate) {
-            toast.error('Please select a date and time')
+            notify({
+                messageCode: 'studio.scheduleDateError' as any,
+                severity: 'ERROR'
+            })
             
 return
         }
@@ -68,11 +77,11 @@ return
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-            <DialogTitle sx={{ fontWeight: 'bold' }}>Schedule Post</DialogTitle>
+            <DialogTitle sx={{ fontWeight: 'bold' }}>{t('scheduleToSocial')}</DialogTitle>
             <DialogContent>
                 <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <Typography variant="body2" color="text.secondary">
-                        Choose when you want this post to go live. We will automatically publish it for you.
+                        {t('scheduleToSocial')}
                     </Typography>
                     <TextField
                         type="datetime-local"
@@ -89,14 +98,14 @@ return
                 </Box>
             </DialogContent>
             <DialogActions sx={{ p: 2.5 }}>
-                 <Button onClick={onClose} color="inherit">Cancel</Button>
+                 <Button onClick={onClose} color="inherit">{tc('common.cancel')}</Button>
                 <Button 
                     onClick={handleSchedule} 
                     variant="contained" 
                     color="primary"
                     startIcon={<i className="tabler-calendar" />}
                 >
-                    Schedule
+                    {tc('common.save')}
                 </Button>
             </DialogActions>
         </Dialog>

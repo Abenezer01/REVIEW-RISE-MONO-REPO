@@ -106,7 +106,7 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
     } finally {
       if (!silent) setIsLoading(false);
     }
-  }, [id]);
+  }, [id, notify]);
 
   const fetchLogs = useCallback(async () => {
     setIsLoadingLogs(true);
@@ -147,7 +147,7 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [profile?.status, id, fetchProfile]);
+  }, [profile?.status, id, fetchProfile, notify]);
 
   const handleReExtract = async () => {
     if (!profile) return;

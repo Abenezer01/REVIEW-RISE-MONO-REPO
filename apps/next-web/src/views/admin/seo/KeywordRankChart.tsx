@@ -61,7 +61,7 @@ export default function KeywordRankChart({ keywordId, keywordText, open, onClose
         }
       ])
     })
-  }, [open, keywordId])
+  }, [open, keywordId, t])
 
   const options: ApexOptions = {
     chart: { parentHeightOffset: 0, toolbar: { show: false } },

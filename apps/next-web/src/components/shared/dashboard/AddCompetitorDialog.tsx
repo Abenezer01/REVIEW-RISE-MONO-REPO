@@ -10,6 +10,7 @@ import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import Grid from '@mui/material/Grid'
 import CircularProgress from '@mui/material/CircularProgress'
+import { useTranslations } from 'next-intl'
 
 import { useAddCompetitor } from '@/hooks/reviews/useReviewAnalytics'
 
@@ -21,6 +22,8 @@ interface AddCompetitorDialogProps {
 }
 
 const AddCompetitorDialog = ({ open, onClose, businessId, locationId }: AddCompetitorDialogProps) => {
+  const t = useTranslations('dashboard.brandRise.competitors')
+  const tc = useTranslations('common')
   const [competitorName, setCompetitorName] = useState('')
   const [averageRating, setAverageRating] = useState('4.0')
   const [totalReviews, setTotalReviews] = useState('0')
@@ -51,13 +54,13 @@ const AddCompetitorDialog = ({ open, onClose, businessId, locationId }: AddCompe
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <form onSubmit={handleSubmit}>
-        <DialogTitle>Add Competitor</DialogTitle>
+        <DialogTitle>{t('addTitle')}</DialogTitle>
         <DialogContent>
             <Grid container spacing={2} sx={{ mt: 0.5 }}>
                 <Grid size={12}>
                     <TextField
                         autoFocus
-                        label="Competitor Name"
+                        label={t('nameLabel')}
                         fullWidth
                         required
                         value={competitorName}
@@ -66,7 +69,7 @@ const AddCompetitorDialog = ({ open, onClose, businessId, locationId }: AddCompe
                 </Grid>
                 <Grid size={6}>
                     <TextField
-                        label="Average Rating (1-5)"
+                        label={t('ratingLabel')}
                         type="number"
                         fullWidth
                         required
@@ -77,7 +80,7 @@ const AddCompetitorDialog = ({ open, onClose, businessId, locationId }: AddCompe
                 </Grid>
                 <Grid size={6}>
                     <TextField
-                        label="Total Reviews"
+                        label={t('totalReviewsLabel')}
                         type="number"
                         fullWidth
                         required
@@ -89,14 +92,14 @@ const AddCompetitorDialog = ({ open, onClose, businessId, locationId }: AddCompe
             </Grid>
         </DialogContent>
         <DialogActions>
-            <Button onClick={onClose} color="inherit">Cancel</Button>
+            <Button onClick={onClose} color="inherit">{tc('common.cancel')}</Button>
             <Button 
                 type="submit" 
                 variant="contained" 
                 disabled={isPending || !competitorName}
                 startIcon={isPending ? <CircularProgress size={20} color="inherit" /> : null}
             >
-                {isPending ? 'Adding...' : 'Add Competitor'}
+                {isPending ? t('adding') : t('addTitle')}
             </Button>
         </DialogActions>
       </form>

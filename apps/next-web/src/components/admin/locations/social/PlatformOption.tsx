@@ -12,6 +12,7 @@ import {
     alpha
 } from '@mui/material';
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import { useTranslations } from 'next-intl';
 
 interface PlatformOptionProps {
     name: string;
@@ -24,6 +25,7 @@ interface PlatformOptionProps {
 
 export const PlatformOption = ({ name, description, icon, features, action, color }: PlatformOptionProps) => {
     const theme = useTheme();
+    const t = useTranslations('social.connections');
 
     
 return (
@@ -49,7 +51,7 @@ return (
                 </Stack>
 
                 <Button variant="contained" fullWidth onClick={action} sx={{ bgcolor: color, '&:hover': { bgcolor: alpha(color, 0.9) } }}>
-                    Connect {name.split(' ')[0]}
+                    {t('modals.connect')} {name.split(' ')[0]}
                 </Button>
             </CardContent>
         </Card>

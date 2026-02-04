@@ -119,8 +119,8 @@ const ConnectGoogleModal = ({ open, onClose, onConnect }: ConnectGoogleModalProp
                     >
                          <Checkbox defaultChecked color="warning" />
                          <ListItemText 
-                            primary={<Typography variant="subtitle1" fontWeight="bold">{ 'Downtown Office' }</Typography>}
-                            secondary={ '123 Main St, San Francisco, CA 94102' }
+                            primary={<Typography variant="subtitle1" fontWeight="bold">{ t('mockData.downtownOffice') }</Typography>}
+                            secondary={ t('mockData.downtownAddress') }
                         />
                     </ListItem>
                 </Card>
@@ -131,8 +131,8 @@ const ConnectGoogleModal = ({ open, onClose, onConnect }: ConnectGoogleModalProp
                     >
                          <Checkbox defaultChecked color="warning" />
                          <ListItemText 
-                            primary={<Typography variant="subtitle1" fontWeight="bold">{ 'Westside Branch' }</Typography>}
-                            secondary={ '456 Oak Ave, San Francisco, CA 94115' }
+                            primary={<Typography variant="subtitle1" fontWeight="bold">{ t('mockData.westsideBranch') }</Typography>}
+                            secondary={ t('mockData.westsideAddress') }
                         />
                     </ListItem>
                 </Card>

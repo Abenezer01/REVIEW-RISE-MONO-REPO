@@ -2,7 +2,8 @@ import React from 'react'
 
 import { Box, Card, CardContent, Typography, Divider, IconButton, Tooltip } from '@mui/material'
 
-import { toast } from 'react-toastify'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import { useTranslation } from '@/hooks/useTranslation'
 
@@ -13,10 +14,14 @@ interface CaptionCardProps {
 
 export default function CaptionCard({ caption, onUseCaption }: CaptionCardProps) {
     const t = useTranslation('studio')
+    const { notify } = useSystemMessages()
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text)
-        toast.success('Copied to clipboard')
+        notify({
+            messageCode: 'common.copied' as any,
+            severity: 'SUCCESS'
+        })
     }
 
     return (

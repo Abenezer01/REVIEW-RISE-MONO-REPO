@@ -7,11 +7,12 @@ import { keyframes } from '@mui/material/styles'
 
 import { SystemMessageCode } from '@platform/contracts'
 
+import { useTranslations } from 'next-intl'
+
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import { SERVICES } from '@/configs/services'
 import apiClient from '@/lib/apiClient'
-import { useTranslation } from '@/hooks/useTranslation'
 
 import PlatformSelector from './selectors/PlatformSelector'
 import ToneSelector from './selectors/ToneSelector'
@@ -56,8 +57,8 @@ interface UnifiedPostGeneratorProps {
 
 export default function UnifiedPostGenerator({ initialDate }: UnifiedPostGeneratorProps) {
     const { notify } = useSystemMessages()
-    const t = useTranslation('studio')
-    const tl = useTranslation('common')
+    const t = useTranslations('studio')
+    const tl = useTranslations('common')
     const [loading, setLoading] = useState(false)
     
     // Inputs
@@ -307,15 +308,15 @@ return
 
                             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
                                 <Box>
-                                    <Typography variant="h6" fontWeight="bold">3-in-1</Typography>
+                                    <Typography variant="h6" fontWeight="bold">{t('magic.outputCount')}</Typography>
                                     <Typography variant="caption" color="text.secondary">{t('magic.outputs')}</Typography>
                                 </Box>
                                 <Box>
-                                    <Typography variant="h6" fontWeight="bold">10s</Typography>
+                                    <Typography variant="h6" fontWeight="bold">{t('magic.generationTime')}</Typography>
                                     <Typography variant="caption" color="text.secondary">{t('magic.generation')}</Typography>
                                 </Box>
                                 <Box>
-                                    <Typography variant="h6" fontWeight="bold">98%</Typography>
+                                    <Typography variant="h6" fontWeight="bold">{t('magic.accuracyRate')}</Typography>
                                     <Typography variant="caption" color="text.secondary">{t('magic.accuracy')}</Typography>
                                 </Box>
                             </Box>

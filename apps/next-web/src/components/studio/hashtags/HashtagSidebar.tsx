@@ -25,6 +25,7 @@ interface HashtagSidebarProps {
 
 export default function HashtagSidebar({ insights }: HashtagSidebarProps) {
     const t = useTranslations('studio.hashtags.sidebar')
+
     const defaultInsights = insights || {
         reach: '2.4M',
         engagement: '4.2%',

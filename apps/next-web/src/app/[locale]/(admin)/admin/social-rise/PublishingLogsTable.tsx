@@ -30,6 +30,7 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
 
 const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingLogsTableProps) => {
   const t = useTranslations('social.publishingLogs');
+  const tc = useTranslations('common');
   const theme = useTheme();
   const format = useFormatter();
   const isDark = theme.palette.mode === 'dark';
@@ -69,7 +70,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
     fetchLogs();
   }, [fetchLogs]);
 
-  const getStatusChip = (status: string) => {
+  const getStatusChip = useCallback((status: string) => {
     switch (status) {
       case 'completed':
       case 'published':
@@ -83,9 +84,9 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
       default:
         return <Chip label={status} size="small" variant="tonal" />;
     }
-  };
+  }, [t]);
 
-  const getPlatformIcon = (platform: string) => {
+  const getPlatformIcon = useCallback((platform: string) => {
     switch (platform.toUpperCase()) {
       case 'INSTAGRAM':
         return <Icon icon="tabler-brand-instagram" fontSize={20} style={{ color: '#E4405F' }} />;
@@ -100,7 +101,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
       default:
         return <Icon icon="tabler-world" fontSize={20} />;
     }
-  };
+  }, []);
 
   const columns: GridColDef[] = useMemo(() => [
     {
@@ -205,7 +206,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
         </Tooltip>
       ),
     },
-  ], [onViewPost, t, format]);
+  ], [onViewPost, t, format, getStatusChip, getPlatformIcon]);
 
   return (
     <Box>
@@ -248,19 +249,19 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
           <MenuItem value="INSTAGRAM">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Icon icon="tabler-brand-instagram" fontSize={18} style={{ color: '#E4405F' }} />
-              <Typography variant="body2" fontWeight="600">Instagram</Typography>
+              <Typography variant="body2" fontWeight="600">{tc('channel.instagram')}</Typography>
             </Box>
           </MenuItem>
           <MenuItem value="FACEBOOK">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Icon icon="tabler-brand-facebook" fontSize={18} style={{ color: '#1877F2' }} />
-              <Typography variant="body2" fontWeight="600">Facebook</Typography>
+              <Typography variant="body2" fontWeight="600">{tc('channel.facebook')}</Typography>
             </Box>
           </MenuItem>
           <MenuItem value="LINKEDIN">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Icon icon="tabler-brand-linkedin" fontSize={18} style={{ color: '#0A66C2' }} />
-              <Typography variant="body2" fontWeight="600">LinkedIn</Typography>
+              <Typography variant="body2" fontWeight="600">{tc('channel.linkedin')}</Typography>
             </Box>
           </MenuItem>
           <MenuItem value="TWITTER">

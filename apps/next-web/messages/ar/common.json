@@ -53,7 +53,9 @@
     "selectFields": "اختر الحقول",
     "search-placeholder": "بحث...",
     "all": "الكل",
+    "days": "أيام",
     "found": "تم العثور على",
+    "id": "المعرف",
     "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟"
   },
   "form": {
