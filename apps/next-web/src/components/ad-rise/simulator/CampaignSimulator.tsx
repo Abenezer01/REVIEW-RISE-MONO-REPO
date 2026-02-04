@@ -37,7 +37,7 @@ export const CampaignSimulator = () => {
         <Box sx={{ flexGrow: 1, height: '100%', py: 2 }}>
             <Grid container spacing={3} sx={{ height: '100%' }}>
                 {/* Left Panel: Controls */}
-                <Grid item xs={12} md={4} sx={{ height: '100%' }}>
+                <Grid size={{md:4,xs:12}} sx={{ height: '100%' }}>
                     <SimulatorControls
                         vertical={input.vertical}
                         objective={input.objective}
@@ -47,7 +47,7 @@ export const CampaignSimulator = () => {
                 </Grid>
 
                 {/* Right Panel: Results */}
-                <Grid item xs={12} md={8} sx={{ height: '100%' }}>
+                <Grid size={{xs:12,md:8}} sx={{ height: '100%' }}>
                     {plan && <SimulatorResults plan={plan} />}
                 </Grid>
             </Grid>

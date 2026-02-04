@@ -1,0 +1,37 @@
+{
+  "title": "Campaign Strategy Simulator",
+  "description": "Visualize your full-funnel strategy in real-time.",
+  "controls": {
+    "title": "Configuration",
+    "vertical_label": "Industry Vertical",
+    "objective_label": "Business Objective",
+    "budget_label": "Monthly Budget",
+    "recommended_budget": "Recommended: $3k - $8k for best results",
+    "objectives": {
+      "Leads": "Leads",
+      "Awareness": "Awareness",
+      "Sales": "Sales",
+      "Local Visits": "Local Visits"
+    },
+    "verticals": {
+      "SaaS": "SaaS",
+      "E-commerce": "E-commerce",
+      "Local Service": "Local Service",
+      "Restaurant": "Restaurant",
+      "Healthcare": "Healthcare"
+    }
+  },
+  "charts": {
+    "channel_mix": "Channel Allocation"
+  },
+  "funnel": {
+    "generated_plan": "Your Custom Plan",
+    "awareness": "Awareness Layer",
+    "consideration": "Consideration Layer",
+    "conversion": "Conversion Layer",
+    "optimization_needed": "Optimization Needed"
+  },
+  "checklist": {
+    "title": "Execution Checklist"
+  }
+}

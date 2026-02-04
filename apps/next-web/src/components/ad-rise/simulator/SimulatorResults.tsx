@@ -41,7 +41,7 @@ export const SimulatorResults = ({ plan }: SimulatorResultsProps) => {
                 {plan.warnings.length > 0 && (
                     <Chip
                         icon={<WarningAmberIcon />}
-                        label="Optimization Needed"
+                        label={t('funnel.optimization_needed')}
                         color="warning"
                         variant="outlined"
                         size="small"
@@ -55,7 +55,7 @@ export const SimulatorResults = ({ plan }: SimulatorResultsProps) => {
 
             <Grid container spacing={3}>
                 {/* Chart Section */}
-                <Grid item xs={12} md={6}>
+                <Grid size={{xs:12,md:6}}>
                     <Typography variant="subtitle2" gutterBottom align="center">
                         {t('charts.channel_mix')}
                     </Typography>
@@ -86,7 +86,7 @@ export const SimulatorResults = ({ plan }: SimulatorResultsProps) => {
                 </Grid>
 
                 {/* Funnel Visualizer */}
-                <Grid item xs={12} md={6}>
+                <Grid size={{xs:12,md:6}}>
                     <Stack spacing={1}>
                         {plan.campaigns.some(c => c.stage === 'Awareness') && (
                             <Card variant="outlined" sx={{ borderTop: '4px solid #00C49F', bgcolor: 'background.paper' }}>
@@ -114,7 +114,7 @@ export const SimulatorResults = ({ plan }: SimulatorResultsProps) => {
                 </Grid>
 
                 {/* Execution Checklist */}
-                <Grid item xs={12}>
+                <Grid size={12}>
                     <Typography variant="subtitle1" fontWeight="bold" gutterBottom sx={{ mt: 2 }}>
                         {t('checklist.title')}
                     </Typography>

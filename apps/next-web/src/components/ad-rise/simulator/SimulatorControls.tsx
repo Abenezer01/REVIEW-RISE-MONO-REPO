@@ -25,7 +25,7 @@ interface SimulatorControlsProps {
 }
 
 export const SimulatorControls = ({ vertical, objective, budget, onChange }: SimulatorControlsProps) => {
-    const t = useTranslations('simulator.controls');
+    const t = useTranslations('simulator');
     const format = useFormatter();
 
     const handleVerticalChange = (event: any) => {
@@ -43,21 +43,21 @@ export const SimulatorControls = ({ vertical, objective, budget, onChange }: Sim
     return (
         <Paper sx={{ p: 4, height: '100%', bgcolor: 'background.paper', borderRadius: 2 }}>
             <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: 'primary.main', mb: 3 }}>
-                Configuration
+                {t('controls.title')}
             </Typography>
 
             <Stack spacing={4}>
                 {/* Vertical Selection */}
                 <FormControl fullWidth>
-                    <InputLabel id="vertical-label">{t('vertical_label')}</InputLabel>
+                    <InputLabel id="vertical-label">{t('controls.vertical_label')}</InputLabel>
                     <Select
                         labelId="vertical-label"
                         value={vertical}
-                        label={t('vertical_label')}
+                        label={t('controls.vertical_label')}
                         onChange={handleVerticalChange}
                     >
                         {['SaaS', 'E-commerce', 'Local Service', 'Restaurant', 'Healthcare'].map((v) => (
-                            <MenuItem key={v} value={v}>{v}</MenuItem>
+                            <MenuItem key={v} value={v}>{t(`controls.verticals.${v}`)}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
@@ -65,7 +65,7 @@ export const SimulatorControls = ({ vertical, objective, budget, onChange }: Sim
                 {/* Objective Selection */}
                 <Box>
                     <Typography gutterBottom variant="subtitle2" color="text.secondary">
-                        {t('objective_label')}
+                        {t('controls.objective_label')}
                     </Typography>
                     <ToggleButtonGroup
                         color="primary"
@@ -78,7 +78,7 @@ export const SimulatorControls = ({ vertical, objective, budget, onChange }: Sim
                     >
                         {['Leads', 'Awareness', 'Sales', 'Local Visits'].map((obj) => (
                             <ToggleButton key={obj} value={obj}>
-                                {obj}
+                                {t(`controls.objectives.${obj}`)}
                             </ToggleButton>
                         ))}
                     </ToggleButtonGroup>
@@ -87,7 +87,7 @@ export const SimulatorControls = ({ vertical, objective, budget, onChange }: Sim
                 {/* Budget Slider */}
                 <Box>
                     <Typography gutterBottom variant="subtitle2" color="text.secondary">
-                        {t('budget_label')} ({format.number(budget, { style: 'currency', currency: 'USD' })})
+                        {t('controls.budget_label')} ({format.number(budget, { style: 'currency', currency: 'USD' })})
                     </Typography>
                     <Slider
                         value={budget}
@@ -100,7 +100,7 @@ export const SimulatorControls = ({ vertical, objective, budget, onChange }: Sim
                         sx={{ mt: 2 }}
                     />
                     <Typography variant="caption" color="text.disabled">
-                        Recommended: $3k - $8k for best results
+                        {t('controls.recommended_budget')}
                     </Typography>
                 </Box>
             </Stack>
