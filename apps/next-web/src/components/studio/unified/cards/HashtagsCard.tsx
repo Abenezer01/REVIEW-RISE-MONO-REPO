@@ -1,7 +1,7 @@
-import React from 'react'
-import { Box, Card, CardContent, Typography, Chip, Stack, IconButton, Tooltip } from '@mui/material'
+import { Box, Card, CardContent, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 
 import { useTranslation } from '@/hooks/useTranslation'
+
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 interface HashtagsCardProps {
