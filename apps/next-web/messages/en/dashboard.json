@@ -1,4 +1,7 @@
 {
+  "app": {
+    "name": "ReviewRise"
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "ai-studio": "AI Content Studio",
@@ -25,6 +28,7 @@
     "seo-keywords": "SEO Keywords",
     "gbp-rocket": "GBPRocket",
     "ad-rise": "AdRise",
+    "ad-rise-blueprint": "Blueprint Generator",
     "brand-rise": "BrandRise",
     "content-templates": "Content Templates",
     "seasonal-events": "Seasonal Events",
@@ -46,6 +50,15 @@
     "feature-flags": "Feature Flags",
     "ai-visibility": "AI Visibility",
     "subscription-issues": "Subscription Issues"
+  },
+  "blueprint": {
+      "title": "Google Search Blueprint",
+      "subtitle": "Generate a complete Google Ads strategy in seconds",
+      "wizard": {
+          "step1": "Campaign Details",
+          "step2": "Generate",
+          "step3": "Results"
+      }
   },
   "auto-reply": "Auto-Reply Settings",
   "seo": {
