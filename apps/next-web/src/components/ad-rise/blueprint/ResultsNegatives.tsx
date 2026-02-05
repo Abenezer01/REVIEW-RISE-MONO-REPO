@@ -16,8 +16,9 @@ import {
     useTheme
 } from '@mui/material';
 
-import { useTranslation } from '@/hooks/useTranslation';
 import type { NegativeKeywordList } from '@platform/contracts';
+
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Props {
     negatives: NegativeKeywordList[];
@@ -30,6 +31,7 @@ export default function ResultsNegatives({ negatives }: Props) {
 
     const copyCategory = (keywords: string[], category: string) => {
         const text = keywords.join(', ');
+
         navigator.clipboard.writeText(text);
         setCopiedCategory(category);
     };
@@ -37,6 +39,7 @@ export default function ResultsNegatives({ negatives }: Props) {
     const copyAll = () => {
         const allKeywords = negatives.flatMap(n => n.keywords);
         const text = allKeywords.join(', ');
+
         navigator.clipboard.writeText(text);
         setCopiedCategory('All keywords');
     };
@@ -65,7 +68,7 @@ export default function ResultsNegatives({ negatives }: Props) {
                                 justifyContent: 'center'
                             }}
                         >
-                            <Typography variant="h6">🚫</Typography>
+                            <Typography variant="h6">{t('icons.block')}</Typography>
                         </Box>
                         <Box sx={{ flex: 1 }}>
                             <Typography variant="h6" sx={{ fontWeight: 600 }}>

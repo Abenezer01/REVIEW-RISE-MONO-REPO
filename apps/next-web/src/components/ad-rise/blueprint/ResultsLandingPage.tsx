@@ -14,8 +14,9 @@ import {
     useTheme
 } from '@mui/material';
 
-import { useTranslation } from '@/hooks/useTranslation';
 import type { LandingPageAnalysis } from '@platform/contracts';
+
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Props {
     analysis?: LandingPageAnalysis;
@@ -59,7 +60,7 @@ export default function ResultsLandingPage({ analysis }: Props) {
                             justifyContent: 'center'
                         }}
                     >
-                        <Typography variant="h6">📊</Typography>
+                        <Typography variant="h6">{t('icons.wizard')}</Typography>
                     </Box>
                     <Box sx={{ flex: 1 }}>
                         <Typography variant="h6" sx={{ fontWeight: 600 }}>

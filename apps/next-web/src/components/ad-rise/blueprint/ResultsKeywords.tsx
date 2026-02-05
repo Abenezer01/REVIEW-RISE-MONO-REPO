@@ -16,8 +16,9 @@ import {
     useTheme
 } from '@mui/material';
 
-import { useTranslation } from '@/hooks/useTranslation';
 import type { KeywordCluster } from '@platform/contracts';
+
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Props {
     clusters: KeywordCluster[];
@@ -31,6 +32,7 @@ export default function ResultsKeywords({ clusters }: Props) {
     const toggleCluster = (index: number) => {
         setExpandedClusters(prev => {
             const newSet = new Set(prev);
+
             if (newSet.has(index)) {
                 newSet.delete(index);
             } else {
@@ -75,7 +77,7 @@ export default function ResultsKeywords({ clusters }: Props) {
                             justifyContent: 'center'
                         }}
                     >
-                        <Typography variant="h6">🔑</Typography>
+                        <Typography variant="h6">{t('icons.key')}</Typography>
                     </Box>
                     <Box>
                         <Typography variant="h6" sx={{ fontWeight: 600 }}>
@@ -149,7 +151,7 @@ export default function ResultsKeywords({ clusters }: Props) {
                                         </Stack>
                                         <IconButton size="small">
                                             <Typography sx={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
-                                                ▼
+                                                {t('icons.caret')}
                                             </Typography>
                                         </IconButton>
                                     </Stack>

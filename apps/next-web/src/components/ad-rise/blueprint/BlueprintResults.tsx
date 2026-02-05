@@ -4,8 +4,9 @@ import React from 'react';
 
 import { Alert, Box, Button, Paper, Stack, Typography, alpha, useTheme } from '@mui/material';
 
-import { useTranslation } from '@/hooks/useTranslation';
 import type { BlueprintOutput } from '@platform/contracts';
+
+import { useTranslation } from '@/hooks/useTranslation';
 
 import ResultsAdGroups from './ResultsAdGroups';
 import ResultsKeywords from './ResultsKeywords';

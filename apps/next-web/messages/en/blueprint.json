@@ -13,7 +13,11 @@
         "ecommerce": "🛒",
         "saas": "💻",
         "healthcare": "✓",
-        "lightning": "⚡"
+        "lightning": "⚡",
+        "memo": "📝",
+        "caret": "▼",
+        "key": "🔑",
+        "block": "🚫"
     },
     "steps": {
         "campaignDetails": "Campaign Details",
