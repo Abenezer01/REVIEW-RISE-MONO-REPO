@@ -1,6 +1,6 @@
-import { Box, Card, CardContent, Chip, Grid, Typography, useTheme, alpha } from '@mui/material'
+import { alpha, Box, Card, CardContent, Chip, Typography, useTheme } from '@mui/material'
 import VerifiedIcon from '@mui/icons-material/Verified'
-import { MetaInterestCluster } from '@platform/contracts'
+import type { MetaInterestCluster } from '@platform/contracts'
 import { useTranslation } from '@/hooks/useTranslation'
 
 interface Props {

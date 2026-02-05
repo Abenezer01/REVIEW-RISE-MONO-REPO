@@ -22,10 +22,10 @@ import {
     Slider,
     Stack,
     Step,
-    StepIconProps,
     StepLabel, Stepper, TextField, Typography,
     useTheme
 } from '@mui/material'
+import type { StepIconProps } from '@mui/material'
 import { useState } from 'react'
 
 import { useTranslation } from '@/hooks/useTranslation'
@@ -96,8 +96,10 @@ export default function MetaBlueprintWizard() {
     const handleNext = async () => {
         if (activeStep === 1) {
             setLoading(true)
+
             try {
                 const result = await MetaBlueprintService.generate(input)
+
                 setOutput(result)
                 setActiveStep(prev => prev + 1)
             } catch (error) {
@@ -157,11 +159,11 @@ export default function MetaBlueprintWizard() {
             <Stack spacing={1}>
                 {[
                     t('meta.results.audiences.prospecting') + ' + ' + t('meta.results.audiences.retargeting'),
-                    'Core audience definitions', // These items were not explicitly in my translation list but I should use something relevant or keep them English if not critical
-                    'Interest cluster recommendations',
-                    'Optimized copy variations',
-                    'Placement strategy guide',
-                    'Export-ready JSON format'
+                    t('meta.results.benefits.coreAudiences'),
+                    t('meta.results.benefits.interestClusters'),
+                    t('meta.results.benefits.optimizedCopy'),
+                    t('meta.results.benefits.placementStrategy'),
+                    t('meta.results.benefits.exportReady')
                 ].map((item, i) => (
                     <Box key={i} sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
                         <CheckCircleIcon color="success" sx={{ fontSize: 16 }} />
@@ -230,6 +232,7 @@ export default function MetaBlueprintWizard() {
                         <Typography color="text.secondary" sx={{ mt: 1 }}>{t('generate.loadingText')}</Typography>
                     </Box>
                 ) : output && activeStep === 2 ? (
+
                     // Results View
                     <Grid container spacing={4}>
                         <Grid size={{ xs: 12 }}>
@@ -291,6 +294,7 @@ export default function MetaBlueprintWizard() {
                         </Grid>
                     </Grid>
                 ) : (
+
                     // Wizard View (7/5 Split)
                     <Grid container spacing={5}>
                         {/* Left Column - Form */}

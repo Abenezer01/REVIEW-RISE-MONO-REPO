@@ -1,9 +1,10 @@
+import { alpha, Box, Button, Card, CardContent, Grid, IconButton, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material'
+import type { MetaCopyVariation } from '@platform/contracts'
+import { useState } from 'react'
+
 import { useTranslation } from '@/hooks/useTranslation'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import { alpha, Box, Button, Card, CardContent, Grid, IconButton, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material'
-import { MetaCopyVariation } from '@platform/contracts'
-import { useState } from 'react'
 
 interface Props {
     data: MetaCopyVariation[]
