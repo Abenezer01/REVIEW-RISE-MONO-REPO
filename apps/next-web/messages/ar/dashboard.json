@@ -31,7 +31,9 @@
     "settings": "الإعدادات",
     "system-settings": "إعدادات النظام",
     "feature-flags": "أعلام الميزات",
-    "ai-visibility": "ظهور الذكاء الاصطناعي"
+    "ai-visibility": "ظهور الذكاء الاصطناعي",
+    "ad-rise-blueprint": "منشئ المخطط",
+    "social-logs": "سجلات النشر"
   },
   "adrise": {
     "title": "معالج حملة AdRise™",
@@ -139,7 +141,8 @@
       "backToSessions": "العودة إلى الجلسات",
       "edit": "تعديل",
       "duplicate": "تكرار",
-      "draftRecovered": "تم الاستئناف من مسودتك السابقة غير المحفوظة."
+      "draftRecovered": "تم الاستئناف من مسودتك السابقة غير المحفوظة.",
+      "noSessionsDesc": "ابدأ بإنشاء أول جلسة AdRise لك لتوليد خطط تسويقية محسنة لعملك."
     },
     "status": {
       "active": "نشط",
@@ -228,6 +231,11 @@
       "volume": "الحجم",
       "kd": "صعوبة الكلمة %",
       "viewHistory": "عرض سجل الترتيب"
+    },
+    "rankings": {
+      "organic": "التصنيف العضوي",
+      "mapPack": "حزمة الخرائط",
+      "historyTitle": "سجل التصنيف"
     }
   },
   "autoReply": {
@@ -376,9 +384,12 @@
         "reject": "رفض",
         "updateReply": "تحديث الرد",
         "postReply": "نشر الرد",
-        "defaultReply": "عزيزي {author}، شكرًا جزيلاً لك على مراجعتك ذات الـ {rating} نجوم! نحن نقدر ملاحظاتك ونأمل في رؤيتك مرة أخرى قريبًا."
+        "defaultReply": "عزيزي {author}، شكرًا جزيلاً لك على مراجعتك ذات الـ {rating} نجوم! نحن نقدر ملاحظاتك ونأمل في رؤيتك مرة أخرى قريبًا.",
+        "notFound": "المراجعة غير موجودة"
       }
-    }
+    },
+    "themesTitle": "موضوعات المراجعة والكلمات المفتاحية",
+    "themesSubtitle": "الموضوعات المتكررة في تعليقات العملاء"
   },
   "actions": {
     "respondToReview": "الرد على المراجعة",
@@ -703,6 +714,26 @@
         "retryJob": "إعادة محاولة المهمة",
         "resolvedByAdmin": "تم الحل بواسطة المسؤول",
         "ignoredByAdmin": "تم التجاهل بواسطة المسؤول"
+      },
+      "detail": {
+        "title": "تفاصيل المهمة",
+        "configuration": "التكوين",
+        "jobType": "نوع المهمة",
+        "business": "العمل",
+        "location": "الموقع",
+        "executionTiming": "التنفيذ والتوقيت",
+        "createdAt": "أنشئت في",
+        "failedAt": "فشلت في",
+        "retryCount": "عدد المحاولات",
+        "ofMaxRetries": "من {max} كحد أقصى",
+        "errorDetails": "تفاصيل الخطأ",
+        "payload": "الحمولة",
+        "resultMetadata": "النتيجة / البيانات الوصفية",
+        "close": "إغلاق",
+        "ignore": "تجاهل",
+        "resolve": "حل",
+        "retryJob": "إعادة محاولة المهمة",
+        "id": "المعرف"
       }
     },
     "social": {
@@ -1060,7 +1091,9 @@
         "noneFound": "لم يتم العثور على شيء.",
         "noneIdentified": "لم يتم تحديد شيء.",
         "none": "لا يوجد"
-      }
+      },
+      "backToList": "العودة إلى المنافسين",
+      "notFound": "المنافس غير موجود"
     },
     "jobs": {
       "title": "مهام وتقارير الذكاء الاصطناعي",
@@ -1148,7 +1181,98 @@
       "metricsInfo": "تساعد المقاييس في تتبع فعالية هذه الخطة.",
       "expectedOutcomes": "النتائج المتوقعة",
       "regenerate": "إعادة توليد الخطة",
-      "mockDateRange": "1-7 فبراير 2024"
+      "mockDateRange": "1-7 فبراير 2024",
+      "launchSubtitle": "خطوات قابلة للتنفيذ لتحسين حضورك في الذكاء الاصطناعي"
+    }
+  },
+  "common": {
+    "actions": "الإجراءات",
+    "all": "الكل",
+    "cancel": "إلغاء",
+    "edit": "تعديل",
+    "loading": "جاري التحميل...",
+    "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
+    "channel": {
+      "google": "جوجل",
+      "facebook": "فيسبوك",
+      "instagram": "إنستغرام",
+      "twitter": "تويتر",
+      "linkedin": "لينكد إن",
+      "yelp": "ييلب",
+      "tripadvisor": "تريب أدفايزر"
+    },
+    "status": {
+      "completed": "مكتمل",
+      "failed": "فاشل",
+      "pending": "معلق",
+      "processing": "جاري المعالجة",
+      "scheduled": "مجدول",
+      "success": "نجاح",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "replied": "تم الرد",
+      "approved": "تمت الموافقة",
+      "none": "لم يتم الرد",
+      "skipped": "تم التخطي"
+    }
+  },
+  "errors": {
+    "businessRequired": "العمل مطلوب",
+    "emailRequired": "البريد الإلكتروني مطلوب",
+    "firstNameRequired": "الاسم الأول مطلوب",
+    "invalidEmail": "عنوان بريد إلكتروني غير صالح",
+    "lastNameRequired": "اسم العائلة مطلوب",
+    "locationRequired": "الموقع مطلوب",
+    "passwordMin": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+    "passwordRequired": "كلمة المرور مطلوبة",
+    "roleRequired": "الدور مطلوب"
+  },
+  "status": {
+    "completed": "مكتمل",
+    "pending": "معلق",
+    "pending_approval": "بانتظار الموافقة",
+    "processing": "جاري المعالجة"
+  },
+  "xAxisLabel": "س: {label}",
+  "yAxisLabel": "| ص: {label}",
+  "dashboard": {
+    "jobs": {
+      "social": {
+        "columns": {
+          "actions": "الإجراءات"
+        },
+        "detail": {
+          "unknownError": "حدث خطأ غير معروف"
+        }
+      }
+    },
+    "reviews": {
+      "positive": "إيجابي",
+      "neutral": "محايد",
+      "negative": "سلبي"
+    }
+  },
+  "landing": {
+    "results": {
+      "categories": {
+        "technical": {
+          "label": "تقني"
+        }
+      },
+      "impact": "التأثير"
+    }
+  },
+  "app": {
+    "name": "ReviewRise",
+    "description": "سيو محلي وإدارة مراجعات مدعوم بالذكاء الاصطناعي"
+  },
+  "blueprint": {
+    "title": "مخطط بحث جوجل",
+    "subtitle": "إنشاء استراتيجية كاملة لإعلانات جوجل في ثوانٍ",
+    "wizard": {
+      "step1": "تفاصيل الحملة",
+      "step2": "توليد",
+      "step3": "النتائج"
     }
   }
 }

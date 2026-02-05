@@ -99,7 +99,10 @@
         "westsideAddress": "456 Oak Ave, San Francisco, CA 94115"
       },
       "mockDuration": "2m 34s",
-      "mockTime": "2:00 AM"
-    }
+      "mockTime": "2:00 AM",
+      "mockDurationValue": "2 mins"
+    },
+    "configure": "Configure",
+    "disconnect": "Disconnect"
   }
 }

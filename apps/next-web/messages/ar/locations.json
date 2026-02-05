@@ -99,7 +99,10 @@
         "westsideAddress": "456 شارع أوك، سان فرانسيسكو، CA 94115"
       },
       "mockDuration": "دقيقتان و34 ثانية",
-      "mockTime": "2:00 صباحاً"
-    }
+      "mockTime": "2:00 صباحاً",
+      "mockDurationValue": "دقيقتان"
+    },
+    "configure": "تكوين",
+    "disconnect": "فصل"
   }
 }

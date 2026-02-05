@@ -92,13 +92,29 @@
       "disconnect": "Disconnect"
     },
     "fbConnect": {
-      "steps": ["Authorize", "Select Page", "Complete"],
+      "steps": [
+        "Authorize",
+        "Select Page",
+        "Complete"
+      ],
       "permissionsTitle": "AdRise needs the following permissions to manage your Facebook Page. You can revoke access at any time.",
       "permissions": [
-        {"title": "Read Page Data", "desc": "View your page insights, posts, and engagement metrics"},
-        {"title": "Publish Content", "desc": "Create and schedule posts on your behalf"},
-        {"title": "Manage Comments", "desc": "Read and respond to comments and messages"},
-        {"title": "Access Insights", "desc": "View analytics and performance data"}
+        {
+          "title": "Read Page Data",
+          "desc": "View your page insights, posts, and engagement metrics"
+        },
+        {
+          "title": "Publish Content",
+          "desc": "Create and schedule posts on your behalf"
+        },
+        {
+          "title": "Manage Comments",
+          "desc": "Read and respond to comments and messages"
+        },
+        {
+          "title": "Access Insights",
+          "desc": "View analytics and performance data"
+        }
       ],
       "dataSecureTitle": "Your Data is Secure",
       "dataSecureDesc": "All tokens are encrypted and stored securely. We never access your personal data or post without your permission.",
@@ -132,72 +148,65 @@
       "day": "DAY",
       "platforms": "PLATFORMS:",
       "scheduled": "SCHEDULED"
-    },
-    "overview": {
-      "studio": "SOCIAL MEDIA STUDIO",
-      "description": "Your centralized command center for Social Rise visibility, performance metrics, and strategy reports.",
-      "stats": {
-        "scheduledPosts": "Scheduled Posts",
-        "published30d": "Published (30d)",
-        "failedPosts": "Failed Posts"
-      },
-      "charts": {
-        "performanceTitle": "Publishing Performance",
-        "performanceSubtitle": "Successful vs Failed posts over the last 14 days",
-        "distributionTitle": "Platform Distribution",
-        "distributionSubtitle": "Posts by social platform",
-        "successful": "Successful",
-        "failed": "Failed"
-      },
-      "upcoming": {
-        "title": "Upcoming Posts",
-        "contentMessaging": "Content & Messaging",
-        "scheduledFor": "Scheduled for {date} at {time}",
-        "noPosts": "No upcoming posts scheduled."
-      },
-      "logs": {
-        "title": "Recent Logs",
-        "logs": "Logs",
-        "publishing": "{platform} Publishing",
-        "noLogs": "No recent publishing activity."
-      }
     }
   },
   "callback": {
     "finalizing": "Finalizing connection...",
-    "info": "This page handles OAuth callbacks. The connection process is managed via popup windows."
+    "info": "Please wait while we complete the integration."
   },
-  "publishingLogs": {
-    "published": "Published",
-    "failed": "Failed",
-    "processing": "Processing",
-    "pending": "Pending",
-    "time": "Time",
-    "platform": "Platform",
-    "postContent": "Post Content",
-    "status": "Status",
-    "detailsErrors": "Details / Errors",
-    "publishedSuccessfully": "Published successfully",
-    "attempt": "Attempt {count}",
-    "waitingToStart": "Waiting to start",
-    "actions": "Actions",
-    "viewOriginalPost": "View Original Post",
-    "allPlatforms": "All Platforms",
-    "twitterX": "Twitter (X)",
-    "googleBusiness": "Google Business",
-    "allStatuses": "All Statuses",
-    "startDate": "Start Date",
-    "endDate": "End Date"
+  "overview": {
+    "studio": "SOCIAL MEDIA STUDIO",
+    "description": "Your centralized command center for Social Rise visibility, performance metrics, and strategy reports.",
+    "stats": {
+      "scheduledPosts": "Scheduled Posts",
+      "published30d": "Published (30d)",
+      "failedPosts": "Failed Posts"
+    },
+    "charts": {
+      "performanceTitle": "Publishing Performance",
+      "performanceSubtitle": "Successful vs Failed posts over the last 14 days",
+      "distributionTitle": "Platform Distribution",
+      "distributionSubtitle": "Posts by social platform",
+      "successful": "Successful",
+      "failed": "Failed"
+    },
+    "upcoming": {
+      "title": "Upcoming Posts",
+      "contentMessaging": "Content & Messaging",
+      "scheduledFor": "Scheduled for {date} at {time}",
+      "noPosts": "No upcoming posts scheduled."
+    },
+    "logs": {
+      "title": "Recent Logs",
+      "logs": "Logs",
+      "publishing": "{platform} Publishing",
+      "noLogs": "No recent publishing activity."
+    }
   },
   "planner": {
-    "goToScheduler": "GO TO SCHEDULER",
-    "aiAdaptationActive": "AI ADAPTATION ACTIVE",
-    "aiStrategySync": "Strategy is automatically synced with your Brand DNA mission and voice.",
-    "curatingStrategy": "Curating your strategy...",
-    "targeting": "Targeting",
-    "week": "WEEK",
-    "day": "DAY",
-    "platforms": "PLATFORMS:",
-    "scheduled": "SCHEDULED"
+    "goToScheduler": "Go to Scheduler"
+  },
+  "publishingLogs": {
+    "title": "Publishing Logs",
+    "allPlatforms": "All Platforms",
+    "allStatuses": "All Statuses",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "platform": "Platform",
+    "status": "Status",
+    "time": "Time",
+    "postContent": "Content",
+    "actions": "Actions",
+    "published": "Published",
+    "failed": "Failed",
+    "pending": "Pending",
+    "processing": "Processing",
+    "googleBusiness": "Google Business",
+    "twitterX": "Twitter (X)",
+    "publishedSuccessfully": "Published successfully",
+    "viewOriginalPost": "View Original Post",
+    "waitingToStart": "Waiting to start",
+    "detailsErrors": "Details / Errors",
+    "attempt": "Attempt"
   }
 }
