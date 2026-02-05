@@ -145,110 +145,110 @@
         "failed": "Failed"
     },
     "meta": {
-        "title": "Meta Ads Blueprint Generator",
-        "subtitle": "AI-powered campaign planning for Facebook & Instagram",
+        "title": "مولد خطة إعلانات ميتا",
+        "subtitle": "تخطيط الحملات المدعوم بالذكاء الاصطناعي لفيسبوك وإنستغرام",
         "steps": {
-            "businessInfo": "Business Information",
-            "geoTargeting": "Geographic Targeting",
-            "results": "Your Blueprint"
+            "businessInfo": "معلومات العمل",
+            "geoTargeting": "الاستهداف الجغرافي",
+            "results": "خطتك"
         },
         "form": {
-            "businessName": "Business Name (Optional)",
-            "businessNamePlaceholder": "e.g., Joe's Plumbing",
-            "offerOrService": "What do you offer?",
-            "offerOrServicePlaceholder": "e.g., Emergency plumbing services",
-            "vertical": "Business Vertical",
+            "businessName": "اسم العمل (اختياري)",
+            "businessNamePlaceholder": "مثال: سباكة جو",
+            "offerOrService": "ماذا تقدم؟",
+            "offerOrServicePlaceholder": "مثال: خدمات السباكة الطارئة",
+            "vertical": "قطاع العمل",
             "verticals": {
-                "localService": "Local Service",
-                "ecommerce": "E-commerce",
-                "saas": "SaaS",
-                "healthcare": "Healthcare",
-                "other": "Other"
+                "localService": "خدمة محلية",
+                "ecommerce": "تجارة إلكترونية",
+                "saas": "برمجيات كخدمة",
+                "healthcare": "رعاية صحية",
+                "other": "أخرى"
             },
-            "geoCenter": "Target Location",
-            "geoCenterPlaceholder": "e.g., San Francisco, CA",
-            "radius": "Radius",
+            "geoCenter": "الموقع المستهدف",
+            "geoCenterPlaceholder": "مثال: سان فرانسيسكو، كاليفورنيا",
+            "radius": "نطاق الاستهداف",
             "radiusUnit": {
-                "miles": "Miles",
-                "km": "Kilometers"
+                "miles": "أميل",
+                "km": "كيلومتر"
             },
-            "painPoints": "Customer Pain Points (Optional)",
-            "painPointsPlaceholder": "e.g., Burst pipes, clogged drains",
-            "landingPageUrl": "Landing Page URL (Optional)",
+            "painPoints": "نقاط ألم العملاء (اختياري)",
+            "painPointsPlaceholder": "مثال: أنابيب منفجرة، مصارف مسدودة",
+            "landingPageUrl": "رابط الصفحة المقصودة (اختياري)",
             "landingPageUrlPlaceholder": "https://example.com"
         },
         "buttons": {
-            "next": "Next",
-            "back": "Back",
-            "generate": "Generate Blueprint",
-            "exportAll": "Export All",
-            "startOver": "Start Over"
+            "next": "التالي",
+            "back": "السابق",
+            "generate": "إنشاء الخطة",
+            "exportAll": "تصدير الكل",
+            "startOver": "البدء من جديد"
         },
         "results": {
-            "title": "Your Meta Ads Blueprint is Ready",
+            "title": "خطة إعلانات ميتا الخاصة بك جاهزة",
             "sections": {
-                "audiences": "Audience Sets",
-                "interests": "Interest Clusters",
-                "adCopy": "Ad Copy Variations",
-                "placements": "Placement Recommendations"
+                "audiences": "مجموعات الجمهور",
+                "interests": "مجموعات الاهتمامات",
+                "adCopy": "نسخ الإعلانات",
+                "placements": "توصيات المواضع"
             },
             "audiences": {
-                "prospecting": "Prospecting (Cold Traffic)",
-                "retargeting": "Retargeting (Warm Traffic)",
-                "estimatedReach": "Estimated Reach",
-                "demographics": "Demographics",
-                "age": "Age",
-                "gender": "Gender",
-                "languages": "Languages",
-                "geoLocations": "Geo Locations",
-                "interests": "Interests",
-                "customAudiences": "Custom Audiences",
-                "lookalikeSources": "Lookalike Sources"
+                "prospecting": "التنقيب (حركة باردة)",
+                "retargeting": "إعادة الاستهداف (حركة دافئة)",
+                "estimatedReach": "الوصول المقدر",
+                "demographics": "الديموغرافيا",
+                "age": "العمر",
+                "gender": "الجنس",
+                "languages": "اللغات",
+                "geoLocations": "المواقع الجغرافية",
+                "interests": "الاهتمامات",
+                "customAudiences": "الجماهير المخصصة",
+                "lookalikeSources": "مصادر الجماهير المشابهة"
             },
             "interests": {
-                "primary": "Primary",
-                "secondary": "Secondary",
-                "exclusions": "Exclusions",
-                "includedInterests": "Included Interests",
-                "interestsCount": "{count} interests",
-                "more": "+{count} more"
+                "primary": "أساسي",
+                "secondary": "ثانوي",
+                "exclusions": "الاستثناءات",
+                "includedInterests": "الاهتمامات المتضمنة",
+                "interestsCount": "{count} اهتمامات",
+                "more": "+{count} أخرى"
             },
             "adCopy": {
-                "variation": "Variation",
-                "primaryText": "Primary Text",
-                "headline": "Headline",
-                "description": "Description",
-                "ctas": "Call-to-Actions",
-                "tone": "Tone",
-                "compliant": "Meta Ads Compliant",
-                "characterLimits": "Character Limits Guide",
-                "copyToClipboard": "Copy to Clipboard",
-                "copyAll": "Copy All",
-                "copied": "Copied!",
-                "chars": "{count} / {limit} chars",
+                "variation": "نسخة",
+                "primaryText": "النص الأساسي",
+                "headline": "العنوان",
+                "description": "الوصف",
+                "ctas": "دعوات اتخاذ إجراء",
+                "tone": "النبرة",
+                "compliant": "متوافق مع إعلانات ميتا",
+                "characterLimits": "دليل حدود الأحرف",
+                "copyToClipboard": "نسخ إلى الحافظة",
+                "copyAll": "نسخ الكل",
+                "copied": "تم النسخ!",
+                "chars": "{count} / {limit} حرف",
                 "guide": {
-                    "primaryText": "Main ad copy for Feed placements.",
-                    "headline": "Bold text above description.",
-                    "description": "Short supporting text.",
-                    "optimized": "Optimized for Primary Text (125c), Headlines (40c), and Descriptions (25c)."
+                    "primaryText": "نص الإعلان الرئيسي لخلاصات الأخبار.",
+                    "headline": "نص عريض يظهر فوق الوصف.",
+                    "description": "نص داعم قصير.",
+                    "optimized": "محسن للنص الرئيسي (125 حرفًا)، والعناوين (40 حرفًا)، والأوصاف (25 حرفًا)."
                 },
-                "charsLimit": "{count} chars"
+                "charsLimit": "{count} حرف"
             },
             "placements": {
-                "platform": "Platform",
-                "format": "Format",
-                "objective": "Objective",
-                "why": "Why",
-                "highImpact": "High Impact",
-                "recommended": "Recommended",
+                "platform": "المنصة",
+                "format": "التنسيق",
+                "objective": "الهدف",
+                "why": "لماذا",
+                "highImpact": "تأثير عالي",
+                "recommended": "موصى به",
                 "objectives": {
-                    "Awareness": "Awareness",
-                    "Traffic": "Traffic",
-                    "Conversion": "Conversion"
+                    "Awareness": "الوعي",
+                    "Traffic": "حركة المرور",
+                    "Conversion": "التحويل"
                 }
             }
         },
-        "loading": "Generating your Meta Ads Blueprint...",
-        "error": "Failed to generate blueprint. Please try again."
+        "loading": "جاري إنشاء خطة إعلانات ميتا الخاصة بك...",
+        "error": "فشل في إنشاء الخطة. يرجى المحاولة مرة أخرى."
     }
 }
