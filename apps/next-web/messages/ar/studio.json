@@ -1,4 +1,8 @@
 {
+  "common": {
+    "export": "تصدير",
+    "share": "مشاركة"
+  },
   "page": {
     "title": "استوديو محتوى الذكاء الاصطناعي",
     "description": "توليد محتوى مدعوم بالذكاء الاصطناعي بما في ذلك التعليقات والهاشتاقات والأفكار والمزيد.",
@@ -113,6 +117,7 @@
     "inputTitle": "تفاصيل الإدخال",
     "detailsTitle": "تفاصيل التعليق",
     "styleTitle": "نمط التعليق",
+    "platform": "المنصة",
     "selectPlatform": "اختر المنصة",
     "productLabel": "وصف المنتج/الخدمة",
     "productPlaceholder": "مثلاً زجاجات مياه صديقة للبيئة لأنماط الحياة النشطة",
@@ -178,6 +183,11 @@
     "loading": "جاري التوليد...",
     "suggestionsTitle": "اقتراحات",
     "copyAll": "نسخ الكل",
+    "useAll": "استخدام جميع الوسوم",
+    "addToPreview": "إضافة إلى المعاينة",
+    "highReach": "وصول عالٍ",
+    "targeted": "مستهدف",
+    "brand": "العلامة التجارية",
     "emptyState": "أدخل موضوعًا لتوليد هاشتاقات ذات صلة.",
     "coreTags": "الوسوم الأساسية (حجم مرتفع)",
     "nicheTags": "الوسوم المتخصصة (مستهدفة)",
@@ -299,6 +309,7 @@
       "planOverview": "نظرة عامة على الخطة",
       "totalPosts": "إجمالي المنشورات"
     },
+    "suggestedPlatform": "المنصة المقترحة",
     "scheduled": {
       "noPosts": "لا توجد منشورات مجدولة لهذا اليوم."
     },
@@ -385,6 +396,8 @@
     "qualityHigh": "عالية",
     "qualityMedium": "متوسطة",
     "qualityLow": "منخفضة",
+    "promptInputPlaceholder": "مثلاً مقهى في الصباح، سيارة مستقبلية، شاطئ هادئ...",
+    "useThisPrompt": "استخدم هذا الموجه",
     "creativityLabel": "مستوى الإبداع",
     "aspectRatioLabel": "نسبة العرض إلى الارتفاع",
     "aspectRatios": {
@@ -514,6 +527,7 @@
     "statDuration": "المدة",
     "statScenes": "المشاهد",
     "statWords": "الكلمات",
+    "untitledPost": "منشور بدون عنوان",
     "inputTitle": "إعدادات الفيديو",
     "styleLabel": "نمط الفيديو",
     "loading": "جاري الكتابة...",

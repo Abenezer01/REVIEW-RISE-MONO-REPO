@@ -28,19 +28,6 @@
     "brand-rise": "براند رايز",
     "content-templates": "قوالب المحتوى",
     "seasonal-events": "الأحداث الموسمية",
-    "seasonalEvents": {
-      "title": "الأحداث الموسمية",
-      "subtitle": "إدارة الأحداث الموسمية لعلامتك التجارية وجدول التسويق للعطلات.",
-      "addEvent": "إضافة حدث",
-      "editEvent": "تعديل الحدث الموسمي",
-      "addNewEvent": "إضافة حدث جديد",
-      "eventName": "اسم الحدث",
-      "date": "التاريخ",
-      "market": "السوق",
-      "description": "الوصف",
-      "deleteTitle": "حذف الحدث الموسمي",
-      "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذا الحدث الموسمي؟ لا يمكن التراجع عن هذا الإجراء."
-    },
     "settings": "الإعدادات",
     "system-settings": "إعدادات النظام",
     "feature-flags": "أعلام الميزات",
@@ -173,6 +160,21 @@
     }
   },
   "auto-reply": "إعدادات الرد التلقائي",
+  "seasonalEvents": {
+    "title": "الأحداث الموسمية",
+    "subtitle": "إدارة الأحداث الموسمية لعلامتك التجارية وجدول التسويق للعطلات.",
+    "addEvent": "إضافة حدث",
+    "editEvent": "تعديل الحدث الموسمي",
+    "addNewEvent": "إضافة حدث جديد",
+    "eventName": "اسم الحدث",
+    "eventNamePlaceholder": "مثلاً تخفيضات الانقلاب الصيفي",
+    "date": "التاريخ",
+    "market": "السوق",
+    "description": "الوصف",
+    "descriptionPlaceholder": "صف الفعالية وأهدافها التسويقية...",
+    "deleteTitle": "حذف الحدث الموسمي",
+    "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذا الحدث الموسمي؟ لا يمكن التراجع عن هذا الإجراء."
+  },
   "seo": {
     "visibility": {
       "title": "الظهور في نتائج البحث",
@@ -291,13 +293,18 @@
   },
   "overview": {
     "title": "نظرة عامة على لوحة القيادة",
+    "activityFeed": {
+      "title": "النشاط الأخير",
+      "subheader": "آخر التحديثات"
+    },
     "welcome": "مرحبًا بعودتك",
     "totalReviews": "إجمالي المراجعات",
     "averageRating": "متوسط التصنيف",
     "responseRate": "معدل الاستجابة",
     "pendingReviews": "المراجعات المعلقة",
     "loading": "جاري التحميل...",
-    "noData": "لا توجد بيانات متاحة"
+    "noData": "لا توجد بيانات متاحة",
+    "dateRange": "النطاق الزمني"
   },
   "stats": {
     "thisWeek": "هذا الأسبوع",
@@ -1007,6 +1014,14 @@
       "uvp": "UVP",
       "services": "الخدمات",
       "analysis": "التحليل",
+      "notFound": "المنافس غير موجود",
+      "backToList": "العودة إلى القائمة",
+      "stats": {
+        "found": "تم العثور على منافسين",
+        "directLocal": "محلي مباشر",
+        "content": "منافسو المحتوى",
+        "aggregators": "المجمعون"
+      },
       "listTitle": "المنافسون المتتبعون",
       "addTitle": "إضافة منافس",
       "nameLabel": "اسم المنافس",

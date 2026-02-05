@@ -133,21 +133,6 @@
       "connecting": "جاري الاتصال...",
       "connectPage": "ربط الصفحة",
       "done": "تم"
-    },
-    "callback": {
-      "finalizing": "جاري إتمام الاتصال...",
-      "info": "تعالج هذه الصفحة ردود فعل OAuth. تتم إدارة عملية الاتصال عبر نوافذ منبثقة."
-    },
-    "planner": {
-      "goToScheduler": "الذهاب إلى المجدول",
-      "aiAdaptationActive": "تكييف الذكاء الاصطناعي نشط",
-      "aiStrategySync": "تتم مزامنة الاستراتيجية تلقائيًا مع مهمة وصوت Brand DNA الخاص بك.",
-      "curatingStrategy": "تنسيق استراتيجيتك...",
-      "targeting": "الاستهداف",
-      "week": "أسبوع",
-      "day": "يوم",
-      "platforms": "المنصات:",
-      "scheduled": "مجدول"
     }
   },
   "callback": {

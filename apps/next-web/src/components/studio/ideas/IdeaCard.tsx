@@ -10,8 +10,7 @@ import Chip from '@mui/material/Chip'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
-
-import { useTranslation } from '@/hooks/useTranslation'
+import { useTranslations } from 'next-intl'
 
 interface IdeaCardProps {
     idea: {
@@ -29,7 +28,8 @@ interface IdeaCardProps {
 }
 
 export default function IdeaCard({ idea, onUse, onBookmark, onCopy }: IdeaCardProps) {
-    const t = useTranslation('studio')
+    const t = useTranslations('studio')
+    const tc = useTranslations('common')
 
     const getEngagementColor = (level?: string) => {
         switch (level) {
@@ -73,14 +73,14 @@ export default function IdeaCard({ idea, onUse, onBookmark, onCopy }: IdeaCardPr
                     </Box>
                     <Box sx={{ display: 'flex', gap: 0.5, ml: 2 }}>
                         {onBookmark && (
-                            <Tooltip title="Bookmark">
+                            <Tooltip title={tc('common.bookmark')}>
                                 <IconButton size="small" onClick={onBookmark}>
                                     <i className="tabler-bookmark" style={{ fontSize: 18 }} />
                                 </IconButton>
                             </Tooltip>
                         )}
                         {onCopy && (
-                            <Tooltip title="Copy">
+                            <Tooltip title={tc('common.copy')}>
                                 <IconButton size="small" onClick={onCopy}>
                                     <i className="tabler-copy" style={{ fontSize: 18 }} />
                                 </IconButton>
