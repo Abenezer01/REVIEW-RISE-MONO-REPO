@@ -64,8 +64,14 @@ const menuData: MenuItem[] = [
     allowedRoles: [ROLES.ADMIN],
     children: [
       {
+        title: 'navigation.social-overview',
+        href: '/admin/social-rise/overview',
+        icon: 'tabler-chart-pie',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
         title: 'navigation.social-content',
-        href: '/admin/social-rise',
+        href: '/admin/social-rise?tab=calendar',
         icon: 'tabler-calendar',
         allowedRoles: [ROLES.ADMIN]
       },

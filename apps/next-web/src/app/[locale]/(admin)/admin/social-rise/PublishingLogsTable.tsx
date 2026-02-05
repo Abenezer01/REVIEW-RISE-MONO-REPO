@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useState, useMemo } from 'react';
 
-import { useTranslations, useFormatter } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -32,7 +32,6 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
   const t = useTranslations('social.publishingLogs');
   const tc = useTranslations('common');
   const theme = useTheme();
-  const format = useFormatter();
   const isDark = theme.palette.mode === 'dark';
   const [logs, setLogs] = useState<PublishingLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,7 +86,13 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
   }, [t]);
 
   const getPlatformIcon = useCallback((platform: string) => {
-    switch (platform.toUpperCase()) {
+    if (!platform) return <Icon icon="tabler-world" fontSize={20} />;
+
+    const normalized = platform.toUpperCase().replace(/\s+/g, '_');
+
+    switch (normalized) {
+      case 'ALL_PLATFORMS':
+        return <Icon icon="tabler-world" fontSize={20} />;
       case 'INSTAGRAM':
         return <Icon icon="tabler-brand-instagram" fontSize={20} style={{ color: '#E4405F' }} />;
       case 'FACEBOOK':
@@ -95,6 +100,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
       case 'LINKEDIN':
         return <Icon icon="tabler-brand-linkedin" fontSize={20} style={{ color: '#0A66C2' }} />;
       case 'TWITTER':
+      case 'X':
         return <Icon icon="tabler-brand-x" fontSize={20} />;
       case 'GOOGLE_BUSINESS':
         return <Icon icon="tabler-brand-google" fontSize={20} style={{ color: '#4285F4' }} />;
@@ -111,14 +117,43 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
       minWidth: 160,
       renderCell: (params) => {
         const date = new Date(params.row.updatedAt);
+        const isDark = theme.palette.mode === 'dark';
 
-        return format.dateTime(date, {
-          month: 'short', 
-          day: 'numeric', 
-          year: 'numeric', 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        });
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, py: 2 }}>
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 42,
+              height: 42,
+              borderRadius: '12px',
+              bgcolor: isDark ? alpha(theme.palette.primary.main, 0.15) : alpha(theme.palette.primary.main, 0.08),
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+              color: 'primary.main',
+              flexShrink: 0
+            }}>
+              <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.6rem', lineHeight: 1, mb: 0.5 }}>
+                {date.toLocaleDateString(undefined, { month: 'short' }).toUpperCase()}
+              </Typography>
+              <Typography variant="body2" sx={{ fontWeight: 900, fontSize: '0.9rem', lineHeight: 1 }}>
+                {date.getDate()}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.2 }}>
+                {date.toLocaleDateString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, opacity: 0.8 }}>
+                {new Intl.RelativeTimeFormat('en', { numeric: 'auto' }).format(
+                  Math.ceil((date.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)), 
+                  'day'
+                )}
+              </Typography>
+            </Box>
+          </Box>
+        );
       },
     },
     {
@@ -206,7 +241,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
         </Tooltip>
       ),
     },
-  ], [onViewPost, t, format, getStatusChip, getPlatformIcon]);
+  ], [onViewPost, t, getStatusChip, getPlatformIcon, theme.palette.mode, theme.palette.primary.main]);
 
   return (
     <Box>
