@@ -34,9 +34,11 @@ app.get('/', (req, res) => {
 import locationsRoutes from './routes/locations.routes';
 import businessesRoutes from './routes/businesses.routes';
 import usersRoutes from './routes/users.routes';
+import rolesRoutes from './routes/roles.routes';
 app.use('/locations', locationsRoutes);
 app.use('/businesses', businessesRoutes);
 app.use('/users', usersRoutes);
+app.use('/', rolesRoutes);
 
 // Error Handling
 app.use(errorHandler);

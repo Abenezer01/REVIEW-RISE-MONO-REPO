@@ -20,18 +20,19 @@ import type { GridColDef } from '@mui/x-data-grid'
 
 import { SystemMessageCode } from '@platform/contracts'
 
-import CustomAvatar from '@core/components/mui/Avatar'
-import CustomChip from '@core/components/mui/Chip'
-import CustomTextField from '@core/components/mui/TextField'
-import ItemsListing from '@components/shared/listing'
-
 import { getReviews } from '@/app/actions/review'
-import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
-import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
 import { Link } from '@/i18n/routing'
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 import { useTranslations } from 'next-intl'
+
+import ItemsListing from '@components/shared/listing'
+import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
+import CustomAvatar from '@core/components/mui/Avatar'
+import CustomChip from '@core/components/mui/Chip'
+import CustomTextField from '@core/components/mui/TextField'
+
+import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 
 const SmartReviewList = () => {
   const { notify } = useSystemMessages()
@@ -63,7 +64,7 @@ const SmartReviewList = () => {
     if (filters.date) {
       startDate = new Date(filters.date)
       startDate.setHours(0, 0, 0, 0)
-      
+
       endDate = new Date(filters.date)
       endDate.setHours(23, 59, 59, 999)
     }
@@ -170,9 +171,9 @@ const SmartReviewList = () => {
             </Typography>
           </Box>
           <Tooltip title={params.value || ''}>
-            <Typography 
-              variant='body2' 
-              sx={{ 
+            <Typography
+              variant='body2'
+              sx={{
                 color: 'text.secondary',
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
@@ -194,9 +195,9 @@ const SmartReviewList = () => {
       minWidth: 120,
       renderCell: (params) => {
         return (
-          <SentimentBadge 
-            sentiment={params.value?.toLowerCase() as any} 
-            size='small' 
+          <SentimentBadge
+            sentiment={params.value?.toLowerCase() as any}
+            size='small'
           />
         )
       }
@@ -283,28 +284,28 @@ const SmartReviewList = () => {
           }
           action={
             <Box sx={{ display: 'flex', gap: 1, mt: 1, mr: 1, alignItems: 'center' }}>
-                <Button 
-                    variant="contained" 
-                    color="primary"
-                    startIcon={<i className="tabler-wand" />}
-                    onClick={async () => {
-                        notify(SystemMessageCode.SUCCESS);
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<i className="tabler-wand" />}
+                onClick={async () => {
+                  notify(SystemMessageCode.SUCCESS);
 
-                        // Dynamic import to avoid server-side issues if any
-                        const { triggerSentimentAnalysis } = await import('@/app/actions/job');
-                        const res = await triggerSentimentAnalysis();
+                  // Dynamic import to avoid server-side issues if any
+                  const { triggerSentimentAnalysis } = await import('@/app/actions/job');
+                  const res = await triggerSentimentAnalysis();
 
-                        if (res.success) {
-                            notify(SystemMessageCode.SUCCESS);
-                            setTimeout(fetchData, 2000); // Reload after a bit
-                        } else {
-                            notify(SystemMessageCode.GENERIC_ERROR);
-                        }
-                    }}
-                    size="small"
-                >
-                    {t('reviews.smart.runSentiment')}
-                </Button>
+                  if (res.success) {
+                    notify(SystemMessageCode.SUCCESS);
+                    setTimeout(fetchData, 2000); // Reload after a bit
+                  } else {
+                    notify(SystemMessageCode.GENERIC_ERROR);
+                  }
+                }}
+                size="small"
+              >
+                {t('reviews.smart.runSentiment')}
+              </Button>
               <CustomChip
                 label={t('reviews.smart.reviewsCount', { count: total })}
                 size='small'
@@ -379,7 +380,7 @@ const SmartReviewList = () => {
                   value={filters.date ? filters.date.toISOString().split('T')[0] : ''}
                   onChange={(e) => handleDateChange(e.target.value)}
                   sx={{ width: { xs: '100%', sm: 200 } }}
-                  InputProps={{ 
+                  InputProps={{
                     sx: { borderRadius: 2, bgcolor: 'background.paper' }
                   }}
                 />
@@ -398,7 +399,7 @@ const SmartReviewList = () => {
                 label={t('reviews.smart.filterRating')}
                 value={filters.rating}
                 onChange={e => handleFilterChange('rating', e.target.value)}
-                SelectProps={{ 
+                SelectProps={{
                   displayEmpty: true,
                   renderValue: (selected) => {
                     if (!selected) {
@@ -434,7 +435,7 @@ const SmartReviewList = () => {
                 label={t('reviews.smart.filterProvider')}
                 value={filters.platform}
                 onChange={e => handleFilterChange('platform', e.target.value)}
-                SelectProps={{ 
+                SelectProps={{
                   displayEmpty: true,
                   renderValue: (selected) => {
                     if (!selected) {
@@ -470,7 +471,7 @@ const SmartReviewList = () => {
                 label={t('reviews.smart.filterSentiment')}
                 value={filters.sentiment}
                 onChange={e => handleFilterChange('sentiment', e.target.value)}
-                SelectProps={{ 
+                SelectProps={{
                   displayEmpty: true,
                   renderValue: (selected) => {
                     if (!selected) {
@@ -506,7 +507,7 @@ const SmartReviewList = () => {
                 label={t('reviews.smart.filterStatus')}
                 value={filters.replyStatus}
                 onChange={e => handleFilterChange('replyStatus', e.target.value)}
-                SelectProps={{ 
+                SelectProps={{
                   displayEmpty: true,
                   renderValue: (selected) => {
                     if (!selected) {

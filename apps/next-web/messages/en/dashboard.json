@@ -1,4 +1,7 @@
 {
+  "app": {
+    "name": "ReviewRise"
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "ai-studio": "AI Content Studio",
@@ -13,7 +16,6 @@
     "social-logs": "Publishing Logs",
     "seo-intelligence": "SEO Intelligence",
     "accounts": "Accounts",
-    "subscription-issues": "Subscription Issues",
     "jobs": "Jobs",
     "logs": "Logs",
     "failed-jobs": "Failed Jobs",
@@ -26,6 +28,7 @@
     "seo-keywords": "SEO Keywords",
     "gbp-rocket": "GBPRocket",
     "ad-rise": "AdRise",
+    "ad-rise-blueprint": "Blueprint Generator",
     "brand-rise": "BrandRise",
     "content-templates": "Content Templates",
     "seasonal-events": "Seasonal Events",
@@ -44,6 +47,139 @@
     "locationRequired": "Location is required",
     "passwordRequired": "Password is required",
     "passwordMin": "Password must be at least {min} characters"
+  },
+  "blueprint": {
+      "title": "Google Search Blueprint",
+      "subtitle": "Generate a complete Google Ads strategy in seconds",
+      "wizard": {
+          "step1": "Campaign Details",
+          "step2": "Generate",
+          "step3": "Results"
+      }
+    },
+  "adrise": {
+    "title": "AdRise™ Campaign Wizard",
+    "subtitle": "Create and optimize your advertising campaigns with AI intelligence.",
+    "steps": {
+      "basics": "Basics",
+      "offer": "Offer",
+      "goal": "Goal",
+      "budget": "Budget",
+      "geo": "Geo",
+      "tone": "Brand Tone",
+      "review": "Review",
+      "step": "Step"
+    },
+    "basics": {
+      "title": "Campaign Basics",
+      "sessionName": "Session Name",
+      "industry": "Industry",
+      "industryPlaceholder": "Select your industry",
+      "mode": "Campaign Mode",
+      "modeQuick": "Quick Mode",
+      "modeQuickDesc": "Automated setup for fast results",
+      "modePro": "Pro Mode",
+      "modeProDesc": "Advanced configuration for full control"
+    },
+    "competitors": {
+      "placeholder": "Enter competitor names or websites"
+    },
+    "fields": {
+      "sessionName": "Session Name",
+      "industry": "Industry",
+      "offer": "Offer",
+      "goal": "Goal",
+      "budgetMonthly": "Monthly Budget",
+      "locations": "Locations",
+      "brandTone": "Brand Tone",
+      "competitors": "Competitors",
+      "audienceNotes": "Audience Notes",
+      "seasonality": "Seasonality",
+      "geoRadius": "Search Radius",
+      "status": "Status"
+    },
+    "offer": {
+      "title": "What are you offering?",
+      "description": "Describe your product or service in detail.",
+      "placeholder": "e.g. We offer premium organic coffee beans delivered to your doorstep...",
+      "audiencePlaceholder": "Describe your target audience (interests, demographics, pain points)..."
+    },
+    "goal": {
+      "title": "Campaign Goal",
+      "objective": "Objective",
+      "objectivePlaceholder": "Select your primary goal",
+      "objectives": {
+        "awareness": "Brand Awareness",
+        "leads": "Lead Generation",
+        "sales": "Sales & Conversions",
+        "traffic": "Website Traffic"
+      }
+    },
+    "budget": {
+      "title": "Campaign Budget",
+      "monthly": "Monthly Budget ($)",
+      "minWarning": "A minimum budget of $500 is recommended for best results.",
+      "placeholder": "Enter monthly budget",
+      "seasonalityNone": "No Seasonality",
+      "seasonalityHoliday": "Holiday Season",
+      "seasonalitySummer": "Summer / Seasonal Peak",
+      "seasonalityBlackFriday": "Black Friday / Cyber Monday"
+    },
+    "geo": {
+      "title": "Target Geography",
+      "locations": "Target Locations",
+      "placeholder": "Enter city, state, or country",
+      "addLocation": "Add Location"
+    },
+    "tone": {
+      "title": "Brand Tone & Voice",
+      "description": "How should your campaign sound to your audience?",
+      "placeholder": "e.g. Professional yet friendly, energetic and youthful..."
+    },
+    "review": {
+      "title": "Review & Launch",
+      "summary": "Please review your campaign details before proceeding.",
+      "sessionName": "Session Name",
+      "industry": "Industry",
+      "mode": "Mode",
+      "offer": "Offer",
+      "objective": "Objective",
+      "budget": "Monthly Budget",
+      "locations": "Locations",
+      "tone": "Brand Tone",
+      "competitors": "Competitors",
+      "audienceNotes": "Audience Notes",
+      "seasonality": "Seasonality",
+      "radius": "Search Radius"
+    },
+    "sessions": {
+      "listTitle": "Previous Sessions",
+      "name": "Session Name",
+      "status": "Status",
+      "date": "Created At",
+      "actions": "Actions",
+      "noSessions": "No sessions found. Create your first campaign!",
+      "noSessionsDesc": "Start by creating your first AdRise session to generate optimized marketing plans for your business.",
+      "createFirst": "Create Your First Session",
+      "backToSessions": "Back to Sessions",
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "draftRecovered": "Resumed from your previous unsaved draft."
+    },
+    "status": {
+      "active": "Active",
+      "draft": "Draft",
+      "completed": "Completed",
+      "saving": "Saving draft...",
+      "saved": "Draft saved",
+      "draftLoaded": "Draft recovered from your previous session"
+    },
+    "validation": {
+      "required": "This field is required",
+      "minBudget": "Budget must be greater than 0",
+      "invalidNumber": "Please enter a valid number",
+      "lowBudgetWarning": "A minimum budget of $500 is recommended for best results."
+    }
   },
   "auto-reply": "Auto-Reply Settings",
   "seasonalEvents": {
@@ -772,7 +908,6 @@
       "themesTitle": "Review Themes & Keywords",
       "themesSubtitle": "Recurring topics in customer feedback",
       "recent": "Recent Reviews",
-      "velocity": "Review Velocity",
       "sentiment": "Sentiment Distribution"
     },
     "tabs": {

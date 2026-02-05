@@ -19,6 +19,8 @@ export type User = {
   firstName?: string
   lastName?: string
   role?: string
+  roles?: string[]
+  permissions?: string[]
   username?: string
   avatar?: string
   locationId?: string

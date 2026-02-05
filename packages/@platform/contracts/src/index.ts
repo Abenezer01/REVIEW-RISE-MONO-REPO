@@ -31,6 +31,8 @@ export * from './ai/prompts/recommendations.prompts';
 export * from './ai/prompts/review-sentiment.prompts';
 export * from './ai/prompts/review-reply.prompts';
 export * from './ai/content-studio';
+export * from './ai/blueprint.schema';
+
 
 // Social Media Integration Schemas
 export * from './social';

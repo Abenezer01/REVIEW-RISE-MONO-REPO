@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unresolved */
 'use client'
 
 import React from 'react'
@@ -97,15 +96,15 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
           color="primary"
           footer={
             <Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={metrics.visibilityScore}
-                  color="primary"
-                  sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
-                />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
-                  {t('aiVisibility.overview.visibilityFooter')}
-                </p>
+              <LinearProgress
+                variant="determinate"
+                value={metrics.visibilityScore}
+                color="primary"
+                sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
+              />
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
+                {t('aiVisibility.overview.visibilityFooter')}
+              </p>
             </Box>
           }
         />
@@ -125,17 +124,17 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
           icon={<HeartIcon />}
           color={getSentimentColor(metrics.sentimentScore)}
           footer={
-             <Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={metrics.sentimentScore}
-                  color={getSentimentColor(metrics.sentimentScore) as any}
-                  sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
-                />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
-                  {t('aiVisibility.overview.sentimentFooter')}
-                </p>
-             </Box>
+            <Box>
+              <LinearProgress
+                variant="determinate"
+                value={metrics.sentimentScore}
+                color={getSentimentColor(metrics.sentimentScore) as any}
+                sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
+              />
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
+                {t('aiVisibility.overview.sentimentFooter')}
+              </p>
+            </Box>
           }
         />
       </Grid>
@@ -154,17 +153,17 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
           icon={<VoiceIcon />}
           color="info"
           footer={
-             <Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={metrics.shareOfVoice}
-                  color="info"
-                  sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
-                />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
-                  {t('aiVisibility.overview.shareOfVoiceFooter')}
-                </p>
-             </Box>
+            <Box>
+              <LinearProgress
+                variant="determinate"
+                value={metrics.shareOfVoice}
+                color="info"
+                sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
+              />
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
+                {t('aiVisibility.overview.shareOfVoiceFooter')}
+              </p>
+            </Box>
           }
         />
       </Grid>
@@ -183,17 +182,17 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
           icon={<AwardIcon />}
           color="secondary"
           footer={
-             <Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={metrics.citationAuthority}
-                  color="secondary"
-                  sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
-                />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
-                  {t('aiVisibility.overview.authorityFooter')}
-                </p>
-             </Box>
+            <Box>
+              <LinearProgress
+                variant="determinate"
+                value={metrics.citationAuthority}
+                color="secondary"
+                sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
+              />
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
+                {t('aiVisibility.overview.authorityFooter')}
+              </p>
+            </Box>
           }
         />
       </Grid>
@@ -212,17 +211,17 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
           icon={<TechnicalIcon />}
           color="success"
           footer={
-             <Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={metrics.technicalReadiness}
-                  color="success"
-                  sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
-                />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
-                  {t('aiVisibility.overview.readinessFooter')}
-                </p>
-             </Box>
+            <Box>
+              <LinearProgress
+                variant="determinate"
+                value={metrics.technicalReadiness}
+                color="success"
+                sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
+              />
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
+                {t('aiVisibility.overview.readinessFooter')}
+              </p>
+            </Box>
           }
         />
       </Grid>

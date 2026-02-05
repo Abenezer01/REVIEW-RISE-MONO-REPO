@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Box, Card, CardContent, Typography, Chip, Stack, IconButton, Tooltip } from '@mui/material'
+import { Box, Card, CardContent, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 
 import { useTranslations } from 'next-intl'
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
@@ -22,8 +20,8 @@ export default function HashtagsCard({ hashtags, onUseHashtags }: HashtagsCardPr
     const getAllHashtags = () => {
         const { highVolume = [], niche = [], branded = [] } = hashtags
 
-        
-return [...highVolume, ...niche, ...branded].join(' ')
+
+        return [...highVolume, ...niche, ...branded].join(' ')
     }
 
     const copyToClipboard = (text: string) => {

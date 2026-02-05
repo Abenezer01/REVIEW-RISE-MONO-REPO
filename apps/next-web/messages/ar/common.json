@@ -68,7 +68,12 @@
     "days": "أيام",
     "found": "تم العثور على",
     "id": "المعرف",
-    "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟"
+    "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
+    "currencySymbol": "$",
+    "distanceUnit": "كم",
+    "of": "من",
+    "none": "لا يوجد",
+    "discard": "تجاهل"
   },
   "list": {
     "actions": {

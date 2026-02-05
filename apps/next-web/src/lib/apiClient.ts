@@ -1,10 +1,13 @@
+/* eslint-disable import/no-unresolved */
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios'
 
 import type { ApiMeta, ApiResponse } from '@platform/contracts'
 import { systemMessageEvents, SYSTEM_MESSAGE_EVENT } from '@platform/utils'
 
-import { useAuthStore } from '@/store/authStore'
+import Cookies from 'js-cookie'
+
+import { useAuthStore } from '../store/authStore'
 
 // Normalize base to avoid duplicated `/api` when combining with public endpoints
 const normalizeBase = (val: string | undefined) => {
@@ -26,8 +29,12 @@ const apiClient = axios.create({
 // Add request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    // Attach token from store if available
-    const token = useAuthStore.getState().token;
+    // Attach token from store if available, otherwise try from cookies
+    let token = useAuthStore.getState().token;
+
+    if (!token) {
+      token = Cookies.get('accessToken') || null;
+    }
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
