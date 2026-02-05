@@ -1,8 +1,7 @@
-import React from 'react'
-
-import { Box, Card, CardContent, Typography, Chip, Stack, IconButton, Tooltip } from '@mui/material'
+import { Box, Card, CardContent, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 
 import { useTranslation } from '@/hooks/useTranslation'
+
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 interface HashtagsCardProps {
@@ -22,8 +21,8 @@ export default function HashtagsCard({ hashtags, onUseHashtags }: HashtagsCardPr
     const getAllHashtags = () => {
         const { highVolume = [], niche = [], branded = [] } = hashtags
 
-        
-return [...highVolume, ...niche, ...branded].join(' ')
+
+        return [...highVolume, ...niche, ...branded].join(' ')
     }
 
     const copyToClipboard = (text: string) => {
@@ -46,8 +45,8 @@ return [...highVolume, ...niche, ...branded].join(' ')
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1 }}>
                         <Tooltip title="Use All Hashtags">
-                            <IconButton 
-                                size="small" 
+                            <IconButton
+                                size="small"
                                 color="primary"
                                 onClick={() => onUseHashtags([...(hashtags.highVolume || []), ...(hashtags.niche || []), ...(hashtags.branded || [])])}
                             >
@@ -74,7 +73,7 @@ return [...highVolume, ...niche, ...branded].join(' ')
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
                             <Typography variant="caption" color="text.secondary">{t('hashtags.highVolumeTitle')}</Typography>
                             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                    <Tooltip title="Add to Preview">
+                                <Tooltip title="Add to Preview">
                                     <IconButton size="small" onClick={() => onUseHashtags(hashtags.highVolume || [])} color="primary">
                                         <i className="tabler-circle-plus" style={{ fontSize: 18 }} />
                                     </IconButton>
@@ -89,8 +88,8 @@ return [...highVolume, ...niche, ...branded].join(' ')
                     <Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                             <Typography variant="caption" color="text.secondary">{t('hashtags.nicheTitle')}</Typography>
-                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                    <Tooltip title="Add to Preview">
+                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                <Tooltip title="Add to Preview">
                                     <IconButton size="small" onClick={() => onUseHashtags(hashtags.niche || [])} color="primary">
                                         <i className="tabler-circle-plus" style={{ fontSize: 18 }} />
                                     </IconButton>
@@ -105,8 +104,8 @@ return [...highVolume, ...niche, ...branded].join(' ')
                     <Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                             <Typography variant="caption" color="text.secondary">{t('hashtags.brandedTitle')}</Typography>
-                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                    <Tooltip title="Add to Preview">
+                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                <Tooltip title="Add to Preview">
                                     <IconButton size="small" onClick={() => onUseHashtags(hashtags.branded || [])} color="primary">
                                         <i className="tabler-circle-plus" style={{ fontSize: 18 }} />
                                     </IconButton>

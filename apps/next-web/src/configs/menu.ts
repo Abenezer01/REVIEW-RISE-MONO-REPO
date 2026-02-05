@@ -130,7 +130,15 @@ const menuData: MenuItem[] = [
     title: 'navigation.ad-rise',
     href: '/admin/ad-rise',
     icon: 'tabler-badge-ad',
-    allowedRoles: [ROLES.ADMIN]
+    allowedRoles: [ROLES.ADMIN],
+    children: [
+      {
+        title: 'navigation.ad-rise-blueprint',
+        href: '/admin/ad-rise/blueprint',
+        icon: 'tabler-wand',
+        allowedRoles: [ROLES.ADMIN]
+      }
+    ]
   },
   {
     title: 'navigation.brand-rise',
