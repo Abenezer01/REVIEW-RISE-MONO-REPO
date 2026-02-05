@@ -41,11 +41,15 @@
     "no": "لا",
     "back": "رجوع",
     "next": "التالي",
+    "refresh": "تحديث",
     "previous": "السابق",
     "finish": "إنهاء",
     "retry": "إعادة المحاولة",
     "generating": "جاري التوليد...",
     "loadMore": "تحميل المزيد",
+    "showLess": "عرض أقل",
+    "moreCount": "+{count} إضافي",
+    "clickToFilter": "انقر للتصفية",
     "comingSoon": "ميزة قادمة قريبًا.",
     "no-items": "لم يتم العثور على عناصر",
     "no-data": "لم يتم العثور على بيانات",
@@ -55,6 +59,11 @@
     "exportCurrentPageOnly": "تصدير سجلات الصفحة الحالية فقط",
     "selectFields": "اختر الحقول",
     "search-placeholder": "بحث...",
+    "copy": "نسخ",
+    "bookmark": "إشارة مرجعية",
+    "share": "مشاركة",
+    "new": "جديد",
+    "popular": "شائع",
     "all": "الكل",
     "days": "أيام",
     "found": "تم العثور على",
@@ -66,6 +75,11 @@
     "none": "لا يوجد",
     "discard": "تجاهل"
   },
+  "list": {
+    "actions": {
+      "reExtract": "إعادة استخراج"
+    }
+  },
   "form": {
     "success-created": "تم الإنشاء بنجاح",
     "success-updated": "تم التحديث بنجاح",
@@ -76,6 +90,7 @@
     "no-results": "لم يتم العثور على نتائج"
   },
   "status": {
+    "aiPowered": "مدعوم بالذكاء الاصطناعي",
     "completed": "مكتمل",
     "failed": "فاشل",
     "pending": "معلق",
@@ -92,7 +107,9 @@
     "approved": "تمت الموافقة",
     "pending_approval": "بانتظار الموافقة",
     "skipped": "تم التخطي",
-    "none": "لم يتم الرد"
+    "none": "لم يتم الرد",
+    "unanalyzed": "غير محلل",
+    "unknown": "غير معروف"
   },
   "channel": {
     "google": "جوجل",
@@ -105,6 +122,12 @@
     "all": "كل القنوات"
   },
   "actions": "الإجراءات",
+  "layout": {
+    "table": "عرض الجدول",
+    "grid": "عرض الشبكة",
+    "list": "عرض القائمة",
+    "masonry": "عرض البناء"
+  },
   "dialog": {
     "confirm-edit-title": "تأكيد التعديل",
     "confirm-edit-message": "هل أنت متأكد أنك تريد تعديل هذا العنصر؟"

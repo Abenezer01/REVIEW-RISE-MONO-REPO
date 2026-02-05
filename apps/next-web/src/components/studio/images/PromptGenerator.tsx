@@ -119,7 +119,7 @@ return
                     {t('images.promptPlaceholder')}
                 </Typography>
                 <TextField
-                    placeholder="e.g., A coffee shop in the morning, A futuristic car, A serene beach..."
+                    placeholder={t('images.promptInputPlaceholder')}
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
                     fullWidth
@@ -205,7 +205,7 @@ return
                                         <Typography variant="subtitle2" fontWeight="bold" color="primary.main">
                                             {idea.title}
                                         </Typography>
-                                        <Tooltip title="Use this prompt">
+                                        <Tooltip title={t('images.useThisPrompt')}>
                                             <IconButton 
                                                 size="small" 
                                                 onClick={() => handleUsePrompt(idea.prompt)}

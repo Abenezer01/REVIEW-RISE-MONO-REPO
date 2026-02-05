@@ -162,5 +162,42 @@
         "noLogs": "No recent publishing activity."
       }
     }
+  },
+  "callback": {
+    "finalizing": "Finalizing connection...",
+    "info": "This page handles OAuth callbacks. The connection process is managed via popup windows."
+  },
+  "publishingLogs": {
+    "published": "Published",
+    "failed": "Failed",
+    "processing": "Processing",
+    "pending": "Pending",
+    "time": "Time",
+    "platform": "Platform",
+    "postContent": "Post Content",
+    "status": "Status",
+    "detailsErrors": "Details / Errors",
+    "publishedSuccessfully": "Published successfully",
+    "attempt": "Attempt {count}",
+    "waitingToStart": "Waiting to start",
+    "actions": "Actions",
+    "viewOriginalPost": "View Original Post",
+    "allPlatforms": "All Platforms",
+    "twitterX": "Twitter (X)",
+    "googleBusiness": "Google Business",
+    "allStatuses": "All Statuses",
+    "startDate": "Start Date",
+    "endDate": "End Date"
+  },
+  "planner": {
+    "goToScheduler": "GO TO SCHEDULER",
+    "aiAdaptationActive": "AI ADAPTATION ACTIVE",
+    "aiStrategySync": "Strategy is automatically synced with your Brand DNA mission and voice.",
+    "curatingStrategy": "Curating your strategy...",
+    "targeting": "Targeting",
+    "week": "WEEK",
+    "day": "DAY",
+    "platforms": "PLATFORMS:",
+    "scheduled": "SCHEDULED"
   }
 }

@@ -1,16 +1,19 @@
 'use client';
 
 import { Sun, Moon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
+  const t = useTranslations('landing.common');
 
   return (
     <button
       onClick={toggleTheme}
       className="theme-toggle"
-      aria-label="Toggle theme"
+      aria-label={theme === 'light' ? t('switchToDark') : t('switchToLight')}
+      title={theme === 'light' ? t('switchToDark') : t('switchToLight')}
     >
       {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
       <style jsx>{`

@@ -1,4 +1,5 @@
 import { Box, Typography, Paper, Grid } from '@mui/material';
+import { useTranslations } from 'next-intl';
 
 interface CompetitorStatsFooterProps {
     total: number;
@@ -8,6 +9,8 @@ interface CompetitorStatsFooterProps {
 }
 
 export const CompetitorStatsFooter = ({ total, directLocal, content, aggregators }: CompetitorStatsFooterProps) => {
+    const t = useTranslations('dashboard');
+
     return (
         <Paper 
             elevation={0}
@@ -21,10 +24,10 @@ export const CompetitorStatsFooter = ({ total, directLocal, content, aggregators
             }}
         >
             <Grid container alignItems="center" justifyContent="space-around">
-                <StatItem label="COMPETITORS FOUND" value={total} color="#D38E18" />
-                <StatItem label="DIRECT LOCAL" value={directLocal} color="#D38E18" />
-                <StatItem label="CONTENT COMPETITORS" value={content} color="#D38E18" />
-                <StatItem label="AGGREGATORS" value={aggregators} color="#D38E18" />
+                <StatItem label={t('brandRise.competitors.stats.found')} value={total} color="#D38E18" />
+                <StatItem label={t('brandRise.competitors.stats.directLocal')} value={directLocal} color="#D38E18" />
+                <StatItem label={t('brandRise.competitors.stats.content')} value={content} color="#D38E18" />
+                <StatItem label={t('brandRise.competitors.stats.aggregators')} value={aggregators} color="#D38E18" />
             </Grid>
         </Paper>
     );

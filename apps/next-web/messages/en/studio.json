@@ -1,4 +1,8 @@
 {
+  "common": {
+    "export": "Export",
+    "share": "Share"
+  },
   "page": {
     "title": "AI Content Studio",
     "description": "Generate AI-powered content including captions, hashtags, ideas, and more.",
@@ -113,6 +117,7 @@
     "inputTitle": "Input Details",
     "detailsTitle": "Caption Details",
     "styleTitle": "Caption Style",
+    "platform": "Platform",
     "selectPlatform": "Select Platform",
     "productLabel": "Product/Service Description",
     "productPlaceholder": "e.g., Eco-friendly water bottles for active lifestyles",
@@ -178,6 +183,11 @@
     "loading": "Generating...",
     "suggestionsTitle": "Suggestions",
     "copyAll": "Copy All",
+    "useAll": "Use All Hashtags",
+    "addToPreview": "Add to Preview",
+    "highReach": "HIGH REACH",
+    "targeted": "TARGETED",
+    "brand": "BRAND",
     "emptyState": "Enter a topic to generate relevant hashtags.",
     "coreTags": "Core Tags (High Volume)",
     "nicheTags": "Niche Tags (Targeted)",
@@ -363,6 +373,7 @@
       "planOverview": "Plan Overview",
       "totalPosts": "Total Posts"
     },
+    "suggestedPlatform": "Suggested Platform",
     "scheduled": {
       "noPosts": "No posts scheduled for this day."
     }
@@ -385,6 +396,8 @@
     "qualityHigh": "High",
     "qualityMedium": "Medium",
     "qualityLow": "Low",
+    "promptInputPlaceholder": "e.g., A coffee shop in the morning, A futuristic car, A serene beach...",
+    "useThisPrompt": "Use this prompt",
     "creativityLabel": "Creativity Level",
     "aspectRatioLabel": "Aspect Ratio",
     "aspectRatios": {
@@ -515,6 +528,7 @@
     "statDuration": "DURATION",
     "statScenes": "SCENES",
     "statWords": "WORDS",
+    "untitledPost": "Untitled Post",
     "inputTitle": "Video Settings",
     "styleLabel": "Video Style",
     "loading": "Writing...",

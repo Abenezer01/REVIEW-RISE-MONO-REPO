@@ -33,7 +33,7 @@ export default function PlatformSelector({ value, onChange }: PlatformSelectorPr
                 value={value}
                 exclusive
                 onChange={handleChange}
-                aria-label="Platform"
+                aria-label={t('platform')}
                 sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', border: 'none' }}
             >
                 {PLATFORMS.map((option) => (
