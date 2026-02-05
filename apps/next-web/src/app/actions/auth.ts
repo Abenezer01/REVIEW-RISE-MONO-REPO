@@ -139,6 +139,8 @@ export async function loginAction(prevState: LoginResponse | null, formData: For
         firstName: nameParts[0] || '',
         lastName: nameParts.slice(1).join(' ') || '',
         role: data.user.role,
+        roles: data.user.roles || (data.user.role ? [data.user.role] : []),
+        permissions: data.user.permissions || [],
         avatar: data.user.image,
         username: data.user.email
       }
