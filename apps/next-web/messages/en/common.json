@@ -64,7 +64,8 @@
     "distanceUnit": "km",
     "of": "of",
     "none": "None",
-    "discard": "Discard"
+    "discard": "Discard",
+    "view": "View"
   },
   "form": {
     "success-created": "created successfully",
@@ -213,5 +214,28 @@
     "thisWeek": "This Week",
     "older": "Older",
     "atTime": "{date}, {time}"
+  },
+  "save": "Save",
+  "cancel": "Cancel",
+  "all": "All",
+  "create": "Create",
+  "update": "Update",
+  "new": "New",
+  "popular": "Popular",
+  "not-available": "N/A",
+  "view": "View",
+  "locations": {
+    "form": {
+      "active": "Active",
+      "archived": "Archived",
+      "name": "Location Name",
+      "address": "Address",
+      "status": "Status"
+    }
+  },
+  "list": {
+    "actions": {
+      "reExtract": "Re-extract"
+    }
   }
 }

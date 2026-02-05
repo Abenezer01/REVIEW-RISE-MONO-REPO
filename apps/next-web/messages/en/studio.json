@@ -372,7 +372,7 @@
     "subtitle": "Create stunning visuals with AI.",
     "inputTitle": "Describe Your Image",
     "aiIdeas": "AI Ideas",
-    "promptPlaceholder": "A futuristic cityscape at sunset with neon lights...",
+    "promptPlaceholder": "e.g., A futuristic cityscape at sunset with neon lights...",
     "promptHelper": "💡 Include details about style, mood, colors, and composition",
     "quickPrompts": {
       "headshot": "Professional headshot",
@@ -403,7 +403,6 @@
     "recentTitle": "Recent Generations",
     "recentEmpty": "No recent generations yet",
     "promptLabel": "Image Description",
-    "promptPlaceholder": "e.g., A futuristic cityscape at sunset with neon lights...",
     "categoryOptional": "Category (Optional)",
     "moodOptional": "Mood (Optional)",
     "generatePromptIdeas": "Generate Prompt Ideas",
@@ -519,7 +518,8 @@
     "styleLabel": "Video Style",
     "loading": "Writing...",
     "duration": "Estimated Duration",
-    "copyScript": "Copy Script"
+    "copyScript": "Copy Script",
+    "untitledPost": "Untitled Post"
   },
   "editor": {
     "editPostStudio": "Edit Post Studio",
@@ -572,5 +572,10 @@
     "schedulePost": "Schedule Post",
     "posting": "Posting...",
     "postNow": "Post Now"
-  }
+  },
+  "common": {
+    "export": "Export",
+    "share": "Share"
+  },
+  "generateButtonLabel": "Generate"
 }

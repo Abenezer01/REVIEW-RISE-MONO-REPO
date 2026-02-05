@@ -165,7 +165,8 @@
         "fair": "50-69 Fair",
         "good": "70-84 Good",
         "excellent": "85+ Excellent"
-      }
+      },
+      "criticalIssuesFound": "Critical issues found that need your attention."
     },
     "footer": {
       "features": "Features",
