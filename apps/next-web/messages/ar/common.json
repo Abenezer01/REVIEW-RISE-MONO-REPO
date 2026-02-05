@@ -64,7 +64,8 @@
     "distanceUnit": "كم",
     "of": "من",
     "none": "لا يوجد",
-    "discard": "تجاهل"
+    "discard": "تجاهل",
+    "view": "عرض"
   },
   "form": {
     "success-created": "تم الإنشاء بنجاح",
@@ -213,5 +214,28 @@
     "thisWeek": "هذا الأسبوع",
     "older": "أقدم",
     "atTime": "{date}، {time}"
+  },
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "all": "الكل",
+  "create": "إنشاء",
+  "update": "تحديث",
+  "new": "جديد",
+  "popular": "شائع",
+  "not-available": "غير متوفر",
+  "view": "عرض",
+  "locations": {
+    "form": {
+      "active": "نشط",
+      "archived": "مؤرشف",
+      "name": "اسم الموقع",
+      "address": "العنوان",
+      "status": "الحالة"
+    }
+  },
+  "list": {
+    "actions": {
+      "reExtract": "إعادة استخراج"
+    }
   }
 }

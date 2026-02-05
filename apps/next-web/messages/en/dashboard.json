@@ -1,6 +1,7 @@
 {
   "app": {
-    "name": "ReviewRise"
+    "name": "ReviewRise",
+    "description": "AI-Powered Local SEO & Review Management"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -52,14 +53,14 @@
     "subscription-issues": "Subscription Issues"
   },
   "blueprint": {
-      "title": "Google Search Blueprint",
-      "subtitle": "Generate a complete Google Ads strategy in seconds",
-      "wizard": {
-          "step1": "Campaign Details",
-          "step2": "Generate",
-          "step3": "Results"
-      }
-    },
+    "title": "Google Search Blueprint",
+    "subtitle": "Generate a complete Google Ads strategy in seconds",
+    "wizard": {
+      "step1": "Campaign Details",
+      "step2": "Generate",
+      "step3": "Results"
+    }
+  },
   "adrise": {
     "title": "AdRise™ Campaign Wizard",
     "subtitle": "Create and optimize your advertising campaigns with AI intelligence.",
@@ -241,6 +242,11 @@
       "volume": "Volume",
       "kd": "KD %",
       "viewHistory": "View Ranking History"
+    },
+    "rankings": {
+      "organic": "Organic Rank",
+      "mapPack": "Map Pack",
+      "historyTitle": "Ranking History"
     }
   },
   "autoReply": {
@@ -318,9 +324,9 @@
   "reviews": {
     "title": "Reviews",
     "recent": "Recent Reviews",
-      "unrepliedCount": "{count} Unreplied",
-      "recentRepliesCount": "{count} Recent Replies",
-      "noRecent": "No recent reviews",
+    "unrepliedCount": "{count} Unreplied",
+    "recentRepliesCount": "{count} Recent Replies",
+    "noRecent": "No recent reviews",
     "positive": "Positive",
     "negative": "Negative",
     "neutral": "Neutral",
@@ -384,9 +390,12 @@
         "reject": "Reject",
         "updateReply": "Update Reply",
         "postReply": "Post Reply",
-        "defaultReply": "Dear {author}, thank you so much for your {rating}-star review! We appreciate your feedback and hope to see you again soon."
+        "defaultReply": "Dear {author}, thank you so much for your {rating}-star review! We appreciate your feedback and hope to see you again soon.",
+        "notFound": "Review not found"
       }
-    }
+    },
+    "themesTitle": "Review Themes & Keywords",
+    "themesSubtitle": "Recurring topics in customer feedback"
   },
   "actions": {
     "respondToReview": "Respond to Review",
@@ -711,6 +720,26 @@
         "retryJob": "Retry Job",
         "resolvedByAdmin": "Resolved by admin",
         "ignoredByAdmin": "Ignored by admin"
+      },
+      "detail": {
+        "title": "Job Details",
+        "configuration": "Configuration",
+        "jobType": "Job Type",
+        "business": "Business",
+        "location": "Location",
+        "executionTiming": "Execution & Timing",
+        "createdAt": "Created At",
+        "failedAt": "Failed At",
+        "retryCount": "Retry Count",
+        "ofMaxRetries": "of {max} max retries",
+        "errorDetails": "Error Details",
+        "payload": "Payload",
+        "resultMetadata": "Result / Metadata",
+        "close": "Close",
+        "ignore": "Ignore",
+        "resolve": "Resolve",
+        "retryJob": "Retry Job",
+        "id": "ID"
       }
     },
     "social": {
@@ -1060,7 +1089,9 @@
         "noneFound": "None found.",
         "noneIdentified": "None identified.",
         "none": "None"
-      }
+      },
+      "backToList": "Back to Competitors",
+      "notFound": "Competitor not found"
     },
     "jobs": {
       "title": "AI Jobs & Reports",
@@ -1148,7 +1179,85 @@
       "metricsInfo": "Metrics help track the effectiveness of this plan.",
       "expectedOutcomes": "Expected Outcomes",
       "regenerate": "Regenerate Plan",
-      "mockDateRange": "Feb 1-7, 2024"
+      "mockDateRange": "Feb 1-7, 2024",
+      "launchSubtitle": "Actionable steps to improve your AI presence"
+    }
+  },
+  "common": {
+    "actions": "Actions",
+    "all": "All",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "confirmDelete": "Are you sure you want to delete this item?",
+    "channel": {
+      "google": "Google",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "twitter": "Twitter",
+      "linkedin": "LinkedIn",
+      "yelp": "Yelp",
+      "tripadvisor": "TripAdvisor"
+    },
+    "status": {
+      "completed": "Completed",
+      "failed": "Failed",
+      "pending": "Pending",
+      "processing": "Processing",
+      "scheduled": "Scheduled",
+      "success": "Success",
+      "active": "Active",
+      "inactive": "Inactive",
+      "replied": "Replied",
+      "approved": "Approved",
+      "none": "Not Replied",
+      "skipped": "Skipped"
+    }
+  },
+  "errors": {
+    "businessRequired": "Business is required",
+    "emailRequired": "Email is required",
+    "firstNameRequired": "First name is required",
+    "invalidEmail": "Invalid email address",
+    "lastNameRequired": "Last name is required",
+    "locationRequired": "Location is required",
+    "passwordMin": "Password must be at least 8 characters",
+    "passwordRequired": "Password is required",
+    "roleRequired": "Role is required"
+  },
+  "status": {
+    "completed": "Completed",
+    "pending": "Pending",
+    "pending_approval": "Pending Approval",
+    "processing": "Processing"
+  },
+  "xAxisLabel": "X: {label}",
+  "yAxisLabel": "| Y: {label}",
+  "dashboard": {
+    "jobs": {
+      "social": {
+        "columns": {
+          "actions": "Actions"
+        },
+        "detail": {
+          "unknownError": "An unknown error occurred"
+        }
+      }
+    },
+    "reviews": {
+      "positive": "Positive",
+      "neutral": "Neutral",
+      "negative": "Negative"
+    }
+  },
+  "landing": {
+    "results": {
+      "categories": {
+        "technical": {
+          "label": "Technical"
+        }
+      },
+      "impact": "Impact"
     }
   }
 }
