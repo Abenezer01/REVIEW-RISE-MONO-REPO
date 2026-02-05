@@ -1,45 +1,51 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import {
+    Alert,
     Box,
     Button,
+    Chip,
+    CircularProgress,
+    Divider,
+    Grid,
+    LinearProgress,
+    Paper,
+    Stack,
     TextField,
     Typography,
-    CircularProgress,
-    Chip,
-    Stack,
-    Grid,
-    Paper,
     alpha,
-    useTheme,
-    Alert,
-    LinearProgress,
-    Divider
+    useTheme
 } from '@mui/material';
-import { BlueprintInput, BlueprintOutput } from '@platform/contracts';
+
+import type { BlueprintInput, BlueprintOutput } from '@platform/contracts';
+
+import { useTranslation } from '@/hooks/useTranslation';
 import { BlueprintService } from '@/services/ad-rise/blueprint.service';
+
 import BlueprintResults from './BlueprintResults';
 
-const STEPS = [
-    { number: 1, label: 'Campaign Details' },
-    { number: 2, label: 'Generate Blueprint' },
-    { number: 3, label: 'Review & Export' }
-];
-
-const VERTICALS = [
-    { id: 'local-service', label: 'Local Service' as const, icon: '🔧' },
-    { id: 'e-commerce', label: 'E-commerce' as const, icon: '🛒' },
-    { id: 'saas', label: 'SaaS' as const, icon: '💻' },
-    { id: 'healthcare', label: 'Healthcare' as const, icon: '✓' }
-];
-
 export default function BlueprintWizard() {
+    const t = useTranslation('blueprint');
     const theme = useTheme();
     const [activeStep, setActiveStep] = useState(0);
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState<BlueprintOutput | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    const verticals = [
+        { id: 'localService', value: 'Local Service', label: t('form.verticals.localService'), icon: t('icons.localService') },
+        { id: 'ecommerce', value: 'E-commerce', label: t('form.verticals.ecommerce'), icon: t('icons.ecommerce') },
+        { id: 'saas', value: 'SaaS', label: t('form.verticals.saas'), icon: t('icons.saas') },
+        { id: 'healthcare', value: 'Healthcare', label: t('form.verticals.healthcare'), icon: t('icons.healthcare') }
+    ];
+
+    const steps = [
+        { number: 1, label: t('steps.campaignDetails') },
+        { number: 2, label: t('steps.generate') },
+        { number: 3, label: t('steps.review') }
+    ];
 
     const [formData, setFormData] = useState<BlueprintInput>({
         offerOrService: '',
@@ -55,28 +61,34 @@ export default function BlueprintWizard() {
     const handleNext = async () => {
         if (activeStep === 0) {
             if (!formData.offerOrService) {
-                setError('Please enter your offer or service');
+                setError(t('form.required'));
+
                 return;
             }
+
             setError(null);
             setActiveStep(1);
         } else if (activeStep === 1) {
             setLoading(true);
             setError(null);
+
             try {
                 const payload = { ...formData };
+
                 if (payload.landingPageUrl && !payload.landingPageUrl.startsWith('http')) {
                     payload.landingPageUrl = `https://${payload.landingPageUrl}`;
                 }
 
                 console.log('Sending blueprint request:', payload);
+
                 const data = await BlueprintService.generate(payload);
+
                 console.log('Blueprint received:', data);
                 setResults(data);
                 setActiveStep(2);
-            } catch (error: any) {
-                console.error('Failed to generate blueprint', error);
-                setError(error.message || 'Generation failed. Please try again.');
+            } catch (err: any) {
+                console.error('Failed to generate blueprint', err);
+                setError(err.message || 'Generation failed. Please try again.');
             } finally {
                 setLoading(false);
             }
@@ -151,26 +163,26 @@ export default function BlueprintWizard() {
                                 color: 'primary.contrastText'
                             }}
                         >
-                            <Typography variant="h6">📊</Typography>
+                            <Typography variant="h6">{t('icons.wizard')}</Typography>
                         </Box>
                         <Box>
                             <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                Google Ads Blueprint
+                                {t('title')}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
-                                AI-Powered Campaign Generator
+                                {t('subtitle')}
                             </Typography>
                         </Box>
                     </Stack>
                     <Stack direction="row" spacing={2}>
                         <Button variant="outlined" size="small">
-                            History
+                            {t('header.history')}
                         </Button>
                         <Button variant="outlined" size="small">
-                            My Blueprints
+                            {t('header.myBlueprints')}
                         </Button>
                         <Button variant="contained" size="small">
-                            Account
+                            {t('header.account')}
                         </Button>
                     </Stack>
                 </Stack>
@@ -183,7 +195,7 @@ export default function BlueprintWizard() {
                     <Grid size={{ xs: 12, md: activeStep === 2 ? 12 : 8 }}>
                         {/* Step Indicator */}
                         <Stack direction="row" spacing={2} sx={{ mb: 4 }}>
-                            {STEPS.map((step, index) => (
+                            {steps.map((step, index) => (
                                 <React.Fragment key={step.number}>
                                     <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flex: 1 }}>
                                         <Box
@@ -216,7 +228,7 @@ export default function BlueprintWizard() {
                                             </Typography>
                                         </Box>
                                     </Stack>
-                                    {index < STEPS.length - 1 && (
+                                    {index < steps.length - 1 && (
                                         <Box
                                             sx={{
                                                 flex: 0.3,
@@ -252,21 +264,21 @@ export default function BlueprintWizard() {
                                 >
                                     <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
                                         <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                            Business Information
+                                            {t('form.businessInfo')}
                                         </Typography>
-                                        <Chip label="Required" color="primary" size="small" />
+                                        <Chip label={t('form.required')} color="primary" size="small" />
                                     </Stack>
 
                                     <Box sx={{ mb: 3 }}>
                                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                            Offer / Services
+                                            {t('form.offerService')}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block' }}>
-                                            What products or services are you promoting?
+                                            {t('form.offerServiceHelp')}
                                         </Typography>
                                         <TextField
                                             fullWidth
-                                            placeholder="Premium Plumbing Services - Emergency & Repairs"
+                                            placeholder={t('form.offerServicePlaceholder')}
                                             value={formData.offerOrService}
                                             onChange={(e) => setFormData({ ...formData, offerOrService: e.target.value })}
                                             sx={{
@@ -279,36 +291,41 @@ export default function BlueprintWizard() {
 
                                     <Box>
                                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                                            Industry Vertical
+                                            {t('form.industryVertical')}
                                         </Typography>
                                         <Grid container spacing={2}>
-                                            {VERTICALS.map((vertical) => (
-                                                <Grid size={{ xs: 6, sm: 3 }} key={vertical.id}>
+                                            {verticals.map((v) => (
+                                                <Grid size={{ xs: 6, sm: 3 }} key={v.id}>
                                                     <Paper
-                                                        onClick={() => setFormData({ ...formData, vertical: vertical.label })}
+                                                        elevation={0}
+                                                        onClick={() => {
+                                                            setFormData({ ...formData, vertical: v.value as any });
+                                                        }}
                                                         sx={{
                                                             p: 2,
                                                             textAlign: 'center',
                                                             cursor: 'pointer',
-                                                            border: `2px solid ${formData.vertical === vertical.label ? theme.palette.primary.main : 'transparent'}`,
-                                                            bgcolor: formData.vertical === vertical.label ? alpha(theme.palette.primary.main, 0.1) : 'background.default',
+                                                            border: `2px solid ${formData.vertical === v.value ? theme.palette.primary.main : theme.palette.divider}`,
+                                                            borderRadius: 2,
+                                                            bgcolor: formData.vertical === v.value ? alpha(theme.palette.primary.main, 0.05) : 'background.paper',
                                                             transition: 'all 0.2s ease',
                                                             '&:hover': {
                                                                 borderColor: theme.palette.primary.main,
-                                                                bgcolor: alpha(theme.palette.primary.main, 0.05)
+                                                                transform: 'translateY(-2px)'
                                                             }
                                                         }}
                                                     >
                                                         <Typography variant="h4" sx={{ mb: 1 }}>
-                                                            {vertical.icon}
+                                                            {v.icon}
                                                         </Typography>
-                                                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                                            {vertical.label}
+                                                        <Typography variant="body2" fontWeight={500}>
+                                                            {v.label}
                                                         </Typography>
                                                     </Paper>
                                                 </Grid>
                                             ))}
                                         </Grid>
+
                                     </Box>
                                 </Paper>
 
@@ -322,22 +339,22 @@ export default function BlueprintWizard() {
                                     }}
                                 >
                                     <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                                        Targeting & Keywords
+                                        {t('form.targetingKeywords')}
                                     </Typography>
 
                                     {/* Geographic Targeting */}
                                     <Box sx={{ mb: 3 }}>
                                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                            Geographic Targeting
+                                            {t('form.geoTargeting')}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block' }}>
-                                            Enter cities, states, or regions you serve
+                                            {t('form.geoTargetingHelp')}
                                         </Typography>
                                         <Stack direction="row" spacing={1} sx={{ mb: 1.5 }}>
                                             <TextField
                                                 fullWidth
                                                 size="small"
-                                                placeholder="Los Angeles, CA"
+                                                placeholder={t('form.geoTargetingPlaceholder')}
                                                 value={locationInput}
                                                 onChange={(e) => setLocationInput(e.target.value)}
                                                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddLocation())}
@@ -353,7 +370,7 @@ export default function BlueprintWizard() {
                                                 disabled={!locationInput.trim()}
                                                 sx={{ minWidth: 80 }}
                                             >
-                                                Add
+                                                {t('form.add')}
                                             </Button>
                                         </Stack>
                                         <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
@@ -377,16 +394,16 @@ export default function BlueprintWizard() {
                                     {/* Customer Pain Points */}
                                     <Box>
                                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                            Customer Pain Points
+                                            {t('form.painPoints')}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block' }}>
-                                            What problems do your customers face? (helps generate problem-focused keywords)
+                                            {t('form.painPointsHelp')}
                                         </Typography>
                                         <TextField
                                             fullWidth
                                             multiline
                                             rows={3}
-                                            placeholder="Emergency plumbing issues, leaking pipes, burst pipes, clogged drains, water heater failures, sewer backups, 24/7 urgent repairs needed"
+                                            placeholder={t('form.painPointsPlaceholder')}
                                             value={painPointInput}
                                             onChange={(e) => setPainPointInput(e.target.value)}
                                             sx={{
@@ -402,7 +419,7 @@ export default function BlueprintWizard() {
                                             disabled={!painPointInput.trim()}
                                             fullWidth
                                         >
-                                            Add Pain Point
+                                            {t('form.addPainPoint')}
                                         </Button>
                                         {formData.painPoints.length > 0 && (
                                             <Stack direction="row" spacing={1} flexWrap="wrap" gap={1} sx={{ mt: 1.5 }}>
@@ -428,20 +445,20 @@ export default function BlueprintWizard() {
                                     }}
                                 >
                                     <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                                        Landing Page
+                                        {t('form.landingPage')}
                                     </Typography>
 
                                     <Box>
                                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                            Landing Page URL
+                                            {t('form.landingPageUrl')}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block' }}>
-                                            Where will your ads direct traffic?
+                                            {t('form.landingPageHelp')}
                                         </Typography>
                                         <Stack direction="row" spacing={1}>
                                             <TextField
                                                 fullWidth
-                                                placeholder="https://premiumplumbing.com/emergency-services"
+                                                placeholder={t('form.landingPagePlaceholder')}
                                                 value={formData.landingPageUrl || ''}
                                                 onChange={(e) => setFormData({ ...formData, landingPageUrl: e.target.value })}
                                                 sx={{
@@ -455,7 +472,7 @@ export default function BlueprintWizard() {
                                                 color="success"
                                                 sx={{ minWidth: 100 }}
                                             >
-                                                Validate
+                                                {t('form.validate')}
                                             </Button>
                                         </Stack>
                                     </Box>
@@ -477,10 +494,10 @@ export default function BlueprintWizard() {
                                     <>
                                         <CircularProgress size={60} sx={{ mb: 3 }} />
                                         <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                                            Generating your Campaign Blueprint...
+                                            {t('generate.loadingTitle')}
                                         </Typography>
                                         <Typography color="text.secondary" sx={{ mb: 3 }}>
-                                            Analyzing keywords, competitors, and creating ads.
+                                            {t('generate.loadingText')}
                                         </Typography>
                                         <LinearProgress sx={{ maxWidth: 400, mx: 'auto' }} />
                                     </>
@@ -502,11 +519,10 @@ export default function BlueprintWizard() {
                                             <Typography variant="h3">✓</Typography>
                                         </Box>
                                         <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                                            Ready to Generate
+                                            {t('generate.readyTitle')}
                                         </Typography>
                                         <Typography color="text.secondary" sx={{ mb: 4, maxWidth: 500, mx: 'auto' }}>
-                                            Click "Generate Complete Blueprint" to create your custom Google Ads campaign
-                                            structure with keywords, ad copy, and optimization recommendations.
+                                            {t('generate.readyText')}
                                         </Typography>
                                         <Paper
                                             sx={{
@@ -519,13 +535,13 @@ export default function BlueprintWizard() {
                                             }}
                                         >
                                             <Typography variant="body2" color="text.secondary">
-                                                <strong>Service:</strong> {formData.offerOrService}
+                                                <strong>{t('generate.service')}</strong> {formData.offerOrService}
                                                 <br />
-                                                <strong>Vertical:</strong> {formData.vertical}
+                                                <strong>{t('generate.vertical')}</strong> {formData.vertical}
                                                 <br />
-                                                <strong>Locations:</strong> {formData.geoTargeting.length > 0 ? formData.geoTargeting.join(', ') : 'None'}
+                                                <strong>{t('generate.locations')}</strong> {formData.geoTargeting.length > 0 ? formData.geoTargeting.join(', ') : 'None'}
                                                 <br />
-                                                <strong>Pain Points:</strong> {formData.painPoints.length}
+                                                <strong>{t('generate.painPoints')}</strong> {formData.painPoints.length}
                                             </Typography>
                                         </Paper>
                                     </>
@@ -547,14 +563,14 @@ export default function BlueprintWizard() {
                                     size="large"
                                     onClick={handleNext}
                                     disabled={loading || (activeStep === 0 && !formData.offerOrService)}
-                                    startIcon={activeStep === 1 ? <span>⚡</span> : null}
+                                    startIcon={activeStep === 1 ? <span>{t('icons.lightning')}</span> : null}
                                     sx={{
                                         py: 1.5,
                                         fontSize: '1rem',
                                         fontWeight: 600
                                     }}
                                 >
-                                    {activeStep === 1 ? 'Generate Complete Blueprint' : 'Continue'}
+                                    {activeStep === 1 ? t('generate.button') : t('generate.continue')}
                                 </Button>
                                 {activeStep > 0 && (
                                     <Button
@@ -564,7 +580,7 @@ export default function BlueprintWizard() {
                                         disabled={loading}
                                         sx={{ mt: 2 }}
                                     >
-                                        Back
+                                        {t('common.back')}
                                     </Button>
                                 )}
                             </Box>
@@ -572,145 +588,147 @@ export default function BlueprintWizard() {
                     </Grid>
 
                     {/* Right Side - Preview Panel */}
-                    {activeStep < 2 && (
-                        <Grid size={{ xs: 12, md: 4 }}>
-                            <Paper
-                                sx={{
-                                    bgcolor: 'background.paper',
-                                    borderRadius: 2,
-                                    p: 3,
-                                    position: 'sticky',
-                                    top: 24
-                                }}
-                            >
-                                <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
-                                    <Box
-                                        sx={{
-                                            width: 40,
-                                            height: 40,
-                                            borderRadius: 1,
-                                            bgcolor: 'primary.main',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            color: 'primary.contrastText'
-                                        }}
-                                    >
-                                        <Typography variant="h6">📋</Typography>
-                                    </Box>
-                                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                        Blueprint Preview
-                                    </Typography>
-                                </Stack>
-
-                                <Stack spacing={2}>
-                                    {[
-                                        { label: 'Keyword Clusters', value: getPreviewStats().keywordClusters },
-                                        { label: 'Ad Groups', value: getPreviewStats().adGroups },
-                                        { label: 'RSA Headlines', value: getPreviewStats().rsaHeadlines },
-                                        { label: 'Descriptions', value: getPreviewStats().descriptions },
-                                        { label: 'Negative Keywords', value: getPreviewStats().negativeKeywords }
-                                    ].map((item, index) => (
-                                        <Stack
-                                            key={index}
-                                            direction="row"
-                                            justifyContent="space-between"
-                                            alignItems="center"
-                                            sx={{
-                                                p: 1.5,
-                                                bgcolor: 'background.default',
-                                                borderRadius: 1
-                                            }}
-                                        >
-                                            <Typography variant="body2" color="text.secondary">
-                                                {item.label}
-                                            </Typography>
-                                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                                {item.value}
-                                            </Typography>
-                                        </Stack>
-                                    ))}
-                                </Stack>
-
-                                <Divider sx={{ my: 3 }} />
-
+                    {
+                        activeStep < 2 && (
+                            <Grid size={{ xs: 12, md: 4 }}>
                                 <Paper
                                     sx={{
-                                        bgcolor: alpha(theme.palette.warning.main, 0.1),
-                                        border: `1px solid ${alpha(theme.palette.warning.main, 0.3)}`,
-                                        borderRadius: 1,
-                                        p: 2
+                                        bgcolor: 'background.paper',
+                                        borderRadius: 2,
+                                        p: 3,
+                                        position: 'sticky',
+                                        top: 24
                                     }}
                                 >
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'warning.main' }}>
-                                        💡 What You'll Get
-                                    </Typography>
-                                    <Stack spacing={0.5}>
+                                    <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+                                        <Box
+                                            sx={{
+                                                width: 40,
+                                                height: 40,
+                                                borderRadius: 1,
+                                                bgcolor: 'primary.main',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                color: 'primary.contrastText'
+                                            }}
+                                        >
+                                            <Typography variant="h6">{t('icons.preview')}</Typography>
+                                        </Box>
+                                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                            {t('preview.title')}
+                                        </Typography>
+                                    </Stack>
+
+                                    <Stack spacing={2}>
                                         {[
-                                            'Intent-based keyword clusters',
-                                            'Match type recommendations',
-                                            'Negative keyword suggestions',
-                                            'Google Ads compliant RSA copy',
-                                            'Landing page optimization tips',
-                                            'Exportable JSON format'
+                                            { label: t('preview.keywordClusters'), value: getPreviewStats().keywordClusters },
+                                            { label: t('preview.adGroups'), value: getPreviewStats().adGroups },
+                                            { label: t('preview.rsaHeadlines'), value: getPreviewStats().rsaHeadlines },
+                                            { label: t('preview.descriptions'), value: getPreviewStats().descriptions },
+                                            { label: t('preview.negativeKeywords'), value: getPreviewStats().negativeKeywords }
                                         ].map((item, index) => (
-                                            <Stack key={index} direction="row" spacing={1} alignItems="center">
-                                                <Typography variant="body2" color="success.main">✓</Typography>
+                                            <Stack
+                                                key={index}
+                                                direction="row"
+                                                justifyContent="space-between"
+                                                alignItems="center"
+                                                sx={{
+                                                    p: 1.5,
+                                                    bgcolor: 'background.default',
+                                                    borderRadius: 1
+                                                }}
+                                            >
                                                 <Typography variant="body2" color="text.secondary">
-                                                    {item}
+                                                    {item.label}
+                                                </Typography>
+                                                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                                    {item.value}
                                                 </Typography>
                                             </Stack>
                                         ))}
                                     </Stack>
-                                </Paper>
 
-                                <Divider sx={{ my: 3 }} />
+                                    <Divider sx={{ my: 3 }} />
 
-                                <Box>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
-                                        Quick Start Templates
-                                    </Typography>
-                                    <Stack spacing={1.5}>
-                                        {[
-                                            { title: 'Emergency Services', desc: '24/7 urgent service keywords' },
-                                            { title: 'Local Service Pro', desc: 'Geo-targeted campaigns' },
-                                            { title: 'Competitor Targeting', desc: 'Capture competitor traffic' }
-                                        ].map((template, index) => (
-                                            <Paper
-                                                key={index}
-                                                sx={{
-                                                    p: 1.5,
-                                                    bgcolor: 'background.default',
-                                                    cursor: 'pointer',
-                                                    transition: 'all 0.2s ease',
-                                                    '&:hover': {
-                                                        bgcolor: alpha(theme.palette.primary.main, 0.05),
-                                                        borderColor: 'primary.main'
-                                                    }
-                                                }}
-                                            >
-                                                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                                    <Box>
-                                                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                                            {template.title}
-                                                        </Typography>
-                                                        <Typography variant="caption" color="text.secondary">
-                                                            {template.desc}
-                                                        </Typography>
-                                                    </Box>
-                                                    <Button size="small" variant="outlined">
-                                                        Use
-                                                    </Button>
+                                    <Paper
+                                        sx={{
+                                            bgcolor: alpha(theme.palette.warning.main, 0.1),
+                                            border: `1px solid ${alpha(theme.palette.warning.main, 0.3)}`,
+                                            borderRadius: 1,
+                                            p: 2
+                                        }}
+                                    >
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'warning.main' }}>
+                                            {t('preview.whatYouGet')}
+                                        </Typography>
+                                        <Stack spacing={0.5}>
+                                            {[
+                                                t('preview.benefits.intentBased'),
+                                                t('preview.benefits.matchType'),
+                                                t('preview.benefits.negativeKeywords'),
+                                                t('preview.benefits.compliantCopy'),
+                                                t('preview.benefits.landingPageTips'),
+                                                t('preview.benefits.exportable')
+                                            ].map((item, index) => (
+                                                <Stack key={index} direction="row" spacing={1} alignItems="center">
+                                                    <Typography variant="body2" color="success.main">✓</Typography>
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        {item}
+                                                    </Typography>
                                                 </Stack>
-                                            </Paper>
-                                        ))}
-                                    </Stack>
-                                </Box>
-                            </Paper>
-                        </Grid>
-                    )}
-                </Grid>
-            </Box>
-        </Box>
+                                            ))}
+                                        </Stack>
+                                    </Paper>
+
+                                    <Divider sx={{ my: 3 }} />
+
+                                    <Box>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
+                                            {t('preview.quickStart')}
+                                        </Typography>
+                                        <Stack spacing={1.5}>
+                                            {[
+                                                { title: t('preview.templates.emergency'), desc: t('preview.templates.emergencyDesc') },
+                                                { title: t('preview.templates.local'), desc: t('preview.templates.localDesc') },
+                                                { title: t('preview.templates.competitor'), desc: t('preview.templates.competitorDesc') }
+                                            ].map((template, index) => (
+                                                <Paper
+                                                    key={index}
+                                                    sx={{
+                                                        p: 1.5,
+                                                        bgcolor: 'background.default',
+                                                        cursor: 'pointer',
+                                                        transition: 'all 0.2s ease',
+                                                        '&:hover': {
+                                                            bgcolor: alpha(theme.palette.primary.main, 0.05),
+                                                            borderColor: 'primary.main'
+                                                        }
+                                                    }}
+                                                >
+                                                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                                        <Box>
+                                                            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                                                {template.title}
+                                                            </Typography>
+                                                            <Typography variant="caption" color="text.secondary">
+                                                                {template.desc}
+                                                            </Typography>
+                                                        </Box>
+                                                        <Button size="small" variant="outlined">
+                                                            {t('preview.use')}
+                                                        </Button>
+                                                    </Stack>
+                                                </Paper>
+                                            ))}
+                                        </Stack>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                        )
+                    }
+                </Grid >
+            </Box >
+        </Box >
     );
 }

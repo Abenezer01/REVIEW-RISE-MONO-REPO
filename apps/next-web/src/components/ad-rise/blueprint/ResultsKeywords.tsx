@@ -1,26 +1,30 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import {
+    Badge,
+    Box,
     Card,
     CardContent,
-    Typography,
     Chip,
-    Box,
-    Stack,
     Collapse,
     IconButton,
-    Badge,
+    Stack,
+    Typography,
     alpha,
     useTheme
 } from '@mui/material';
-import { KeywordCluster } from '@platform/contracts';
+
+import { useTranslation } from '@/hooks/useTranslation';
+import type { KeywordCluster } from '@platform/contracts';
 
 interface Props {
     clusters: KeywordCluster[];
 }
 
 export default function ResultsKeywords({ clusters }: Props) {
+    const t = useTranslation('blueprint');
     const theme = useTheme();
     const [expandedClusters, setExpandedClusters] = useState<Set<number>>(new Set([0]));
 
@@ -32,6 +36,7 @@ export default function ResultsKeywords({ clusters }: Props) {
             } else {
                 newSet.add(index);
             }
+
             return newSet;
         });
     };
@@ -74,10 +79,13 @@ export default function ResultsKeywords({ clusters }: Props) {
                     </Box>
                     <Box>
                         <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                            Keyword Clusters by Intent
+                            {t('results.keywords.title')}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            {clusters.length} cluster{clusters.length !== 1 ? 's' : ''} • {clusters.reduce((sum, c) => sum + c.keywords.length, 0)} keywords total
+                            {t('results.keywords.subtitle', {
+                                clusters: clusters.length,
+                                keywords: clusters.reduce((sum, c) => sum + c.keywords.length, 0)
+                            })}
                         </Typography>
                     </Box>
                 </Stack>
@@ -85,6 +93,7 @@ export default function ResultsKeywords({ clusters }: Props) {
                 <Stack spacing={2}>
                     {(clusters || []).map((cluster, i) => {
                         const isExpanded = expandedClusters.has(i);
+
                         return (
                             <Box
                                 key={i}
@@ -134,7 +143,7 @@ export default function ResultsKeywords({ clusters }: Props) {
                                                 }}
                                             >
                                                 <Typography variant="body2" color="text.secondary">
-                                                    keywords
+                                                    {t('results.keywords.badge')}
                                                 </Typography>
                                             </Badge>
                                         </Stack>

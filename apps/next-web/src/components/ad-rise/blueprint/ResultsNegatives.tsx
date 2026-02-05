@@ -1,26 +1,30 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import {
+    Alert,
+    Box,
+    Button,
     Card,
     CardContent,
-    Typography,
-    Box,
-    Stack,
     Chip,
-    Button,
-    alpha,
-    useTheme,
     Snackbar,
-    Alert
+    Stack,
+    Typography,
+    alpha,
+    useTheme
 } from '@mui/material';
-import { NegativeKeywordList } from '@platform/contracts';
+
+import { useTranslation } from '@/hooks/useTranslation';
+import type { NegativeKeywordList } from '@platform/contracts';
 
 interface Props {
     negatives: NegativeKeywordList[];
 }
 
 export default function ResultsNegatives({ negatives }: Props) {
+    const t = useTranslation('blueprint');
     const theme = useTheme();
     const [copiedCategory, setCopiedCategory] = useState<string | null>(null);
 
@@ -65,10 +69,10 @@ export default function ResultsNegatives({ negatives }: Props) {
                         </Box>
                         <Box sx={{ flex: 1 }}>
                             <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                Negative Keywords
+                                {t('results.negatives.title')}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {totalKeywords} keyword{totalKeywords !== 1 ? 's' : ''} to prevent wasted ad spend
+                                {t('results.negatives.subtitle', { count: totalKeywords })}
                             </Typography>
                         </Box>
                         <Button
@@ -76,7 +80,7 @@ export default function ResultsNegatives({ negatives }: Props) {
                             size="small"
                             onClick={copyAll}
                         >
-                            Copy All
+                            {t('results.negatives.copyAll')}
                         </Button>
                     </Stack>
 
@@ -94,7 +98,7 @@ export default function ResultsNegatives({ negatives }: Props) {
                                             {list.category}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            {list.keywords.length} keyword{list.keywords.length !== 1 ? 's' : ''}
+                                            {t('results.negatives.subtitle', { count: list.keywords.length })}
                                         </Typography>
                                     </Box>
                                     <Button
@@ -102,7 +106,7 @@ export default function ResultsNegatives({ negatives }: Props) {
                                         size="small"
                                         onClick={() => copyCategory(list.keywords, list.category)}
                                     >
-                                        Copy
+                                        {t('results.negatives.copy')}
                                     </Button>
                                 </Stack>
 
@@ -148,8 +152,7 @@ export default function ResultsNegatives({ negatives }: Props) {
                         }}
                     >
                         <Typography variant="body2" color="info.main">
-                            <strong>💡 Tip:</strong> Add these negative keywords to your campaign to prevent your ads
-                            from showing for irrelevant searches and save your budget for qualified traffic.
+                            <strong>{t('results.negatives.tipTitle')}</strong> {t('results.negatives.tipText')}
                         </Typography>
                     </Box>
                 </CardContent>
@@ -163,7 +166,7 @@ export default function ResultsNegatives({ negatives }: Props) {
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
                 <Alert severity="success" variant="filled" onClose={() => setCopiedCategory(null)}>
-                    {copiedCategory} copied to clipboard!
+                    {t('results.common.copied', { label: copiedCategory || '' })}
                 </Alert>
             </Snackbar>
         </>

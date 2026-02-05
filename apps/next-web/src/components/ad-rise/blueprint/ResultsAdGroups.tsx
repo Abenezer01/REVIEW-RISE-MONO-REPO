@@ -1,28 +1,32 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import {
+    Alert,
+    Box,
+    Button,
     Card,
     CardContent,
-    Typography,
-    Box,
-    Stack,
+    Chip,
     Collapse,
     IconButton,
-    Chip,
-    Button,
-    alpha,
-    useTheme,
     Snackbar,
-    Alert
+    Stack,
+    Typography,
+    alpha,
+    useTheme
 } from '@mui/material';
-import { AdGroup } from '@platform/contracts';
+
+import { useTranslation } from '@/hooks/useTranslation';
+import type { AdGroup } from '@platform/contracts';
 
 interface Props {
     adGroups: AdGroup[];
 }
 
 export default function ResultsAdGroups({ adGroups }: Props) {
+    const t = useTranslation('blueprint');
     const theme = useTheme();
     const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set([0]));
     const [copiedText, setCopiedText] = useState<string | null>(null);
@@ -35,6 +39,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
             } else {
                 newSet.add(index);
             }
+
             return newSet;
         });
     };
@@ -45,12 +50,12 @@ export default function ResultsAdGroups({ adGroups }: Props) {
     };
 
     const copyAllHeadlines = (headlines: string[]) => {
-        const text = headlines.join('\\n');
+        const text = headlines.join('\n');
         copyToClipboard(text, 'All headlines');
     };
 
     const copyAllDescriptions = (descriptions: string[]) => {
-        const text = descriptions.join('\\n');
+        const text = descriptions.join('\n');
         copyToClipboard(text, 'All descriptions');
     };
 
@@ -80,10 +85,10 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                         </Box>
                         <Box>
                             <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                RSA Assets (Responsive Search Ads)
+                                {t('results.adGroups.title')}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {adGroups.length} ad group{adGroups.length !== 1 ? 's' : ''} with optimized headlines and descriptions
+                                {t('results.adGroups.subtitle', { count: adGroups.length })}
                             </Typography>
                         </Box>
                     </Stack>
@@ -91,6 +96,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                     <Stack spacing={2}>
                         {(adGroups || []).map((group, i) => {
                             const isExpanded = expandedGroups.has(i);
+
                             return (
                                 <Box
                                     key={i}
@@ -124,7 +130,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                     {group.name}
                                                 </Typography>
                                                 <Chip
-                                                    label={`${group.keywords.keywords.length} keywords`}
+                                                    label={t('results.adGroups.keywordsCount', { count: group.keywords.keywords.length })}
                                                     size="small"
                                                     variant="outlined"
                                                 />
@@ -144,7 +150,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                             <Box sx={{ mb: 3 }}>
                                                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                                                     <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                                                        Headlines ({group.assets.headlines.length})
+                                                        {t('results.adGroups.headlines', { count: group.assets.headlines.length })}
                                                     </Typography>
                                                     <Button
                                                         size="small"
@@ -154,7 +160,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                             copyAllHeadlines(group.assets.headlines);
                                                         }}
                                                     >
-                                                        Copy All
+                                                        {t('results.adGroups.copyAll')}
                                                     </Button>
                                                 </Stack>
                                                 <Stack spacing={1}>
@@ -213,7 +219,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                             <Box>
                                                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                                                     <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'secondary.main' }}>
-                                                        Descriptions ({group.assets.descriptions.length})
+                                                        {t('results.adGroups.descriptions', { count: group.assets.descriptions.length })}
                                                     </Typography>
                                                     <Button
                                                         size="small"
@@ -223,7 +229,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                             copyAllDescriptions(group.assets.descriptions);
                                                         }}
                                                     >
-                                                        Copy All
+                                                        {t('results.adGroups.copyAll')}
                                                     </Button>
                                                 </Stack>
                                                 <Stack spacing={1}>
@@ -294,7 +300,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
                 <Alert severity="success" variant="filled" onClose={() => setCopiedText(null)}>
-                    {copiedText} copied to clipboard!
+                    {t('results.adGroups.copied', { label: copiedText || '' })}
                 </Alert>
             </Snackbar>
         </>

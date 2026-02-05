@@ -1,31 +1,38 @@
 'use client';
 
 import React from 'react';
+
 import {
+    Box,
     Card,
     CardContent,
-    Typography,
-    Box,
-    Stack,
     Chip,
     LinearProgress,
+    Stack,
+    Typography,
     alpha,
     useTheme
 } from '@mui/material';
-import { LandingPageAnalysis } from '@platform/contracts';
+
+import { useTranslation } from '@/hooks/useTranslation';
+import type { LandingPageAnalysis } from '@platform/contracts';
 
 interface Props {
     analysis?: LandingPageAnalysis;
 }
 
 export default function ResultsLandingPage({ analysis }: Props) {
+    const t = useTranslation('blueprint');
     const theme = useTheme();
 
-    if (!analysis) return null;
+    if (!analysis) {
+        return null;
+    }
 
     const getScoreColor = (score: number) => {
         if (score >= 80) return theme.palette.success.main;
         if (score >= 60) return theme.palette.warning.main;
+
         return theme.palette.error.main;
     };
 
@@ -56,7 +63,7 @@ export default function ResultsLandingPage({ analysis }: Props) {
                     </Box>
                     <Box sx={{ flex: 1 }}>
                         <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                            Landing Page Analysis
+                            {t('results.landingPage.title')}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" noWrap>
                             {analysis.url}
@@ -116,12 +123,12 @@ export default function ResultsLandingPage({ analysis }: Props) {
                         {/* Score Details */}
                         <Box sx={{ flex: 1 }}>
                             <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                                Overall Match Quality
+                                {t('results.landingPage.matchQuality')}
                             </Typography>
                             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                {analysis.score >= 80 && 'Excellent! Your landing page is well-optimized for this campaign.'}
-                                {analysis.score >= 60 && analysis.score < 80 && 'Good, but there\'s room for improvement.'}
-                                {analysis.score < 60 && 'Consider optimizing your landing page for better ad performance.'}
+                                {analysis.score >= 80 && t('results.landingPage.score.excellent')}
+                                {analysis.score >= 60 && analysis.score < 80 && t('results.landingPage.score.good')}
+                                {analysis.score < 60 && t('results.landingPage.score.fair')}
                             </Typography>
                             <LinearProgress
                                 variant="determinate"
@@ -143,7 +150,7 @@ export default function ResultsLandingPage({ analysis }: Props) {
                 {/* Page Checklist */}
                 <Box sx={{ mb: 3 }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
-                        Page Checklist
+                        {t('results.landingPage.checklist')}
                     </Typography>
                     <Stack spacing={1.5}>
                         {/* Mobile Optimized */}
@@ -166,10 +173,10 @@ export default function ResultsLandingPage({ analysis }: Props) {
                                 {analysis.mobileOptimized ? '✓' : '✗'}
                             </Typography>
                             <Typography variant="body2" sx={{ flex: 1 }}>
-                                Mobile Optimized
+                                {t('results.landingPage.mobileOptimized')}
                             </Typography>
                             <Chip
-                                label={analysis.mobileOptimized ? 'Passed' : 'Failed'}
+                                label={analysis.mobileOptimized ? t('common.passed') : t('common.failed')}
                                 size="small"
                                 color={analysis.mobileOptimized ? 'success' : 'error'}
                                 sx={{ fontWeight: 500 }}
@@ -181,7 +188,7 @@ export default function ResultsLandingPage({ analysis }: Props) {
                 {/* Trust Signals */}
                 <Box sx={{ mb: 3 }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: 'success.main' }}>
-                        ✓ Detected Trust Signals ({analysis.trustSignalsDetected?.length || 0})
+                        {t('results.landingPage.trustSignals', { count: analysis.trustSignalsDetected?.length || 0 })}
                     </Typography>
                     <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
                         {(analysis.trustSignalsDetected || []).map((signal, i) => (
@@ -204,7 +211,7 @@ export default function ResultsLandingPage({ analysis }: Props) {
                 {analysis.missingElements && analysis.missingElements.length > 0 && (
                     <Box>
                         <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: 'warning.main' }}>
-                            ⚠ Recommended Trust Elements ({analysis.missingElements.length})
+                            {t('results.landingPage.missingElements', { count: analysis.missingElements.length })}
                         </Typography>
                         <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
                             {analysis.missingElements.map((el, i) => (

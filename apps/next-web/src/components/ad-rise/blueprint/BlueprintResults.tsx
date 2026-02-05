@@ -1,24 +1,29 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography, Alert, Paper, Stack, Button, Divider, alpha, useTheme } from '@mui/material';
-import { BlueprintOutput } from '@platform/contracts';
-import ResultsKeywords from './ResultsKeywords';
+
+import { Alert, Box, Button, Paper, Stack, Typography, alpha, useTheme } from '@mui/material';
+
+import { useTranslation } from '@/hooks/useTranslation';
+import type { BlueprintOutput } from '@platform/contracts';
+
 import ResultsAdGroups from './ResultsAdGroups';
-import ResultsNegatives from './ResultsNegatives';
+import ResultsKeywords from './ResultsKeywords';
 import ResultsLandingPage from './ResultsLandingPage';
+import ResultsNegatives from './ResultsNegatives';
 
 interface Props {
     results: BlueprintOutput | null;
 }
 
 export default function BlueprintResults({ results }: Props) {
+    const t = useTranslation('blueprint');
     const theme = useTheme();
 
     if (!results) {
         return (
             <Box sx={{ mt: 4 }}>
-                <Alert severity="info">No blueprint generated yet.</Alert>
+                <Alert severity="info">{t('results.noBlueprint')}</Alert>
             </Box>
         );
     }
@@ -59,10 +64,10 @@ export default function BlueprintResults({ results }: Props) {
                     </Box>
                     <Box sx={{ flex: 1 }}>
                         <Typography variant="h5" sx={{ fontWeight: 600, color: 'success.dark' }}>
-                            Your Google Ads Blueprint is Ready
+                            {t('results.successTitle')}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Review your campaign structure, keywords, and ad copy below
+                            {t('results.successText')}
                         </Typography>
                     </Box>
                     <Stack direction="row" spacing={1}>
@@ -71,14 +76,14 @@ export default function BlueprintResults({ results }: Props) {
                             size="small"
                             onClick={() => handleExport('csv')}
                         >
-                            Export CSV
+                            {t('results.exportCsv')}
                         </Button>
                         <Button
                             variant="contained"
                             size="small"
                             onClick={() => handleExport('google-ads')}
                         >
-                            Export to Google Ads
+                            {t('results.exportGoogleAds')}
                         </Button>
                     </Stack>
                 </Stack>
@@ -114,14 +119,14 @@ export default function BlueprintResults({ results }: Props) {
             >
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <Typography variant="body2" color="text.secondary">
-                        Need help implementing this blueprint? Contact our support team.
+                        {t('results.support')}
                     </Typography>
                     <Stack direction="row" spacing={2}>
                         <Button variant="outlined" onClick={() => window.print()}>
-                            Print Blueprint
+                            {t('results.print')}
                         </Button>
                         <Button variant="contained" onClick={() => handleExport('pdf')}>
-                            Download PDF
+                            {t('results.pdf')}
                         </Button>
                     </Stack>
                 </Stack>
