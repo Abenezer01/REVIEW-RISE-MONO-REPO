@@ -50,6 +50,7 @@ model User {
   sessions          Session[]
   userBusinessRoles UserBusinessRole[]
   userRoles         UserRole[]
+  adriseSessions    AdriseSession[]
 }
 
 model UserRole {
@@ -103,6 +104,7 @@ model Business {
   scriptDrafts         ScriptDraft[]
   carouselDrafts       CarouselDraft[]
   plannerPlans         MonthlyPlannerPlan[]
+  adriseSessions       AdriseSession[]
 
   @@index([name])
   @@index([status])
@@ -1000,4 +1002,52 @@ model MonthlyPlannerPlan {
 
   @@unique([businessId, month, year])
   @@index([businessId])
+}
+
+model AdriseSession {
+  id            String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId    String               @db.Uuid
+  userId        String?              @db.Uuid
+  status        String               @default("active") // active, completed, failed
+  mode          String               @default("QUICK") // QUICK, PRO
+  industryCode  String?
+  objective     String?
+  budgetMonthly Float?
+  geo           Json?
+  inputs        Json?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  
+  business      Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user          User?                @relation(fields: [userId], references: [id])
+  versions      AdriseSessionVersion[]
+  outputs       AdriseOutput[]
+
+  @@index([businessId])
+  @@index([userId])
+  @@index([status])
+}
+
+model AdriseSessionVersion {
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sessionId        String        @db.Uuid
+  versionNumber    Int
+  inputs           Json
+  createdAt        DateTime      @default(now())
+  
+  session          AdriseSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+}
+
+model AdriseOutput {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sessionId   String        @db.Uuid
+  output      Json
+  status      String        @default("success") // success, partial, failed
+  createdAt   DateTime      @default(now())
+  
+  session     AdriseSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
 }

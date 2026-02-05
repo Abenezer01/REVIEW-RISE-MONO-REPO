@@ -105,6 +105,24 @@ async function main() {
         },
     });
 
+    const editorRole = await prisma.role.upsert({
+        where: { name: 'Editor' },
+        update: {},
+        create: {
+            name: 'Editor',
+            description: 'Can edit and manage content',
+        },
+    });
+
+    const viewerRole = await prisma.role.upsert({
+        where: { name: 'Viewer' },
+        update: {},
+        create: {
+            name: 'Viewer',
+            description: 'Read-only access to the workspace',
+        },
+    });
+
     const staffRole = await prisma.role.upsert({
         where: { name: 'Staff' },
         update: {},
@@ -114,7 +132,7 @@ async function main() {
         },
     });
 
-    console.log(`✅ Created 4 roles\n`);
+    console.log(`✅ Created roles\n`);
 
     // 2. Create Permissions
     console.log('🔐 Creating permissions...');
@@ -133,6 +151,10 @@ async function main() {
         { action: 'review:read', description: 'View reviews' },
         { action: 'review:write', description: 'Create and edit reviews' },
         { action: 'review:respond', description: 'Respond to reviews' },
+        { action: 'adrise:read', description: 'View AdRise sessions and plans' },
+        { action: 'adrise:write', description: 'Create and edit AdRise sessions' },
+        { action: 'adrise:regenerate', description: 'Regenerate AdRise plans' },
+        { action: 'adrise:delete', description: 'Delete AdRise sessions' },
     ];
 
     const createdPermissions: Record<string, any> = {};
@@ -188,7 +210,7 @@ async function main() {
         });
     }
 
-    // Manager: Read/write for business, locations, reviews
+    // Manager: Read/write for business, locations, reviews, adrise
     const managerPermissionActions = [
         'business:read',
         'business:write',
@@ -198,6 +220,9 @@ async function main() {
         'review:read',
         'review:write',
         'review:respond',
+        'adrise:read',
+        'adrise:write',
+        'adrise:regenerate',
     ];
     for (const action of managerPermissionActions) {
         const permission = createdPermissions[action];
@@ -212,6 +237,52 @@ async function main() {
                 update: {},
                 create: {
                     roleId: managerRole.id,
+                    permissionId: permission.id,
+                },
+            });
+        }
+    }
+
+    // Editor: Same as Manager for now
+    for (const action of managerPermissionActions) {
+        const permission = createdPermissions[action];
+        if (permission) {
+            await prisma.rolePermission.upsert({
+                where: {
+                    roleId_permissionId: {
+                        roleId: editorRole.id,
+                        permissionId: permission.id,
+                    },
+                },
+                update: {},
+                create: {
+                    roleId: editorRole.id,
+                    permissionId: permission.id,
+                },
+            });
+        }
+    }
+
+    // Viewer: Read-only access
+    const viewerPermissionActions = [
+        'business:read',
+        'location:read',
+        'review:read',
+        'adrise:read',
+    ];
+    for (const action of viewerPermissionActions) {
+        const permission = createdPermissions[action];
+        if (permission) {
+            await prisma.rolePermission.upsert({
+                where: {
+                    roleId_permissionId: {
+                        roleId: viewerRole.id,
+                        permissionId: permission.id,
+                    },
+                },
+                update: {},
+                create: {
+                    roleId: viewerRole.id,
                     permissionId: permission.id,
                 },
             });
@@ -293,11 +364,53 @@ async function main() {
 
     console.log(`✅ Created 3 sample users\n`);
 
+    // 5. Create Sample Business
+    console.log('🏢 Creating sample business...');
+    const business = await prisma.business.upsert({
+        where: { slug: 'test-business' },
+        update: {},
+        create: {
+            id: 'd4f2e85a-1e52-4467-9d10-631742461880',
+            name: 'Test Business',
+            slug: 'test-business',
+            description: 'A sample business for development',
+            status: 'active',
+        },
+    });
+
     // 4b. Assign System Roles to Users (CRITICAL for login)
     console.log('🔗 Assigning system roles (UserRole) to users...');
     await assignSystemRole(user1.id, 'Owner');
     await assignSystemRole(user2.id, 'Admin');
     await assignSystemRole(user3.id, 'Manager');
+
+    // 6. Assign Business-Specific Roles (UserBusinessRole)
+    console.log('🔗 Assigning business roles (UserBusinessRole)...');
+    // User 1 is Owner of the business
+    await assignRole(user1.id, business.id, ownerRole.id, null);
+    // User 2 is Admin of the business
+    await assignRole(user2.id, business.id, adminRole.id, null);
+    // User 3 is Manager of the business
+    await assignRole(user3.id, business.id, managerRole.id, null);
+
+    // Create a Viewer user for testing
+    const viewerUser = await prisma.user.upsert({
+        where: { email: 'viewer@example.com' },
+        update: {
+            password: hashedPassword,
+        },
+        create: {
+            id: 'a1b2c3d4-e5f6-4a5b-b6c7-d8e9f0a1b2c3',
+            email: 'viewer@example.com',
+            name: 'Vince Viewer',
+            emailVerified: new Date(),
+            password: hashedPassword,
+        },
+    });
+    await assignSystemRole(viewerUser.id, 'Viewer');
+    await assignRole(viewerUser.id, business.id, viewerRole.id, null);
+
+    console.log(`✅ Assigned roles and created sample business\n`);
     console.log(`✅ Assigned system roles to users\n`);
 
     // 5. Create Sample Businesses

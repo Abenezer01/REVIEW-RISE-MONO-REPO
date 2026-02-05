@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { forwardRef } from 'react'
+import { forwardRef, useId } from 'react'
 
 // MUI Imports
 import { styled } from '@mui/material/styles'
@@ -253,9 +253,12 @@ const TextFieldStyled = styled(TextField)<TextFieldProps>(({ theme }) => ({
 
 const CustomTextField = forwardRef((props: TextFieldProps, ref) => {
   const { size = 'small', slotProps, ...rest } = props
+  const generatedId = useId()
+  const id = props.id || generatedId
 
   return (
     <TextFieldStyled
+      id={id}
       size={size}
       inputRef={ref}
       {...rest}

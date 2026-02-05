@@ -59,7 +59,12 @@
     "days": "Days",
     "found": "Found",
     "id": "ID",
-    "confirmDelete": "Are you sure you want to delete this item?"
+    "confirmDelete": "Are you sure you want to delete this item?",
+    "currencySymbol": "$",
+    "distanceUnit": "km",
+    "of": "of",
+    "none": "None",
+    "discard": "Discard"
   },
   "form": {
     "success-created": "created successfully",
