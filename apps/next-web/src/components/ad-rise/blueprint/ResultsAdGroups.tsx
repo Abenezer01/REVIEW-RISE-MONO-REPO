@@ -211,7 +211,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                                     }}
                                                                     sx={{ opacity: 0, transition: 'opacity 0.2s' }}
                                                                 >
-                                                                    📋
+                                                                    {t('icons.preview')}
                                                                 </IconButton>
                                                             </Stack>
                                                         </Box>
@@ -280,7 +280,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                                     }}
                                                                     sx={{ opacity: 0, transition: 'opacity 0.2s' }}
                                                                 >
-                                                                    📋
+                                                                    {t('icons.preview')}
                                                                 </IconButton>
                                                             </Stack>
                                                         </Box>
