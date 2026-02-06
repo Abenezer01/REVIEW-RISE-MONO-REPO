@@ -1,10 +1,10 @@
 {
-    "title": "Google Search Blueprint",
-    "subtitle": "AI-Powered Campaign Generator",
+    "title": "مخطط بحث جوجل",
+    "subtitle": "مولد حملات مدعوم بالذكاء الاصطناعي",
     "header": {
-        "history": "History",
-        "myBlueprints": "My Blueprints",
-        "account": "Account"
+        "history": "السجل",
+        "myBlueprints": "مخططاتي",
+        "account": "الحساب"
     },
     "icons": {
         "wizard": "📊",
@@ -20,129 +20,129 @@
         "block": "🚫"
     },
     "steps": {
-        "campaignDetails": "Campaign Details",
-        "generate": "Generate Blueprint",
-        "review": "Review & Export"
+        "campaignDetails": "تفاصيل الحملة",
+        "generate": "إنشاء المخطط",
+        "review": "المراجعة والتصدير"
     },
     "form": {
-        "businessInfo": "Business Information",
-        "required": "Required",
-        "offerService": "Offer / Services",
-        "offerServicePlaceholder": "Premium Plumbing Services - Emergency & Repairs",
-        "offerServiceHelp": "What products or services are you promoting?",
-        "industryVertical": "Industry Vertical",
-        "targetingKeywords": "Targeting & Keywords",
-        "geoTargeting": "Geographic Targeting",
-        "geoTargetingPlaceholder": "Los Angeles, CA",
-        "geoTargetingHelp": "Enter cities, states, or regions you serve",
-        "add": "Add",
-        "painPoints": "Customer Pain Points",
-        "painPointsPlaceholder": "Emergency plumbing issues, leaking pipes, burst pipes, clogged drains, water heater failures, sewer backups, 24/7 urgent repairs needed",
-        "painPointsHelp": "What problems do your customers face? (helps generate problem-focused keywords)",
-        "addPainPoint": "Add Pain Point",
-        "landingPage": "Landing Page",
-        "landingPageUrl": "Landing Page URL",
+        "businessInfo": "معلومات العمل",
+        "required": "مطلوب",
+        "offerService": "العرض / الخدمات",
+        "offerServicePlaceholder": "خدمات سباكة متميزة - طوارئ وإصلاحات",
+        "offerServiceHelp": "ما هي المنتجات أو الخدمات التي تروج لها؟",
+        "industryVertical": "قطاع العمل",
+        "targetingKeywords": "الاستهداف والكلمات الرئيسية",
+        "geoTargeting": "الاستهداف الجغرافي",
+        "geoTargetingPlaceholder": "دبي، الإمارات العربية المتحدة",
+        "geoTargetingHelp": "أدخل المدن أو المناطق التي تخدمها",
+        "add": "إضافة",
+        "painPoints": "نقاط ألم العملاء",
+        "painPointsPlaceholder": "مشاكل السباكة الطارئة، تسرب المواسير، انفجار المواسير، انسداد المصارف...",
+        "painPointsHelp": "ما هي المشاكل التي يواجهها عملاؤك؟ (يساعد في إنشاء كلمات رئيسية تركز على المشكلة)",
+        "addPainPoint": "إضافة نقطة ألم",
+        "landingPage": "الصفحة المقصودة",
+        "landingPageUrl": "رابط الصفحة المقصودة",
         "landingPagePlaceholder": "https://premiumplumbing.com/emergency-services",
-        "landingPageHelp": "Where will your ads direct traffic?",
-        "validate": "Validate",
+        "landingPageHelp": "إلى أين ستوجه إعلاناتك الزوار؟",
+        "validate": "تحقق",
         "verticals": {
-            "localService": "Local Service",
-            "ecommerce": "E-commerce",
-            "saas": "SaaS",
-            "healthcare": "Healthcare"
+            "localService": "خدمة محلية",
+            "ecommerce": "تجارة إلكترونية",
+            "saas": "برمجيات كخدمة",
+            "healthcare": "رعاية صحية"
         }
     },
     "generate": {
-        "loadingTitle": "Generating your Campaign Blueprint...",
-        "loadingText": "Analyzing keywords, competitors, and creating ads.",
-        "readyTitle": "Ready to Generate",
-        "readyText": "Click \"Generate Complete Blueprint\" to create your custom Google Ads campaign structure with keywords, ad copy, and optimization recommendations.",
-        "service": "Service:",
-        "vertical": "Vertical:",
-        "locations": "Locations:",
-        "painPoints": "Pain Points:",
-        "button": "Generate Complete Blueprint",
-        "continue": "Continue"
+        "loadingTitle": "جاري إنشاء مخطط حملتك...",
+        "loadingText": "تحليل الكلمات الرئيسية والمنافسين وإنشاء الإعلانات.",
+        "readyTitle": "جاهز للإنشاء",
+        "readyText": "انقر على \"إنشاء مخطط كامل\" لإنشاء هيكل مخصص لحملة إعلانات جوجل مع الكلمات الرئيسية ونصوص الإعلانات وتوصيات التحسين.",
+        "service": "الخدمة:",
+        "vertical": "القطاع:",
+        "locations": "المواقع:",
+        "painPoints": "نقاط الألم:",
+        "button": "إنشاء مخطط كامل",
+        "continue": "استمرار"
     },
     "preview": {
-        "title": "Blueprint Preview",
-        "keywordClusters": "Keyword Clusters",
-        "adGroups": "Ad Groups",
-        "rsaHeadlines": "RSA Headlines",
-        "descriptions": "Descriptions",
-        "negativeKeywords": "Negative Keywords",
-        "whatYouGet": "💡 What You'll Get",
+        "title": "معاينة المخطط",
+        "keywordClusters": "مجموعات الكلمات الرئيسية",
+        "adGroups": "المجموعات الإعلانية",
+        "rsaHeadlines": "عناوين RSA",
+        "descriptions": "الأوصاف",
+        "negativeKeywords": "الكلمات الرئيسية السلبية",
+        "whatYouGet": "💡 ما ستحصل عليه",
         "benefits": {
-            "intentBased": "Intent-based keyword clusters",
-            "matchType": "Match type recommendations",
-            "negativeKeywords": "Negative keyword suggestions",
-            "compliantCopy": "Google Ads compliant RSA copy",
-            "landingPageTips": "Landing page optimization tips",
-            "exportable": "Exportable JSON format"
+            "intentBased": "مجموعات كلمات رئيسية مبنية على النية",
+            "matchType": "توصيات أنواع المطابقة",
+            "negativeKeywords": "اقتراحات الكلمات الرئيسية السلبية",
+            "compliantCopy": "نصوص إعلانية متوافقة مع إعلانات جوجل",
+            "landingPageTips": "نصائح تحسين الصفحة المقصودة",
+            "exportable": "تنسيق JSON قابل للتصدير"
         },
-        "quickStart": "Quick Start Templates",
+        "quickStart": "قوالب البدء السريع",
         "templates": {
-            "emergency": "Emergency Services",
-            "emergencyDesc": "24/7 urgent service keywords",
-            "local": "Local Service Pro",
-            "localDesc": "Geo-targeted campaigns",
-            "competitor": "Competitor Targeting",
-            "competitorDesc": "Capture competitor traffic"
+            "emergency": "خدمات الطوارئ",
+            "emergencyDesc": "كلمات رئيسية للخدمات العاجلة 24/7",
+            "local": "محترف خدمات محلية",
+            "localDesc": "حملات مستهدفة جغرافياً",
+            "competitor": "استهداف المنافسين",
+            "competitorDesc": "جذب زيارات المنافسين"
         },
-        "use": "Use"
+        "use": "استخدام"
     },
 
     "results": {
-        "successTitle": "Your Google Ads Blueprint is Ready",
-        "successText": "Review your campaign structure, keywords, and ad copy below",
-        "noBlueprint": "No blueprint generated yet.",
-        "exportCsv": "Export CSV",
-        "exportGoogleAds": "Export to Google Ads",
-        "support": "Need help implementing this blueprint? Contact our support team.",
-        "print": "Print Blueprint",
-        "pdf": "Download PDF",
+        "successTitle": "مخطط إعلانات جوجل الخاص بك جاهز",
+        "successText": "راجع هيكل حملتك والكلمات الرئيسية ونصوص الإعلانات أدناه",
+        "noBlueprint": "لم يتم إنشاء مخطط بعد.",
+        "exportCsv": "تصدير CSV",
+        "exportGoogleAds": "تصدير إلى إعلانات جوجل",
+        "support": "هل تحتاج إلى مساعدة في تنفيذ هذا المخطط؟ اتصل بفريق الدعم لدينا.",
+        "print": "طباعة المخطط",
+        "pdf": "تحميل PDF",
         "common": {
-            "copied": "copied to clipboard!"
+            "copied": "تم النسخ إلى الحافظة!"
         },
         "keywords": {
-            "title": "Keyword Clusters by Intent",
-            "subtitle": "{clusters} clusters • {keywords} keywords total",
-            "badge": "keywords"
+            "title": "مجموعات الكلمات الرئيسية حسب النية",
+            "subtitle": "{clusters} مجموعات • {keywords} إجمالي الكلمات الرئيسية",
+            "badge": "كلمات رئيسية"
         },
         "adGroups": {
-            "title": "RSA Assets (Responsive Search Ads)",
-            "subtitle": "{count} ad group(s) with optimized headlines and descriptions",
-            "keywordsCount": "{count} keywords",
-            "headlines": "Headlines ({count})",
-            "descriptions": "Descriptions ({count})",
-            "copyAll": "Copy All",
-            "copyLabel": "Copy"
+            "title": "أصول RSA (إعلانات البحث المتجاوبة)",
+            "subtitle": "{count} مجموعة إعلانية مع عناوين وأوصاف محسنة",
+            "keywordsCount": "{count} كلمات رئيسية",
+            "headlines": "العناوين ({count})",
+            "descriptions": "الأوصاف ({count})",
+            "copyAll": "نسخ الكل",
+            "copyLabel": "نسخ"
         },
         "negatives": {
-            "title": "Negative Keywords",
-            "subtitle": "{count} keyword(s) to prevent wasted ad spend",
-            "copyAll": "Copy All",
-            "copy": "Copy",
-            "tip": "Tip: Add these negative keywords to your campaign to prevent your ads from showing for irrelevant searches and save your budget for qualified traffic."
+            "title": "الكلمات الرئيسية السلبية",
+            "subtitle": "{count} كلمة رئيسية لمنع إهدار الإنفاق الإعلاني",
+            "copyAll": "نسخ الكل",
+            "copy": "نسخ",
+            "tip": "نصيحة: أضف هذه الكلمات الرئيسية السلبية إلى حملتك لمنع ظهور إعلاناتك لعمليات بحث غير ذات صلة وتوفير ميزانيتك للزيارات المؤهلة."
         },
         "landingPage": {
-            "title": "Landing Page Analysis",
-            "matchQuality": "Overall Match Quality",
+            "title": "تحليل الصفحة المقصودة",
+            "matchQuality": "جودة المطابقة الإجمالية",
             "score": {
-                "excellent": "Excellent! Your landing page is well-optimized for this campaign.",
-                "good": "Good, but there's room for improvement.",
-                "fair": "Consider optimizing your landing page for better ad performance."
+                "excellent": "ممتاز! صفحتك المقصودة محسنة جيداً لهذه الحملة.",
+                "good": "جيد، ولكن هناك مجال للتحسين.",
+                "fair": "فكر في تحسين صفحتك المقصودة لأداء إعلاني أفضل."
             },
-            "checklist": "Page Checklist",
-            "mobileOptimized": "Mobile Optimized",
-            "trustSignals": "Detected Trust Signals ({count})",
-            "missingElements": "Recommended Trust Elements ({count})"
+            "checklist": "قائمة فحص الصفحة",
+            "mobileOptimized": "محسنة للجوال",
+            "trustSignals": "إشارات الثقة المكتشفة ({count})",
+            "missingElements": "عناصر الثقة الموصى بها ({count})"
         }
     },
     "common": {
-        "back": "Back",
-        "passed": "Passed",
-        "failed": "Failed"
+        "back": "رجوع",
+        "passed": "نجح",
+        "failed": "فشل"
     },
     "meta": {
         "title": "مولد خطة إعلانات ميتا",
@@ -191,6 +191,13 @@
                 "interests": "مجموعات الاهتمامات",
                 "adCopy": "نسخ الإعلانات",
                 "placements": "توصيات المواضع"
+            },
+            "benefits": {
+                "coreAudiences": "تعريفات الجمهور الأساسية",
+                "interestClusters": "توصيات مجموعات الاهتمامات",
+                "optimizedCopy": "تنويعات نصوص إعلانية محسنة",
+                "placementStrategy": "دليل استراتيجية الموضع",
+                "exportReady": "تنسيق JSON جاهز للتصدير"
             },
             "audiences": {
                 "prospecting": "التنقيب (حركة باردة)",

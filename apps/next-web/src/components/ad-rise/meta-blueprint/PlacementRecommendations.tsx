@@ -1,23 +1,16 @@
-import { Box, Card, CardContent, Chip, Grid, Typography, useTheme, alpha, Stack } from '@mui/material'
 import LightbulbIcon from '@mui/icons-material/Lightbulb'
-import FacebookIcon from '@mui/icons-material/Facebook'
-import InstagramIcon from '@mui/icons-material/Instagram'
-import { MetaPlacement } from '@platform/contracts'
+import { alpha, Box, Card, CardContent, Chip, Stack, Typography, useTheme } from '@mui/material'
+import type { PlacementRecommendation } from '@platform/contracts'
+
 import { useTranslation } from '@/hooks/useTranslation'
 
 interface Props {
-    data: MetaPlacement[]
+    data: PlacementRecommendation[]
 }
 
 export default function PlacementRecommendations({ data }: Props) {
     const theme = useTheme()
     const t = useTranslation('blueprint')
-
-    const getPlatformIcon = (platform: string) => {
-        if (platform.toLowerCase().includes('facebook')) return <FacebookIcon />
-        if (platform.toLowerCase().includes('instagram')) return <InstagramIcon />
-        return <LightbulbIcon />
-    }
 
     return (
         <Stack spacing={2}>
