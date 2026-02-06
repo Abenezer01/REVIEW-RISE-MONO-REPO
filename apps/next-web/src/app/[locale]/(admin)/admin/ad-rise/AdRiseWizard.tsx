@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 import {
   Box,
@@ -257,6 +257,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
       offer: '',
       goal: '',
       budgetMonthly: 1000,
+      pacing: 'even',
       locations: [] as string[],
       brandTone: businessBrandTone || '',
       mode: 'QUICK',
@@ -264,13 +265,60 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
       geoRadius: 10,
       audienceNotes: '',
       seasonality: 'none',
+      seasonalityStart: '',
+      seasonalityEnd: '',
+      promoWindow: 7,
       status: 'active'
     };
   };
 
   const initialValues = getInitialValues();
 
-  const validationSchema = [
+  const getDaysInCurrentMonth = () => {
+    const now = new Date();
+
+    return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  };
+
+  const calculatePromoWindow = (start: string, end: string) => {
+    if (!start || !end) return 7;
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const diffTime = endDate.getTime() - startDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Inclusive
+
+    return isNaN(diffDays) || diffDays < 0 ? 0 : diffDays;
+  };
+
+  const getAllocation = (goal: string, budget: number) => {
+    const isLowBudget = budget < 500;
+    
+    // Default allocations
+    const allocation = {
+      google: { awareness: 20, consideration: 40, conversion: 40 },
+      meta: { awareness: 30, consideration: 40, conversion: 30 }
+    };
+
+    if (goal === 'awareness') {
+      allocation.google = { awareness: 50, consideration: 30, conversion: 20 };
+      allocation.meta = { awareness: 60, consideration: 30, conversion: 10 };
+    } else if (goal === 'traffic') {
+      allocation.google = { awareness: 20, consideration: 60, conversion: 20 };
+      allocation.meta = { awareness: 30, consideration: 50, conversion: 20 };
+    }
+
+    // Adjust for low budget (prioritize conversion/consideration)
+    if (isLowBudget) {
+      allocation.google.awareness = Math.max(0, allocation.google.awareness - 10);
+      allocation.google.conversion = Math.min(100, allocation.google.conversion + 10);
+      allocation.meta.awareness = Math.max(0, allocation.meta.awareness - 10);
+      allocation.meta.conversion = Math.min(100, allocation.meta.conversion + 10);
+    }
+
+    return allocation;
+  };
+
+  const validationSchema = useMemo(() => [
     // Step 0: Basics
     Yup.object({
       sessionName: Yup.string().required(t('validation.required')),
@@ -291,7 +339,17 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
     Yup.object({
       budgetMonthly: Yup.number()
         .required(t('validation.required'))
-        .min(1, t('validation.minBudget'))
+        .min(1, t('validation.minBudget')),
+      seasonalityStart: Yup.string().when('seasonality', {
+        is: (val: string) => val !== 'none',
+        then: (schema) => schema.required(t('validation.required')),
+        otherwise: (schema) => schema.notRequired()
+      }),
+      seasonalityEnd: Yup.string().when('seasonality', {
+        is: (val: string) => val !== 'none',
+        then: (schema) => schema.required(t('validation.required')),
+        otherwise: (schema) => schema.notRequired()
+      })
     }),
 
     // Step 4: Geo
@@ -306,7 +364,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
 
     // Step 6: Review
     Yup.object({})
-  ];
+  ], [t]);
 
   const handleNext = (validateForm: any, setTouched: any) => {
     validateForm().then((errors: any) => {
@@ -343,6 +401,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                 <CustomTextBox
                   name="sessionName"
                   label={t('fields.sessionName')}
+                  tooltip={t('fields.sessionNameTooltip')}
                   placeholder="My Summer Campaign"
                   fullWidth
                   autoFocus
@@ -352,6 +411,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                 <CustomSelect
                   name="industry"
                   label={t('fields.industry')}
+                  tooltip={t('fields.industryTooltip')}
                   options={[
                     { label: 'E-commerce', value: 'ecommerce' },
                     { label: 'SaaS', value: 'saas' },
@@ -365,6 +425,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                 <CustomSelect
                   name="status"
                   label={t('fields.status')}
+                  tooltip={t('fields.statusTooltip')}
                   options={[
                     { label: t('status.active'), value: 'active' },
                     { label: t('status.draft'), value: 'draft' },
@@ -414,6 +475,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                   <CustomTagsInput
                     name="competitors"
                     label={t('fields.competitors')}
+                    tooltip={t('fields.competitorsTooltip')}
                     placeholder={t('competitors.placeholder')}
                     fullWidth
                   />
@@ -430,6 +492,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                 <CustomTextBox
                   name="offer"
                   label={t('fields.offer')}
+                  tooltip={t('fields.offerTooltip')}
                   placeholder={t('offer.placeholder')}
                   multiline
                   rows={4}
@@ -441,9 +504,10 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                   <CustomTextBox
                     name="audienceNotes"
                     label={t('fields.audienceNotes')}
+                    tooltip={t('fields.audienceNotesTooltip')}
                     placeholder={t('offer.audiencePlaceholder')}
                     multiline
-                    rows={3}
+                    rows={4}
                     fullWidth
                   />
                 </Grid>
@@ -479,7 +543,13 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
             </Grid>
           </Fade>
         );
-      case 3:
+
+      case 3: {
+        const daysInMonth = getDaysInCurrentMonth();
+        const dailyBudget = Math.round((values.budgetMonthly || 0) / daysInMonth);
+        const isLowBudget = values.budgetMonthly < 500;
+        const isVeryLowBudget = values.budgetMonthly < 200;
+
         return (
           <Fade in timeout={500}>
             <Grid container spacing={5}>
@@ -487,36 +557,104 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                 <CustomTextBox
                   name="budgetMonthly"
                   label={t('fields.budgetMonthly')}
+                  tooltip={t('fields.budgetMonthlyTooltip')}
                   type="number"
                   fullWidth
                   InputProps={{
                     startAdornment: <Typography sx={{ mr: 1 }}>{tc('common.currencySymbol') || '$'}</Typography>
                   }}
                 />
-                {values.budgetMonthly < 500 && (
+                <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('budget.dailyBudget')}:
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: 'success.main' }}>
+                    {tc('common.currencySymbol') || '$'}{dailyBudget}{t('budget.dailyUnit')}
+                  </Typography>
+                </Box>
+                
+                {isVeryLowBudget && (
+                  <Alert severity="error" icon={<WarningIcon />} sx={{ mt: 2 }}>
+                    {t('budget.lowBudgetWarning')}
+                  </Alert>
+                )}
+                {isLowBudget && !isVeryLowBudget && (
                   <Alert severity="warning" icon={<WarningIcon />} sx={{ mt: 2 }}>
                     {t('validation.lowBudgetWarning')}
                   </Alert>
                 )}
               </Grid>
               {values.mode === 'PRO' && (
-                <Grid size={{ xs: 12 }}>
-                  <CustomSelect
-                    name="seasonality"
-                    label={t('fields.seasonality')}
-                    options={[
-                      { label: t('budget.seasonalityNone'), value: 'none' },
-                      { label: t('budget.seasonalityHoliday'), value: 'holiday' },
-                      { label: t('budget.seasonalitySummer'), value: 'summer' },
-                      { label: t('budget.seasonalityBlackFriday'), value: 'black_friday' }
-                    ]}
-                    fullWidth
-                  />
-                </Grid>
+                <>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <CustomSelect
+                      name="seasonality"
+                      label={t('fields.seasonality')}
+                      tooltip={t('fields.seasonalityTooltip')}
+                      options={[
+                        { label: t('budget.seasonalityNone'), value: 'none', description: t('budget.seasonalityNoneDesc') },
+                        { label: t('budget.seasonalityHoliday'), value: 'holiday', description: t('budget.seasonalityHolidayDesc') },
+                        { label: t('budget.seasonalitySummer'), value: 'summer', description: t('budget.seasonalitySummerDesc') },
+                        { label: t('budget.seasonalityBlackFriday'), value: 'black_friday', description: t('budget.seasonalityBlackFridayDesc') }
+                      ]}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <CustomSelect
+                      name="pacing"
+                      label={t('budget.allocation')}
+                      tooltip={t('fields.pacingTooltip')}
+                      options={[
+                        { label: t('budget.pacingEven'), value: 'even', description: t('budget.pacingEvenDesc') },
+                        { label: t('budget.pacingFrontLoad'), value: 'front_load', description: t('budget.pacingFrontLoadDesc') },
+                        { label: t('budget.pacingRampUp'), value: 'ramp_up', description: t('budget.pacingRampUpDesc') }
+                      ]}
+                      fullWidth
+                    />
+                  </Grid>
+
+                  {values.seasonality !== 'none' && (
+                    <>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextBox
+                name="seasonalityStart"
+                label={t('fields.seasonalityStart')}
+                tooltip={t('fields.seasonalityStartTooltip')}
+                type="date"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                onValueChange={(val: string | number) => {
+                  const window = calculatePromoWindow(String(val), values.seasonalityEnd);
+
+                  setFieldValue('promoWindow', window);
+                }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextBox
+                name="seasonalityEnd"
+                label={t('fields.seasonalityEnd')}
+                tooltip={t('fields.seasonalityEndTooltip')}
+                type="date"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                onValueChange={(val: string | number) => {
+                  const window = calculatePromoWindow(values.seasonalityStart, String(val));
+
+                  setFieldValue('promoWindow', window);
+                }}
+              />
+            </Grid>
+          </>
+        )}
+                </>
               )}
             </Grid>
           </Fade>
         );
+      }
+
       case 4:
         return (
           <Fade in timeout={500}>
@@ -525,6 +663,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                 <CustomTagsInput
                   name="locations"
                   label={t('fields.locations')}
+                  tooltip={t('fields.locationsTooltip')}
                   placeholder={t('geo.placeholder')}
                 />
               </Grid>
@@ -533,6 +672,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                   <CustomTextBox
                     name="geoRadius"
                     label={t('fields.geoRadius')}
+                    tooltip={t('fields.geoRadiusTooltip')}
                     type="number"
                     placeholder="10"
                     fullWidth
@@ -545,26 +685,41 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
             </Grid>
           </Fade>
         );
+
       case 5:
         return (
           <Fade in timeout={500}>
             <Grid container spacing={5}>
               <Grid size={{ xs: 12 }}>
-                <CustomSelect
-                  name="brandTone"
-                  label={t('fields.brandTone')}
-                  options={[
-                    { label: 'Professional', value: 'professional' },
-                    { label: 'Friendly', value: 'friendly' },
-                    { label: 'Exciting', value: 'exciting' },
-                    { label: 'Urgent', value: 'urgent' }
-                  ]}
-                  fullWidth
-                />
+                {values.mode === 'PRO' ? (
+                  <CustomTextBox
+                    name="brandTone"
+                    label={t('fields.brandTone')}
+                    tooltip={t('fields.brandToneTooltip')}
+                    placeholder={t('tone.placeholder')}
+                    multiline
+                    rows={4}
+                    fullWidth
+                  />
+                ) : (
+                  <CustomSelect
+                    name="brandTone"
+                    label={t('fields.brandTone')}
+                    tooltip={t('fields.brandToneTooltip')}
+                    options={[
+                      { label: 'Professional', value: 'professional' },
+                      { label: 'Friendly', value: 'friendly' },
+                      { label: 'Exciting', value: 'exciting' },
+                      { label: 'Urgent', value: 'urgent' }
+                    ]}
+                    fullWidth
+                  />
+                )}
               </Grid>
             </Grid>
           </Fade>
         );
+
       case 6:
         return (
           <Fade in timeout={500}>
@@ -690,18 +845,144 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                         <Typography variant="h6" sx={{ mt: 1, color: 'success.main', fontWeight: 600 }}>
                           {tc('common.currencySymbol') || '$'}{values.budgetMonthly}
                         </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {Math.round((values.budgetMonthly || 0) / getDaysInCurrentMonth())} {t('budget.dailyUnit')}
+                        </Typography>
                       </Grid>
                       {values.mode === 'PRO' && (
                         <Grid size={{ xs: 12, sm: 6 }}>
                           <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
-                            {t('review.seasonality')}
+                            {t('fields.seasonality')}
                           </Typography>
-                          <Typography variant="body1" sx={{ mt: 1, textTransform: 'capitalize' }}>
-                            {values.seasonality || 'None'}
+                          <Typography variant="body1" sx={{ mt: 1, fontWeight: 500 }}>
+                            {t(`budget.seasonality${(values.seasonality || 'none').split('_').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join('')}`)}
                           </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {t(`budget.pacing${(values.pacing || 'even').split('_').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join('')}`)}
+                          </Typography>
+                          {values.seasonality !== 'none' && values.seasonalityStart && values.seasonalityEnd && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                              {values.seasonalityStart} — {values.seasonalityEnd} ({values.promoWindow} {t('budget.days')})
+                            </Typography>
+                          )}
                         </Grid>
                       )}
                     </Grid>
+
+                    <Divider />
+
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, mb: 2, display: 'block' }}>
+                        {t('budget.allocation')}
+                      </Typography>
+                      {(() => {
+                        const allocation = getAllocation(values.goal, values.budgetMonthly);
+                        
+                        return (
+                          <Grid container spacing={4}>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                              <Card variant="outlined" sx={{ bgcolor: alpha(theme.palette.primary.main, 0.02) }}>
+                                <CardContent sx={{ p: '16px !important' }}>
+                                  <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <GoalIcon fontSize="small" /> {t('budget.google')}
+                                  </Typography>
+                                  <Stack spacing={1}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                      <Typography variant="body2">{t('budget.awareness')}</Typography>
+                                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{allocation.google.awareness}%</Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                      <Typography variant="body2">{t('budget.consideration')}</Typography>
+                                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{allocation.google.consideration}%</Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                      <Typography variant="body2">{t('budget.conversion')}</Typography>
+                                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{allocation.google.conversion}%</Typography>
+                                    </Box>
+                                  </Stack>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                              <Card variant="outlined" sx={{ bgcolor: alpha(theme.palette.secondary.main, 0.02) }}>
+                                <CardContent sx={{ p: '16px !important' }}>
+                                  <Typography variant="subtitle2" color="secondary" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <OfferIcon fontSize="small" /> {t('budget.meta')}
+                                  </Typography>
+                                  <Stack spacing={1}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                      <Typography variant="body2">{t('budget.awareness')}</Typography>
+                                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{allocation.meta.awareness}%</Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                      <Typography variant="body2">{t('budget.consideration')}</Typography>
+                                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{allocation.meta.consideration}%</Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                      <Typography variant="body2">{t('budget.conversion')}</Typography>
+                                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{allocation.meta.conversion}%</Typography>
+                                    </Box>
+                                  </Stack>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                          </Grid>
+                        );
+                      })()}
+                    </Box>
+
+                    <Divider sx={{ my: 4 }} />
+
+                    <Box>
+                      <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, mb: 1, display: 'block' }}>
+                        {t('budget.rationale')}
+                      </Typography>
+                      <Paper variant="outlined" sx={{ p: 4, bgcolor: alpha(theme.palette.info.main, 0.05), borderLeft: `4px solid ${theme.palette.info.main}` }}>
+                        <Typography variant="body2" sx={{ mb: 2 }}>
+                          {t('budget.rationaleText', {
+                            goal: values.goal,
+                            pacing: t(`budget.pacing${(values.pacing || 'even').split('_').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join('')}`)
+                          })}
+                        </Typography>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 700, mt: 2, mb: 1 }}>
+                          {t('budget.assumptions')}
+                        </Typography>
+                        <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.875rem' }}>
+                          <li>{values.budgetMonthly >= 1000 ? t('budget.assumptionBudget') : t('budget.assumptionEfficiency')}</li>
+                          <li>{t('budget.assumptionCPC', { industry: values.industry })}</li>
+                          <li>{t('budget.assumptionSeasonality', { seasonality: values.seasonality || 'none' })}</li>
+                        </ul>
+
+                        {values.mode === 'PRO' && values.seasonality !== 'none' && (
+                          <>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mt: 4, mb: 1 }}>
+                              {t('budget.scheduleCurve')}
+                            </Typography>
+                            <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.875rem' }}>
+                              {values.pacing === 'ramp_up' ? (
+                                <li>{t('budget.curveRampUp', { start: values.seasonalityStart || 'TBD', window: values.promoWindow })}</li>
+                              ) : values.pacing === 'front_load' ? (
+                                <li>{t('budget.curveRampDown', { end: values.seasonalityEnd || 'TBD' })}</li>
+                              ) : (
+                                <li>{t('budget.curveEven')}</li>
+                              )}
+                            </ul>
+                          </>
+                        )}
+                        {(values.budgetMonthly < 500 || values.goal === 'awareness' || values.goal === 'sales' || values.goal === 'leads') && (
+                          <>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mt: 4, mb: 1 }}>
+                              {t('budget.tradeoffs')}
+                            </Typography>
+                            <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.875rem' }}>
+                              {values.budgetMonthly < 500 && <li>{t('budget.tradeoffLowBudget')}</li>}
+                              {values.goal === 'awareness' && <li>{t('budget.tradeoffAwareness')}</li>}
+                              {(values.goal === 'sales' || values.goal === 'leads') && <li>{t('budget.tradeoffConversion')}</li>}
+                            </ul>
+                          </>
+                        )}
+                      </Paper>
+                    </Box>
 
                     <Divider />
 
