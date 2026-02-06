@@ -5,6 +5,8 @@ import { useField, useFormikContext } from 'formik';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import Chip from '@mui/material/Chip';
+import { Tooltip, IconButton, InputAdornment } from '@mui/material';
+import { Info as InfoIcon } from '@mui/icons-material';
 
 import CustomTextField from '@/@core/components/mui/TextField';
 
@@ -13,6 +15,7 @@ interface CustomTagsInputProps {
   label?: string;
   placeholder?: string;
   fullWidth?: boolean;
+  tooltip?: string;
   [key: string]: any;
 }
 
@@ -20,6 +23,7 @@ const CustomTagsInput: React.FC<CustomTagsInputProps> = ({
   name,
   label,
   placeholder,
+  tooltip,
   ...props
 }) => {
   const textFieldProps = { ...props };
@@ -96,6 +100,23 @@ const CustomTagsInput: React.FC<CustomTagsInputProps> = ({
           placeholder={placeholder}
           error={meta.touched && Boolean(meta.error)}
           helperText={meta.touched && meta.error}
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <>
+                {params.InputProps.endAdornment}
+                {tooltip && (
+                  <InputAdornment position="end">
+                    <Tooltip title={tooltip} arrow>
+                      <IconButton size="small" edge="end">
+                        <InfoIcon fontSize="small" color="action" />
+                      </IconButton>
+                    </Tooltip>
+                  </InputAdornment>
+                )}
+              </>
+            )
+          }}
           onKeyDown={(e: React.KeyboardEvent) => {
             if (e.key === ',') {
               e.preventDefault();
