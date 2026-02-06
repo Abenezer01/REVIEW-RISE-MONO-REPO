@@ -15,6 +15,8 @@
     "profiles": "Profiles"
   },
   "common": {
+    "new": "New",
+    "popular": "Popular",
     "copyright": "© {year}, all rights reserved",
     "apply": "Apply",
     "save": "Save",
@@ -41,11 +43,15 @@
     "no": "No",
     "back": "Back",
     "next": "Next",
+    "refresh": "Refresh",
     "previous": "Previous",
     "finish": "Finish",
     "retry": "Retry",
     "generating": "Generating...",
     "loadMore": "Load More",
+    "showLess": "Show less",
+    "moreCount": "+{count} more",
+    "clickToFilter": "Click to filter",
     "comingSoon": "Coming soon feature.",
     "no-items": "No items found",
     "no-data": "No Data Found",
@@ -55,6 +61,11 @@
     "exportCurrentPageOnly": "Export only current page's records",
     "selectFields": "Select Fields",
     "search-placeholder": "Search...",
+    "copy": "Copy",
+    "bookmark": "Bookmark",
+    "share": "Share",
+    "new": "New",
+    "popular": "Popular",
     "all": "All",
     "days": "Days",
     "found": "Found",
@@ -64,7 +75,13 @@
     "distanceUnit": "km",
     "of": "of",
     "none": "None",
-    "discard": "Discard"
+    "discard": "Discard",
+    "view": "View"
+  },
+  "list": {
+    "actions": {
+      "reExtract": "Re-extract"
+    }
   },
   "form": {
     "success-created": "created successfully",
@@ -76,6 +93,7 @@
     "no-results": "No results found"
   },
   "status": {
+    "aiPowered": "AI-Powered",
     "completed": "Completed",
     "failed": "Failed",
     "pending": "Pending",
@@ -92,7 +110,9 @@
     "approved": "Approved",
     "pending_approval": "Pending Approval",
     "skipped": "Skipped",
-    "none": "Not Replied"
+    "none": "Not Replied",
+    "unanalyzed": "Unanalyzed",
+    "unknown": "Unknown"
   },
   "channel": {
     "google": "Google",
@@ -105,6 +125,12 @@
     "all": "All Channels"
   },
   "actions": "Actions",
+  "layout": {
+    "table": "Table View",
+    "grid": "Grid View",
+    "list": "List View",
+    "masonry": "Masonry View"
+  },
   "dialog": {
     "confirm-edit-title": "Confirm Edit",
     "confirm-edit-message": "Are you sure you want to edit this item?"
@@ -213,5 +239,28 @@
     "thisWeek": "This Week",
     "older": "Older",
     "atTime": "{date}, {time}"
+  },
+  "save": "Save",
+  "cancel": "Cancel",
+  "all": "All",
+  "create": "Create",
+  "update": "Update",
+  "new": "New",
+  "popular": "Popular",
+  "not-available": "N/A",
+  "view": "View",
+  "locations": {
+    "form": {
+      "active": "Active",
+      "archived": "Archived",
+      "name": "Location Name",
+      "address": "Address",
+      "status": "Status"
+    }
+  },
+  "list": {
+    "actions": {
+      "reExtract": "Re-extract"
+    }
   }
 }

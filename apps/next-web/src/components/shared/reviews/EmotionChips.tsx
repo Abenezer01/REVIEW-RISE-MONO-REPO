@@ -6,6 +6,7 @@ import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Tooltip from '@mui/material/Tooltip'
 import { useTheme, alpha } from '@mui/material/styles'
+import { useTranslations } from 'next-intl'
 
 interface EmotionChipsProps {
   emotions: string[]
@@ -21,6 +22,7 @@ const EmotionChips = ({
   onEmotionClick 
 }: EmotionChipsProps) => {
   const theme = useTheme()
+  const t = useTranslations('common')
   const [expanded, setExpanded] = useState(false)
 
   if (!emotions || emotions.length === 0) {
@@ -79,7 +81,7 @@ const EmotionChips = ({
         const { color, bgColor } = getEmotionColor(emotion)
         
         return (
-          <Tooltip key={index} title={clickable ? 'Click to filter' : ''} arrow>
+          <Tooltip key={index} title={clickable ? t('common.clickToFilter') : ''} arrow>
             <Chip
               label={emotion}
               size="small"
@@ -106,7 +108,7 @@ const EmotionChips = ({
       
       {!expanded && remainingCount > 0 && (
         <Chip
-          label={`+${remainingCount} more`}
+          label={t('common.moreCount', { count: remainingCount })}
           size="small"
           variant="outlined"
           onClick={() => setExpanded(true)}
@@ -128,7 +130,7 @@ const EmotionChips = ({
       
       {expanded && emotions.length > maxDisplay && (
         <Chip
-          label="Show less"
+          label={t('common.showLess')}
           size="small"
           variant="outlined"
           onClick={() => setExpanded(false)}

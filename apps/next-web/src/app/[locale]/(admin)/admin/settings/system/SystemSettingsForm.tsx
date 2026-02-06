@@ -356,7 +356,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                     ...settings,
                                     email_config: { ...settings.email_config, smtp_host: e.target.value }
                                 })}
-                                placeholder="smtp.gmail.com"
+                                placeholder={t('smtpHostPlaceholder')}
                             />
                             <TextField
                                 fullWidth
@@ -408,7 +408,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                 onBlur={validateForm}
                                 error={!!errors.from_email}
                                 helperText={errors.from_email}
-                                placeholder="noreply@example.com"
+                                placeholder={t('fromEmailPlaceholder')}
                             />
                             <TextField
                                 fullWidth
@@ -418,7 +418,7 @@ export default function SystemSettingsForm({ initialSettings }: SystemSettingsFo
                                     ...settings,
                                     email_config: { ...settings.email_config, from_name: e.target.value }
                                 })}
-                                placeholder="RiseReview"
+                                placeholder={t('fromNamePlaceholder')}
                             />
                         </Box>
                     </CardContent>

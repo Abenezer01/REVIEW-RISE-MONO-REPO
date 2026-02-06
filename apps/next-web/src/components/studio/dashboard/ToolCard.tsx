@@ -17,33 +17,34 @@ interface ToolCardProps {
 }
 
 export default function ToolCard({ title, description, icon, stats, color = 'primary.main', isNew, isPopular, onClick }: ToolCardProps) {
-    const t = useTranslations()
+    const t = useTranslations('studio')
+    const tc = useTranslations('common')
 
     return (
-        <Card 
-            variant="outlined" 
-            sx={{ 
-                height: '100%', 
-                display: 'flex', 
-                flexDirection: 'column', 
-                position: 'relative', 
+        <Card
+            variant="outlined"
+            sx={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                position: 'relative',
                 transition: 'all 0.3s ease-in-out',
                 borderColor: 'divider',
-                '&:hover': { 
+                '&:hover': {
                     borderColor: color,
                     transform: 'translateY(-4px)',
                     boxShadow: `0 4px 20px 0 ${color}25`
-                } 
+                }
             }}
         >
             <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                    <Box sx={{ 
-                        width: 56, 
-                        height: 56, 
-                        borderRadius: 3, 
-                        display: 'flex', 
-                        alignItems: 'center', 
+                    <Box sx={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: 3,
+                        display: 'flex',
+                        alignItems: 'center',
                         justifyContent: 'center',
                         bgcolor: `${color}15`, // alpha 0.15
                         color: color,
@@ -52,8 +53,8 @@ export default function ToolCard({ title, description, icon, stats, color = 'pri
                         {icon}
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                        {isNew && <Chip label={t('common.new')} size="small" sx={{ bgcolor: '#FF4081', color: 'white', borderRadius: 1, height: 22, fontSize: '0.7rem', fontWeight: 'bold' }} />}
-                        {isPopular && <Chip label={t('common.popular')} size="small" sx={{ bgcolor: '#7C4DFF', color: 'white', borderRadius: 1, height: 22, fontSize: '0.7rem', fontWeight: 'bold' }} />}
+                        {isNew && <Chip label={tc('common.new')} size="small" sx={{ bgcolor: '#FF4081', color: 'white', borderRadius: 1, height: 22, fontSize: '0.7rem', fontWeight: 'bold' }} />}
+                        {isPopular && <Chip label={tc('common.popular')} size="small" sx={{ bgcolor: '#7C4DFF', color: 'white', borderRadius: 1, height: 22, fontSize: '0.7rem', fontWeight: 'bold' }} />}
                     </Box>
                 </Box>
 
@@ -69,19 +70,19 @@ export default function ToolCard({ title, description, icon, stats, color = 'pri
                     ))}
                 </Box>
 
-                <Button 
-                    variant="contained" 
-                    fullWidth 
-                    onClick={onClick} 
-                    sx={{ 
-                        bgcolor: color, 
-                        color: 'white', 
+                <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={onClick}
+                    sx={{
+                        bgcolor: color,
+                        color: 'white',
                         fontWeight: 'bold',
                         boxShadow: `0 4px 12px ${color}40`,
-                        '&:hover': { bgcolor: color, filter: 'brightness(1.1)' } 
+                        '&:hover': { bgcolor: color, filter: 'brightness(1.1)' }
                     }}
                 >
-                    {t('studio.generateButtonLabel', { type: title.split(' ')[0] })}
+                    {t('studio.studio.generateButtonLabel', { type: title.split(' ')[0] })}
                 </Button>
             </CardContent>
         </Card>

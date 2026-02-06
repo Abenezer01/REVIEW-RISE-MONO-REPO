@@ -358,7 +358,7 @@ const BrandProfilesList = ({ refreshTrigger = 0 }: BrandProfilesListProps) => {
                     </Select>
                 </FormControl>
 
-                <Tooltip title="Refresh Data">
+                <Tooltip title={tc('common.refresh')}>
                     <IconButton
                         onClick={fetchProfiles}
                         color="primary"

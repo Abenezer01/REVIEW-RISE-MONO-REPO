@@ -26,6 +26,7 @@ interface HashtagResultsProps {
 
 export default function HashtagResults({ results, onCopyAll, onExport, onRegenerate }: HashtagResultsProps) {
     const t = useTranslations('studio')
+    const tc = useTranslations('common')
     const { notify } = useSystemMessages()
     const [activeTab, setActiveTab] = useState<'all' | 'popular' | 'niche' | 'trending'>('all')
 
@@ -75,7 +76,7 @@ export default function HashtagResults({ results, onCopyAll, onExport, onRegener
                             size="small" 
                             variant="outlined"
                         >
-                                {t('common.export')}
+                                {tc('common.export')}
                         </Button>
                     )}
                     {onRegenerate && (

@@ -24,7 +24,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
             theme: (await import(`../../messages/${locale}/theme.json`)).default,
             social: (await import(`../../messages/${locale}/social.json`)).default,
             settings: (await import(`../../messages/${locale}/settings.json`)).default,
-            admin: (await import(`../../messages/${locale}/admin.json`)).default
+            admin: (await import(`../../messages/${locale}/admin.json`)).default,
+            blueprint: (await import(`../../messages/${locale}/blueprint.json`)).default
         }
     }
 })
