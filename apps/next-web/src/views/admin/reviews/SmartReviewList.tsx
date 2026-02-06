@@ -22,9 +22,9 @@ import { SystemMessageCode } from '@platform/contracts'
 
 import { getReviews } from '@/app/actions/review'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
-import { useTranslation } from '@/hooks/useTranslation'
 import { Link } from '@/i18n/routing'
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+import { useTranslations } from 'next-intl'
 
 import ItemsListing from '@components/shared/listing'
 import SentimentBadge from '@/components/shared/reviews/SentimentBadge'
@@ -37,7 +37,7 @@ import { ITEMS_LISTING_TYPE } from '@/configs/listingConfig'
 const SmartReviewList = () => {
   const { notify } = useSystemMessages()
   const theme = useTheme()
-  const t = useTranslation('dashboard')
+  const t = useTranslations('dashboard')
   const { locationId } = useLocationFilter()
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -144,7 +144,7 @@ const SmartReviewList = () => {
             </CustomAvatar>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-                {author || 'Anonymous'}
+                {author || t('reviews.smart.anonymous')}
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <i className={platformIconMap[platform?.toLowerCase()] || 'tabler-world'} style={{ fontSize: '1rem', color: theme.palette.text.secondary }} />
@@ -183,7 +183,7 @@ const SmartReviewList = () => {
                 lineHeight: 1.5
               }}
             >
-              {params.value || 'No content provided'}
+              {params.value || t('reviews.smart.noContent')}
             </Typography>
           </Tooltip>
         </Box>
@@ -493,9 +493,9 @@ const SmartReviewList = () => {
                 }}
               >
                 <MenuItem value=''>{t('reviews.smart.allSentiments')}</MenuItem>
-                <MenuItem value='Positive'>{t('dashboard.reviews.positive')}</MenuItem>
-                <MenuItem value='Neutral'>{t('dashboard.reviews.neutral')}</MenuItem>
-                <MenuItem value='Negative'>{t('dashboard.reviews.negative')}</MenuItem>
+                <MenuItem value='Positive'>{t('reviews.positive')}</MenuItem>
+                <MenuItem value='Neutral'>{t('reviews.neutral')}</MenuItem>
+                <MenuItem value='Negative'>{t('reviews.negative')}</MenuItem>
               </CustomTextField>
             </Grid>
 

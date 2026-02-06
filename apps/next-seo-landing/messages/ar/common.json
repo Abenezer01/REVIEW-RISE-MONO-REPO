@@ -1,7 +1,15 @@
 {
+  "theme": {
+    "light": "فاتح",
+    "dark": "داكن",
+    "system": "النظام"
+  },
   "landing": {
     "common": {
-      "brandName": "ReviewRise"
+      "brandName": "ReviewRise",
+      "toggleTheme": "تبديل المظهر",
+      "switchToLight": "التبديل إلى الوضع الفاتح",
+      "switchToDark": "التبديل إلى الوضع الداكن"
     },
     "header": {
       "features": "المميزات"
@@ -165,7 +173,8 @@
         "fair": "50-69 مقبول",
         "good": "70-84 جيد",
         "excellent": "85+ ممتاز"
-      }
+      },
+      "criticalIssuesFound": "تم العثور على مشاكل حرجة تتطلب انتباهك."
     },
     "footer": {
       "features": "المميزات",

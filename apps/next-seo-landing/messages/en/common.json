@@ -1,7 +1,15 @@
 {
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
   "landing": {
     "common": {
-      "brandName": "ReviewRise"
+      "brandName": "ReviewRise",
+      "toggleTheme": "Toggle theme",
+      "switchToLight": "Switch to light mode",
+      "switchToDark": "Switch to dark mode"
     },
     "header": {
       "features": "Features"
@@ -165,7 +173,8 @@
         "fair": "50-69 Fair",
         "good": "70-84 Good",
         "excellent": "85+ Excellent"
-      }
+      },
+      "criticalIssuesFound": "Critical issues found that need your attention."
     },
     "footer": {
       "features": "Features",
