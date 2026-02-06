@@ -134,5 +134,10 @@
     "accountUpdateError": "Failed to update account",
     "jobTriggerSuccess": "Job triggered successfully",
     "jobTriggerError": "Failed to trigger job"
+  },
+  "adrise": {
+    "sessions": {
+      "draftRecovered": "Your previous progress has been restored"
+    }
   }
 }

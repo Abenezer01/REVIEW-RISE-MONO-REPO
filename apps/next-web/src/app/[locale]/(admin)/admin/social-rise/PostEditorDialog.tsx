@@ -26,9 +26,9 @@ import Typography from '@mui/material/Typography';
 import { alpha, useTheme } from '@mui/material/styles';
 
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker';
-import type { ScheduledPost } from '@/services/brand.service';
+import { BrandService, type ScheduledPost } from '@/services/brand.service';
 
-const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [key: string]: any }) => {
+const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number;[key: string]: any }) => {
   return <i className={icon} style={{ fontSize }} {...rest} />;
 };
 
@@ -57,6 +57,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
   const router = useRouter();
   const isDark = theme.palette.mode === 'dark';
   const [loading, setLoading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const STATUS_OPTIONS = useMemo(() => [
     { value: 'draft', label: t('status.draft') },
@@ -141,21 +142,36 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
     }
   }, [post, initialDate, open]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
 
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
-    const newMedia = Array.from(files).map(file => ({
-      url: URL.createObjectURL(file),
-      type: file.type.startsWith('video') ? 'video' as const : 'image' as const,
-      name: file.name
-    }));
+    setLoading(true);
 
-    setFormData(prev => ({
-      ...prev,
-      media: [...prev.media, ...newMedia]
-    }));
+    try {
+      const uploads = await Promise.all(
+        Array.from(files).map(async (file) => {
+          const response = await BrandService.uploadFile(file);
+
+          return {
+            url: response.url,
+            type: file.type.startsWith('video') ? 'video' as const : 'image' as const,
+            name: file.name
+          };
+        })
+      );
+
+      setFormData(prev => ({
+        ...prev,
+        media: [...prev.media, ...uploads]
+      }));
+    } catch (error) {
+      console.error('Failed to upload files', error);
+      alert(t('uploadFailed'));
+    } finally {
+      setLoading(false);
+    }
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -199,20 +215,22 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
     }
   };
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
     if (!post || !onDelete) return;
 
-    if (window.confirm(t('confirmDelete'))) {
-      setLoading(true);
+    setLoading(true);
 
-      try {
-        await onDelete(post.id);
-        onClose();
-      } catch (error) {
-        console.error('Failed to delete post', error);
-      } finally {
-        setLoading(false);
-      }
+    try {
+      await onDelete(post.id);
+      setDeleteDialogOpen(false);
+      onClose();
+    } catch (error) {
+      console.error('Failed to delete post', error);
+      setLoading(false);
     }
   };
 
@@ -232,21 +250,21 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
   };
 
   const handleSmartStudio = () => {
-      const date = formData.scheduledAt || new Date();
-      const dateStr = date.toISOString().split('T')[0];
+    const date = formData.scheduledAt || new Date();
+    const dateStr = date.toISOString().split('T')[0];
 
-      router.push(`/admin/studio/smart-create?date=${dateStr}`);
+    router.push(`/admin/studio/smart-create?date=${dateStr}`);
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="md" 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
       fullWidth
       PaperProps={{
-        sx: { 
-          borderRadius: '24px', 
+        sx: {
+          borderRadius: '24px',
           boxShadow: isDark ? 'none' : '0 25px 80px rgba(0,0,0,0.15)',
           border: `1px solid ${isDark ? theme.palette.divider : alpha(theme.palette.divider, 0.6)}`,
           overflow: 'hidden',
@@ -255,9 +273,9 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
         }
       }}
     >
-      <DialogTitle component="div" sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
+      <DialogTitle component="div" sx={{
+        display: 'flex',
+        alignItems: 'center',
         justifyContent: 'space-between',
         px: { xs: 6, md: 10 },
         py: 8,
@@ -273,41 +291,41 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
-            {!post && (
-                <Button
-                    variant="outlined"
-                    color="primary"
-                    startIcon={<Icon icon="tabler-wand" />}
-                    onClick={handleSmartStudio}
-                    sx={{ borderRadius: '12px', textTransform: 'none', fontWeight: 600 }}
-                >
-                    {t('useSmartStudio')}
-                </Button>
-            )}
-            <IconButton 
-            size="small" 
-            onClick={onClose} 
-            sx={{ 
-                color: 'text.secondary',
-                bgcolor: isDark ? alpha(theme.palette.common.white, 0.05) : alpha(theme.palette.common.black, 0.04),
-                borderRadius: '12px',
-                '&:hover': {
+          {!post && (
+            <Button
+              variant="outlined"
+              color="primary"
+              startIcon={<Icon icon="tabler-wand" />}
+              onClick={handleSmartStudio}
+              sx={{ borderRadius: '12px', textTransform: 'none', fontWeight: 600 }}
+            >
+              {t('useSmartStudio')}
+            </Button>
+          )}
+          <IconButton
+            size="small"
+            onClick={onClose}
+            sx={{
+              color: 'text.secondary',
+              bgcolor: isDark ? alpha(theme.palette.common.white, 0.05) : alpha(theme.palette.common.black, 0.04),
+              borderRadius: '12px',
+              '&:hover': {
                 bgcolor: isDark ? alpha(theme.palette.common.white, 0.1) : alpha(theme.palette.common.black, 0.08),
                 transform: 'rotate(90deg)'
-                },
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              },
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
             }}
-            >
+          >
             <Icon icon="tabler-x" fontSize={20} />
-            </IconButton>
+          </IconButton>
         </Box>
       </DialogTitle>
-      
+
       <DialogContent sx={{ px: { xs: 6, md: 10 }, py: 8 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {/* Platforms Selection */}
           <Box>
-            <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: '1px', mb: 2, mt:5, display: 'block' }}>
+            <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: '1px', mb: 2, mt: 5, display: 'block' }}>
               {t('distributionChannels')}
             </Typography>
             <FormControl fullWidth>
@@ -318,8 +336,8 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                 value={formData.platforms}
                 onChange={(e) => setFormData({ ...formData, platforms: typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value })}
                 input={
-                  <OutlinedInput 
-                    sx={{ 
+                  <OutlinedInput
+                    sx={{
                       borderRadius: '16px',
                       bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : alpha(theme.palette.common.black, 0.02),
                       '& .MuiOutlinedInput-notchedOutline': {
@@ -330,7 +348,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                         boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
                       },
                       transition: 'all 0.2s'
-                    }} 
+                    }}
                   />
                 }
                 renderValue={(selected) => {
@@ -344,12 +362,12 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                         const platform = PLATFORMS.find(p => p.value === value);
 
                         return (
-                          <Chip 
-                            key={value} 
+                          <Chip
+                            key={value}
                             label={platform ? tc(`channel.${platform.key}`) : value}
-                            size="small" 
+                            size="small"
                             icon={<Icon icon={platform?.icon || 'tabler-world'} fontSize={16} style={{ color: platform?.color }} />}
-                            sx={{ 
+                            sx={{
                               borderRadius: '10px',
                               bgcolor: isDark ? alpha(platform?.color || '#000', 0.15) : alpha(platform?.color || '#000', 0.08),
                               color: platform?.color || 'inherit',
@@ -366,19 +384,19 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
               >
                 {PLATFORMS.map((platform) => (
                   <MenuItem key={platform.value} value={platform.value} sx={{ borderRadius: '12px', mx: 2, my: 0.5 }}>
-                    <Checkbox 
-                      checked={formData.platforms.indexOf(platform.value) > -1} 
+                    <Checkbox
+                      checked={formData.platforms.indexOf(platform.value) > -1}
                       size="small"
                       sx={{ '&.Mui-checked': { color: platform.color } }}
                     />
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                      <Box 
-                        sx={{ 
-                          width: 32, 
-                          height: 32, 
-                          borderRadius: '10px', 
-                          display: 'flex', 
-                          alignItems: 'center', 
+                      <Box
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: '10px',
+                          display: 'flex',
+                          alignItems: 'center',
                           justifyContent: 'center',
                           bgcolor: isDark ? alpha(platform.color, 0.2) : alpha(platform.color, 0.1),
                           color: platform.color,
@@ -387,7 +405,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                       >
                         <Icon icon={platform.icon} fontSize={18} />
                       </Box>
-                      <ListItemText 
+                      <ListItemText
                         primary={tc(`channel.${platform.key}`)}
                         primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
                       />
@@ -400,59 +418,59 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
 
           {/* Title & Caption */}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-             <Box>
-                <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: '1px', mb: 2, display: 'block' }}>
-                    {t('contentCore')}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap', mb: 4 }}>
+            <Box>
+              <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: '1px', mb: 2, display: 'block' }}>
+                {t('contentCore')}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap', mb: 4 }}>
                 <TextField
-                    id="post-title-input"
-                    fullWidth
-                    label={t('campaignName')}
-                    placeholder={t('campaignPlaceholder')}
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    sx={{ 
+                  id="post-title-input"
+                  fullWidth
+                  label={t('campaignName')}
+                  placeholder={t('campaignPlaceholder')}
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  sx={{
                     flex: 1,
                     minWidth: 280,
-                    '& .MuiOutlinedInput-root': { 
-                        borderRadius: '16px',
-                        bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : alpha(theme.palette.common.black, 0.02),
-                        '& fieldset': { border: 'none' },
-                        '&.Mui-focused': {
-                            bgcolor: 'background.paper',
-                            boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
-                        }
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '16px',
+                      bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : alpha(theme.palette.common.black, 0.02),
+                      '& fieldset': { border: 'none' },
+                      '&.Mui-focused': {
+                        bgcolor: 'background.paper',
+                        boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
+                      }
                     },
                     '& .MuiInputLabel-root': { fontWeight: 600 }
-                    }}
+                  }}
                 />
 
                 <TextField
-                    id="post-hashtags-input"
-                    fullWidth
-                    label={t('smartHashtags')}
-                    placeholder={t('hashtagsPlaceholder')}
-                    value={formData.hashtags}
-                    onChange={(e) => setFormData({ ...formData, hashtags: e.target.value })}
-                    sx={{ 
+                  id="post-hashtags-input"
+                  fullWidth
+                  label={t('smartHashtags')}
+                  placeholder={t('hashtagsPlaceholder')}
+                  value={formData.hashtags}
+                  onChange={(e) => setFormData({ ...formData, hashtags: e.target.value })}
+                  sx={{
                     flex: 1,
                     minWidth: 280,
-                    '& .MuiOutlinedInput-root': { 
-                        borderRadius: '16px',
-                        bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : alpha(theme.palette.common.black, 0.02),
-                        '& fieldset': { border: 'none' },
-                        '&.Mui-focused': {
-                            bgcolor: 'background.paper',
-                            boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
-                        }
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '16px',
+                      bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : alpha(theme.palette.common.black, 0.02),
+                      '& fieldset': { border: 'none' },
+                      '&.Mui-focused': {
+                        bgcolor: 'background.paper',
+                        boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
+                      }
                     },
                     '& .MuiInputLabel-root': { fontWeight: 600 }
-                    }}
+                  }}
                 />
-                </Box>
+              </Box>
 
-                <TextField
+              <TextField
                 id="post-caption-input"
                 fullWidth
                 multiline
@@ -461,19 +479,19 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                 placeholder={t('composePlaceholder')}
                 value={formData.text}
                 onChange={(e) => setFormData({ ...formData, text: e.target.value })}
-                sx={{ 
-                    '& .MuiOutlinedInput-root': { 
+                sx={{
+                  '& .MuiOutlinedInput-root': {
                     borderRadius: '16px',
                     bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : alpha(theme.palette.common.black, 0.02),
                     '& fieldset': { border: 'none' },
                     '&.Mui-focused': {
-                        bgcolor: 'background.paper',
-                        boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
+                      bgcolor: 'background.paper',
+                      boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
                     }
-                    },
-                    '& .MuiInputLabel-root': { fontWeight: 600 }
+                  },
+                  '& .MuiInputLabel-root': { fontWeight: 600 }
                 }}
-                />
+              />
             </Box>
           </Box>
 
@@ -482,7 +500,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
             <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: '1px', mb: 2, display: 'block' }}>
               {t('visualAssets')}
             </Typography>
-            
+
             {/* Hidden File Input */}
             <input
               type="file"
@@ -507,9 +525,9 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                     border: `1px solid ${theme.palette.divider}`,
                     boxShadow: '0 8px 20px rgba(0,0,0,0.08)',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': { 
-                        transform: 'translateY(-4px)',
-                        boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
                     }
                   }}
                 >
@@ -543,9 +561,9 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                       color: 'white',
                       padding: '5px',
                       borderRadius: '10px',
-                      '&:hover': { 
-                          bgcolor: theme.palette.error.main,
-                          transform: 'scale(1.1)'
+                      '&:hover': {
+                        bgcolor: theme.palette.error.main,
+                        transform: 'scale(1.1)'
                       }
                     }}
                     onClick={() => removeMedia(index)}
@@ -570,7 +588,7 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                   bgcolor: isDark ? alpha(theme.palette.primary.main, 0.04) : alpha(theme.palette.primary.main, 0.02),
                   color: 'primary.main',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': { 
+                  '&:hover': {
                     bgcolor: isDark ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.primary.main, 0.05),
                     borderColor: 'primary.main',
                     transform: 'translateY(-4px)',
@@ -579,13 +597,13 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
                 }}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <Box sx={{ 
-                    p: 1.5, 
-                    borderRadius: '12px', 
-                    bgcolor: alpha(theme.palette.primary.main, 0.1),
-                    mb: 1
+                <Box sx={{
+                  p: 1.5,
+                  borderRadius: '12px',
+                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  mb: 1
                 }}>
-                    <Icon icon="tabler-cloud-upload" fontSize={24} />
+                  <Icon icon="tabler-cloud-upload" fontSize={24} />
                 </Box>
                 <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.65rem', letterSpacing: '0.5px' }}>{t('upload')}</Typography>
               </Box>
@@ -598,94 +616,94 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
               {t('logistics')}
             </Typography>
             <Box sx={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                <Box sx={{ flex: 1, minWidth: 260 }}>
+              <Box sx={{ flex: 1, minWidth: 260 }}>
                 <AppReactDatepicker
-                    selected={formData.scheduledAt}
-                    onChange={(date: Date | null) => {
-                    if (date) setFormData({ ...formData, scheduledAt: date });
-                    }}
-                    showTimeSelect
-                    dateFormat="MMMM d, yyyy h:mm aa"
-                    customInput={
-                    <TextField 
-                        id="post-scheduled-at-input" 
-                        fullWidth 
-                        label={t('publishSchedule')}
-                        sx={{ 
-                        '& .MuiOutlinedInput-root': { 
-                            borderRadius: '16px',
-                            bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : alpha(theme.palette.common.black, 0.02),
-                            '& fieldset': { border: 'none' },
-                            '&.Mui-focused': {
-                                bgcolor: 'background.paper',
-                                boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
-                            }
+                  selected={formData.scheduledAt}
+                  onChange={(date: Date | null) => {
+                    if (date) setFormData({ ...formData, scheduledAt: date, status: 'scheduled' });
+                  }}
+                  showTimeSelect
+                  dateFormat="MMMM d, yyyy h:mm aa"
+                  customInput={
+                    <TextField
+                      id="post-scheduled-at-input"
+                      fullWidth
+                      label={t('publishSchedule')}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: '16px',
+                          bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : alpha(theme.palette.common.black, 0.02),
+                          '& fieldset': { border: 'none' },
+                          '&.Mui-focused': {
+                            bgcolor: 'background.paper',
+                            boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
+                          }
                         },
                         '& .MuiInputLabel-root': { fontWeight: 600 }
-                        }} 
+                      }}
                     />
-                    }
+                  }
                 />
-                </Box>
+              </Box>
 
-                <Box sx={{ flex: 1, minWidth: 260 }}>
+              <Box sx={{ flex: 1, minWidth: 260 }}>
                 <FormControl fullWidth>
-                    <Select
+                  <Select
                     id="post-status-select"
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as ScheduledPost['status'] })}
                     input={
-                        <OutlinedInput 
-                          sx={{ 
-                            borderRadius: '16px',
-                            bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : alpha(theme.palette.common.black, 0.02),
-                            '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-                            '&.Mui-focused': {
-                                bgcolor: 'background.paper',
-                                boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
-                            }
-                          }} 
-                        />
-                      }
-                    >
+                      <OutlinedInput
+                        sx={{
+                          borderRadius: '16px',
+                          bgcolor: isDark ? alpha(theme.palette.common.white, 0.03) : alpha(theme.palette.common.black, 0.02),
+                          '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                          '&.Mui-focused': {
+                            bgcolor: 'background.paper',
+                            boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
+                          }
+                        }}
+                      />
+                    }
+                  >
                     {STATUS_OPTIONS.map(opt => (
-                        <MenuItem key={opt.value} value={opt.value} sx={{ borderRadius: '10px', mx: 2, my: 0.5 }}>
-                            <Typography variant="body2" fontWeight={600}>{opt.label}</Typography>
-                        </MenuItem>
+                      <MenuItem key={opt.value} value={opt.value} sx={{ borderRadius: '10px', mx: 2, my: 0.5 }}>
+                        <Typography variant="body2" fontWeight={600}>{opt.label}</Typography>
+                      </MenuItem>
                     ))}
-                    </Select>
+                  </Select>
                 </FormControl>
-                </Box>
+              </Box>
             </Box>
           </Box>
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ 
-        justifyContent: 'space-between', 
-        px: { xs: 6, md: 10 }, 
+      <DialogActions sx={{
+        justifyContent: 'space-between',
+        px: { xs: 6, md: 10 },
         py: 8,
         bgcolor: isDark ? alpha(theme.palette.common.white, 0.02) : alpha(theme.palette.common.black, 0.01),
         borderTop: `1px solid ${theme.palette.divider}`
       }}>
-        <Box sx={{ display: 'flex', gap: 3, mt:5 }}>
+        <Box sx={{ display: 'flex', gap: 3, mt: 5 }}>
           {post && (
             <>
-              <Button 
-                variant="tonal" 
-                color="error" 
+              <Button
+                variant="tonal"
+                color="error"
                 startIcon={<Icon icon="tabler-trash" fontSize={18} />}
-                onClick={handleDelete} 
+                onClick={handleDeleteClick}
                 disabled={loading}
                 sx={{ borderRadius: '10px', textTransform: 'none', fontWeight: 600 }}
               >
                 {t('delete')}
               </Button>
-              <Button 
-                variant="tonal" 
-                color="primary" 
+              <Button
+                variant="tonal"
+                color="primary"
                 startIcon={<Icon icon="tabler-copy" fontSize={18} />}
-                onClick={handleDuplicate} 
+                onClick={handleDuplicate}
                 disabled={loading}
                 sx={{ borderRadius: '10px', textTransform: 'none', fontWeight: 600 }}
               >
@@ -694,28 +712,28 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
             </>
           )}
         </Box>
-        <Box sx={{ display: 'flex', gap: 4, mt:5 }}>
-          <Button 
-            variant="outlined" 
-            color="secondary" 
-            onClick={onClose} 
+        <Box sx={{ display: 'flex', gap: 4, mt: 5 }}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={onClose}
             disabled={loading}
             sx={{ borderRadius: '10px', px: 6, textTransform: 'none', fontWeight: 600 }}
           >
             {t('cancel')}
           </Button>
-          <Button 
-            variant="contained" 
-            onClick={handleSave} 
+          <Button
+            variant="contained"
+            onClick={handleSave}
             disabled={loading || !formData.text || formData.platforms.length === 0}
-            sx={{ 
-              borderRadius: '10px', 
+            sx={{
+              borderRadius: '10px',
               px: 8,
               py: 2.5,
               fontWeight: 600,
               textTransform: 'none',
               bgcolor: theme.palette.primary.main,
-              '&:hover': { 
+              '&:hover': {
                 bgcolor: theme.palette.primary.dark,
                 transform: 'translateY(-1px)',
                 boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}`
@@ -724,10 +742,66 @@ const PostEditorDialog = ({ open, onClose, post, initialDate, onSave, onDelete, 
               boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.3)}`
             }}
           >
-            {loading ? t('saving') : post ? t('updatePost') : t('schedulePost')}
+            {loading ? t('saving') : post ? t('updatePost') : formData.status === 'draft' ? t('saveDraft') : t('schedulePost')}
           </Button>
         </Box>
       </DialogActions>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '20px',
+            p: 2
+          }
+        }}
+      >
+        <DialogTitle sx={{ textAlign: 'center', pt: 4 }}>
+          <Box sx={{
+            width: 60,
+            height: 60,
+            borderRadius: '50%',
+            bgcolor: alpha(theme.palette.error.main, 0.1),
+            color: theme.palette.error.main,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            mx: 'auto',
+            mb: 2
+          }}>
+            <Icon icon="tabler-alert-triangle" fontSize={32} />
+          </Box>
+          <Typography variant="h5" component="div" fontWeight="800">
+            {t('confirmDelete')}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" textAlign="center" color="text.secondary">
+            {t('deleteWarning')}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 4, gap: 2 }}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => setDeleteDialogOpen(false)}
+            sx={{ borderRadius: '12px', px: 4 }}
+          >
+            {t('cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleConfirmDelete}
+            disabled={loading}
+            sx={{ borderRadius: '12px', px: 4, boxShadow: theme.shadows[4] }}
+          >
+            {t('delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };

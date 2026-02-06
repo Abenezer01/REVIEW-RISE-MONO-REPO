@@ -470,4 +470,17 @@ export const BrandService = {
   deletePlannerEvent: async (businessId: string, eventId: string) => {
     await apiClient.delete(`/api/brands/${businessId}/planner/events/${eventId}`);
   },
+
+  uploadFile: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await apiClient.post<{ url: string }>('/api/v1/uploads', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data;
+  },
 };

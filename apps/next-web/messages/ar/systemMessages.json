@@ -134,5 +134,10 @@
     "accountUpdateError": "فشل تحديث الحساب",
     "jobTriggerSuccess": "تم تفعيل المهمة بنجاح",
     "jobTriggerError": "فشل تفعيل المهمة"
+  },
+  "adrise": {
+    "sessions": {
+      "draftRecovered": "تم استعادة تقدمك السابق"
+    }
   }
 }
