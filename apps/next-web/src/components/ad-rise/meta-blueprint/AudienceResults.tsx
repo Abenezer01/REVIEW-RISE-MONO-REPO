@@ -1,6 +1,6 @@
-import { Box, Card, CardContent, Chip, Grid, LinearProgress, Typography, useTheme, alpha, Stack } from '@mui/material'
-import { MetaAudienceSet } from '@platform/contracts'
-import { useTranslations } from 'next-intl';
+import { useTranslation } from '@/hooks/useTranslation';
+import { alpha, Box, Card, CardContent, Grid, LinearProgress, Stack, Typography, useTheme } from '@mui/material';
+import type { MetaAudienceSet } from '@platform/contracts';
 
 interface Props {
     data: MetaAudienceSet[]
@@ -8,7 +8,7 @@ interface Props {
 
 export default function AudienceResults({ data }: Props) {
     const theme = useTheme();
-    const t = useTranslations('blueprint')
+    const t = useTranslation('blueprint')
 
     const prospecting = data.find(d => d.type === 'Prospecting')
     const retargeting = data.find(d => d.type === 'Retargeting')
@@ -44,7 +44,7 @@ export default function AudienceResults({ data }: Props) {
                             <Typography variant="caption" color="text.secondary">{t('meta.results.audiences.interests')}</Typography>
                             <Typography variant="body2">
                                 {audience.interests.slice(0, 3).join(', ')}
-                                {audience.interests.length > 3 && ` +${audience.interests.length - 3} more`}
+                                {audience.interests.length > 3 && t('meta.results.interests.more', { count: audience.interests.length - 3 })}
                             </Typography>
                         </Box>
                     )}

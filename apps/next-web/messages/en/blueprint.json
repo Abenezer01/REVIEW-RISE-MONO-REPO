@@ -192,6 +192,13 @@
                 "adCopy": "Ad Copy Variations",
                 "placements": "Placement Recommendations"
             },
+            "benefits": {
+                "coreAudiences": "Core audience definitions",
+                "interestClusters": "Interest cluster recommendations",
+                "optimizedCopy": "Optimized copy variations",
+                "placementStrategy": "Placement strategy guide",
+                "exportReady": "Export-ready JSON format"
+            },
             "audiences": {
                 "prospecting": "Prospecting (Cold Traffic)",
                 "retargeting": "Retargeting (Warm Traffic)",
