@@ -6,12 +6,12 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import BoltIcon from '@mui/icons-material/Bolt'
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import HealingIcon from '@mui/icons-material/Healing'
 import HistoryIcon from '@mui/icons-material/History'
-import LanguageIcon from '@mui/icons-material/Language'
 import SaveAltIcon from '@mui/icons-material/SaveAlt'
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag'
 import StoreIcon from '@mui/icons-material/Store'
+
+import type { StepIconProps } from '@mui/material'
 import {
     alpha,
     Box, Button, Card, CardContent,
@@ -25,8 +25,8 @@ import {
     StepLabel, Stepper, TextField, Typography,
     useTheme
 } from '@mui/material'
-import type { StepIconProps } from '@mui/material'
 import { useState } from 'react'
+import VerticalSelection from '../shared/VerticalSelection'
 
 import { useTranslation } from '@/hooks/useTranslation'
 import { MetaBlueprintService } from '@/services/ad-rise/meta-blueprint.service'
@@ -38,12 +38,7 @@ import AudienceResults from './AudienceResults'
 import InterestClusters from './InterestClusters'
 import PlacementRecommendations from './PlacementRecommendations'
 
-const VERTICALS = [
-    { value: 'Local Service', icon: <StoreIcon fontSize="large" /> },
-    { value: 'E-commerce', icon: <ShoppingBagIcon fontSize="large" /> },
-    { value: 'SaaS', icon: <LanguageIcon fontSize="large" /> },
-    { value: 'Healthcare', icon: <HealingIcon fontSize="large" /> },
-] as const
+
 
 // Custom Step Icon to match 40x40px spec
 const CustomStepIcon = (props: StepIconProps) => {
@@ -94,23 +89,25 @@ export default function MetaBlueprintWizard() {
     const [painPointInput, setPainPointInput] = useState('')
 
     const handleNext = async () => {
-        if (activeStep === 1) {
-            setLoading(true)
+        if (activeStep === 0) {
+            if (!input.offerOrService || !input.geoTargeting.center) {
+                return;
+            }
+            setActiveStep(1);
+        } else if (activeStep === 1) {
+            setLoading(true);
 
             try {
-                const result = await MetaBlueprintService.generate(input)
-
-                setOutput(result)
-                setActiveStep(prev => prev + 1)
+                const result = await MetaBlueprintService.generate(input);
+                setOutput(result);
+                setActiveStep(2);
             } catch (error) {
-                console.error('Failed to generate blueprint', error)
+                console.error('Failed to generate blueprint', error);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
-        } else {
-            setActiveStep(prev => prev + 1)
         }
-    }
+    };
 
     const addPainPoint = () => {
         if (painPointInput.trim()) {
@@ -120,8 +117,8 @@ export default function MetaBlueprintWizard() {
     }
 
     const steps = [
-        t('meta.steps.businessInfo'),
-        t('meta.steps.geoTargeting'),
+        t('meta.steps.businessInfo'), // Now contains both Info & Geo
+        t('steps.generate'),
         t('meta.steps.results')
     ]
 
@@ -299,132 +296,117 @@ export default function MetaBlueprintWizard() {
                     <Grid container spacing={5}>
                         {/* Left Column - Form */}
                         <Grid size={{ xs: 12, md: 7 }}>
-                            <Card variant="outlined" sx={{ p: 0, bgcolor: 'background.paper', overflow: 'hidden' }}>
-                                <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Typography variant="h6" fontWeight="bold">
-                                        {activeStep === 0 ? t('meta.form.businessName') : t('meta.form.geoCenter')}
-                                    </Typography>
-                                    <Chip label={t('form.required')} size="small" color="primary" />
-                                </Box>
-                                <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 4, p: 3 }}>
+                            {activeStep === 0 && (
+                                <Card variant="outlined" sx={{ p: 0, bgcolor: 'background.paper', overflow: 'hidden' }}>
+                                    <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <Typography variant="h6" fontWeight="bold">
+                                            {t('meta.steps.businessInfo')}
+                                        </Typography>
+                                        <Chip label={t('form.required')} size="small" color="primary" />
+                                    </Box>
+                                    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 4, p: 3 }}>
+                                        <Box>
+                                            <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.offerOrService')}</Typography>
+                                            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>{t('form.offerServiceHelp')}</Typography>
+                                            <TextField
+                                                placeholder={t('meta.form.offerOrServicePlaceholder')}
+                                                value={input.offerOrService}
+                                                onChange={(e) => setInput({ ...input, offerOrService: e.target.value })}
+                                                fullWidth
+                                                variant="outlined"
+                                                sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
+                                            />
+                                        </Box>
 
-                                    {activeStep === 0 && (
-                                        <>
-                                            <Box>
-                                                <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.offerOrService')}</Typography>
-                                                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>{t('form.offerServiceHelp')}</Typography>
-                                                <TextField
-                                                    placeholder={t('meta.form.offerOrServicePlaceholder')}
-                                                    value={input.offerOrService}
-                                                    onChange={(e) => setInput({ ...input, offerOrService: e.target.value })}
-                                                    fullWidth
-                                                    variant="outlined"
-                                                    sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
+                                        <Box>
+                                            <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.vertical')}</Typography>
+                                            <VerticalSelection
+                                                value={input.vertical}
+                                                onChange={(v) => setInput({ ...input, vertical: v as any })}
+                                            />
+                                        </Box>
+
+                                        <Box>
+                                            <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.painPoints')}</Typography>
+                                            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>{t('form.painPointsHelp')}</Typography>
+                                            <TextField
+                                                multiline
+                                                rows={3}
+                                                placeholder={t('meta.form.painPointsPlaceholder')}
+                                                value={painPointInput}
+                                                onChange={(e) => setPainPointInput(e.target.value)}
+                                                fullWidth
+                                                sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        addPainPoint();
+                                                    }
+                                                }}
+                                            />
+                                            <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                                {input.painPoints.map((p, i) => (
+                                                    <Chip key={i} label={p} onDelete={() => setInput(prev => ({ ...prev, painPoints: prev.painPoints.filter((_, idx) => idx !== i) }))} />
+                                                ))}
+                                            </Box>
+                                            <Button size="small" onClick={addPainPoint} sx={{ mt: 1 }}>{t('form.addPainPoint')}</Button>
+                                        </Box>
+
+                                        <Box>
+                                            <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.geoCenter')}</Typography>
+                                            <TextField
+                                                placeholder={t('meta.form.geoCenterPlaceholder')}
+                                                value={input.geoTargeting.center}
+                                                onChange={(e) => setInput({ ...input, geoTargeting: { ...input.geoTargeting, center: e.target.value } })}
+                                                fullWidth
+                                                sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
+                                            />
+                                        </Box>
+
+                                        <Box sx={{ p: 3, bgcolor: 'background.default', borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                                <Typography variant="body2" fontWeight="bold">{t('meta.form.radius')}</Typography>
+                                                <Chip label={`${input.geoTargeting.radius} ${t(`meta.form.radiusUnit.${input.geoTargeting.unit}`)}`} color="primary" size="small" />
+                                            </Box>
+                                            <Box sx={{ px: 1 }}>
+                                                <Slider
+                                                    value={input.geoTargeting.radius}
+                                                    onChange={(_, val) => setInput({
+                                                        ...input,
+                                                        geoTargeting: { ...input.geoTargeting, radius: val as number }
+                                                    })}
+                                                    min={5}
+                                                    max={100}
+                                                    step={5}
+                                                    marks={[
+                                                        { value: 5, label: '5' },
+                                                        { value: 25, label: '25' },
+                                                        { value: 50, label: '50' },
+                                                        { value: 100, label: '100' }
+                                                    ]}
                                                 />
                                             </Box>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            )}
 
-                                            <Box>
-                                                <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.vertical')}</Typography>
-                                                <Grid container spacing={2}>
-                                                    {VERTICALS.map((v) => (
-                                                        <Grid size={{ xs: 6, md: 3 }} key={v.value}>
-                                                            <Paper
-                                                                variant="outlined"
-                                                                onClick={() => setInput({ ...input, vertical: v.value as any })}
-                                                                sx={{
-                                                                    p: 2,
-                                                                    textAlign: 'center',
-                                                                    cursor: 'pointer',
-                                                                    bgcolor: input.vertical === v.value ? alpha(theme.palette.primary.main, 0.05) : 'background.default',
-                                                                    borderColor: input.vertical === v.value ? 'primary.main' : 'divider',
-                                                                    transition: 'all 0.2s',
-                                                                    '&:hover': { borderColor: 'primary.main', transform: 'translateY(-2px)' }
-                                                                }}
-                                                            >
-                                                                <Box sx={{ color: input.vertical === v.value ? 'primary.main' : 'text.secondary', mb: 1 }}>
-                                                                    {v.icon}
-                                                                </Box>
-                                                                <Typography variant="caption" fontWeight="bold">{t(`meta.form.verticals.${v.value === 'Local Service' ? 'localService' : v.value === 'E-commerce' ? 'ecommerce' : v.value.toLowerCase()}`)}</Typography>
-                                                            </Paper>
-                                                        </Grid>
-                                                    ))}
-                                                </Grid>
-                                            </Box>
-
-                                            <Box>
-                                                <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.painPoints')}</Typography>
-                                                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>{t('form.painPointsHelp')}</Typography>
-                                                <TextField
-                                                    multiline
-                                                    rows={4}
-                                                    placeholder={t('meta.form.painPointsPlaceholder')}
-                                                    value={painPointInput}
-                                                    onChange={(e) => setPainPointInput(e.target.value)}
-                                                    fullWidth
-                                                    sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            e.preventDefault();
-                                                            addPainPoint();
-                                                        }
-                                                    }}
-                                                />
-                                                <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                                    {input.painPoints.map((p, i) => (
-                                                        <Chip key={i} label={p} onDelete={() => setInput(prev => ({ ...prev, painPoints: prev.painPoints.filter((_, idx) => idx !== i) }))} />
-                                                    ))}
-                                                </Box>
-                                                <Button size="small" onClick={addPainPoint} sx={{ mt: 1 }}>{t('form.addPainPoint')}</Button>
-                                            </Box>
-                                        </>
-                                    )}
-
-                                    {activeStep === 1 && (
-                                        <>
-                                            <Box>
-                                                <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.geoCenter')}</Typography>
-                                                <TextField
-                                                    placeholder={t('meta.form.geoCenterPlaceholder')}
-                                                    value={input.geoTargeting.center}
-                                                    onChange={(e) => setInput({ ...input, geoTargeting: { ...input.geoTargeting, center: e.target.value } })}
-                                                    fullWidth
-                                                    sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
-                                                />
-                                            </Box>
-
-                                            <Box sx={{ p: 3, bgcolor: 'background.default', borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                                    <Typography variant="body2" fontWeight="bold">{t('meta.form.radius')}</Typography>
-                                                    <Chip label={`${input.geoTargeting.radius} ${t(`meta.form.radiusUnit.${input.geoTargeting.unit}`)}`} color="primary" size="small" />
-                                                </Box>
-                                                <Box sx={{ px: 1 }}>
-                                                    <Typography variant="h3" color="primary.main" align="center" fontWeight="bold" sx={{ mb: 1 }}>
-                                                        {input.geoTargeting.radius}
-                                                    </Typography>
-                                                    <Typography variant="caption" align="center" display="block" color="text.secondary" sx={{ mb: 3 }}>{t(`meta.form.radiusUnit.${input.geoTargeting.unit}`)}</Typography>
-                                                    <Slider
-                                                        value={input.geoTargeting.radius}
-                                                        onChange={(_, val) => setInput({
-                                                            ...input,
-                                                            geoTargeting: { ...input.geoTargeting, radius: val as number }
-                                                        })}
-                                                        min={5}
-                                                        max={100}
-                                                        step={5}
-                                                        marks={[
-                                                            { value: 5, label: '5' },
-                                                            { value: 25, label: '25' },
-                                                            { value: 50, label: '50' },
-                                                            { value: 100, label: '100' }
-                                                        ]}
-                                                    />
-                                                </Box>
-                                            </Box>
-                                        </>
-                                    )}
-
-                                </CardContent>
-                            </Card>
+                            {activeStep === 1 && (
+                                <Paper sx={{ bgcolor: 'background.paper', borderRadius: 2, p: 6, textAlign: 'center', border: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ width: 80, height: 80, borderRadius: '50%', bgcolor: alpha(theme.palette.primary.main, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 3 }}>
+                                        <CheckCircleIcon sx={{ fontSize: 40, color: 'primary.main' }} />
+                                    </Box>
+                                    <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>{t('generate.readyTitle')}</Typography>
+                                    <Typography color="text.secondary" sx={{ mb: 4, maxWidth: 500, mx: 'auto' }}>{t('generate.readyText')}</Typography>
+                                    <Paper sx={{ bgcolor: 'background.default', p: 2, maxWidth: 500, mx: 'auto', textAlign: 'left', border: 1, borderColor: 'divider' }}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            <strong>{t('generate.service')}</strong> {input.offerOrService}<br />
+                                            <strong>{t('generate.vertical')}</strong> {input.vertical}<br />
+                                            <strong>{t('meta.form.geoCenter')}:</strong> {input.geoTargeting.center} ({input.geoTargeting.radius} {t(`meta.form.radiusUnit.${input.geoTargeting.unit}`)})
+                                        </Typography>
+                                    </Paper>
+                                </Paper>
+                            )}
 
                             {/* Navigation Actions */}
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
@@ -443,8 +425,7 @@ export default function MetaBlueprintWizard() {
                                     onClick={handleNext}
                                     startIcon={activeStep === 1 ? <BoltIcon /> : undefined}
                                     disabled={
-                                        (activeStep === 0 && !input.offerOrService) ||
-                                        (activeStep === 1 && !input.geoTargeting.center)
+                                        (activeStep === 0 && (!input.offerOrService || !input.geoTargeting.center))
                                     }
                                     sx={{ px: 6, py: 1.2, fontWeight: 'bold' }}
                                 >
