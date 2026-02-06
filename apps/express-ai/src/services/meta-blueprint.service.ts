@@ -139,7 +139,7 @@ export class MetaBlueprintService {
         return variations;
     }
 
-    private generatePlacements(input: MetaBlueprintInput): PlacementRecommendation[] {
+    private generatePlacements(_input: MetaBlueprintInput): PlacementRecommendation[] {
         return [
             {
                 platform: 'Facebook',
