@@ -93,12 +93,14 @@ export default function MetaBlueprintWizard() {
             if (!input.offerOrService || !input.geoTargeting.center) {
                 return;
             }
+
             setActiveStep(1);
         } else if (activeStep === 1) {
             setLoading(true);
 
             try {
                 const result = await MetaBlueprintService.generate(input);
+
                 setOutput(result);
                 setActiveStep(2);
             } catch (error) {

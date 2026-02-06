@@ -31,6 +31,7 @@ export default function VerticalSelection({ value, onChange, tPrefix = 'meta.for
 
     const getTranslationKey = (v: string) => {
         const key = v === 'Local Service' ? 'localService' : v === 'E-commerce' ? 'ecommerce' : v.toLowerCase()
+
         return `${tPrefix}.${key}`
     }
 
