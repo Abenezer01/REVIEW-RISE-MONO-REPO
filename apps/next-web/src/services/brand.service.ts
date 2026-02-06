@@ -473,6 +473,7 @@ export const BrandService = {
 
   uploadFile: async (file: File) => {
     const formData = new FormData();
+
     formData.append('file', file);
 
     const response = await apiClient.post<{ url: string }>('/api/v1/uploads', formData, {
@@ -480,6 +481,7 @@ export const BrandService = {
         'Content-Type': 'multipart/form-data',
       },
     });
+
 
     return response.data;
   },
