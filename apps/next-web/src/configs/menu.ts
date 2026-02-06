@@ -133,9 +133,21 @@ const menuData: MenuItem[] = [
     allowedRoles: [ROLES.ADMIN],
     children: [
       {
-        title: 'navigation.ad-rise-blueprint',
+        title: 'navigation.platform-overview',
+        href: '/admin/ad-rise',
+        icon: 'tabler-dashboard',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.google-blueprint',
         href: '/admin/ad-rise/blueprint',
-        icon: 'tabler-wand',
+        icon: 'tabler-brand-google',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.meta-blueprint',
+        href: '/admin/ad-rise/meta-blueprint',
+        icon: 'tabler-brand-meta',
         allowedRoles: [ROLES.ADMIN]
       }
     ]

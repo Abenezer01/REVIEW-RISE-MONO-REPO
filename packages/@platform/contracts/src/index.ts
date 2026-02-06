@@ -72,3 +72,7 @@ export type {
     ApiError,
     ApiMeta
 } from './responses';
+
+// AI Schemas
+export * from './ai/blueprint.schema';
+export * from './ai/meta-blueprint.schema';

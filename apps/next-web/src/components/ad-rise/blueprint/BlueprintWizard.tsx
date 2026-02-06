@@ -25,6 +25,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { BlueprintService } from '@/services/ad-rise/blueprint.service';
 
 import BlueprintResults from './BlueprintResults';
+import VerticalSelection from '../shared/VerticalSelection';
 
 export default function BlueprintWizard() {
     const t = useTranslation('blueprint');
@@ -34,12 +35,7 @@ export default function BlueprintWizard() {
     const [results, setResults] = useState<BlueprintOutput | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const verticals = [
-        { id: 'localService', value: 'Local Service', label: t('form.verticals.localService'), icon: t('icons.localService') },
-        { id: 'ecommerce', value: 'E-commerce', label: t('form.verticals.ecommerce'), icon: t('icons.ecommerce') },
-        { id: 'saas', value: 'SaaS', label: t('form.verticals.saas'), icon: t('icons.saas') },
-        { id: 'healthcare', value: 'Healthcare', label: t('form.verticals.healthcare'), icon: t('icons.healthcare') }
-    ];
+
 
     const steps = [
         { number: 1, label: t('steps.campaignDetails') },
@@ -293,38 +289,11 @@ export default function BlueprintWizard() {
                                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
                                             {t('form.industryVertical')}
                                         </Typography>
-                                        <Grid container spacing={2}>
-                                            {verticals.map((v) => (
-                                                <Grid size={{ xs: 6, sm: 3 }} key={v.id}>
-                                                    <Paper
-                                                        elevation={0}
-                                                        onClick={() => {
-                                                            setFormData({ ...formData, vertical: v.value as any });
-                                                        }}
-                                                        sx={{
-                                                            p: 2,
-                                                            textAlign: 'center',
-                                                            cursor: 'pointer',
-                                                            border: `2px solid ${formData.vertical === v.value ? theme.palette.primary.main : theme.palette.divider}`,
-                                                            borderRadius: 2,
-                                                            bgcolor: formData.vertical === v.value ? alpha(theme.palette.primary.main, 0.05) : 'background.paper',
-                                                            transition: 'all 0.2s ease',
-                                                            '&:hover': {
-                                                                borderColor: theme.palette.primary.main,
-                                                                transform: 'translateY(-2px)'
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Typography variant="h4" sx={{ mb: 1 }}>
-                                                            {v.icon}
-                                                        </Typography>
-                                                        <Typography variant="body2" fontWeight={500}>
-                                                            {v.label}
-                                                        </Typography>
-                                                    </Paper>
-                                                </Grid>
-                                            ))}
-                                        </Grid>
+                                        <VerticalSelection
+                                            value={formData.vertical as any}
+                                            onChange={(v) => setFormData({ ...formData, vertical: v as any })}
+                                            tPrefix="form.verticals"
+                                        />
 
                                     </Box>
                                 </Paper>
