@@ -64,8 +64,6 @@
     "copy": "Copy",
     "bookmark": "Bookmark",
     "share": "Share",
-    "new": "New",
-    "popular": "Popular",
     "all": "All",
     "days": "Days",
     "found": "Found",
@@ -256,11 +254,6 @@
       "name": "Location Name",
       "address": "Address",
       "status": "Status"
-    }
-  },
-  "list": {
-    "actions": {
-      "reExtract": "Re-extract"
     }
   }
 }

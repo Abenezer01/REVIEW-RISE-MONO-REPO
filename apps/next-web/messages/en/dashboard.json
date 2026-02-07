@@ -39,7 +39,10 @@
     "settings": "Settings",
     "system-settings": "System Settings",
     "feature-flags": "Feature Flags",
-    "ai-visibility": "AI Visibility"
+    "ai-visibility": "AI Visibility",
+    "creative-engine": "Creative Engine",
+    "simulator": "Simulator",
+    "subscription-issues": "Subscription Issues"
   },
   "errors": {
     "firstNameRequired": "First name is required",
@@ -1098,8 +1101,6 @@
       "uvp": "UVP",
       "services": "Services",
       "analysis": "Analysis",
-      "notFound": "Competitor not found",
-      "backToList": "Back to List",
       "stats": {
         "found": "COMPETITORS FOUND",
         "directLocal": "DIRECT LOCAL",
@@ -1299,17 +1300,6 @@
       "none": "Not Replied",
       "skipped": "Skipped"
     }
-  },
-  "errors": {
-    "businessRequired": "Business is required",
-    "emailRequired": "Email is required",
-    "firstNameRequired": "First name is required",
-    "invalidEmail": "Invalid email address",
-    "lastNameRequired": "Last name is required",
-    "locationRequired": "Location is required",
-    "passwordMin": "Password must be at least 8 characters",
-    "passwordRequired": "Password is required",
-    "roleRequired": "Role is required"
   },
   "status": {
     "completed": "Completed",

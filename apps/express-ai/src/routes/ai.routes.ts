@@ -14,6 +14,7 @@ import {
     SystemMessageCode
 } from '@platform/contracts';
 import { llmService } from '../services/llm.service';
+import { generateConcepts, generateCreativeImage } from '../controllers/creative-engine.controller';
 
 const router = Router();
 
@@ -157,5 +158,9 @@ router.post('/reviews/analyze', validateRequest(AnalyzeReviewRequestSchema), asy
         res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
+
+// Creative Engine Routes
+router.post('/creative-engine/concepts', generateConcepts);
+router.post('/creative-engine/image', generateCreativeImage);
 
 export default router;

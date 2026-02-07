@@ -66,6 +66,11 @@ const LocaleLayout = async (props: Props) => {
 
     return (
         <html id='__next' lang={locale} dir={direction} suppressHydrationWarning>
+            <head>
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet" />
+            </head>
             <body className={`flex is-full min-bs-full flex-auto flex-col ${publicSans.className}`} suppressHydrationWarning>
                 <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
                 <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>

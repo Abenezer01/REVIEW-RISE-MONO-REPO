@@ -76,3 +76,4 @@ export type {
 // AI Schemas
 export * from './ai/blueprint.schema';
 export * from './ai/meta-blueprint.schema';
+export * from './ai/creative-engine.schema';

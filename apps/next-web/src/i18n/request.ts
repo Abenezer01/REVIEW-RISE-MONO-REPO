@@ -25,7 +25,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
             social: (await import(`../../messages/${locale}/social.json`)).default,
             settings: (await import(`../../messages/${locale}/settings.json`)).default,
             admin: (await import(`../../messages/${locale}/admin.json`)).default,
-            blueprint: (await import(`../../messages/${locale}/blueprint.json`)).default
+            blueprint: (await import(`../../messages/${locale}/blueprint.json`)).default,
+            simulator: (await import(`../../messages/${locale}/simulator.json`)).default,
+            'ad-rise': (await import(`../../messages/${locale}/ad-rise.json`)).default
         }
     }
 })

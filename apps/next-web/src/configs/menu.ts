@@ -149,6 +149,18 @@ const menuData: MenuItem[] = [
         href: '/admin/ad-rise/meta-blueprint',
         icon: 'tabler-brand-meta',
         allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.creative-engine',
+        href: '/admin/ad-rise/creative-engine',
+        icon: 'tabler-bulb',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.simulator',
+        href: '/admin/ad-rise/simulator',
+        icon: 'tabler-device-gamepad',
+        allowedRoles: [ROLES.ADMIN]
       }
     ]
   },
