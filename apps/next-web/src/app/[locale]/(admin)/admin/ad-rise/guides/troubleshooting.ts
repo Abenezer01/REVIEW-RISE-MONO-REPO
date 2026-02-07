@@ -5,6 +5,49 @@ export interface TroubleshootingNode {
     steps: string[];
 }
 
+export interface DiagnosticOption {
+    label: string;
+    nextId: string;
+    type: 'question' | 'result';
+}
+
+export interface DiagnosticStep {
+    id: string;
+    question: string;
+    description?: string;
+    options: DiagnosticOption[];
+}
+
+export const DIAGNOSTIC_STEPS: DiagnosticStep[] = [
+    {
+        id: 'q-start',
+        question: 'Are your ads being shown (Impressions)?',
+        description: 'Check if the "Impressions" column in your ad platform shows a number greater than 0.',
+        options: [
+            { label: 'No, impressions are 0 or very low', nextId: 'tr-1', type: 'result' },
+            { label: 'Yes, I see impressions', nextId: 'q-clicks', type: 'question' },
+        ],
+    },
+    {
+        id: 'q-clicks',
+        question: 'Are people clicking on your ads (CTR)?',
+        description: 'Check if your Click-Through Rate is below 1% for Google Search or below 0.5% for Meta.',
+        options: [
+            { label: 'No, CTR is low', nextId: 'tr-3', type: 'result' },
+            { label: 'Yes, I am getting clicks', nextId: 'q-conversions', type: 'question' },
+        ],
+    },
+    {
+        id: 'q-conversions',
+        question: 'Are those clicks turning into Leads/Sales?',
+        description: 'Check if you are getting traffic but no conversion actions.',
+        options: [
+            { label: 'No, nobody is converting', nextId: 'tr-4', type: 'result' },
+            { label: 'Yes, but the cost per result is too high', nextId: 'tr-2', type: 'result' },
+        ],
+    },
+];
+
 export const TROUBLESHOOTING_FLOWS: TroubleshootingNode[] = [
     {
         id: 'tr-1',

@@ -417,7 +417,7 @@ const AdminAdRisePage = () => {
     <Grid container spacing={6}>
       <Grid size={{ xs: 12 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Box>
+          <Box className="hide-on-print">
             <Typography variant='h3' sx={{ fontWeight: 700, mb: 0.5 }}>
               {t('navigation.ad-rise')}™
             </Typography>
@@ -430,6 +430,7 @@ const AdminAdRisePage = () => {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={handleCreateNew}
+              className="hide-on-print"
               sx={{
                 px: 6,
                 py: 2.5,
@@ -519,6 +520,7 @@ const AdminAdRisePage = () => {
               variant="text"
               startIcon={<ArrowBackIcon />}
               onClick={() => setIsWizardOpen(false)}
+              className="hide-on-print"
               sx={{ mb: 4, fontWeight: 600 }}
             >
               {t('adrise.sessions.backToSessions')}
@@ -541,6 +543,7 @@ const AdminAdRisePage = () => {
               variant="text"
               startIcon={<ArrowBackIcon />}
               onClick={() => setIsGuideOpen(false)}
+              className="hide-on-print"
               sx={{ mb: 4, fontWeight: 600 }}
             >
               {t('adrise.sessions.backToSessions')}

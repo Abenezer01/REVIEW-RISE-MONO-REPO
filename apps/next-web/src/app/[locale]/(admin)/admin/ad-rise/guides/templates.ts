@@ -129,6 +129,16 @@ export const SETUP_TEMPLATES: PlatformGuide[] = [
                     },
                 ],
             },
+            {
+                title: 'Conversion Tracking',
+                steps: [
+                    {
+                        id: 'm-ct-1',
+                        title: 'Verify Pixel/API',
+                        description: 'Ensure the Meta Pixel or Conversions API is active and receiving events on your site.',
+                    },
+                ],
+            },
         ],
     },
 ];

@@ -258,7 +258,14 @@
       "metaSetup": "Meta Setup Guide",
       "dayPostLaunch": "Day {day} Post-Launch",
       "recommendation": "Our Recommendation",
-      "checklistActions": "CHECKLIST ACTIONS"
+      "checklistActions": "CHECKLIST ACTIONS",
+      "diagnosticTitle": "Campaign Diagnostic",
+      "diagnosticResult": "Diagnostic Result:",
+      "requiredActions": "REQUIRED ACTIONS",
+      "startNew": "Start New Diagnostic",
+      "previousQuestion": "Previous Question",
+      "backToQuestion": "Back to Question",
+      "printGuide": "Print Execution Guide"
     }
   },
   "auto-reply": "Auto-Reply Settings",

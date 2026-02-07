@@ -12,32 +12,35 @@ import {
     Stack,
     Checkbox,
     FormControlLabel,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
+    Button,
     LinearProgress,
     Divider,
     alpha,
     useTheme,
-    Grid
+    Grid,
+    GlobalStyles
 } from '@mui/material';
 
 import {
     ExpandMore as ExpandMoreIcon,
     HelpOutline as HelpIcon,
-    CheckCircle as CheckCircleIcon,
     ErrorOutline as ErrorIcon,
     TrendingUp as TrendingUpIcon,
     Settings as SettingsIcon,
     Campaign as CampaignIcon,
-    CalendarMonth as CalendarIcon
+    CalendarMonth as CalendarIcon,
+    ArrowBack as ArrowBackIcon,
+    QuestionAnswer as QuestionIcon,
+    Print as PrintIcon,
+    RadioButtonUnchecked as UncheckedIcon,
+    CheckCircle as CheckedIcon
 } from '@mui/icons-material';
 
 import { useTranslations } from 'next-intl';
 
 import { SETUP_TEMPLATES } from './guides/templates';
 import { OPTIMIZATION_TASKS } from './guides/optimization';
-import { TROUBLESHOOTING_FLOWS } from './guides/troubleshooting';
+import { TROUBLESHOOTING_FLOWS, DIAGNOSTIC_STEPS } from './guides/troubleshooting';
 
 interface ExecutionGuideProps {
     sessionId: string;
@@ -50,6 +53,13 @@ const ExecutionGuide = ({ initialChecklist = {}, onToggleStep, isSaving }: Execu
     const theme = useTheme();
     const t = useTranslations('dashboard.adrise.guide');
     const [activeTab, setActiveTab] = useState(0);
+    const [diagStepId, setDiagStepId] = useState<string>('q-start');
+    const [diagResultId, setDiagResultId] = useState<string | null>(null);
+    const [history, setHistory] = useState<string[]>([]);
+
+    const handlePrint = () => {
+        window.print();
+    };
 
     const checklist = useMemo(() => initialChecklist, [initialChecklist]);
 
@@ -70,14 +80,84 @@ const ExecutionGuide = ({ initialChecklist = {}, onToggleStep, isSaving }: Execu
         setActiveTab(newValue);
     };
 
+    const handleDiagOption = (nextId: string, type: 'question' | 'result') => {
+        setHistory(prev => [...prev, diagStepId]);
+
+        if (type === 'question') {
+            setDiagStepId(nextId);
+        } else {
+            setDiagResultId(nextId);
+        }
+    };
+
+    const handleDiagBack = () => {
+        if (diagResultId) {
+            setDiagResultId(null);
+
+            return;
+        }
+
+        if (history.length > 0) {
+            const prev = history[history.length - 1];
+
+            setHistory(prevHistory => prevHistory.slice(0, -1));
+            setDiagStepId(prev);
+        }
+    };
+
+    const resetDiag = () => {
+        setDiagStepId('q-start');
+        setDiagResultId(null);
+        setHistory([]);
+    };
+
+    const currentDiagStep = useMemo(() => DIAGNOSTIC_STEPS.find(s => s.id === diagStepId), [diagStepId]);
+    const currentDiagResult = useMemo(() => TROUBLESHOOTING_FLOWS.find(r => r.id === diagResultId), [diagResultId]);
+
     const isStepCompleted = (stepId: string) => !!checklist[stepId];
 
     return (
         <Box sx={{ width: '100%', mb: 10 }}>
+            <GlobalStyles
+                styles={{
+                    '@media print': {
+                        'header, footer, aside, nav, .mui-fixed, .ts-vertical-nav, .ts-navbar, .ts-footer': {
+                            display: 'none !important'
+                        },
+                        '.layout-page-content, .layout-content-wrapper, main': {
+                            padding: '0 !important',
+                            margin: '0 !important',
+                            width: '100% !important',
+                            maxWidth: 'none !important',
+                            position: 'static !important'
+                        },
+                        'body': {
+                            backgroundColor: 'white !important'
+                        },
+                        '.MuiTabs-root': {
+                            display: 'none !important'
+                        },
+                        '.hide-on-print': {
+                            display: 'none !important'
+                        },
+
+                        // Ensure the content container doesn't have extra padding
+                        '.layout-page-content, .layout-content-wrapper': {
+                            paddingTop: '0 !important'
+                        }
+                    }
+                }}
+            />
+
             {/* Progress Header */}
-            <Card sx={{ mb: 6, borderRadius: 3, bgcolor: alpha(theme.palette.primary.main, 0.02) }}>
-                <CardContent sx={{ p: 6 }}>
-                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+            <Card sx={{
+                mb: 6,
+                borderRadius: 3,
+                bgcolor: alpha(theme.palette.primary.main, 0.02),
+                '@media print': { mb: 2, boxShadow: 'none', border: '1px solid #eee' }
+            }}>
+                <CardContent sx={{ p: 6, '@media print': { p: 4 } }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2, '@media print': { mb: 1 } }}>
                         <Box>
                             <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
                                 {t('title')}
@@ -86,24 +166,46 @@ const ExecutionGuide = ({ initialChecklist = {}, onToggleStep, isSaving }: Execu
                                 {t('subtitle')}
                             </Typography>
                         </Box>
-                        <Box sx={{ textAlign: 'right' }}>
-                            <Typography variant="h4" sx={{ fontWeight: 800, color: 'primary.main' }}>
-                                {progress}%
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                {t('overallProgress')}
+                        <Stack direction="row" spacing={2} alignItems="center" sx={{ '@media print': { display: 'none' } }}>
+                            <Button
+                                variant="outlined"
+                                startIcon={<PrintIcon />}
+                                onClick={handlePrint}
+                                sx={{ fontWeight: 600, borderRadius: 2 }}
+                            >
+                                {t('printGuide')}
+                            </Button>
+                            <Box sx={{ textAlign: 'right' }}>
+                                <Typography variant="h4" sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                    {progress}%
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                    {t('overallProgress')}
+                                </Typography>
+                            </Box>
+                        </Stack>
+
+                        {/* Print-only Progress Info */}
+                        <Box sx={{ display: 'none', '@media print': { display: 'block', textAlign: 'right' } }}>
+                            <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                                {t('overallProgress')}: {progress}%
                             </Typography>
                         </Box>
                     </Stack>
                     <LinearProgress
                         variant="determinate"
                         value={progress}
-                        sx={{ height: 10, borderRadius: 5, bgcolor: alpha(theme.palette.primary.main, 0.1) }}
+                        sx={{
+                            height: 10,
+                            borderRadius: 5,
+                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                            '@media print': { border: '1px solid #ddd' }
+                        }}
                     />
                 </CardContent>
             </Card>
 
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4, '@media print': { display: 'none' } }}>
                 <Tabs value={activeTab} onChange={handleTabChange} aria-label="execution guide tabs">
                     <Tab icon={<SettingsIcon sx={{ fontSize: 20 }} />} iconPosition="start" label={t('setupGuides')} />
                     <Tab icon={<CalendarIcon sx={{ fontSize: 20 }} />} iconPosition="start" label={t('optimizationScheduler')} />
@@ -113,9 +215,9 @@ const ExecutionGuide = ({ initialChecklist = {}, onToggleStep, isSaving }: Execu
 
             {/* Setup Guides */}
             <TabPanel value={activeTab} index={0}>
-                <Grid container spacing={6}>
+                <Grid container spacing={6} sx={{ '@media print': { display: 'block' } }}>
                     {SETUP_TEMPLATES.map((guide) => (
-                        <Grid size={{ xs: 12, md: 6 }} key={guide.id}>
+                        <Grid size={{ xs: 12, md: 6 }} key={guide.id} sx={{ '@media print': { mb: 8, breakInside: 'avoid' } }}>
                             <Card sx={{ borderRadius: 3, height: '100%' }}>
                                 <CardContent sx={{ p: 6 }}>
                                     <Stack direction="row" spacing={3} alignItems="center" sx={{ mb: 4 }}>
@@ -152,11 +254,25 @@ const ExecutionGuide = ({ initialChecklist = {}, onToggleStep, isSaving }: Execu
                                                     >
                                                         <FormControlLabel
                                                             control={
-                                                                <Checkbox
-                                                                    checked={isStepCompleted(step.id)}
-                                                                    onChange={(e) => onToggleStep(step.id, e.target.checked)}
-                                                                    disabled={isSaving}
-                                                                />
+                                                                <>
+                                                                    <Checkbox
+                                                                        checked={isStepCompleted(step.id)}
+                                                                        onChange={(e) => onToggleStep(step.id, e.target.checked)}
+                                                                        disabled={isSaving}
+                                                                        sx={{ '@media print': { display: 'none' } }}
+                                                                    />
+                                                                    <Box sx={{
+                                                                        display: 'none',
+                                                                        mr: 3,
+                                                                        mt: 1,
+                                                                        '@media print': { display: 'block' }
+                                                                    }}>
+                                                                        {isStepCompleted(step.id) ?
+                                                                            <CheckedIcon color="success" sx={{ fontSize: 20 }} /> :
+                                                                            <UncheckedIcon sx={{ fontSize: 20, color: '#ccc' }} />
+                                                                        }
+                                                                    </Box>
+                                                                </>
                                                             }
                                                             label={
                                                                 <Box>
@@ -183,8 +299,8 @@ const ExecutionGuide = ({ initialChecklist = {}, onToggleStep, isSaving }: Execu
             </TabPanel>
 
             {/* Optimization Scheduler */}
-            <TabPanel value={activeTab} index={1}>
-                <Stack spacing={4}>
+            <TabPanel value={activeTab} index={1} className="print-section">
+                <Stack spacing={4} sx={{ '@media print': { mt: 4 } }}>
                     {[3, 7, 14].map((day) => (
                         <Box key={day}>
                             <Typography variant="h6" sx={{ fontWeight: 700, mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -201,11 +317,25 @@ const ExecutionGuide = ({ initialChecklist = {}, onToggleStep, isSaving }: Execu
                                             <CardContent sx={{ p: 4 }}>
                                                 <FormControlLabel
                                                     control={
-                                                        <Checkbox
-                                                            checked={isStepCompleted(task.id)}
-                                                            onChange={(e) => onToggleStep(task.id, e.target.checked)}
-                                                            disabled={isSaving}
-                                                        />
+                                                        <>
+                                                            <Checkbox
+                                                                checked={isStepCompleted(task.id)}
+                                                                onChange={(e) => onToggleStep(task.id, e.target.checked)}
+                                                                disabled={isSaving}
+                                                                sx={{ '@media print': { display: 'none' } }}
+                                                            />
+                                                            <Box sx={{
+                                                                display: 'none',
+                                                                mr: 3,
+                                                                mt: 1,
+                                                                '@media print': { display: 'block' }
+                                                            }}>
+                                                                {isStepCompleted(task.id) ?
+                                                                    <CheckedIcon color="success" sx={{ fontSize: 20 }} /> :
+                                                                    <UncheckedIcon sx={{ fontSize: 20, color: '#ccc' }} />
+                                                                }
+                                                            </Box>
+                                                        </>
                                                     }
                                                     label={
                                                         <Box>
@@ -231,39 +361,120 @@ const ExecutionGuide = ({ initialChecklist = {}, onToggleStep, isSaving }: Execu
 
             {/* Troubleshooting */}
             <TabPanel value={activeTab} index={2}>
-                <Grid container spacing={4}>
-                    {TROUBLESHOOTING_FLOWS.map((flow) => (
-                        <Grid size={{ xs: 12, md: 6 }} key={flow.id}>
-                            <Accordion sx={{ borderRadius: '12px !important', overflow: 'hidden', border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                    <Stack direction="row" spacing={3} alignItems="center">
-                                        <ErrorIcon color="error" />
-                                        <Typography sx={{ fontWeight: 700 }}>{flow.issue}</Typography>
-                                    </Stack>
-                                </AccordionSummary>
-                                <AccordionDetails sx={{ p: 4, bgcolor: alpha(theme.palette.error.main, 0.02) }}>
-                                    <Typography variant="subtitle2" sx={{ color: 'error.main', fontWeight: 800, mb: 2 }}>
-                                        {t('recommendation')}: {flow.suggestion}
+                <Box sx={{ width: '100%', '@media print': { display: 'none' } }}>
+                    {(diagResultId || history.length > 0) && (
+                        <Button
+                            variant="text"
+                            startIcon={<ArrowBackIcon />}
+                            onClick={handleDiagBack}
+                            sx={{ mb: 4, fontWeight: 600 }}
+                        >
+                            {diagResultId ? t('backToQuestion') : t('previousQuestion')}
+                        </Button>
+                    )}
+
+                    {!diagResultId && currentDiagStep && (
+                        <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
+                            <Box sx={{ p: 4, bgcolor: alpha(theme.palette.primary.main, 0.05), borderBottom: '1px solid', borderColor: 'divider' }}>
+                                <Stack direction="row" spacing={2} alignItems="center">
+                                    <QuestionIcon color="primary" />
+                                    <Typography variant="h6" sx={{ fontWeight: 800 }}>{t('diagnosticTitle')}</Typography>
+                                </Stack>
+                            </Box>
+                            <CardContent sx={{ p: 6 }}>
+                                <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>{currentDiagStep.question}</Typography>
+                                {currentDiagStep.description && (
+                                    <Typography variant="body1" color="text.secondary" sx={{ mb: 6 }}>
+                                        {currentDiagStep.description}
                                     </Typography>
-                                    <Divider sx={{ mb: 3 }} />
-                                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 2 }}>
-                                        {t('checklistActions')}:
-                                    </Typography>
-                                    <Stack spacing={1.5}>
-                                        {flow.steps.map((step, idx) => (
-                                            <Box key={idx} sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                                                <CheckCircleIcon sx={{ fontSize: 16, color: 'primary.main', mt: 0.5 }} />
-                                                <Typography variant="body2">{step}</Typography>
+                                )}
+
+                                <Stack spacing={2}>
+                                    {currentDiagStep.options.map((opt, idx) => (
+                                        <Box key={idx}
+                                            onClick={() => handleDiagOption(opt.nextId, opt.type)}
+                                            sx={{
+                                                p: 4,
+                                                borderRadius: 3,
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s',
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                '&:hover': {
+                                                    borderColor: 'primary.main',
+                                                    bgcolor: alpha(theme.palette.primary.main, 0.02),
+                                                    transform: 'translateX(8px)'
+                                                }
+                                            }}
+                                        >
+                                            <Typography sx={{ fontWeight: 600 }}>{opt.label}</Typography>
+                                            <ExpandMoreIcon sx={{ transform: 'rotate(-90deg)', color: 'text.secondary' }} />
+                                        </Box>
+                                    ))}
+                                </Stack>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {diagResultId && currentDiagResult && (
+                        <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'error.main', overflow: 'hidden' }}>
+                            <Box sx={{ p: 4, bgcolor: alpha(theme.palette.error.main, 0.05), borderBottom: '1px solid', borderColor: alpha(theme.palette.error.main, 0.1) }}>
+                                <Stack direction="row" spacing={2} alignItems="center">
+                                    <ErrorIcon color="error" />
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: 'error.main' }}>{t('diagnosticResult')} {currentDiagResult.issue}</Typography>
+                                </Stack>
+                            </Box>
+                            <CardContent sx={{ p: 6 }}>
+                                <Typography variant="subtitle1" sx={{ color: 'error.main', fontWeight: 800, mb: 4, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                    {t('recommendation')}: {currentDiagResult.suggestion}
+                                </Typography>
+
+                                <Divider sx={{ mb: 4 }} />
+
+                                <Typography variant="overline" sx={{ fontWeight: 800, color: 'text.secondary', mb: 3, display: 'block' }}>
+                                    {t('requiredActions')}
+                                </Typography>
+
+                                <Stack spacing={2.5}>
+                                    {currentDiagResult.steps.map((step, idx) => (
+                                        <Box key={idx} sx={{ display: 'flex', gap: 2.5, alignItems: 'flex-start' }}>
+                                            <Box sx={{
+                                                mt: 0.5,
+                                                minWidth: 20,
+                                                height: 20,
+                                                borderRadius: '50%',
+                                                bgcolor: 'primary.main',
+                                                color: 'white',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: 12,
+                                                fontWeight: 800
+                                            }}>
+                                                {idx + 1}
                                             </Box>
-                                        ))}
-                                    </Stack>
-                                </AccordionDetails>
-                            </Accordion>
-                        </Grid>
-                    ))}
-                </Grid>
+                                            <Typography variant="body1" sx={{ fontWeight: 500 }}>{step}</Typography>
+                                        </Box>
+                                    ))}
+                                </Stack>
+
+                                <Button
+                                    variant="outlined"
+                                    onClick={resetDiag}
+                                    fullWidth
+                                    sx={{ mt: 6, py: 1.5, borderRadius: 2, fontWeight: 700 }}
+                                >
+                                    {t('startNew')}
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    )}
+                </Box>
             </TabPanel>
-        </Box>
+        </Box >
     );
 };
 
@@ -271,25 +482,36 @@ interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
     value: number;
+    className?: string;
 }
 
 function TabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
 
     return (
-        <div
+        <Box
             role="tabpanel"
-            hidden={value !== index}
             id={`simple-tabpanel-${index}`}
             aria-labelledby={`simple-tab-${index}`}
+            className={value === index ? 'active-tab-panel' : ''}
+            sx={{
+                width: '100%',
+                display: value === index ? 'block' : 'none',
+                '@media print': {
+                    display: (index === 0 || index === 1) ? 'block !important' : 'none !important'
+                }
+            }}
             {...other}
         >
-            {value === index && (
-                <Box sx={{ pt: 4 }}>
+            {(value === index || index === 0 || index === 1) && (
+                <Box sx={{
+                    pt: 4,
+                    '@media print': { pt: 0 }
+                }}>
                     {children}
                 </Box>
             )}
-        </div>
+        </Box>
     );
 }
 
