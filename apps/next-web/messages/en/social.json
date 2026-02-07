@@ -152,6 +152,13 @@
   },
   "calendar": {
     "statusLegend": "Status Legend:",
+    "today": "Today",
+    "views": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "year": "Year"
+    },
     "statuses": {
       "scheduled": "Scheduled",
       "published": "Published",
