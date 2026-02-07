@@ -138,6 +138,14 @@
   "adrise": {
     "sessions": {
       "draftRecovered": "Your previous progress has been restored"
+    },
+    "offer": {
+      "smartFillSuccess": "Offer extracted successfully!",
+      "smartFillError": "Failed to extract offer. Please check the URL or enter manually."
     }
+  },
+  "errors": {
+    "missingLandingPage": "Please enter a landing page URL first.",
+    "internalError": "A server error occurred. Please try again later."
   }
 }

@@ -21,6 +21,7 @@ import {
   Skeleton,
   Fade,
   Paper,
+  Tooltip,
   alpha,
   useTheme,
   useMediaQuery
@@ -40,7 +41,8 @@ import {
   WarningAmber as WarningIcon,
   FlashOn as QuickModeIcon,
   SettingsSuggest as ProModeIcon,
-  CloudDone as SavedIcon
+  CloudDone as SavedIcon,
+  AutoFixHigh
 } from '@mui/icons-material';
 
 import { Formik, Form, useFormikContext } from 'formik';
@@ -53,8 +55,9 @@ import CustomInputVertical from '@core/components/custom-inputs/Vertical';
 import CustomTextBox from '@/components/shared/form/custom-text-box';
 import CustomSelect from '@/components/shared/form/custom-select';
 import CustomTagsInput from '@/components/shared/form/custom-tags-input';
-import { saveSession, getBrandTone } from '@/app/actions/adrise';
+import { saveSession, getBrandTone, getBusinessDetails, scrapeOfferFromUrl, recommendGoal } from '@/app/actions/adrise';
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
+import { countries } from '@/shared/utils/countries';
 
 const AUTOSAVE_KEY = 'adrise_wizard_draft';
 
@@ -80,7 +83,7 @@ const FormikAutosave = ({ businessId, activeStep, onStepSave, disabled = false, 
         businessId,
         updatedAt: Date.now()
       };
-      
+
       localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(draft));
     }, 1000); // Faster local save (1s)
 
@@ -93,7 +96,7 @@ const FormikAutosave = ({ businessId, activeStep, onStepSave, disabled = false, 
 
     onStepSave?.(values);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeStep]); 
+  }, [activeStep]);
 
   // Proactive save for session name on Step 0
   useEffect(() => {
@@ -123,7 +126,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
   const theme = useTheme();
   const t = useTranslations('dashboard.adrise');
   const tc = useTranslations('common');
-  
+
   const steps = [
     { label: t('steps.basics'), icon: <InfoIcon /> },
     { label: t('steps.offer'), icon: <OfferIcon /> },
@@ -138,12 +141,16 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
   const [activeStep, setActiveStep] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | undefined>(sessionId);
-  const [isSaving, setIsSaving] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [isDraftRecovered, setIsDraftRecovered] = useState(false);
   const [businessBrandTone, setBusinessBrandTone] = useState<string | null>(null);
+  const [businessWebsite, setBusinessWebsite] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isScraping, setIsScraping] = useState(false);
+  const [recommendedGoal, setRecommendedGoal] = useState<string | null>(null);
+  const [isRecommending, setIsRecommending] = useState(false);
 
   // Sync currentSessionId with sessionId prop
   useEffect(() => {
@@ -152,26 +159,38 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
     }
   }, [sessionId]);
 
-  // Fetch business brand tone
+  // Fetch business profile data (brand tone and website)
   useEffect(() => {
-    const fetchTone = async () => {
+    const fetchBusinessProfile = async () => {
       if (businessId) {
-        const result = await getBrandTone(businessId);
+        // Fetch tone and details in parallel
+        const [toneResult, profileResult] = await Promise.all([
+          getBrandTone(businessId),
+          getBusinessDetails(businessId)
+        ]);
 
-        if (result.success && result.data) {
-          setBusinessBrandTone(result.data);
+        if (toneResult.success && toneResult.data) {
+          setBusinessBrandTone(toneResult.data);
+        }
+
+        if (profileResult.success && profileResult.data) {
+          const business = profileResult.data as any;
+
+          if (business.website) {
+            setBusinessWebsite(business.website);
+          }
         }
       }
     };
 
-    fetchTone();
+    fetchBusinessProfile();
   }, [businessId]);
 
   useEffect(() => {
     setIsMounted(true);
 
-    // Check for draft if no initialData or sessionId
-    if (!initialData && !sessionId) {
+    // Check for draft if no initialData or sessionId and we haven't recovered one yet
+    if (!initialData && !sessionId && !isDraftRecovered) {
       const savedDraft = localStorage.getItem(AUTOSAVE_KEY);
 
       if (savedDraft) {
@@ -183,13 +202,20 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
             setActiveStep(draft.activeStep || 0);
             setIsDraftRecovered(true);
             notify({ messageCode: 'adrise.sessions.draftRecovered' as any, variant: 'TOAST', severity: 'info' });
+          } else {
+            // Even if invalid or not found, mark as attempt done to avoid re-runs
+            setIsDraftRecovered(true);
           }
         } catch (e) {
           console.error('Failed to parse draft', e);
+          setIsDraftRecovered(true);
         }
+      } else {
+        // No draft found, mark as attempt done
+        setIsDraftRecovered(true);
       }
     }
-  }, [businessId, initialData, sessionId, notify]);
+  }, [businessId, initialData, sessionId, notify, isDraftRecovered]);
 
   const handleStepSave = useCallback(async (values: any) => {
     if (readOnly) return;
@@ -220,7 +246,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
         if (!currentSessionId) {
           setCurrentSessionId(result.data.id);
         }
-        
+
         // Show "Saved" indicator briefly
         setShowSaved(true);
         setTimeout(() => setShowSaved(false), 3000);
@@ -268,6 +294,9 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
       seasonalityStart: '',
       seasonalityEnd: '',
       promoWindow: 7,
+      landingPage: businessWebsite || '',
+      campaignStart: '',
+      campaignEnd: '',
       status: 'active'
     };
   };
@@ -292,7 +321,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
 
   const getAllocation = (goal: string, budget: number) => {
     const isLowBudget = budget < 500;
-    
+
     // Default allocations
     const allocation = {
       google: { awareness: 20, consideration: 40, conversion: 40 },
@@ -322,7 +351,18 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
     // Step 0: Basics
     Yup.object({
       sessionName: Yup.string().required(t('validation.required')),
-      industry: Yup.string().required(t('validation.required'))
+      industry: Yup.string().required(t('validation.required')),
+      landingPage: Yup.string()
+        .url(t('validation.invalidUrl'))
+        .required(t('validation.required')),
+      campaignStart: Yup.string().required(t('validation.required')),
+      campaignEnd: Yup.string()
+        .required(t('validation.required'))
+        .test('is-after', t('validation.invalidDateRange'), function (value) {
+          const { campaignStart } = this.parent;
+
+          return !campaignStart || !value || new Date(value) >= new Date(campaignStart);
+        })
     }),
 
     // Step 1: Offer
@@ -366,9 +406,14 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
     Yup.object({})
   ], [t]);
 
-  const handleNext = (validateForm: any, setTouched: any) => {
+  const handleNext = (validateForm: any, setTouched: any, values: any) => {
     validateForm().then((errors: any) => {
       if (Object.keys(errors).length === 0) {
+        // If moving from Step 1 (Offer) to Step 2 (Goal), trigger recommendation
+        if (activeStep === 1) {
+          handleRecommendGoal(values);
+        }
+
         setActiveStep((prev) => prev + 1);
       } else {
         // Mark all fields in current step as touched to show errors
@@ -386,10 +431,62 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
     setActiveStep((prev) => prev - 1);
   };
 
+  const handleSmartFill = async (values: any, setFieldValue: any) => {
+    if (!values.landingPage) {
+      notify({ messageCode: 'errors.missingLandingPage' as any, variant: 'TOAST', severity: 'warning' });
+      
+return;
+    }
+
+    setIsScraping(true);
+
+    try {
+      const result = await scrapeOfferFromUrl(values.landingPage, values.industry);
+
+      if (result.success && result.data) {
+        setFieldValue('offer', result.data);
+        notify({ messageCode: 'adrise.offer.smartFillSuccess' as any, variant: 'TOAST', severity: 'success' });
+      } else {
+        notify({ messageCode: 'errors.internalError' as any, variant: 'TOAST', severity: 'error' });
+      }
+    } catch (error: any) {
+      console.error('Smart Fill Error:', error);
+      notify({ messageCode: 'adrise.offer.smartFillError' as any, variant: 'TOAST', severity: 'error' });
+    } finally {
+      setIsScraping(false);
+    }
+  };
+
+  const handleRecommendGoal = async (values: any) => {
+    if (!values.offer) {
+      return;
+    }
+
+    setIsRecommending(true);
+
+    try {
+      const result = await recommendGoal(values.offer, values.industry);
+
+      if (result.success && result.data) {
+        setRecommendedGoal(result.data);
+      }
+    } catch (error) {
+      console.error('Goal Recommendation Error:', error);
+    } finally {
+      setIsRecommending(false);
+    }
+  };
+
+
   const renderStepContent = (step: number, values: any, setFieldValue: any) => {
     // Automatically set brandTone if it's empty and we have a businessBrandTone
     if (step === 5 && !values.brandTone && businessBrandTone) {
       setTimeout(() => setFieldValue('brandTone', businessBrandTone), 0);
+    }
+
+    // Automatically set landingPage if it's empty and we have a businessWebsite
+    if (step === 0 && !values.landingPage && businessWebsite) {
+      setTimeout(() => setFieldValue('landingPage', businessWebsite), 0);
     }
 
     switch (step) {
@@ -412,11 +509,20 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                   name="industry"
                   label={t('fields.industry')}
                   tooltip={t('fields.industryTooltip')}
+                  placeholder="e.g. Health & Wellness"
                   options={[
                     { label: 'E-commerce', value: 'ecommerce' },
                     { label: 'SaaS', value: 'saas' },
-                    { label: 'Local Business', value: 'local' },
-                    { label: 'Education', value: 'education' }
+                    { label: 'Real Estate', value: 'real_estate' },
+                    { label: 'Healthcare', value: 'healthcare' },
+                    { label: 'Fashion & Apparel', value: 'fashion' },
+                    { label: 'Food & Beverage', value: 'food_beverage' },
+                    { label: 'Travel & Hospitality', value: 'travel' },
+                    { label: 'Automotive', value: 'automotive' },
+                    { label: 'Financial Services', value: 'finance' },
+                    { label: 'Legal Services', value: 'legal' },
+                    { label: 'Education', value: 'education' },
+                    { label: 'Local Business', value: 'local' }
                   ]}
                   fullWidth
                 />
@@ -426,6 +532,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                   name="status"
                   label={t('fields.status')}
                   tooltip={t('fields.statusTooltip')}
+                  placeholder="Select status"
                   options={[
                     { label: t('status.active'), value: 'active' },
                     { label: t('status.draft'), value: 'draft' },
@@ -435,20 +542,51 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                 />
               </Grid>
               <Grid size={{ xs: 12 }}>
+                <CustomTextBox
+                  name="landingPage"
+                  label={t('fields.landingPage')}
+                  tooltip={t('fields.landingPageTooltip')}
+                  placeholder="https://yourbrand.com/special-offer"
+                  fullWidth
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CustomTextBox
+                  name="campaignStart"
+                  label={t('fields.campaignStart')}
+                  tooltip={t('fields.campaignTimelineTooltip')}
+                  type="date"
+                  placeholder="YYYY-MM-DD"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CustomTextBox
+                  name="campaignEnd"
+                  label={t('fields.campaignEnd')}
+                  tooltip={t('fields.campaignTimelineTooltip')}
+                  type="date"
+                  placeholder="YYYY-MM-DD"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="subtitle2" sx={{ mb: 3, fontWeight: 600 }}>
                   {t('basics.mode')}
                 </Typography>
                 <Grid container spacing={4}>
                   {[
-                    { 
-                      value: 'QUICK', 
-                      title: t('basics.modeQuick'), 
+                    {
+                      value: 'QUICK',
+                      title: t('basics.modeQuick'),
                       content: t('basics.modeQuickDesc'),
                       icon: <QuickModeIcon fontSize="large" color={values.mode === 'QUICK' ? 'primary' : 'action'} />
                     },
-                    { 
-                      value: 'PRO', 
-                      title: t('basics.modePro'), 
+                    {
+                      value: 'PRO',
+                      title: t('basics.modePro'),
                       content: t('basics.modeProDesc'),
                       icon: <ProModeIcon fontSize="large" color={values.mode === 'PRO' ? 'primary' : 'action'} />
                     }
@@ -489,6 +627,29 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
           <Fade in timeout={500}>
             <Grid container spacing={5}>
               <Grid size={{ xs: 12 }}>
+                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                    {t('offer.title')}
+                  </Typography>
+                  <Tooltip title={t('offer.smartFillTooltip')}>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={isScraping ? <CircularProgress size={16} color="inherit" /> : <AutoFixHigh />}
+                      onClick={() => handleSmartFill(values, setFieldValue)}
+                      disabled={isScraping || !values.landingPage}
+                      sx={{
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 700,
+                        borderWidth: 1.5,
+                        '&:hover': { borderWidth: 1.5 }
+                      }}
+                    >
+                      {isScraping ? t('offer.smartFillLoading') : t('offer.smartFill')}
+                    </Button>
+                  </Tooltip>
+                </Box>
                 <CustomTextBox
                   name="offer"
                   label={t('fields.offer')}
@@ -519,25 +680,55 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
         return (
           <Fade in timeout={500}>
             <Grid container spacing={4}>
+              {isRecommending && (
+                <Grid size={{ xs: 12 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, bgcolor: alpha(theme.palette.primary.main, 0.05), borderRadius: 2 }}>
+                    <CircularProgress size={20} />
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {t('goal.recommending')}
+                    </Typography>
+                  </Box>
+                </Grid>
+              )}
               {[
-                { value: 'traffic', title: t('goal.objectives.traffic'), content: 'Drive more people to your website' },
-                { value: 'leads', title: t('goal.objectives.leads'), content: 'Collect information from potential customers' },
-                { value: 'sales', title: t('goal.objectives.sales'), content: 'Directly sell products or services' },
-                { value: 'awareness', title: t('goal.objectives.awareness'), content: 'Reach more people and build brand' }
+                { value: 'traffic', title: t('goal.objectives.traffic'), content: t('goal.objectives.trafficSubtitle') },
+                { value: 'leads', title: t('goal.objectives.leads'), content: t('goal.objectives.leadsSubtitle') },
+                { value: 'sales', title: t('goal.objectives.sales'), content: t('goal.objectives.salesSubtitle') },
+                { value: 'awareness', title: t('goal.objectives.awareness'), content: t('goal.objectives.awarenessSubtitle') }
               ].map((item) => (
                 <Grid size={{ xs: 12, sm: 6 }} key={item.value}>
-                  <CustomInputVertical
-                    type="radio"
-                    name="goal"
-                    selected={values.goal}
-                    handleChange={(val) => setFieldValue('goal', val)}
-                    data={{
-                      value: item.value,
-                      title: item.title,
-                      content: item.content,
-                      asset: <GoalIcon fontSize="large" color={values.goal === item.value ? 'primary' : 'action'} />
-                    }}
-                  />
+                  <Box sx={{ position: 'relative' }}>
+                    {recommendedGoal === item.value && (
+                      <Chip
+                        label={t('goal.recommended')}
+                        color="primary"
+                        size="small"
+                        icon={<AutoFixHigh sx={{ fontSize: '14px !important' }} />}
+                        sx={{
+                          position: 'absolute',
+                          top: -10,
+                          right: 10,
+                          zIndex: 1,
+                          fontWeight: 800,
+                          fontSize: '10px',
+                          height: 20,
+                          boxShadow: theme.shadows[2]
+                        }}
+                      />
+                    )}
+                    <CustomInputVertical
+                      type="radio"
+                      name="goal"
+                      selected={values.goal}
+                      handleChange={(val) => setFieldValue('goal', val)}
+                      data={{
+                        value: item.value,
+                        title: item.title,
+                        content: item.content,
+                        asset: <GoalIcon fontSize="large" color={values.goal === item.value ? 'primary' : 'action'} />
+                      }}
+                    />
+                  </Box>
                 </Grid>
               ))}
             </Grid>
@@ -545,8 +736,19 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
         );
 
       case 3: {
-        const daysInMonth = getDaysInCurrentMonth();
-        const dailyBudget = Math.round((values.budgetMonthly || 0) / daysInMonth);
+
+        // Calculate campaign duration if both dates are set
+        let campaignDays = getDaysInCurrentMonth(); // Default to ~30 days
+
+        if (values.campaignStart && values.campaignEnd) {
+          const startDate = new Date(values.campaignStart);
+          const endDate = new Date(values.campaignEnd);
+          const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+
+          campaignDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
+        }
+
+        const dailyBudget = Math.round((values.budgetMonthly || 0) / campaignDays);
         const isLowBudget = values.budgetMonthly < 500;
         const isVeryLowBudget = values.budgetMonthly < 200;
 
@@ -559,6 +761,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                   label={t('fields.budgetMonthly')}
                   tooltip={t('fields.budgetMonthlyTooltip')}
                   type="number"
+                  placeholder="500"
                   fullWidth
                   InputProps={{
                     startAdornment: <Typography sx={{ mr: 1 }}>{tc('common.currencySymbol') || '$'}</Typography>
@@ -571,8 +774,13 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                   <Typography variant="body2" sx={{ fontWeight: 600, color: 'success.main' }}>
                     {tc('common.currencySymbol') || '$'}{dailyBudget}{t('budget.dailyUnit')}
                   </Typography>
+                  {values.campaignStart && values.campaignEnd && (
+                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+                      ({campaignDays} {t('budget.days')})
+                    </Typography>
+                  )}
                 </Box>
-                
+
                 {isVeryLowBudget && (
                   <Alert severity="error" icon={<WarningIcon />} sx={{ mt: 2 }}>
                     {t('budget.lowBudgetWarning')}
@@ -617,37 +825,37 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                   {values.seasonality !== 'none' && (
                     <>
                       <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextBox
-                name="seasonalityStart"
-                label={t('fields.seasonalityStart')}
-                tooltip={t('fields.seasonalityStartTooltip')}
-                type="date"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                onValueChange={(val: string | number) => {
-                  const window = calculatePromoWindow(String(val), values.seasonalityEnd);
+                        <CustomTextBox
+                          name="seasonalityStart"
+                          label={t('fields.seasonalityStart')}
+                          tooltip={t('fields.seasonalityStartTooltip')}
+                          type="date"
+                          fullWidth
+                          InputLabelProps={{ shrink: true }}
+                          onValueChange={(val: string | number) => {
+                            const window = calculatePromoWindow(String(val), values.seasonalityEnd);
 
-                  setFieldValue('promoWindow', window);
-                }}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextBox
-                name="seasonalityEnd"
-                label={t('fields.seasonalityEnd')}
-                tooltip={t('fields.seasonalityEndTooltip')}
-                type="date"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                onValueChange={(val: string | number) => {
-                  const window = calculatePromoWindow(values.seasonalityStart, String(val));
+                            setFieldValue('promoWindow', window);
+                          }}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <CustomTextBox
+                          name="seasonalityEnd"
+                          label={t('fields.seasonalityEnd')}
+                          tooltip={t('fields.seasonalityEndTooltip')}
+                          type="date"
+                          fullWidth
+                          InputLabelProps={{ shrink: true }}
+                          onValueChange={(val: string | number) => {
+                            const window = calculatePromoWindow(values.seasonalityStart, String(val));
 
-                  setFieldValue('promoWindow', window);
-                }}
-              />
-            </Grid>
-          </>
-        )}
+                            setFieldValue('promoWindow', window);
+                          }}
+                        />
+                      </Grid>
+                    </>
+                  )}
                 </>
               )}
             </Grid>
@@ -664,7 +872,9 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                   name="locations"
                   label={t('fields.locations')}
                   tooltip={t('fields.locationsTooltip')}
-                  placeholder={t('geo.placeholder')}
+                  placeholder={t('geo.countryPlaceholder') || 'Select target countries...'}
+                  options={countries}
+                  fullWidth
                 />
               </Grid>
               {values.mode === 'PRO' && (
@@ -702,17 +912,14 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                     fullWidth
                   />
                 ) : (
-                  <CustomSelect
+                  <CustomTextBox
                     name="brandTone"
                     label={t('fields.brandTone')}
                     tooltip={t('fields.brandToneTooltip')}
-                    options={[
-                      { label: 'Professional', value: 'professional' },
-                      { label: 'Friendly', value: 'friendly' },
-                      { label: 'Exciting', value: 'exciting' },
-                      { label: 'Urgent', value: 'urgent' }
-                    ]}
+                    placeholder={businessBrandTone || t('tone.placeholder')}
+                    disabled
                     fullWidth
+                    helperText={businessBrandTone ? t('tone.fromProfile') : t('tone.notSet')}
                   />
                 )}
               </Grid>
@@ -725,303 +932,200 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
           <Fade in timeout={500}>
             <Grid container spacing={6}>
               <Grid size={{ xs: 12 }}>
-                <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <ReviewIcon color="primary" />
-                  <Typography variant="h5" sx={{ fontWeight: 600 }}>{t('review.title')}</Typography>
+                <Box sx={{ mb: 6, display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <ReviewIcon color="primary" sx={{ fontSize: 32 }} />
+                  <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: -1 }}>
+                    {t('review.title')}
+                  </Typography>
                 </Box>
-                
-                <Paper variant="outlined" sx={{ p: 6, borderRadius: 2, bgcolor: alpha(theme.palette.primary.main, 0.02) }}>
-                  <Stack spacing={6}>
-                    <Box>
-                      <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
-                        {t('review.sessionName')}
-                      </Typography>
-                      <Typography variant="h6" sx={{ mt: 1 }}>{values.sessionName}</Typography>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {/* Primary Info Blueprint */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 8,
+                      borderRadius: 5,
+                      background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.primary.main, 0.01)} 100%)`,
+                      border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <Box sx={{
+                      position: 'absolute',
+                      bottom: -40,
+                      right: -40,
+                      opacity: 0.03,
+                      transform: 'rotate(-15deg)'
+                    }}>
+                      <ReviewIcon sx={{ fontSize: 240 }} />
                     </Box>
 
-                    <Divider />
-
                     <Grid container spacing={6}>
-                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
-                          {t('review.industry')}
+                      <Grid size={{ xs: 12, md: 8 }}>
+                        <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2 }}>
+                          {t('review.sessionName')}
                         </Typography>
-                        <Typography variant="body1" sx={{ mt: 1, fontWeight: 500, textTransform: 'capitalize' }}>
-                          {values.industry || '—'}
-                        </Typography>
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
-                          {t('review.mode')}
-                        </Typography>
-                        <Box sx={{ mt: 1 }}>
-                          <Chip 
-                            label={values.mode} 
-                            size="small" 
-                            color={values.mode === 'PRO' ? 'info' : 'secondary'} 
+                        <Typography variant="h3" sx={{ mt: 1, fontWeight: 800, letterSpacing: -1 }}>{values.sessionName}</Typography>
+
+                        <Stack direction="row" spacing={3} sx={{ mt: 4 }}>
+                          <Chip
+                            label={t(`status.${values.status || 'draft'}`)}
+                            color={values.status === 'active' ? 'success' : 'warning'}
                             variant="tonal"
+                            sx={{ fontWeight: 700, px: 2 }}
+                          />
+                          <Chip
+                            label={values.mode}
+                            color="primary"
+                            variant="tonal"
+                            sx={{ fontWeight: 700, px: 2 }}
                             icon={values.mode === 'PRO' ? <ProModeIcon /> : <QuickModeIcon />}
                           />
-                        </Box>
+                        </Stack>
                       </Grid>
-                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
-                          {t('review.objective')}
+                      <Grid size={{ xs: 12, md: 4 }} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                        <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 800 }}>
+                          {t('fields.landingPage')}
                         </Typography>
-                        <Box sx={{ mt: 1 }}>
-                          <Chip 
-                            label={(values.goal || '—').toUpperCase()} 
-                            color="primary" 
-                            size="small" 
-                            variant="tonal" 
-                          />
-                        </Box>
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
-                          {t('fields.status')}
+                        <Typography variant="body1" sx={{ mt: 1, color: 'primary.main', fontWeight: 700, textDecoration: 'underline', wordBreak: 'break-all' }}>
+                          {values.landingPage || '—'}
                         </Typography>
-                        <Box sx={{ mt: 1 }}>
-                          <Chip 
-                            label={t(`status.${values.status || 'draft'}`)} 
-                            color={values.status === 'active' ? 'success' : values.status === 'completed' ? 'info' : 'warning'} 
-                            size="small" 
-                            variant="tonal" 
-                          />
-                        </Box>
                       </Grid>
                     </Grid>
+                  </Paper>
 
-                    <Divider />
-
-                    <Box>
-                      <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
-                        {t('review.offer')}
-                      </Typography>
-                      <Typography variant="body1" sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>
-                        {values.offer || '—'}
-                      </Typography>
-                    </Box>
-
-                    {values.mode === 'PRO' && (
-                      <>
-                        <Divider />
-                        <Grid container spacing={6}>
-                          <Grid size={{ xs: 12, md: 6 }}>
-                            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
-                              {t('review.competitors')}
-                            </Typography>
-                            {Array.isArray(values.competitors) && values.competitors.length > 0 ? (
-                              <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap sx={{ mt: 1 }}>
-                                {values.competitors.map((comp: string) => (
-                                  <Chip key={comp} label={comp} size="small" variant="outlined" />
-                                ))}
-                              </Stack>
-                            ) : (
-                              <Typography variant="body2" color="text.disabled" sx={{ mt: 1, fontStyle: 'italic' }}>
-                                {tc('common.none') || 'None'}
+                  {/* Secondary Details Grid */}
+                  <Grid container spacing={6}>
+                    {/* Strategy Column */}
+                    <Grid size={{ xs: 12, md: 7 }}>
+                      <Card sx={{ height: '100%', p: 2 }}>
+                        <CardContent>
+                          <Typography variant="h6" sx={{ mb: 6, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(theme.palette.primary.main, 0.1), display: 'flex' }}>
+                              <GoalIcon color="primary" />
+                            </Box>
+                            {t('review.campaignStrategy')}
+                          </Typography>
+                          <Grid container spacing={6}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1 }}>
+                                {t('review.objective')}
                               </Typography>
-                            )}
+                              <Typography variant="h6" sx={{ mt: 1, fontWeight: 700, color: 'primary.main' }}>
+                                {t(`goal.objectives.${values.goal}`)}
+                              </Typography>
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1 }}>
+                                {t('fields.campaignStart')} / {t('fields.campaignEnd')}
+                              </Typography>
+                              <Typography variant="h6" sx={{ mt: 1, fontWeight: 700 }}>
+                                {values.campaignStart || '—'} — {values.campaignEnd || '—'}
+                              </Typography>
+                            </Grid>
+                            <Grid size={{ xs: 12 }}>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, mb: 1, display: 'block' }}>
+                                {t('review.locations')}
+                              </Typography>
+                              <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+                                {values.locations.map((loc: string) => (
+                                  <Chip key={loc} label={loc} size="small" variant="outlined" sx={{ borderRadius: 1, fontWeight: 600 }} />
+                                ))}
+                                {values.mode === 'PRO' && (
+                                  <Chip label={`+${values.geoRadius}km radius`} size="small" color="primary" variant="tonal" sx={{ borderRadius: 1, fontWeight: 600 }} />
+                                )}
+                              </Stack>
+                            </Grid>
                           </Grid>
-                          <Grid size={{ xs: 12, md: 6 }}>
-                            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
-                              {t('review.audienceNotes')}
-                            </Typography>
-                            <Typography variant="body1" sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>
-                              {values.audienceNotes || '—'}
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                      </>
-                    )}
-
-                    <Divider />
-
-                    <Grid container spacing={6}>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
-                          {t('review.budget')}
-                        </Typography>
-                        <Typography variant="h6" sx={{ mt: 1, color: 'success.main', fontWeight: 600 }}>
-                          {tc('common.currencySymbol') || '$'}{values.budgetMonthly}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {Math.round((values.budgetMonthly || 0) / getDaysInCurrentMonth())} {t('budget.dailyUnit')}
-                        </Typography>
-                      </Grid>
-                      {values.mode === 'PRO' && (
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                          <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
-                            {t('fields.seasonality')}
-                          </Typography>
-                          <Typography variant="body1" sx={{ mt: 1, fontWeight: 500 }}>
-                            {t(`budget.seasonality${(values.seasonality || 'none').split('_').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join('')}`)}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {t(`budget.pacing${(values.pacing || 'even').split('_').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join('')}`)}
-                          </Typography>
-                          {values.seasonality !== 'none' && values.seasonalityStart && values.seasonalityEnd && (
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-                              {values.seasonalityStart} — {values.seasonalityEnd} ({values.promoWindow} {t('budget.days')})
-                            </Typography>
-                          )}
-                        </Grid>
-                      )}
+                        </CardContent>
+                      </Card>
                     </Grid>
 
-                    <Divider />
+                    {/* Financial Column */}
+                    <Grid size={{ xs: 12, md: 5 }}>
+                      <Card sx={{ height: '100%', p: 2, bgcolor: alpha(theme.palette.success.main, 0.02) }}>
+                        <CardContent>
+                          <Typography variant="h6" sx={{ mb: 6, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(theme.palette.success.main, 0.1), display: 'flex' }}>
+                              <BudgetIcon color="success" />
+                            </Box>
+                            {t('review.budgetLogistics')}
+                          </Typography>
 
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, mb: 2, display: 'block' }}>
-                        {t('budget.allocation')}
+                          <Box sx={{ mb: 6 }}>
+                            <Typography variant="h3" sx={{ color: 'success.main', fontWeight: 900 }}>
+                              {tc('common.currencySymbol') || '$'}{values.budgetMonthly}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
+                              {t('review.totalMonthly')} / {tc('common.currencySymbol') || '$'}{Math.round((values.budgetMonthly || 0) / getDaysInCurrentMonth())} {t('budget.dailyUnit')}
+                            </Typography>
+                          </Box>
+
+                          <Stack spacing={3}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>{t('fields.industry')}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 800, textTransform: 'capitalize' }}>{values.industry}</Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>{t('fields.brandTone')}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 800, textTransform: 'capitalize' }}>{values.brandTone}</Typography>
+                            </Box>
+                          </Stack>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  </Grid>
+
+                  {/* Allocation Visualizer */}
+                  <Card sx={{ p: 2 }}>
+                    <CardContent>
+                      <Typography variant="h6" sx={{ mb: 6, fontWeight: 800 }}>
+                        {t('review.channelAllocation')}
                       </Typography>
                       {(() => {
                         const allocation = getAllocation(values.goal, values.budgetMonthly);
-                        
+
                         return (
-                          <Grid container spacing={4}>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                              <Card variant="outlined" sx={{ bgcolor: alpha(theme.palette.primary.main, 0.02) }}>
-                                <CardContent sx={{ p: '16px !important' }}>
-                                  <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <GoalIcon fontSize="small" /> {t('budget.google')}
-                                  </Typography>
-                                  <Stack spacing={1}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                      <Typography variant="body2">{t('budget.awareness')}</Typography>
-                                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{allocation.google.awareness}%</Typography>
+                          <Grid container spacing={8}>
+                            {[
+                              { platform: 'Google Ads', icon: <GoalIcon />, color: theme.palette.primary.main, data: allocation.google },
+                              { platform: 'Meta (FB/IG)', icon: <OfferIcon />, color: theme.palette.secondary.main, data: allocation.meta }
+                            ].map((item) => (
+                              <Grid size={{ xs: 12, md: 6 }} key={item.platform}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 900, mb: 4, color: item.color, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                  {item.icon} {item.platform}
+                                </Typography>
+                                <Stack spacing={4}>
+                                  {['awareness', 'consideration', 'conversion'].map((stage) => (
+                                    <Box key={stage}>
+                                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                                        <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 800, color: 'text.secondary', letterSpacing: 0.5 }}>
+                                          {t(`budget.${stage}`)}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ fontWeight: 900 }}>{item.data[stage as keyof typeof item.data]}%</Typography>
+                                      </Box>
+                                      <Box sx={{ height: 8, width: '100%', bgcolor: 'action.hover', borderRadius: 10, overflow: 'hidden' }}>
+                                        <Box sx={{
+                                          height: '100%',
+                                          width: `${item.data[stage as keyof typeof item.data]}%`,
+                                          bgcolor: item.color,
+                                          borderRadius: 10,
+                                          boxShadow: `0 0 10px ${alpha(item.color, 0.4)}`
+                                        }} />
+                                      </Box>
                                     </Box>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                      <Typography variant="body2">{t('budget.consideration')}</Typography>
-                                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{allocation.google.consideration}%</Typography>
-                                    </Box>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                      <Typography variant="body2">{t('budget.conversion')}</Typography>
-                                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{allocation.google.conversion}%</Typography>
-                                    </Box>
-                                  </Stack>
-                                </CardContent>
-                              </Card>
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                              <Card variant="outlined" sx={{ bgcolor: alpha(theme.palette.secondary.main, 0.02) }}>
-                                <CardContent sx={{ p: '16px !important' }}>
-                                  <Typography variant="subtitle2" color="secondary" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <OfferIcon fontSize="small" /> {t('budget.meta')}
-                                  </Typography>
-                                  <Stack spacing={1}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                      <Typography variant="body2">{t('budget.awareness')}</Typography>
-                                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{allocation.meta.awareness}%</Typography>
-                                    </Box>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                      <Typography variant="body2">{t('budget.consideration')}</Typography>
-                                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{allocation.meta.consideration}%</Typography>
-                                    </Box>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                      <Typography variant="body2">{t('budget.conversion')}</Typography>
-                                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{allocation.meta.conversion}%</Typography>
-                                    </Box>
-                                  </Stack>
-                                </CardContent>
-                              </Card>
-                            </Grid>
+                                  ))}
+                                </Stack>
+                              </Grid>
+                            ))}
                           </Grid>
                         );
                       })()}
-                    </Box>
-
-                    <Divider sx={{ my: 4 }} />
-
-                    <Box>
-                      <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, mb: 1, display: 'block' }}>
-                        {t('budget.rationale')}
-                      </Typography>
-                      <Paper variant="outlined" sx={{ p: 4, bgcolor: alpha(theme.palette.info.main, 0.05), borderLeft: `4px solid ${theme.palette.info.main}` }}>
-                        <Typography variant="body2" sx={{ mb: 2 }}>
-                          {t('budget.rationaleText', {
-                            goal: values.goal,
-                            pacing: t(`budget.pacing${(values.pacing || 'even').split('_').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join('')}`)
-                          })}
-                        </Typography>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 700, mt: 2, mb: 1 }}>
-                          {t('budget.assumptions')}
-                        </Typography>
-                        <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.875rem' }}>
-                          <li>{values.budgetMonthly >= 1000 ? t('budget.assumptionBudget') : t('budget.assumptionEfficiency')}</li>
-                          <li>{t('budget.assumptionCPC', { industry: values.industry })}</li>
-                          <li>{t('budget.assumptionSeasonality', { seasonality: values.seasonality || 'none' })}</li>
-                        </ul>
-
-                        {values.mode === 'PRO' && values.seasonality !== 'none' && (
-                          <>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mt: 4, mb: 1 }}>
-                              {t('budget.scheduleCurve')}
-                            </Typography>
-                            <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.875rem' }}>
-                              {values.pacing === 'ramp_up' ? (
-                                <li>{t('budget.curveRampUp', { start: values.seasonalityStart || 'TBD', window: values.promoWindow })}</li>
-                              ) : values.pacing === 'front_load' ? (
-                                <li>{t('budget.curveRampDown', { end: values.seasonalityEnd || 'TBD' })}</li>
-                              ) : (
-                                <li>{t('budget.curveEven')}</li>
-                              )}
-                            </ul>
-                          </>
-                        )}
-                        {(values.budgetMonthly < 500 || values.goal === 'awareness' || values.goal === 'sales' || values.goal === 'leads') && (
-                          <>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mt: 4, mb: 1 }}>
-                              {t('budget.tradeoffs')}
-                            </Typography>
-                            <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.875rem' }}>
-                              {values.budgetMonthly < 500 && <li>{t('budget.tradeoffLowBudget')}</li>}
-                              {values.goal === 'awareness' && <li>{t('budget.tradeoffAwareness')}</li>}
-                              {(values.goal === 'sales' || values.goal === 'leads') && <li>{t('budget.tradeoffConversion')}</li>}
-                            </ul>
-                          </>
-                        )}
-                      </Paper>
-                    </Box>
-
-                    <Divider />
-
-                    <Box>
-                      <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
-                        {t('review.locations')}
-                      </Typography>
-                      {Array.isArray(values.locations) && values.locations.length > 0 ? (
-                        <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap sx={{ mt: 1, mb: 2 }}>
-                          {values.locations.map((loc: string) => (
-                            <Chip key={loc} label={loc} size="small" color="primary" variant="outlined" />
-                          ))}
-                        </Stack>
-                      ) : (
-                        <Typography variant="body2" color="text.disabled" sx={{ mt: 1, mb: 2, fontStyle: 'italic' }}>
-                          {tc('common.none') || 'None'}
-                        </Typography>
-                      )}
-                      
-                      {values.mode === 'PRO' && (
-                        <Typography variant="caption" color="text.disabled" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <GeoIcon fontSize="inherit" />
-                          {t('review.radius')}: {values.geoRadius} {tc('common.distanceUnit') || 'km'}
-                        </Typography>
-                      )}
-                    </Box>
-
-                    <Divider />
-
-                    <Box>
-                      <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
-                        {t('review.tone')}
-                      </Typography>
-                      <Typography variant="body1" sx={{ mt: 1, textTransform: 'capitalize' }}>
-                        {values.brandTone || '—'}
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </Paper>
+                    </CardContent>
+                  </Card>
+                </Box>
               </Grid>
             </Grid>
           </Fade>
@@ -1049,80 +1153,92 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
   }
 
   return (
-    <StepperWrapper>
+    <StepperWrapper sx={{
+      '& .MuiCard-root': {
+        background: alpha(theme.palette.background.paper, 0.8),
+        backdropFilter: 'blur(12px)',
+        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+        boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.08)}`,
+        borderRadius: 4
+      }
+    }}>
       <Card>
-        <CardContent>
+        <CardContent sx={{ p: { xs: 6, md: 10 } }}>
           {isMobile ? (
-            <Box sx={{ mb: 6, textAlign: 'center' }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>
-                {t('steps.step')} {activeStep + 1} {tc('common.of')} {steps.length}
+            <Box sx={{ mb: 8, textAlign: 'center' }}>
+              <Typography variant="overline" color="primary" sx={{ fontWeight: 800, letterSpacing: 2 }}>
+                {t('steps.step')} {activeStep + 1} / {steps.length}
               </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              <Typography variant="h5" sx={{ fontWeight: 800, mt: 1 }}>
                 {steps[activeStep].label}
               </Typography>
-              <Box sx={{ mt: 2, display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+              <Box sx={{ mt: 3, display: 'flex', gap: 1, justifyContent: 'center' }}>
                 {steps.map((_, index) => (
                   <Box
                     key={index}
                     sx={{
-                      height: 4,
-                      flex: 1,
-                      maxWidth: 40,
-                      borderRadius: 1,
+                      height: 6,
+                      width: index === activeStep ? 40 : 12,
+                      borderRadius: 3,
                       bgcolor: index <= activeStep ? 'primary.main' : 'action.hover',
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                      boxShadow: index === activeStep ? `0 0 10px ${alpha(theme.palette.primary.main, 0.4)}` : 'none'
                     }}
                   />
                 ))}
               </Box>
             </Box>
           ) : (
-            <Stepper 
-              activeStep={activeStep} 
-              alternativeLabel 
-              sx={{ 
-                mb: 8,
+            <Stepper
+              activeStep={activeStep}
+              alternativeLabel
+              sx={{
+                mb: 12,
                 '& .MuiStepLabel-label': {
-                  mt: 1,
-                  fontWeight: 500,
+                  mt: 2,
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: 1,
                   color: 'text.disabled',
                   '&.Mui-active': {
                     color: 'primary.main',
-                    fontWeight: 600
-                  },
-                  '&.Mui-completed': {
-                    color: 'text.primary'
                   }
                 },
                 '& .MuiStepIcon-root': {
-                  width: 32,
-                  height: 32,
+                  width: 40,
+                  height: 40,
+                  borderRadius: '50%',
+                  border: `2px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  p: 0.5,
+                  color: 'transparent',
+                  bgcolor: 'background.paper',
+                  transition: 'all 0.3s ease',
                   '&.Mui-active': {
-                    filter: `drop-shadow(0 0 4px ${alpha(theme.palette.primary.main, 0.4)})`
+                    color: 'primary.main',
+                    borderColor: 'primary.main',
+                    transform: 'scale(1.1)',
+                    boxShadow: `0 0 15px ${alpha(theme.palette.primary.main, 0.3)}`
+                  },
+                  '&.Mui-completed': {
+                    color: 'success.main',
+                    borderColor: 'success.main',
+                    bgcolor: alpha(theme.palette.success.main, 0.05)
                   }
                 }
               }}
             >
               {steps.map((step, index) => (
                 <Step key={step.label} completed={activeStep > index}>
-                  <StepLabel 
+                  <StepLabel
                     icon={
-                      <Box sx={{ 
-                        position: 'relative',
+                      <Box sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        color: activeStep === index ? 'primary.main' : activeStep > index ? 'success.main' : 'text.disabled'
                       }}>
-                        {activeStep > index ? (
-                          <Check sx={{ color: 'primary.main' }} />
-                        ) : (
-                          <Box sx={{ 
-                            color: activeStep === index ? 'primary.main' : 'text.disabled',
-                            display: 'flex'
-                          }}>
-                            {step.icon}
-                          </Box>
-                        )}
+                        {activeStep > index ? <Check sx={{ fontSize: 24 }} /> : step.icon}
                       </Box>
                     }
                   >
@@ -1154,7 +1270,10 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                     competitors: values.competitors,
                     geoRadius: values.geoRadius,
                     audienceNotes: values.audienceNotes,
-                    seasonality: values.seasonality
+                    seasonality: values.seasonality,
+                    landingPage: values.landingPage,
+                    campaignStart: values.campaignStart,
+                    campaignEnd: values.campaignEnd
                   },
                   incrementVersion: true
                 });
@@ -1183,8 +1302,8 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                 />
 
                 {isDraftRecovered && !readOnly && (
-                  <Alert 
-                    severity="info" 
+                  <Alert
+                    severity="info"
                     sx={{ mb: 4 }}
                     action={
                       <Button color="inherit" size="small" onClick={() => {
@@ -1248,7 +1367,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                         key='next-button'
                         type='button'
                         variant='contained'
-                        onClick={() => handleNext(validateForm, setTouched)}
+                        onClick={() => handleNext(validateForm, setTouched, values)}
                         endIcon={<ArrowForward />}
                       >
                         {tc('common.next')}
