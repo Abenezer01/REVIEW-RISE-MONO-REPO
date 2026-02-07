@@ -47,6 +47,18 @@ const nextConfig: NextConfig = {
       }
     ]
   },
+  rewrites: async () => {
+    return [
+      {
+        source: '/uploads/:path*',
+        destination: 'http://localhost:3007/uploads/:path*',
+      },
+      {
+        source: '/api/v1/uploads/:path*',
+        destination: 'http://localhost:3007/api/v1/uploads/:path*',
+      }
+    ]
+  },
   transpilePackages: ['@platform/utils', '@platform/contracts', '@platform/i18n', '@platform/db'],
   serverExternalPackages: ['@prisma/client', '@prisma/client-runtime-utils']
 }

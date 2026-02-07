@@ -39,7 +39,8 @@
     "settings": "Settings",
     "system-settings": "System Settings",
     "feature-flags": "Feature Flags",
-    "ai-visibility": "AI Visibility"
+    "ai-visibility": "AI Visibility",
+    "subscription-issues": "Subscription Issues"
   },
   "errors": {
     "firstNameRequired": "First name is required",
@@ -115,9 +116,9 @@
       "seasonalityStartTooltip": "The date when your seasonal peak or promotion begins.",
       "seasonalityEnd": "Peak End Date",
       "seasonalityEndTooltip": "The date when your seasonal peak or promotion ends.",
-        "promoWindow": "Promo Window",
-        "promoWindowTooltip": "The total duration of your promotion in days. This is automatically calculated from your start and end dates.",
-        "geoRadius": "Search Radius",
+      "promoWindow": "Promo Window",
+      "promoWindowTooltip": "The total duration of your promotion in days. This is automatically calculated from your start and end dates.",
+      "geoRadius": "Search Radius",
       "geoRadiusTooltip": "The distance around your target locations to reach potential customers.",
       "status": "Status",
       "statusTooltip": "The current state of your campaign planning session."
@@ -1098,8 +1099,6 @@
       "uvp": "UVP",
       "services": "Services",
       "analysis": "Analysis",
-      "notFound": "Competitor not found",
-      "backToList": "Back to List",
       "stats": {
         "found": "COMPETITORS FOUND",
         "directLocal": "DIRECT LOCAL",
@@ -1299,17 +1298,6 @@
       "none": "Not Replied",
       "skipped": "Skipped"
     }
-  },
-  "errors": {
-    "businessRequired": "Business is required",
-    "emailRequired": "Email is required",
-    "firstNameRequired": "First name is required",
-    "invalidEmail": "Invalid email address",
-    "lastNameRequired": "Last name is required",
-    "locationRequired": "Location is required",
-    "passwordMin": "Password must be at least 8 characters",
-    "passwordRequired": "Password is required",
-    "roleRequired": "Role is required"
   },
   "status": {
     "completed": "Completed",

@@ -16,9 +16,13 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 import v1Routes from './routes/v1';
+import uploadRoutes from './routes/v1/upload.routes';
+import path from 'path';
 import { publishingWorker } from './services/publishing-worker.service';
 
 app.use('/api/v1', v1Routes);
+app.use('/api/v1/uploads', uploadRoutes);
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.get('/', (req, res) => {
     const response = createSuccessResponse(null, 'Express Brand Service is running', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
@@ -35,7 +39,7 @@ app.use(errorHandler);
 app.listen(PORT, () => {
     // eslint-disable-next-line no-console
     console.log(`Server is running on port ${PORT}`);
-    
+
     // Start background publishing worker
     publishingWorker.start();
 });
