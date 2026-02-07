@@ -6,14 +6,13 @@ import { useTranslations } from 'next-intl';
 import CreativeEngine from '@/components/ad-rise/creative-engine/CreativeEngine';
 import CreativeLibrary from '@/components/ad-rise/creative-engine/CreativeLibrary';
 import ConceptResultCard from '@/components/ad-rise/creative-engine/ConceptResultCard';
-import type { CreativeConcept} from '@platform/contracts';
-import { CreativeConceptOutput } from '@platform/contracts';
+import type { CreativeConcept } from '@platform/contracts';
 import { Image as ImageIcon, AutoAwesome, CollectionsBookmark } from '@mui/icons-material';
 import apiClient from '@/lib/apiClient';
 
 export default function CreativeEnginePage() {
-    const t = useTranslations('CreativeEngine'); 
-    
+    const t = useTranslations('ad-rise.creativeEngine');
+
     // Tabs
     const [activeTab, setActiveTab] = useState(0);
 
@@ -46,6 +45,7 @@ export default function CreativeEnginePage() {
         }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleReuseConcept = (concept: CreativeConcept) => {
         // Implementation for library reuse would go here
         setActiveTab(0);
@@ -65,21 +65,21 @@ export default function CreativeEnginePage() {
                             variant="outlined"
                             sx={{ mb: 2 }}
                         >
-                            ← Back to Editor
+                            {t('backToEditor')}
                         </Button>
                         <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-                            Generated Concepts
+                            {t('generatedConcepts')}
                         </Typography>
                         <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                            Here are your AI-generated creative angles.
+                            {t('generatedConceptsSubtitle')}
                         </Typography>
                     </Box>
-                     <Button 
-                        variant="contained" 
+                    <Button
+                        variant="contained"
                         color="primary"
-                        onClick={() => setView('input')} 
+                        onClick={() => setView('input')}
                     >
-                        Start New Campaign
+                        {t('startNewCampaign')}
                     </Button>
                 </Box>
 
@@ -107,10 +107,10 @@ export default function CreativeEnginePage() {
                     </Box>
                     <Box>
                         <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-                            Creative Prompt Engine
+                            {t('title')}
                         </Typography>
                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            AI-Powered Concept & Image Generator
+                            {t('subtitle')}
                         </Typography>
                     </Box>
                 </Box>
@@ -118,8 +118,8 @@ export default function CreativeEnginePage() {
 
             <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
                 <Tabs value={activeTab} onChange={handleTabChange} aria-label="creative engine tabs">
-                    <Tab icon={<AutoAwesome />} iconPosition="start" label="Generator" />
-                    <Tab icon={<CollectionsBookmark />} iconPosition="start" label="Creative Library" />
+                    <Tab icon={<AutoAwesome />} iconPosition="start" label={t('tabs.generator')} />
+                    <Tab icon={<CollectionsBookmark />} iconPosition="start" label={t('tabs.library')} />
                 </Tabs>
             </Box>
 
