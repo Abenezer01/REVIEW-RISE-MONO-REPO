@@ -19,7 +19,12 @@ import {
   Menu,
   MenuItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -34,7 +39,8 @@ import {
   CheckCircleOutline as ActiveIcon,
   HistoryEdu as DraftIcon,
   DoneAll as CompletedIcon,
-  PlaylistAddCheck as GuideIcon
+  PlaylistAddCheck as GuideIcon,
+  Delete as DeleteIcon
 } from '@mui/icons-material';
 
 import { useTranslations } from 'next-intl';
@@ -42,7 +48,7 @@ import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
 import { usePermissions } from '@/hooks/usePermissions';
-import { getSessions, getSessionWithLatestVersion, updateSessionStatus, updateChecklist } from '@/app/actions/adrise';
+import { getSessions, getSessionWithLatestVersion, updateSessionStatus, updateChecklist, deleteSession } from '@/app/actions/adrise';
 import StatisticsCard from '@/components/statistics/StatisticsCard';
 import TableListing from '@/components/shared/listing/list-types/table-listing';
 
@@ -67,6 +73,8 @@ const AdminAdRisePage = () => {
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [sessionForGuide, setSessionForGuide] = useState<any | null>(null);
   const [isUpdatingChecklist, setIsUpdatingChecklist] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 
   const fetchSessions = useCallback(async () => {
     if (!businessId) return;
@@ -271,6 +279,35 @@ const AdminAdRisePage = () => {
     }
   }, [sessionForGuide]);
 
+  const handleDeleteClick = useCallback((sessionId: string) => {
+    setSessionToDelete(sessionId);
+    setDeleteDialogOpen(true);
+  }, []);
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!sessionToDelete) return;
+    setLoading(true);
+    setDeleteDialogOpen(false);
+
+    try {
+      const result = await deleteSession(sessionToDelete);
+
+      if (result.success) {
+        await fetchSessions();
+      }
+    } catch (error) {
+      console.error('Failed to delete session:', error);
+    } finally {
+      setLoading(false);
+      setSessionToDelete(null);
+    }
+  }, [sessionToDelete, fetchSessions]);
+
+  const handleDeleteCancel = useCallback(() => {
+    setDeleteDialogOpen(false);
+    setSessionToDelete(null);
+  }, []);
+
   const columns: GridColDef[] = useMemo(() => [
     {
       field: 'name',
@@ -390,23 +427,37 @@ const AdminAdRisePage = () => {
             </IconButton>
           </Tooltip>
           {canEdit && (
-            <Tooltip title={t('adrise.sessions.duplicate')}>
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDuplicate(params.row.id);
-                }}
-                sx={{ color: 'secondary.main', bgcolor: alpha(theme.palette.secondary.main, 0.08) }}
-              >
-                <DuplicateIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+            <>
+              <Tooltip title={t('adrise.sessions.duplicate')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDuplicate(params.row.id);
+                  }}
+                  sx={{ color: 'secondary.main', bgcolor: alpha(theme.palette.secondary.main, 0.08) }}
+                >
+                  <DuplicateIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t('adrise.sessions.delete')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteClick(params.row.id);
+                  }}
+                  sx={{ color: 'error.main', bgcolor: alpha(theme.palette.error.main, 0.08) }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </>
           )}
         </Stack>
       )
     }
-  ], [theme, t, tc, canEdit, handleEdit, handleDuplicate, setStatusMenuAnchor, handleOpenGuide]);
+  ], [theme, t, tc, canEdit, handleEdit, handleDuplicate, handleDeleteClick, setStatusMenuAnchor, handleOpenGuide]);
 
   const handleWizardSuccess = () => {
     setIsWizardOpen(false);
@@ -592,6 +643,34 @@ const AdminAdRisePage = () => {
           <ListItemText primary={t('adrise.status.completed')} />
         </MenuItem>
       </Menu>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            minWidth: 400
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 600 }}>
+          {t('adrise.sessions.deleteConfirmTitle')}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {t('adrise.sessions.deleteConfirmMessage')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 4, pt: 2 }}>
+          <Button onClick={handleDeleteCancel} variant="outlined">
+            {tc('common.cancel')}
+          </Button>
+          <Button onClick={handleDeleteConfirm} variant="contained" color="error" autoFocus>
+            {tc('common.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Grid>
   );
 };

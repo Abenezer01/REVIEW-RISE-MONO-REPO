@@ -122,6 +122,11 @@
       "promoWindowTooltip": "The total duration of your promotion in days. This is automatically calculated from your start and end dates.",
       "geoRadius": "Search Radius",
       "geoRadiusTooltip": "The distance around your target locations to reach potential customers.",
+      "landingPage": "Landing Page URL",
+      "landingPageTooltip": "The website address where your ads will point to (e.g., https://yourbrand.com/offer).",
+      "campaignStart": "Campaign Start",
+      "campaignEnd": "Campaign End",
+      "campaignTimelineTooltip": "The planned duration for your advertising campaign.",
       "status": "Status",
       "statusTooltip": "The current state of your campaign planning session."
     },
@@ -129,7 +134,10 @@
       "title": "What are you offering?",
       "description": "Describe your product or service in detail.",
       "placeholder": "e.g. We offer premium organic coffee beans delivered to your doorstep...",
-      "audiencePlaceholder": "Describe your target audience (interests, demographics, pain points)..."
+      "audiencePlaceholder": "Describe your target audience (interests, demographics, pain points)...",
+      "smartFill": "Smart Fill",
+      "smartFillLoading": "Scanning website...",
+      "smartFillTooltip": "Let AI scan your landing page to extract current offers automatically."
     },
     "goal": {
       "title": "Campaign Goal",
@@ -137,10 +145,16 @@
       "objectivePlaceholder": "Select your primary goal",
       "objectives": {
         "awareness": "Brand Awareness",
+        "awarenessSubtitle": "Reach more people and build brand recognition",
         "leads": "Lead Generation",
+        "leadsSubtitle": "Collect contact info from potential customers",
         "sales": "Sales & Conversions",
-        "traffic": "Website Traffic"
-      }
+        "salesSubtitle": "Drive direct product or service purchases",
+        "traffic": "Website Traffic",
+        "trafficSubtitle": "Get more people to visit your landing page"
+      },
+      "recommended": "Recommended",
+      "recommending": "AI is analyzing your offer..."
     },
     "budget": {
       "title": "Campaign Budget",
@@ -195,12 +209,15 @@
       "title": "Target Geography",
       "locations": "Target Locations",
       "placeholder": "Enter city, state, or country",
+      "countryPlaceholder": "Select target countries...",
       "addLocation": "Add Location"
     },
     "tone": {
       "title": "Brand Tone & Voice",
       "description": "How should your campaign sound to your audience?",
-      "placeholder": "e.g. Professional yet friendly, energetic and youthful..."
+      "placeholder": "e.g. Professional yet friendly, energetic and youthful...",
+      "fromProfile": "Automatically loaded from your Brand Profile",
+      "notSet": "No brand voice set in your Brand Profile. Please update your Brand DNA."
     },
     "review": {
       "title": "Review & Launch",
@@ -216,6 +233,10 @@
       "competitors": "Competitors",
       "audienceNotes": "Audience Notes",
       "seasonality": "Seasonality",
+      "campaignStrategy": "Campaign Strategy",
+      "budgetLogistics": "Budget & Logistics",
+      "totalMonthly": "Total Monthly",
+      "channelAllocation": "AI-Generated Channel Allocation",
       "radius": "Search Radius"
     },
     "sessions": {
@@ -231,6 +252,9 @@
       "viewGuide": "View Execution Guide",
       "edit": "Edit",
       "duplicate": "Duplicate",
+      "delete": "Delete",
+      "deleteConfirmTitle": "Delete Session?",
+      "deleteConfirmMessage": "Are you sure you want to delete this session? This action cannot be undone.",
       "draftRecovered": "Resumed from your previous unsaved draft."
     },
     "status": {
@@ -245,7 +269,9 @@
       "required": "This field is required",
       "minBudget": "Budget must be greater than 0",
       "invalidNumber": "Please enter a valid number",
-      "lowBudgetWarning": "A minimum budget of $500 is recommended for best results."
+      "lowBudgetWarning": "A minimum budget of $500 is recommended for best results.",
+      "invalidUrl": "Please enter a valid URL (e.g. https://brand.com)",
+      "invalidDateRange": "End date must be after start date"
     },
     "guide": {
       "title": "Campaign Execution Guide",

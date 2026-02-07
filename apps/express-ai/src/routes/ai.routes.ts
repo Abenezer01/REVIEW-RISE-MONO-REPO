@@ -163,4 +163,70 @@ router.post('/reviews/analyze', validateRequest(AnalyzeReviewRequestSchema), asy
 router.post('/creative-engine/concepts', generateConcepts);
 router.post('/creative-engine/image', generateCreativeImage);
 
+router.post('/extract-offer', async (req, res) => {
+    try {
+        const { html, businessContext } = req.body;
+        if (!html) {
+            return res.status(400).json({ error: 'Missing html content' });
+        }
+
+        const prompt = `
+        You are a conversion optimization expert. Analyze the following website HTML and extract any current promotional offers, discounts, or incentives (e.g., "$50 off", "Buy 1 Get 1 Free", "Free Consultation", "Join for $1").
+        
+        Business Context: ${businessContext || 'Local Business'}
+        
+        HTML Content:
+        ${html.substring(0, 15000)} // Truncate to avoid token limits
+        
+        Rules:
+        1. Identify the most prominent offer.
+        2. Describe it in a concise (1-2 sentences), high-converting way suitable for an ad campaign.
+        3. If no specific offer is found, summarize the core value proposition of the service.
+        4. Return ONLY the extracted text. No JSON, no preamble.
+        `;
+
+        const extractedOffer = await llmService.generateText(prompt, { temperature: 0.3 });
+        res.json({ extractedOffer: extractedOffer.trim() });
+    } catch (error: any) {
+        console.error('Offer Extraction Error:', error);
+        res.status(500).json({ error: error.message || 'Internal Server Error' });
+    }
+});
+
+router.post('/recommend-goal', async (req, res) => {
+    try {
+        const { offer, industry, businessContext } = req.body;
+        if (!offer) {
+            return res.status(400).json({ error: 'Missing offer content' });
+        }
+
+        const prompt = `
+        You are a digital marketing strategist. Based on the following offer and industry, recommend the most appropriate campaign goal from the list: [traffic, leads, sales, awareness].
+        
+        Industry: ${industry || 'Not specified'}
+        Offer: ${offer}
+        Business Context: ${businessContext || 'Local Business'}
+        
+        Rules:
+        1. Choose exactly one from: [traffic, leads, sales, awareness].
+        2. 'sales' is for direct purchases.
+        3. 'leads' is for service-based businesses or complex products requiring contact.
+        4. 'traffic' is for educational content or getting people to a physical store/detailed page.
+        5. 'awareness' is for new brands or reaching the widest audience possible.
+        
+        Return ONLY the chosen goal word.
+        `;
+
+        const recommendedGoal = await llmService.generateText(prompt, { temperature: 0.1 });
+        const cleanGoal = recommendedGoal.trim().toLowerCase();
+
+        // Validate output
+        const validGoals = ['traffic', 'leads', 'sales', 'awareness'];
+        res.json({ recommendedGoal: validGoals.includes(cleanGoal) ? cleanGoal : 'leads' });
+    } catch (error: any) {
+        console.error('Goal Recommendation Error:', error);
+        res.status(500).json({ error: error.message || 'Internal Server Error' });
+    }
+});
+
 export default router;
