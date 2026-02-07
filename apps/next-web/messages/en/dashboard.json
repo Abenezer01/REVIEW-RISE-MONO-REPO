@@ -40,6 +40,8 @@
     "system-settings": "System Settings",
     "feature-flags": "Feature Flags",
     "ai-visibility": "AI Visibility",
+    "creative-engine": "Creative Engine",
+    "simulator": "Simulator",
     "subscription-issues": "Subscription Issues"
   },
   "errors": {

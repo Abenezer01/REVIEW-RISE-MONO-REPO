@@ -33,7 +33,9 @@
     "feature-flags": "أعلام الميزات",
     "ai-visibility": "ظهور الذكاء الاصطناعي",
     "ad-rise-blueprint": "منشئ المخطط",
-    "social-logs": "سجلات النشر"
+    "social-logs": "سجلات النشر",
+    "creative-engine": "المحرك الإبداعي",
+    "simulator": "المحاكي"
   },
   "adrise": {
     "title": "معالج حملة AdRise™",
@@ -1073,8 +1075,6 @@
       "uvp": "UVP",
       "services": "الخدمات",
       "analysis": "التحليل",
-      "notFound": "المنافس غير موجود",
-      "backToList": "العودة إلى القائمة",
       "stats": {
         "found": "تم العثور على منافسين",
         "directLocal": "محلي مباشر",
