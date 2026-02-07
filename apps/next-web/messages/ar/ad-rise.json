@@ -1,1 +1,94 @@
-{}
+{
+  "creativeEngine": {
+    "title": "محرك المقترحات الإبداعية",
+    "subtitle": "مولد الأفكار والصور المدعوم بالذكاء الاصطناعي",
+    "backToEditor": "← العودة إلى المحرر",
+    "generatedConcepts": "المفاهيم المولدة",
+    "generatedConceptsSubtitle": "إليك الزوايا الإبداعية المولدة بواسطة الذكاء الاصطناعي.",
+    "startNewCampaign": "بدء حملة جديدة",
+    "tabs": {
+      "generator": "المولد",
+      "library": "المكتبة الإبداعية"
+    },
+    "form": {
+      "campaignDetails": "تفاصيل الحملة",
+      "step1": "الخطوة 1",
+      "step2": "الخطوة 2",
+      "offerLabel": "العرض / المنتج",
+      "offerSubtitle": "ما الذي تروج له؟",
+      "offerPlaceholder": "مثال: منتجات تنظيف صديقة للبيئة فاخرة",
+      "audienceLabel": "نقاط ألم الجمهور",
+      "audienceSubtitle": "ما هي المشكلات التي يواجهها جمهورك؟",
+      "audiencePlaceholder": "مثال: المواد الكيميائية القاسية التي تضر بصحة الأسرة، المخاوف البيئية...",
+      "brandToneTitle": "ملف نبرة العلامة التجارية",
+      "generateButton": "توليد المفاهيم الإبداعية",
+      "generating": "جاري التوليد..."
+    },
+    "tone": {
+      "title": "ملف نبرة العلامة التجارية",
+      "selectTone": "اختر النبرة",
+      "preferredWords": "الكلمات المفضلة (مفصولة بفاصلة)",
+      "preferredWordsPlaceholder": "مثال: صديق للبيئة، طبيعي، آمن",
+      "bannedPhrases": "العبارات المحظورة (مفصولة بفاصلة)",
+      "bannedPhrasesPlaceholder": "مثال: رخيص، سام",
+      "options": {
+        "Friendly": {
+          "label": "ودود",
+          "description": "دافئ، يمكن التقرب منه، حواري"
+        },
+        "Professional": {
+          "label": "احترافي",
+          "description": "رسمي، موثوق، خبير"
+        },
+        "Luxury": {
+          "label": "فاخر",
+          "description": "ممتاز، متطور، حصري"
+        },
+        "Urgent": {
+          "label": "عاجل",
+          "description": "حساس للوقت، مدفوع بالعمل"
+        }
+      }
+    },
+    "results": {
+      "visualIdea": "الفكرة المرئية:",
+      "viewGeneratedImage": "عرض الصورة المولدة",
+      "aiImageGeneration": "توليد الصور بالذكاء الاصطناعي",
+      "prompt": "المقترح:",
+      "viewPrompts": "عرض المقترحات والصورة",
+      "hidePrompts": "إخفاء المقترحات",
+      "copy": "نسخ",
+      "copied": "تم النسخ",
+      "generateArt": "توليد فن (DALL-E)",
+      "generating": "جاري التوليد..."
+    },
+    "summary": {
+      "title": "ما ستحصل عليه",
+      "concepts": "مفاهيم إبداعية",
+      "conceptsCount": "3-6",
+      "formats": "تنوع التنسيقات",
+      "formatsCount": "3",
+      "templates": "قوالب المقترحات",
+      "templatesCount": "9-18"
+    },
+    "settings": {
+      "aiImageTitle": "توليد الصور بالذكاء الاصطناعي",
+      "enableAiImages": "تفعيل صور الذكاء الاصطناعي",
+      "enableAiImagesDesc": "توليد الصور باستخدام OpenAI DALL-E"
+    },
+    "features": {
+      "title": "ميزات المفهوم",
+      "item1": "زوايا العناوين المرتبطة بنقاط الألم",
+      "item2": "أفكار مرئية لكل مفهوم",
+      "item3": "تنوعات النص الأساسي",
+      "item4": "عبارات حث على اتخاذ إجراء محسنة لكل مفهوم",
+      "item5": "مقترحات خاصة بالتنسيق (Feed, Stories, Reels)",
+      "item6": "حفظ في المكتبة الإبداعية"
+    },
+    "library": {
+      "comingSoon": "المكتبة الإبداعية قريباً",
+      "description": "احفظ أفضل مفاهيمك وأعد استخدامها لاحقاً. هذه الميزة قيد التطوير حالياً.",
+      "browse": "تصفح المكتبة"
+    }
+  }
+}

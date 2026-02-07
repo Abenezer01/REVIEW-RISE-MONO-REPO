@@ -1,1 +1,94 @@
-{}
+{
+  "creativeEngine": {
+    "title": "Creative Prompt Engine",
+    "subtitle": "AI-Powered Concept & Image Generator",
+    "backToEditor": "← Back to Editor",
+    "generatedConcepts": "Generated Concepts",
+    "generatedConceptsSubtitle": "Here are your AI-generated creative angles.",
+    "startNewCampaign": "Start New Campaign",
+    "tabs": {
+      "generator": "Generator",
+      "library": "Creative Library"
+    },
+    "form": {
+      "campaignDetails": "Campaign Details",
+      "step1": "Step 1",
+      "step2": "Step 2",
+      "offerLabel": "Offer / Product",
+      "offerSubtitle": "What are you promoting?",
+      "offerPlaceholder": "e.g. Premium Eco-Friendly Cleaning Products",
+      "audienceLabel": "Audience Pain Points",
+      "audienceSubtitle": "What problems does your audience face?",
+      "audiencePlaceholder": "e.g. Harsh chemicals harming family health, environmental concerns...",
+      "brandToneTitle": "Brand Tone Profile",
+      "generateButton": "Generate Creative Concepts",
+      "generating": "Generating..."
+    },
+    "tone": {
+      "title": "Brand Tone Profile",
+      "selectTone": "Select Tone",
+      "preferredWords": "Preferred Words (comma separated)",
+      "preferredWordsPlaceholder": "e.g. eco-friendly, natural, safe",
+      "bannedPhrases": "Banned Phrases (comma separated)",
+      "bannedPhrasesPlaceholder": "e.g. cheap, toxic",
+      "options": {
+        "Friendly": {
+          "label": "Friendly",
+          "description": "Warm, approachable, conversational"
+        },
+        "Professional": {
+          "label": "Professional",
+          "description": "Formal, authoritative, expert"
+        },
+        "Luxury": {
+          "label": "Luxury",
+          "description": "Premium, sophisticated, exclusive"
+        },
+        "Urgent": {
+          "label": "Urgent",
+          "description": "Time-sensitive, action-driven"
+        }
+      }
+    },
+    "results": {
+      "visualIdea": "Visual Idea:",
+      "viewGeneratedImage": "View Generated Image",
+      "aiImageGeneration": "AI Image Generation",
+      "prompt": "Prompt:",
+      "viewPrompts": "View Prompts & Image",
+      "hidePrompts": "Hide Prompts",
+      "copy": "Copy",
+      "copied": "Copied",
+      "generateArt": "Generate Art (DALL-E)",
+      "generating": "Generating..."
+    },
+    "summary": {
+      "title": "What You'll Get",
+      "concepts": "Creative Concepts",
+      "conceptsCount": "3-6",
+      "formats": "Format Variations",
+      "formatsCount": "3",
+      "templates": "Prompt Templates",
+      "templatesCount": "9-18"
+    },
+    "settings": {
+      "aiImageTitle": "AI Image Generation",
+      "enableAiImages": "Enable AI Images",
+      "enableAiImagesDesc": "Generate images with OpenAI DALL-E"
+    },
+    "features": {
+      "title": "Concept Features",
+      "item1": "Headline angles tied to pain points",
+      "item2": "Visual ideas for each concept",
+      "item3": "Primary text variations",
+      "item4": "Optimized CTAs per concept",
+      "item5": "Format-specific prompts (Feed, Stories, Reels)",
+      "item6": "Save to creative library"
+    },
+    "library": {
+      "comingSoon": "Creative Library Coming Soon",
+      "description": "Save your best concepts and reuse them later. This feature is currently under development.",
+      "browse": "Browse Library"
+    }
+  }
+}

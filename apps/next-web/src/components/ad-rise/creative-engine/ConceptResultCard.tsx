@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Box, Typography, Paper, Chip, Stack, Alert, Button, Collapse, IconButton } from '@mui/material';
+import { Box, Typography, Paper, Chip, Stack, Alert, Button, Collapse } from '@mui/material';
 import type { CreativeConcept } from '@platform/contracts';
+import { useTranslations } from 'next-intl';
 
 interface ConceptResultCardProps {
     concept: CreativeConcept;
@@ -9,6 +10,7 @@ interface ConceptResultCardProps {
 }
 
 export default function ConceptResultCard({ concept, onGenerateImage, isGeneratingImage }: ConceptResultCardProps) {
+    const t = useTranslations('ad-rise.creativeEngine.results');
     const [expanded, setExpanded] = useState(false);
     const [copiedFormat, setCopiedFormat] = useState<string | null>(null);
 
@@ -47,7 +49,7 @@ export default function ConceptResultCard({ concept, onGenerateImage, isGenerati
             </Box>
 
             <Alert severity="info" icon={false} sx={{ mb: 2, bgcolor: 'action.hover', border: 'none' }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'text.primary' }}>Visual Idea:</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'text.primary' }}>{t('visualIdea')}</Typography>
                 <Typography variant="body2">{concept.visualIdea}</Typography>
             </Alert>
 
@@ -56,22 +58,22 @@ export default function ConceptResultCard({ concept, onGenerateImage, isGenerati
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Button 
+                <Button
                     onClick={() => setExpanded(!expanded)}
                     size="small"
                 >
-                    {expanded ? 'Hide Prompts' : 'View Prompts & Image'}
+                    {expanded ? t('hidePrompts') : t('viewPrompts')}
                 </Button>
 
                 {concept.imageUrl && (
-                    <Button 
-                        href={concept.imageUrl} 
-                        target="_blank" 
-                        color="success" 
+                    <Button
+                        href={concept.imageUrl}
+                        target="_blank"
+                        color="success"
                         size="small"
                         variant="outlined"
                     >
-                        View Generated Image
+                        {t('viewGeneratedImage')}
                     </Button>
                 )}
             </Box>
@@ -89,12 +91,12 @@ export default function ConceptResultCard({ concept, onGenerateImage, isGenerati
                                     </Typography>
                                     <Paper sx={{ p: 1.5, bgcolor: 'background.paper', fontSize: '0.85rem', position: 'relative' }}>
                                         {prompt.substring(0, 100)}...
-                                        <Button 
-                                            size="small" 
+                                        <Button
+                                            size="small"
                                             sx={{ position: 'absolute', right: 2, top: 2, minWidth: 'auto', p: 0.5 }}
                                             onClick={() => handleCopy(prompt, format)}
                                         >
-                                            {copiedFormat === format ? 'Copied' : 'Copy'}
+                                            {copiedFormat === format ? t('copied') : t('copy')}
                                         </Button>
                                     </Paper>
                                 </Box>
@@ -104,19 +106,19 @@ export default function ConceptResultCard({ concept, onGenerateImage, isGenerati
 
                     {/* Image Generation */}
                     <Box sx={{ borderTop: '1px solid', borderColor: 'divider', pt: 2 }}>
-                        <Typography variant="subtitle2" sx={{ mb: 1 }}>AI Image Generation</Typography>
+                        <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('aiImageGeneration')}</Typography>
                         <Typography variant="caption" display="block" sx={{ mb: 2, color: 'text.secondary', fontStyle: 'italic' }}>
-                            Prompt: {concept.imagePrompt}
+                            {t('prompt')} {concept.imagePrompt}
                         </Typography>
-                        
+
                         {!concept.imageUrl && (
-                            <Button 
-                                variant="contained" 
-                                color="secondary" 
+                            <Button
+                                variant="contained"
+                                color="secondary"
                                 onClick={() => onGenerateImage(concept.imagePrompt || '')}
                                 disabled={isGeneratingImage || !concept.imagePrompt}
                             >
-                                {isGeneratingImage ? 'Generating...' : 'Generate Art (DALL-E)'}
+                                {isGeneratingImage ? t('generating') : t('generateArt')}
                             </Button>
                         )}
                         

@@ -1,17 +1,18 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography, Grid, Paper, Button, Stack } from '@mui/material';
+import { Box, Typography, Paper, Button } from '@mui/material';
 import type { CreativeConcept } from '@platform/contracts';
 import { AutoAwesome } from '@mui/icons-material';
+import { useTranslations } from 'next-intl';
 
 interface CreativeLibraryProps {
     onReuse: (concept: CreativeConcept) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function CreativeLibrary({ onReuse }: CreativeLibraryProps) {
-    // Mock data for now, would fetch from API
-    const savedConcepts: CreativeConcept[] = [];
+    const t = useTranslations('ad-rise.creativeEngine.library');
 
     return (
         <Box sx={{ textAlign: 'center', py: 8 }}>
@@ -20,13 +21,13 @@ export default function CreativeLibrary({ onReuse }: CreativeLibraryProps) {
                      <AutoAwesome sx={{ fontSize: 48, opacity: 0.5 }} />
                 </Box>
                 <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
-                    Creative Library Coming Soon
+                    {t('comingSoon')}
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                    Save your best concepts and reuse them later. This feature is currently under development.
+                    {t('description')}
                 </Typography>
                 <Button variant="contained" disabled>
-                    Browse Library
+                    {t('browse')}
                 </Button>
             </Paper>
         </Box>
