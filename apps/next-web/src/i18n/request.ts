@@ -11,6 +11,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
         locale = routing.defaultLocale
     }
 
+    const adRiseMessages = (await import(`../../messages/${locale}/ad-rise.json`)).default
+
     return {
         locale,
         messages: {
@@ -25,9 +27,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
             social: (await import(`../../messages/${locale}/social.json`)).default,
             settings: (await import(`../../messages/${locale}/settings.json`)).default,
             admin: (await import(`../../messages/${locale}/admin.json`)).default,
-            blueprint: (await import(`../../messages/${locale}/blueprint.json`)).default,
+            blueprint: adRiseMessages.blueprint,
             simulator: (await import(`../../messages/${locale}/simulator.json`)).default,
-            'ad-rise': (await import(`../../messages/${locale}/ad-rise.json`)).default
+            'ad-rise': adRiseMessages
         }
     }
 })
