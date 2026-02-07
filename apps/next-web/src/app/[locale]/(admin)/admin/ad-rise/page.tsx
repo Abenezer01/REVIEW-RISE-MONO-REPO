@@ -33,7 +33,8 @@ import {
   ArrowBack as ArrowBackIcon,
   CheckCircleOutline as ActiveIcon,
   HistoryEdu as DraftIcon,
-  DoneAll as CompletedIcon
+  DoneAll as CompletedIcon,
+  PlaylistAddCheck as GuideIcon
 } from '@mui/icons-material';
 
 import { useTranslations } from 'next-intl';
@@ -41,11 +42,12 @@ import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
 import { usePermissions } from '@/hooks/usePermissions';
-import { getSessions, getSessionWithLatestVersion, updateSessionStatus } from '@/app/actions/adrise';
+import { getSessions, getSessionWithLatestVersion, updateSessionStatus, updateChecklist } from '@/app/actions/adrise';
 import StatisticsCard from '@/components/statistics/StatisticsCard';
 import TableListing from '@/components/shared/listing/list-types/table-listing';
 
 import AdRiseWizard from './AdRiseWizard';
+import ExecutionGuide from './ExecutionGuide';
 
 const AdminAdRisePage = () => {
   const theme = useTheme();
@@ -59,8 +61,12 @@ const AdminAdRisePage = () => {
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [selectedSessionId, setSelectedSessionId] = useState<string | undefined>();
   const [initialData, setInitialData] = useState<any | undefined>();
-  
+
   const [statusMenuAnchor, setStatusMenuAnchor] = useState<{ el: HTMLElement, sessionId: string } | null>(null);
+
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [sessionForGuide, setSessionForGuide] = useState<any | null>(null);
+  const [isUpdatingChecklist, setIsUpdatingChecklist] = useState(false);
 
   const fetchSessions = useCallback(async () => {
     if (!businessId) return;
@@ -216,6 +222,55 @@ const AdminAdRisePage = () => {
     }
   }, [fetchSessions]);
 
+  const handleOpenGuide = useCallback((session: any) => {
+    setSessionForGuide(session);
+    setIsGuideOpen(true);
+  }, []);
+
+  const handleToggleStep = useCallback(async (stepId: string, completed: boolean) => {
+    if (!sessionForGuide) return;
+    setIsUpdatingChecklist(true);
+
+    try {
+      const result = await updateChecklist(sessionForGuide.id, stepId, completed);
+
+      if (result.success) {
+        // Update local state to reflect change immediately
+        setSessionForGuide((prev: any) => {
+          const inputs = (prev.inputs || {}) as any;
+          const checklist = inputs.checklist || {};
+
+          return {
+            ...prev,
+            inputs: {
+              ...inputs,
+              checklist: {
+                ...checklist,
+                [stepId]: completed
+              }
+            }
+          };
+        });
+
+        // Also update the sessions list
+        setSessions(prev => prev.map(s => (s.id === sessionForGuide.id ? {
+          ...s,
+          inputs: {
+            ...(s.inputs || {}),
+            checklist: {
+              ...((s.inputs || {}).checklist || {}),
+              [stepId]: completed
+            }
+          }
+        } : s)));
+      }
+    } catch (error) {
+      console.error('Failed to update step:', error);
+    } finally {
+      setIsUpdatingChecklist(false);
+    }
+  }, [sessionForGuide]);
+
   const columns: GridColDef[] = useMemo(() => [
     {
       field: 'name',
@@ -228,9 +283,9 @@ const AdminAdRisePage = () => {
 
         return (
           <Stack direction="row" spacing={3} alignItems="center" sx={{ height: '100%' }}>
-            <Box sx={{ 
-              p: 2, 
-              borderRadius: 2, 
+            <Box sx={{
+              p: 2,
+              borderRadius: 2,
               bgcolor: alpha(theme.palette.primary.main, 0.1),
               color: theme.palette.primary.main,
               display: 'flex'
@@ -252,9 +307,9 @@ const AdminAdRisePage = () => {
       width: 120,
       renderCell: (params: GridRenderCellParams) => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-          <Chip 
-            label={params.value} 
-            size="small" 
+          <Chip
+            label={params.value}
+            size="small"
             variant="tonal"
             color={params.value === 'PRO' ? 'info' : 'secondary'}
             sx={{ fontWeight: 500 }}
@@ -268,9 +323,9 @@ const AdminAdRisePage = () => {
       width: 150,
       renderCell: (params: GridRenderCellParams) => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-          <Chip 
-            label={t(`adrise.status.${params.value || 'draft'}`)} 
-            size="small" 
+          <Chip
+            label={t(`adrise.status.${params.value || 'draft'}`)}
+            size="small"
             color={getStatusColor(params.value)}
             variant="tonal"
             icon={params.value === 'active' ? <CheckCircleIcon /> : <PendingIcon />}
@@ -310,8 +365,20 @@ const AdminAdRisePage = () => {
       headerAlign: 'right',
       renderCell: (params: GridRenderCellParams) => (
         <Stack direction="row" spacing={1} justifyContent="flex-end" alignItems="center" sx={{ height: '100%', pr: 2 }}>
+          <Tooltip title={t('adrise.sessions.viewGuide')}>
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenGuide(params.row);
+              }}
+              sx={{ color: 'info.main', bgcolor: alpha(theme.palette.info.main, 0.08) }}
+            >
+              <GuideIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
           <Tooltip title={canEdit ? t('adrise.sessions.edit') : tc('common.view')}>
-            <IconButton 
+            <IconButton
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
@@ -324,7 +391,7 @@ const AdminAdRisePage = () => {
           </Tooltip>
           {canEdit && (
             <Tooltip title={t('adrise.sessions.duplicate')}>
-              <IconButton 
+              <IconButton
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -339,7 +406,7 @@ const AdminAdRisePage = () => {
         </Stack>
       )
     }
-  ], [theme, t, tc, canEdit, handleEdit, handleDuplicate, setStatusMenuAnchor]);
+  ], [theme, t, tc, canEdit, handleEdit, handleDuplicate, setStatusMenuAnchor, handleOpenGuide]);
 
   const handleWizardSuccess = () => {
     setIsWizardOpen(false);
@@ -363,8 +430,8 @@ const AdminAdRisePage = () => {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={handleCreateNew}
-              sx={{ 
-                px: 6, 
+              sx={{
+                px: 6,
                 py: 2.5,
                 borderRadius: 2,
                 boxShadow: theme.shadows[3],
@@ -379,12 +446,12 @@ const AdminAdRisePage = () => {
         </Box>
       </Grid>
 
-      {!isWizardOpen && (
+      {!isWizardOpen && !isGuideOpen && (
         <>
           <Grid size={{ xs: 12 }}>
-            <StatisticsCard 
-              data={stats} 
-              title="Campaign Overview" 
+            <StatisticsCard
+              data={stats}
+              title="Campaign Overview"
               actionText="Real-time data"
               gridItemSize={{ xs: 12, sm: 6, md: 3 }}
             />
@@ -404,19 +471,19 @@ const AdminAdRisePage = () => {
               />
             ) : (
               <Card sx={{ borderRadius: 3, p: 10 }}>
-                <Box sx={{ 
-                  py: 10, 
-                  display: 'flex', 
-                  flexDirection: 'column', 
+                <Box sx={{
+                  py: 10,
+                  display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
                   textAlign: 'center',
                   px: 5
                 }}>
-                  <Box sx={{ 
-                    mb: 4, 
-                    p: 4, 
-                    borderRadius: '50%', 
+                  <Box sx={{
+                    mb: 4,
+                    p: 4,
+                    borderRadius: '50%',
                     bgcolor: alpha(theme.palette.primary.main, 0.1),
                     color: theme.palette.primary.main
                   }}>
@@ -429,8 +496,8 @@ const AdminAdRisePage = () => {
                     {t('adrise.sessions.noSessionsDesc')}
                   </Typography>
                   {canEdit && (
-                    <Button 
-                      variant="contained" 
+                    <Button
+                      variant="contained"
                       startIcon={<AddIcon />}
                       onClick={handleCreateNew}
                       sx={{ borderRadius: 2 }}
@@ -462,6 +529,27 @@ const AdminAdRisePage = () => {
               initialData={initialData}
               onSuccess={handleWizardSuccess}
               readOnly={!canEdit}
+            />
+          </Box>
+        </Grid>
+      )}
+
+      {isGuideOpen && sessionForGuide && (
+        <Grid size={{ xs: 12 }}>
+          <Box>
+            <Button
+              variant="text"
+              startIcon={<ArrowBackIcon />}
+              onClick={() => setIsGuideOpen(false)}
+              sx={{ mb: 4, fontWeight: 600 }}
+            >
+              {t('adrise.sessions.backToSessions')}
+            </Button>
+            <ExecutionGuide
+              sessionId={sessionForGuide.id}
+              initialChecklist={(sessionForGuide.inputs as any)?.checklist || {}}
+              onToggleStep={handleToggleStep}
+              isSaving={isUpdatingChecklist}
             />
           </Box>
         </Grid>

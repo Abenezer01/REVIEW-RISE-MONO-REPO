@@ -40,9 +40,9 @@
     "system-settings": "System Settings",
     "feature-flags": "Feature Flags",
     "ai-visibility": "AI Visibility",
+    "subscription-issues": "Subscription Issues",
     "creative-engine": "Creative Engine",
-    "simulator": "Simulator",
-    "subscription-issues": "Subscription Issues"
+    "simulator": "Ad Simulator"
   },
   "errors": {
     "firstNameRequired": "First name is required",
@@ -228,6 +228,7 @@
       "noSessionsDesc": "Start by creating your first AdRise session to generate optimized marketing plans for your business.",
       "createFirst": "Create Your First Session",
       "backToSessions": "Back to Sessions",
+      "viewGuide": "View Execution Guide",
       "edit": "Edit",
       "duplicate": "Duplicate",
       "draftRecovered": "Resumed from your previous unsaved draft."
@@ -245,6 +246,19 @@
       "minBudget": "Budget must be greater than 0",
       "invalidNumber": "Please enter a valid number",
       "lowBudgetWarning": "A minimum budget of $500 is recommended for best results."
+    },
+    "guide": {
+      "title": "Campaign Execution Guide",
+      "subtitle": "Track your setup progress and follow optimization schedules for maximum ROI.",
+      "overallProgress": "OVERALL PROGRESS",
+      "setupGuides": "Setup Guides",
+      "optimizationScheduler": "Optimization Scheduler",
+      "troubleshooting": "Troubleshooting",
+      "googleSetup": "Google Setup Guide",
+      "metaSetup": "Meta Setup Guide",
+      "dayPostLaunch": "Day {day} Post-Launch",
+      "recommendation": "Our Recommendation",
+      "checklistActions": "CHECKLIST ACTIONS"
     }
   },
   "auto-reply": "Auto-Reply Settings",

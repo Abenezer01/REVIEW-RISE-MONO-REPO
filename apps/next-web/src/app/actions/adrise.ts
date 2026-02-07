@@ -26,12 +26,12 @@ export async function getSessionWithLatestVersion(sessionId: string) {
 
     const latestVersion = session.versions[0]; // Ordered by versionNumber desc
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       data: {
         ...session,
         latestInputs: session.inputs || latestVersion?.inputs || {}
-      } 
+      }
     };
   } catch (error) {
     console.error('Error fetching session details:', error);
@@ -123,7 +123,7 @@ export async function duplicateSession(sessionId: string) {
     }
 
     const original = sessionResult.data;
-    
+
     // Create new session with original data
     const duplicated = await adriseSessionRepository.create({
       mode: original.mode,
@@ -179,5 +179,37 @@ export async function getBrandTone(businessId: string) {
     console.error('Error fetching brand tone:', error);
 
     return { success: false, error: 'Failed to fetch brand tone' };
+  }
+}
+
+export async function updateChecklist(sessionId: string, stepId: string, completed: boolean) {
+  try {
+    const sessionResult = await getSessionWithLatestVersion(sessionId);
+
+    if (!sessionResult.success || !sessionResult.data) {
+      return { success: false, error: 'Session not found' };
+    }
+
+    const session = sessionResult.data;
+    const inputs = (session.latestInputs || session.inputs || {}) as any;
+    const checklist = inputs.checklist || {};
+
+    const updatedChecklist = {
+      ...checklist,
+      [stepId]: completed
+    };
+
+    const updated = await adriseSessionRepository.update(sessionId, {
+      inputs: {
+        ...inputs,
+        checklist: updatedChecklist
+      }
+    });
+
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error('Error updating checklist:', error);
+
+    return { success: false, error: 'Failed to update checklist' };
   }
 }
