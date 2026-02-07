@@ -50,6 +50,9 @@ export const ScheduledPostSchema = z.object({
     ]),
     scheduledAt: z.string().datetime(),
     platforms: z.array(z.string()),
+    status: z.enum(['draft', 'scheduled', 'published', 'failed', 'cancelled']).optional(),
+    timezone: z.string().optional(),
+    locationId: z.string().uuid().nullable().optional(),
 });
 
 export const UpdateScheduledPostSchema = ScheduledPostSchema.partial();

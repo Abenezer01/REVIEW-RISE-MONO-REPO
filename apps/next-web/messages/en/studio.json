@@ -561,6 +561,8 @@
     "schedulePost": "Schedule Post",
     "saving": "Saving...",
     "confirmDelete": "Are you sure you want to delete this scheduled post?",
+    "deleteWarning": "This action cannot be undone. The post will be permanently removed from your calendar.",
+    "saveDraft": "Save Draft",
     "provideCaptionError": "Please provide a caption and select at least one platform.",
     "status": {
       "draft": "Draft",

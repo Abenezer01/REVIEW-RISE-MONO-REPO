@@ -215,6 +215,17 @@ const AppFullCalendar = styled('div')(({ theme }: { theme: Theme }) => ({
             color: 'var(--mui-palette-info-main)',
             padding: 0
           }
+        },
+        '&.event-bg-secondary': {
+          border: 0,
+          color: 'var(--mui-palette-secondary-main)',
+          backgroundColor: 'var(--mui-palette-secondary-lightOpacity)',
+          '& .fc-event-title, & .fc-event-time': {
+            fontSize: theme.typography.caption.fontSize,
+            fontWeight: 500,
+            color: 'var(--mui-palette-secondary-main)',
+            padding: 0
+          }
         }
       },
       '&.event-bg-primary': {
@@ -260,6 +271,15 @@ const AppFullCalendar = styled('div')(({ theme }: { theme: Theme }) => ({
         },
         '&:hover td': {
           backgroundColor: 'var(--mui-palette-info-lightOpacity)'
+        }
+      },
+      '&.event-bg-secondary': {
+        '& .fc-list-event-dot': {
+          borderColor: 'var(--mui-palette-secondary-main)',
+          backgroundColor: 'var(--mui-palette-secondary-main)'
+        },
+        '&:hover td': {
+          backgroundColor: 'var(--mui-palette-secondary-lightOpacity)'
         }
       },
       '&.fc-daygrid-event': {

@@ -118,9 +118,9 @@
       "seasonalityStartTooltip": "The date when your seasonal peak or promotion begins.",
       "seasonalityEnd": "Peak End Date",
       "seasonalityEndTooltip": "The date when your seasonal peak or promotion ends.",
-        "promoWindow": "Promo Window",
-        "promoWindowTooltip": "The total duration of your promotion in days. This is automatically calculated from your start and end dates.",
-        "geoRadius": "Search Radius",
+      "promoWindow": "Promo Window",
+      "promoWindowTooltip": "The total duration of your promotion in days. This is automatically calculated from your start and end dates.",
+      "geoRadius": "Search Radius",
       "geoRadiusTooltip": "The distance around your target locations to reach potential customers.",
       "status": "Status",
       "statusTooltip": "The current state of your campaign planning session."
