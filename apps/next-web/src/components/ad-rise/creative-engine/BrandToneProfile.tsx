@@ -1,19 +1,22 @@
-import { Box, Typography, Grid, Paper, TextField, useTheme } from '@mui/material';
+import { Box, Typography, Grid, Paper, TextField } from '@mui/material';
 import { SentimentSatisfiedAlt, BusinessCenter, Diamond, Bolt } from '@mui/icons-material';
+import { useTranslations } from 'next-intl';
 
 interface BrandToneProfileProps {
     value: any;
     onChange: (value: any) => void;
 }
 
-const TONE_OPTIONS = [
-    { value: 'Friendly', label: 'Friendly', Icon: SentimentSatisfiedAlt, description: 'Warm, approachable, conversational' },
-    { value: 'Professional', label: 'Professional', Icon: BusinessCenter, description: 'Formal, authoritative, expert' },
-    { value: 'Luxury', label: 'Luxury', Icon: Diamond, description: 'Premium, sophisticated, exclusive' },
-    { value: 'Urgent', label: 'Urgent', Icon: Bolt, description: 'Time-sensitive, action-driven' },
-];
-
 export default function BrandToneProfile({ value, onChange }: BrandToneProfileProps) {
+    const t = useTranslations('ad-rise.creativeEngine.tone');
+
+    const TONE_OPTIONS = [
+        { value: 'Friendly', label: t('options.Friendly.label'), Icon: SentimentSatisfiedAlt, description: t('options.Friendly.description') },
+        { value: 'Professional', label: t('options.Professional.label'), Icon: BusinessCenter, description: t('options.Professional.description') },
+        { value: 'Luxury', label: t('options.Luxury.label'), Icon: Diamond, description: t('options.Luxury.description') },
+        { value: 'Urgent', label: t('options.Urgent.label'), Icon: Bolt, description: t('options.Urgent.description') },
+    ];
+
     const handleChangeTone = (toneType: string) => {
         onChange({ ...value, toneType });
     };
@@ -21,13 +24,13 @@ export default function BrandToneProfile({ value, onChange }: BrandToneProfilePr
     return (
         <Box sx={{ mt: 4 }}>
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                Brand Tone Profile
+                {t('title')}
             </Typography>
-            
+
             <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
-                Select Tone
+                {t('selectTone')}
             </Typography>
-            
+
             <Grid container spacing={2}>
                 {TONE_OPTIONS.map((option) => {
                     const isSelected = value.toneType === option.value;
@@ -74,19 +77,19 @@ export default function BrandToneProfile({ value, onChange }: BrandToneProfilePr
             {/* Word Preferences */}
             <Grid container spacing={3} sx={{ mt: 2 }}>
                 <Grid size={{ xs: 12, md: 6 }}>
-                    <Typography variant="subtitle2" sx={{ mb: 1 }}>Preferred Words (comma separated)</Typography>
-                     <TextField 
-                        fullWidth 
-                        placeholder="e.g. eco-friendly, natural, safe"
+                    <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('preferredWords')}</Typography>
+                    <TextField
+                        fullWidth
+                        placeholder={t('preferredWordsPlaceholder')}
                         value={value.preferredWords?.join(', ') || ''}
                         onChange={(e) => onChange({ ...value, preferredWords: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
-                    <Typography variant="subtitle2" sx={{ mb: 1 }}>Banned Phrases (comma separated)</Typography>
-                     <TextField 
-                        fullWidth 
-                        placeholder="e.g. cheap, toxic"
+                    <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('bannedPhrases')}</Typography>
+                    <TextField
+                        fullWidth
+                        placeholder={t('bannedPhrasesPlaceholder')}
                         value={value.bannedPhrases?.join(', ') || ''}
                         onChange={(e) => onChange({ ...value, bannedPhrases: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
                     />
