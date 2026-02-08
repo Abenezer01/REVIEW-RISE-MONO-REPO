@@ -5,7 +5,7 @@ import axios from 'axios';
 
 import { adriseSessionRepository } from '@platform/db/src/repositories/adrise-session.repository';
 import { adriseSessionVersionRepository } from '@platform/db/src/repositories/adrise-session-version.repository';
-import { brandDNARepository } from '@platform/db/src/repositories/brand-dna.repository';
+import { brandProfileRepository } from '@platform/db/src/repositories/brand-profile.repository';
 import { businessRepository } from '@platform/db/src/repositories/business.repository';
 
 export async function getSessions(businessId: string) {
@@ -188,9 +188,36 @@ export async function deleteSession(sessionId: string) {
 
 export async function getBrandTone(businessId: string) {
   try {
-    const brandDna = await brandDNARepository.findByBusinessId(businessId);
+    console.log("Business ID", businessId);
+    const brandProfile = await brandProfileRepository.findByBusinessId(businessId);
 
-    return { success: true, data: brandDna?.voice || null };
+    console.log("Brand Profile", brandProfile);
+
+    if (!brandProfile || !brandProfile.tone) {
+      return { success: true, data: null };
+    }
+
+    let toneData = brandProfile.tone;
+
+    // Handle potential stringified JSON
+    if (typeof toneData === 'string') {
+      try {
+        toneData = JSON.parse(toneData);
+      } catch (e) {
+        console.error('Error parsing brand tone JSON:', e);
+
+        return { success: true, data: null };
+      }
+    }
+
+    // Extract descriptors
+    const descriptors = (toneData as any)?.descriptors;
+
+    if (Array.isArray(descriptors) && descriptors.length > 0) {
+      return { success: true, data: descriptors.join(', ') };
+    }
+
+    return { success: true, data: null };
   } catch (error) {
     console.error('Error fetching brand tone:', error);
 

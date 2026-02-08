@@ -217,7 +217,7 @@
       "description": "How should your campaign sound to your audience?",
       "placeholder": "e.g. Professional yet friendly, energetic and youthful...",
       "fromProfile": "Automatically loaded from your Brand Profile",
-      "notSet": "No brand voice set in your Brand Profile. Please update your Brand DNA."
+      "notSet": "No brand voice set in your Brand Profile. Please update your Brand Profile."
     },
     "review": {
       "title": "Review & Launch",
@@ -237,7 +237,26 @@
       "budgetLogistics": "Budget & Logistics",
       "totalMonthly": "Total Monthly",
       "channelAllocation": "AI-Generated Channel Allocation",
-      "radius": "Search Radius"
+      "radius": "Search Radius",
+      "exportJson": "Export JSON",
+      "print": "Print Report",
+      "creatives": "Creatives",
+      "execution": "Execution",
+      "creativeSpecs": {
+        "googleTitle": "Google Search Ads",
+        "googleHeadlines": "3-5 Responsive Headlines (30 chars)",
+        "googleDescriptions": "2-3 Descriptions (90 chars)",
+        "googleSitelinks": "Sitelink Extensions",
+        "metaTitle": "Meta Visuals",
+        "metaFeed": "1080x1080 (Feed Image)",
+        "metaStories": "1080x1920 (Reels/Stories Video)",
+        "metaText": "Primary Text (125 chars)"
+      },
+      "timeline": {
+        "setup": "Setup & Launch",
+        "review": "Initial Review",
+        "optimize": "Optimization"
+      }
     },
     "sessions": {
       "listTitle": "Previous Sessions",

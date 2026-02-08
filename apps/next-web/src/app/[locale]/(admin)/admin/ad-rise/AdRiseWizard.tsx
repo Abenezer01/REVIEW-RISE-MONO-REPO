@@ -24,25 +24,30 @@ import {
   Tooltip,
   alpha,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  GlobalStyles
 } from '@mui/material';
 
 import {
   Info as InfoIcon,
-  ShoppingBag as OfferIcon,
-  AdsClick as GoalIcon,
-  MonetizationOn as BudgetIcon,
   LocationOn as GeoIcon,
   RecordVoiceOver as ToneIcon,
-  CheckCircle as ReviewIcon,
   ArrowBack,
   ArrowForward,
   Check,
   WarningAmber as WarningIcon,
   FlashOn as QuickModeIcon,
   SettingsSuggest as ProModeIcon,
-  CloudDone as SavedIcon,
-  AutoFixHigh
+  Save as SavedIcon,
+  AutoFixHigh,
+  AttachMoney as BudgetIcon,
+  TrendingUp as GoalIcon,
+  LocalOffer as OfferIcon,
+  RateReview as ReviewIcon,
+  FileDownload as DownloadIcon,
+  Print as PrintIcon,
+  Image as ImageIcon,
+  Timeline as TimelineIcon
 } from '@mui/icons-material';
 
 import { Formik, Form, useFormikContext } from 'formik';
@@ -434,8 +439,8 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
   const handleSmartFill = async (values: any, setFieldValue: any) => {
     if (!values.landingPage) {
       notify({ messageCode: 'errors.missingLandingPage' as any, variant: 'TOAST', severity: 'warning' });
-      
-return;
+
+      return;
     }
 
     setIsScraping(true);
@@ -477,6 +482,22 @@ return;
     }
   };
 
+  const handleExportJSON = (values: any) => {
+    const data = JSON.stringify(values, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = `campaign-plan-${values.sessionName || 'draft'}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   const renderStepContent = (step: number, values: any, setFieldValue: any) => {
     // Automatically set brandTone if it's empty and we have a businessBrandTone
@@ -932,11 +953,29 @@ return;
           <Fade in timeout={500}>
             <Grid container spacing={6}>
               <Grid size={{ xs: 12 }}>
-                <Box sx={{ mb: 6, display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <ReviewIcon color="primary" sx={{ fontSize: 32 }} />
-                  <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: -1 }}>
-                    {t('review.title')}
-                  </Typography>
+                <Box sx={{ mb: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <ReviewIcon color="primary" sx={{ fontSize: 32 }} />
+                    <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: -1 }}>
+                      {t('review.title')}
+                    </Typography>
+                  </Box>
+                  <Box className="hide-on-print" sx={{ display: 'flex', gap: 2 }}>
+                    <Button
+                      variant="outlined"
+                      startIcon={<DownloadIcon />}
+                      onClick={() => handleExportJSON(values)}
+                    >
+                      {t('review.exportJson')}
+                    </Button>
+                    <Button
+                      variant="contained"
+                      startIcon={<PrintIcon />}
+                      onClick={handlePrint}
+                    >
+                      {t('review.print')}
+                    </Button>
+                  </Box>
                 </Box>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -1126,6 +1165,73 @@ return;
                     </CardContent>
                   </Card>
                 </Box>
+
+                {/* Creatives & Execution Grid */}
+                <Grid container spacing={6} sx={{ mt: 2 }}>
+                  {/* Creatives Column */}
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Card sx={{ height: '100%', p: 2 }}>
+                      <CardContent>
+                        <Typography variant="h6" sx={{ mb: 6, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(theme.palette.warning.main, 0.1), display: 'flex' }}>
+                            <ImageIcon color="warning" />
+                          </Box>
+                          {t('review.creatives')}
+                        </Typography>
+                        <Stack spacing={3}>
+                          <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.default', border: `1px dashed ${theme.palette.divider}` }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>{t('review.creativeSpecs.googleTitle')}</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              • {t('review.creativeSpecs.googleHeadlines')}<br />
+                              • {t('review.creativeSpecs.googleDescriptions')}<br />
+                              • {t('review.creativeSpecs.googleSitelinks')}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.default', border: `1px dashed ${theme.palette.divider}` }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>{t('review.creativeSpecs.metaTitle')}</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              • {t('review.creativeSpecs.metaFeed')}<br />
+                              • {t('review.creativeSpecs.metaStories')}<br />
+                              • {t('review.creativeSpecs.metaText')}
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+
+                  {/* Execution Column */}
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Card sx={{ height: '100%', p: 2 }}>
+                      <CardContent>
+                        <Typography variant="h6" sx={{ mb: 6, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(theme.palette.info.main, 0.1), display: 'flex' }}>
+                            <TimelineIcon color="info" />
+                          </Box>
+                          {t('review.execution')}
+                        </Typography>
+                        <Stack spacing={4}>
+                          {[
+                            { day: 'Day 1', task: t('review.timeline.setup'), color: theme.palette.primary.main },
+                            { day: 'Day 3', task: t('review.timeline.review'), color: theme.palette.info.main },
+                            { day: 'Day 7', task: t('review.timeline.optimize'), color: theme.palette.success.main }
+                          ].map((item, i) => (
+                            <Box key={i} sx={{ display: 'flex', gap: 3 }}>
+                              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: item.color, border: `3px solid ${alpha(item.color, 0.2)}` }} />
+                                {i < 2 && <Box sx={{ width: 2, height: '100%', bgcolor: 'divider', my: 0.5 }} />}
+                              </Box>
+                              <Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{item.day}</Typography>
+                                <Typography variant="body2" color="text.secondary">{item.task}</Typography>
+                              </Box>
+                            </Box>
+                          ))}
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
           </Fade>
@@ -1162,6 +1268,23 @@ return;
         borderRadius: 4
       }
     }}>
+      <GlobalStyles styles={{
+        '@media print': {
+          '.hide-on-print, header, footer, .MuiDrawer-root, .MuiStepper-root, nav, button, aside, [class*="sidebar"], [class*="Sidebar"]': {
+            display: 'none !important'
+          },
+          'body, html, #root, .MuiCard-root': {
+            height: 'auto !important',
+            overflow: 'visible !important',
+            backgroundColor: 'white !important',
+            color: 'black !important'
+          },
+          '.MuiCard-root': {
+            boxShadow: 'none !important',
+            border: 'none !important'
+          }
+        }
+      }} />
       <Card>
         <CardContent sx={{ p: { xs: 6, md: 10 } }}>
           {isMobile ? (
