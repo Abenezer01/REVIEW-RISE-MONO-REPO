@@ -23,6 +23,8 @@ import type { BlueprintInput, BlueprintOutput } from '@platform/contracts';
 
 import { useTranslation } from '@/hooks/useTranslation';
 import { BlueprintService } from '@/services/ad-rise/blueprint.service';
+import { useCreativeAnalytics } from '@/hooks/useCreativeAnalytics';
+import { DisclaimerPanel } from '../creative-engine/DisclaimerPanel';
 
 import BlueprintResults from './BlueprintResults';
 import VerticalSelection from '../shared/VerticalSelection';
@@ -34,6 +36,13 @@ export default function BlueprintWizard() {
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState<BlueprintOutput | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    const { trackWizardStart, trackWizardComplete } = useCreativeAnalytics();
+
+    React.useEffect(() => {
+        trackWizardStart({ type: 'google_blueprint' });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
 
 
@@ -81,6 +90,7 @@ export default function BlueprintWizard() {
 
                 console.log('Blueprint received:', data);
                 setResults(data);
+                trackWizardComplete({ type: 'google_blueprint', businessName: formData.offerOrService }); // Using offer as proxy for now
                 setActiveStep(2);
             } catch (err: any) {
                 console.error('Failed to generate blueprint', err);
@@ -186,6 +196,9 @@ export default function BlueprintWizard() {
 
             {/* Main Content */}
             <Box sx={{ px: 6, py: 4 }}>
+                <Box sx={{ mb: 4 }}>
+                    <DisclaimerPanel />
+                </Box>
                 <Grid container spacing={4}>
                     {/* Left Side - Form */}
                     <Grid size={{ xs: 12, md: activeStep === 2 ? 12 : 8 }}>

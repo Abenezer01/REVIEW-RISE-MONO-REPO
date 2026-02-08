@@ -51,6 +51,7 @@ model User {
   userBusinessRoles UserBusinessRole[]
   userRoles         UserRole[]
   adriseSessions    AdriseSession[]
+  creativeEngineAnalytics CreativeEngineAnalytics[]
 }
 
 model UserRole {
@@ -105,6 +106,7 @@ model Business {
   carouselDrafts       CarouselDraft[]
   plannerPlans         MonthlyPlannerPlan[]
   adriseSessions       AdriseSession[]
+  creativeEngineAnalytics CreativeEngineAnalytics[]
 
   @@index([name])
   @@index([status])
@@ -1050,4 +1052,20 @@ model AdriseOutput {
   session     AdriseSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
+}
+
+model CreativeEngineAnalytics {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventType   String // wizard_start, wizard_complete, plan_exported
+  businessId  String?  @db.Uuid
+  userId      String?  @db.Uuid
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  business    Business? @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([businessId])
+  @@index([userId])
+  @@index([eventType])
+  @@index([createdAt])
 }

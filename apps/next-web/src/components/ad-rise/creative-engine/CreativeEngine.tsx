@@ -172,9 +172,9 @@ export default function CreativeEngine({ onConceptsGenerated }: CreativeEnginePr
                     </Paper>
 
                     {/* Features List */}
-                    <Paper sx={{ p: 3, borderRadius: 3, bgcolor: 'primary.dark', color: 'white' }}>
+                    <Paper sx={{ p: 3, borderRadius: 3,  color: 'white' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'white' }}>{t('features.title')}</Typography>
+                            <Typography variant="h6" sx={{ fontWeight: 'bold', }}>{t('features.title')}</Typography>
                         </Box>
                         <List dense disablePadding>
                             {[

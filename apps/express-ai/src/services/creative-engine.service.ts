@@ -1,4 +1,5 @@
 import { CreativeConceptOutput } from '@platform/contracts';
+import { navGuardrailsService } from './nav-guardrails.service';
 import { CREATIVE_ENGINE_PROMPTS } from '../prompts/creative-engine.prompts';
 import { imageGenerationService } from './image/image-generation.service';
 import { llmService } from './llm.service';
@@ -24,6 +25,28 @@ export class CreativeEngineService {
                     }
                 }));
             }
+
+            // Validate and Filter Concepts
+            output.concepts = output.concepts.map(concept => {
+                const googleValidation = navGuardrailsService.validateGoogleAds(concept);
+                const metaValidation = navGuardrailsService.validateMetaAds(concept);
+                const safetyValidation = navGuardrailsService.validateSafety(concept); // Tone profile could be passed here if available
+
+                // Attach warnings/errors to concept if contract supported it, 
+                // for now we just log or could filter out invalid ones.
+                // In a real app, we might tag them as "needs review".
+                
+                if (!googleValidation.isValid) {
+                    console.warn(`Concept ${concept.id} failed Google validation:`, googleValidation.errors);
+                }
+                if (!safetyValidation.isValid) {
+                    console.warn(`Concept ${concept.id} failed safety validation:`, safetyValidation.errors);
+                    // Filter out unsafe concepts? 
+                    // For now, let's keep them but maybe flag them in future.
+                }
+
+                return concept; 
+            });
 
             return output;
         } catch (error) {

@@ -25,11 +25,13 @@ import {
     StepLabel, Stepper, TextField, Typography,
     useTheme
 } from '@mui/material'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import VerticalSelection from '../shared/VerticalSelection'
 
 import { useTranslation } from '@/hooks/useTranslation'
 import { MetaBlueprintService } from '@/services/ad-rise/meta-blueprint.service'
+import { useCreativeAnalytics } from '@/hooks/useCreativeAnalytics'
+import { DisclaimerPanel } from '../creative-engine/DisclaimerPanel'
 
 import type { MetaBlueprintInput, MetaBlueprintOutput } from '@platform/contracts'
 
@@ -72,6 +74,12 @@ export default function MetaBlueprintWizard() {
     const [activeStep, setActiveStep] = useState(0)
     const [loading, setLoading] = useState(false)
     const [output, setOutput] = useState<MetaBlueprintOutput | null>(null)
+    const { trackWizardStart, trackWizardComplete } = useCreativeAnalytics()
+
+    useEffect(() => {
+        trackWizardStart({ type: 'meta_blueprint' })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const [input, setInput] = useState<MetaBlueprintInput>({
         businessName: '',
@@ -102,6 +110,7 @@ export default function MetaBlueprintWizard() {
                 const result = await MetaBlueprintService.generate(input);
 
                 setOutput(result);
+                trackWizardComplete({ type: 'meta_blueprint', businessName: input.businessName });
                 setActiveStep(2);
             } catch (error) {
                 console.error('Failed to generate blueprint', error);
@@ -213,6 +222,9 @@ export default function MetaBlueprintWizard() {
             </Box>
 
             {/* Stepper */}
+            <Box sx={{ px: 4, mb: 2 }}>
+                <DisclaimerPanel />
+            </Box>
             <Box sx={{ px: 4, mb: 5 }}>
                 <Stepper activeStep={activeStep} alternativeLabel connector={<Box sx={{ flex: 1, height: 2, bgcolor: 'divider', mt: 2.5 }} />}>
                     {steps.map((label) => (

@@ -1,0 +1,14 @@
+
+> @apps/express-ai@0.1.0 test C:\Users\pc\Documents\Projects\Review Rise\REVIEW-RISE-MONO-REPO\REVIEW-RISE-MONO-REPO\apps\express-ai
+> jest
+
+Error: Jest: Failed to parse the TypeScript config file C:\Users\pc\Documents\Projects\Review Rise\REVIEW-RISE-MONO-REPO\REVIEW-RISE-MONO-REPO\apps\express-ai\jest.config.ts
+  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed
+Error: Cannot find package 'ts-node' imported from C:\Users\pc\Documents\Projects\Review Rise\REVIEW-RISE-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-config@29.7.0_@types+n_ad4506a2b584e0f4153b4fc0b9ce0119\node_modules\jest-config\build\readConfigFileAndSetRootDir.js
+    at readConfigFileAndSetRootDir (C:\Users\pc\Documents\Projects\Review Rise\REVIEW-RISE-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-config@29.7.0_@types+n_ad4506a2b584e0f4153b4fc0b9ce0119\node_modules\jest-config\build\readConfigFileAndSetRootDir.js:116:13)
+    at async readInitialOptions (C:\Users\pc\Documents\Projects\Review Rise\REVIEW-RISE-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-config@29.7.0_@types+n_ad4506a2b584e0f4153b4fc0b9ce0119\node_modules\jest-config\build\index.js:403:13)
+    at async readConfig (C:\Users\pc\Documents\Projects\Review Rise\REVIEW-RISE-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-config@29.7.0_@types+n_ad4506a2b584e0f4153b4fc0b9ce0119\node_modules\jest-config\build\index.js:147:48)
+    at async readConfigs (C:\Users\pc\Documents\Projects\Review Rise\REVIEW-RISE-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-config@29.7.0_@types+n_ad4506a2b584e0f4153b4fc0b9ce0119\node_modules\jest-config\build\index.js:424:26)
+    at async runCLI (C:\Users\pc\Documents\Projects\Review Rise\REVIEW-RISE-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\@jest+core@29.7.0_babel-plugin-macros@3.1.0\node_modules\@jest\core\build\cli\index.js:151:59)
+    at async Object.run (C:\Users\pc\Documents\Projects\Review Rise\REVIEW-RISE-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-cli@29.7.0_@types+node_ee677e933c8fdf46df6a2f5f661955b9\node_modules\jest-cli\build\run.js:130:37)
+ ELIFECYCLE  Test failed. See above for more details.
