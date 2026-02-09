@@ -229,4 +229,16 @@ router.post('/recommend-goal', async (req, res) => {
     }
 });
 
+import { campaignNarrativeService } from '../services/campaign-narrative.service';
+
+router.post('/generate-campaign-narrative', async (req, res) => {
+    try {
+        const result = await campaignNarrativeService.generate(req.body);
+        res.json(createSuccessResponse(result, 'Campaign narrative generated', 200, {}, SystemMessageCode.SUCCESS));
+    } catch (error: any) {
+        console.error('Narrative Generation Error:', error);
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
+    }
+});
+
 export default router;

@@ -242,6 +242,11 @@
       "print": "Print Report",
       "creatives": "Creatives",
       "execution": "Execution",
+      "strategyNarrative": "Strategy Narrative",
+      "generatingNarrative": "Generating strategy explanation...",
+      "generateNarrative": "Generate Explanation",
+      "assumptions": "Planning Assumptions",
+      "noAssumptions": "Complete the narrative to see planning assumptions.",
       "creativeSpecs": {
         "googleTitle": "Google Search Ads",
         "googleHeadlines": "3-5 Responsive Headlines (30 chars)",

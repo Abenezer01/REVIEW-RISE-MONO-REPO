@@ -47,7 +47,9 @@ import {
   FileDownload as DownloadIcon,
   Print as PrintIcon,
   Image as ImageIcon,
-  Timeline as TimelineIcon
+  Timeline as TimelineIcon,
+  FactCheck as AssumptionsIcon,
+  AutoFixHigh as NarrativeIcon
 } from '@mui/icons-material';
 
 import { Formik, Form, useFormikContext } from 'formik';
@@ -60,7 +62,7 @@ import CustomInputVertical from '@core/components/custom-inputs/Vertical';
 import CustomTextBox from '@/components/shared/form/custom-text-box';
 import CustomSelect from '@/components/shared/form/custom-select';
 import CustomTagsInput from '@/components/shared/form/custom-tags-input';
-import { saveSession, getBrandTone, getBusinessDetails, scrapeOfferFromUrl, recommendGoal } from '@/app/actions/adrise';
+import { saveSession, getBrandTone, getBusinessDetails, scrapeOfferFromUrl, recommendGoal, generateCampaignNarrative } from '@/app/actions/adrise';
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 import { countries } from '@/shared/utils/countries';
 
@@ -127,6 +129,16 @@ interface AdRiseWizardProps {
   readOnly?: boolean;
 }
 
+const NarrativeTrigger = ({ values, fetchNarrative, narrativeData, isLoading }: any) => {
+  useEffect(() => {
+    if (!narrativeData && !isLoading) {
+      fetchNarrative(values);
+    }
+  }, [values, fetchNarrative, narrativeData, isLoading]);
+
+  return null;
+};
+
 const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly = false }: AdRiseWizardProps) => {
   const theme = useTheme();
   const t = useTranslations('dashboard.adrise');
@@ -156,6 +168,28 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
   const [isScraping, setIsScraping] = useState(false);
   const [recommendedGoal, setRecommendedGoal] = useState<string | null>(null);
   const [isRecommending, setIsRecommending] = useState(false);
+  const [narrativeData, setNarrativeData] = useState<{ narrative: string; assumptions: string[] } | null>(null);
+  const [isNarrativeLoading, setIsNarrativeLoading] = useState(false);
+
+  // Fetch campaign narrative on review step
+  const fetchNarrative = useCallback(async (values: any) => {
+    setIsNarrativeLoading(true);
+    const res = await generateCampaignNarrative({
+      sessionName: values.sessionName,
+      industry: values.industry,
+      offer: values.offer,
+      goal: values.goal,
+      locations: values.locations,
+      budgetMonthly: values.budgetMonthly,
+      mode: values.mode,
+      brandTone: values.brandTone || businessBrandTone
+    });
+
+    if (res.success) {
+      setNarrativeData(res.data.data);
+    }
+    setIsNarrativeLoading(false);
+  }, [businessBrandTone]);
 
   // Sync currentSessionId with sessionId prop
   useEffect(() => {
@@ -190,6 +224,13 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
 
     fetchBusinessProfile();
   }, [businessId]);
+
+  // Handle Narrative Fetching on review step (Step 6)
+  useEffect(() => {
+    if (activeStep !== 6) {
+      setNarrativeData(null); // Reset when moving away to allow re-generation if inputs change
+    }
+  }, [activeStep]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -243,7 +284,14 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
           competitors: values.competitors,
           geoRadius: values.geoRadius,
           audienceNotes: values.audienceNotes,
-          seasonality: values.seasonality
+          seasonality: values.seasonality,
+          seasonalityStart: values.seasonalityStart,
+          seasonalityEnd: values.seasonalityEnd,
+          promoWindow: values.promoWindow,
+          landingPage: values.landingPage,
+          campaignStart: values.campaignStart,
+          campaignEnd: values.campaignEnd,
+          pacing: values.pacing
         }
       });
 
@@ -1109,13 +1157,94 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                             </Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                               <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>{t('fields.brandTone')}</Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 800, textTransform: 'capitalize' }}>{values.brandTone}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 800, textTransform: 'capitalize' }}>{values.brandTone || businessBrandTone}</Typography>
                             </Box>
                           </Stack>
                         </CardContent>
                       </Card>
                     </Grid>
                   </Grid>
+
+                  {/* AI Narrative & Assumptions */}
+                  <Grid container spacing={6}>
+                    <Grid size={{ xs: 12, md: 8 }}>
+                      <Card sx={{ height: '100%', p: 2, position: 'relative', overflow: 'hidden' }}>
+                        <Box sx={{
+                          position: 'absolute',
+                          top: -20,
+                          right: -20,
+                          opacity: 0.05,
+                          transform: 'rotate(-10deg)'
+                        }}>
+                          <NarrativeIcon sx={{ fontSize: 120 }} />
+                        </Box>
+                        <CardContent>
+                          <Typography variant="h6" sx={{ mb: 4, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(theme.palette.primary.main, 0.1), display: 'flex' }}>
+                              <NarrativeIcon color="primary" />
+                            </Box>
+                            {t('review.strategyNarrative') || 'Strategy Narrative'}
+                          </Typography>
+
+                          {isNarrativeLoading ? (
+                            <Box sx={{ py: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                              <CircularProgress size={24} />
+                              <Typography variant="body2" color="text.secondary">{t('review.generatingNarrative') || 'Generating strategy explanation...'}</Typography>
+                            </Box>
+                          ) : narrativeData ? (
+                            <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+                              {narrativeData.narrative}
+                            </Typography>
+                          ) : (
+                            <Button variant="tonal" onClick={() => fetchNarrative(values)}>
+                              {t('review.generateNarrative') || 'Generate Explanation'}
+                            </Button>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <Card sx={{ height: '100%', p: 2, bgcolor: alpha(theme.palette.info.main, 0.02) }}>
+                        <CardContent>
+                          <Typography variant="h6" sx={{ mb: 4, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(theme.palette.info.main, 0.1), display: 'flex' }}>
+                              <AssumptionsIcon color="info" />
+                            </Box>
+                            {t('review.assumptions') || 'Planning Assumptions'}
+                          </Typography>
+
+                          {isNarrativeLoading ? (
+                            <Stack spacing={2} sx={{ mt: 2 }}>
+                              {[1, 2, 3, 4].map((i) => (
+                                <Skeleton key={i} variant="text" height={20} />
+                              ))}
+                            </Stack>
+                          ) : narrativeData?.assumptions ? (
+                            <Stack spacing={2}>
+                              {narrativeData.assumptions.map((assumption, idx) => (
+                                <Box key={idx} sx={{ display: 'flex', gap: 2 }}>
+                                  <Box sx={{ mt: 0.5, width: 6, height: 6, borderRadius: '50%', bgcolor: 'info.main', flexShrink: 0 }} />
+                                  <Typography variant="body2" sx={{ fontWeight: 600 }}>{assumption}</Typography>
+                                </Box>
+                              ))}
+                            </Stack>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">
+                              {t('review.noAssumptions') || 'Complete the narrative to see planning assumptions.'}
+                            </Typography>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  </Grid>
+
+                  {/* Allocation Visualizer */}
+                  <NarrativeTrigger
+                    values={values}
+                    fetchNarrative={fetchNarrative}
+                    narrativeData={narrativeData}
+                    isLoading={isNarrativeLoading}
+                  />
 
                   {/* Allocation Visualizer */}
                   <Card sx={{ p: 2 }}>

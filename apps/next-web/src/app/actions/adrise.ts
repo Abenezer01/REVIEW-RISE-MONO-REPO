@@ -7,6 +7,8 @@ import { adriseSessionRepository } from '@platform/db/src/repositories/adrise-se
 import { adriseSessionVersionRepository } from '@platform/db/src/repositories/adrise-session-version.repository';
 import { brandProfileRepository } from '@platform/db/src/repositories/brand-profile.repository';
 import { businessRepository } from '@platform/db/src/repositories/business.repository';
+import apiClient from '@/lib/apiClient';
+import { SERVICES } from '@/configs/services';
 
 export async function getSessions(businessId: string) {
   try {
@@ -266,6 +268,18 @@ export async function scrapeOfferFromUrl(url: string, businessContext?: string) 
       success: false,
       error: error.response?.data?.error || error.message || 'Failed to extract offer. Please enter it manually.'
     };
+  }
+}
+
+export async function generateCampaignNarrative(data: any) {
+  try {
+    const response = await apiClient.post<any>(`${SERVICES.ai.url}/generate-campaign-narrative`, data);
+
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error('Error generating campaign narrative:', error);
+
+    return { success: false, error: 'Failed to generate campaign narrative' };
   }
 }
 
