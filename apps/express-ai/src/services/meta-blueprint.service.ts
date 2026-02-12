@@ -95,12 +95,40 @@ export class MetaBlueprintService {
                 interests: ['Online shopping', 'Engaged shoppers', 'Luxury goods'],
                 exclusions: []
             });
+            clusters.push({
+                name: 'Competitors & Brands',
+                theme: 'Likely Customers',
+                type: 'Secondary',
+                interests: ['Big Brands', 'Competitor A', 'Competitor B'],
+                exclusions: []
+            });
+            clusters.push({
+                name: 'Lifestyle & Hobbies',
+                theme: 'Audience Persona',
+                type: 'Secondary',
+                interests: ['Fashion', 'Gadgets', 'Trending Items'],
+                exclusions: ['Bargain hunters']
+            });
         } else {
             clusters.push({
                 name: 'Industry Interests',
                 theme: 'Industry Interests',
                 type: 'Primary',
                 interests: [input.offerOrService, 'Business', 'Entrepreneurship'],
+                exclusions: []
+            });
+            clusters.push({
+                name: 'Professional Development',
+                theme: 'Growth Mindset',
+                type: 'Secondary',
+                interests: ['Professional training', 'Workshops', 'Networking'],
+                exclusions: []
+            });
+            clusters.push({
+                name: 'Small Business Decision Makers',
+                theme: 'B2B Targeting',
+                type: 'Secondary',
+                interests: ['Small business owners', 'Admin admins', 'Management'],
                 exclusions: []
             });
         }

@@ -7,9 +7,11 @@ interface ConceptResultCardProps {
     concept: CreativeConcept;
     onGenerateImage: (prompt: string) => void;
     isGeneratingImage: boolean;
+    onSave?: (concept: CreativeConcept) => void;
+    isSaving?: boolean;
 }
 
-export default function ConceptResultCard({ concept, onGenerateImage, isGeneratingImage }: ConceptResultCardProps) {
+export default function ConceptResultCard({ concept, onGenerateImage, isGeneratingImage, onSave, isSaving }: ConceptResultCardProps) {
     const t = useTranslations('ad-rise.creativeEngine.results');
     const [expanded, setExpanded] = useState(false);
     const [copiedFormat, setCopiedFormat] = useState<string | null>(null);
@@ -21,13 +23,13 @@ export default function ConceptResultCard({ concept, onGenerateImage, isGenerati
     };
 
     return (
-        <Paper 
+        <Paper
             elevation={0}
-            sx={{ 
-                p: 3, 
-                mb: 3, 
-                borderRadius: 2, 
-                border: '1px solid', 
+            sx={{
+                p: 3,
+                mb: 3,
+                borderRadius: 2,
+                border: '1px solid',
                 borderColor: 'divider',
                 transition: 'all 0.2s',
                 '&:hover': {
@@ -45,7 +47,19 @@ export default function ConceptResultCard({ concept, onGenerateImage, isGenerati
                         {concept.primaryText}
                     </Typography>
                 </Box>
-                <Chip label="Concept" size="small" color="primary" variant="outlined" />
+                <Stack direction="row" spacing={1}>
+                    <Chip label="Concept" size="small" color="primary" variant="outlined" />
+                    {onSave && (
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={() => onSave(concept)}
+                            disabled={isSaving}
+                        >
+                            {isSaving ? t('saving') : t('save')}
+                        </Button>
+                    )}
+                </Stack>
             </Box>
 
             <Alert severity="info" icon={false} sx={{ mb: 2, bgcolor: 'action.hover', border: 'none' }}>
@@ -80,10 +94,10 @@ export default function ConceptResultCard({ concept, onGenerateImage, isGenerati
 
             <Collapse in={expanded} sx={{ mt: 2 }}>
                 <Box sx={{ bgcolor: 'background.neutral', p: 2, borderRadius: 2 }}>
-                    
+
                     {/* Platform Prompts */}
                     <Box sx={{ mb: 3 }}>
-                         <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
                             {Object.entries(concept.formatPrompts).map(([format, prompt]) => (
                                 <Box key={format} sx={{ flex: 1 }}>
                                     <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 'bold', color: 'text.secondary', display: 'block', mb: 0.5 }}>
@@ -121,13 +135,13 @@ export default function ConceptResultCard({ concept, onGenerateImage, isGenerati
                                 {isGeneratingImage ? t('generating') : t('generateArt')}
                             </Button>
                         )}
-                        
+
                         {concept.imageUrl && (
-                             <Box 
-                                component="img" 
-                                src={concept.imageUrl} 
-                                alt="Generated Creative" 
-                                sx={{ width: '100%', maxWidth: 300, borderRadius: 2, mt: 1 }} 
+                            <Box
+                                component="img"
+                                src={concept.imageUrl}
+                                alt="Generated Creative"
+                                sx={{ width: '100%', maxWidth: 300, borderRadius: 2, mt: 1 }}
                             />
                         )}
                     </Box>

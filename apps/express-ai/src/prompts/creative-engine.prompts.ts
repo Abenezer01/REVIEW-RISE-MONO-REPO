@@ -1,5 +1,5 @@
 export const CREATIVE_ENGINE_PROMPTS = {
-    GENERATE_CONCEPTS: (input: any) => `
+  GENERATE_CONCEPTS: (input: any) => `
 You are a world-class creative director and copywriter.
 Your goal is to generate ${input.quantity || 3} distinct creative concepts for a marketing campaign.
 
@@ -36,15 +36,16 @@ Return a JSON object with this exact structure:
       "formatPrompts": {
         "feed": "...",
         "story": "...",
-        "reel": "..."
+        "reel": "...",
+        "carousel": "..."
       }
     }
   ]
 }
 `,
-    FORMAT_TEMPLATES: {
-        FEED: (concept: any) => `Write a Facebook Feed post using this concept: "${concept.headline}". Focus on "${concept.visualIdea}". Keep it under 280 characters. Include hashtags.`,
-        STORY: (concept: any) => `Write a 3-frame Instagram Story script for this concept: "${concept.headline}". Frame 1: Hook. Frame 2: Value. Frame 3: CTA.`,
-        REEL: (concept: any) => `Write a 30-second Instagram Reel script for this concept: "${concept.headline}". Include visual cues and voiceover text.`
-    }
+  FORMAT_TEMPLATES: {
+    FEED: (concept: any) => `Write a Facebook Feed post using this concept: "${concept.headline}". Focus on "${concept.visualIdea}". Keep it under 280 characters. Include hashtags.`,
+    STORY: (concept: any) => `Write a 3-frame Instagram Story script for this concept: "${concept.headline}". Frame 1: Hook. Frame 2: Value. Frame 3: CTA.`,
+    REEL: (concept: any) => `Write a 30-second Instagram Reel script for this concept: "${concept.headline}". Include visual cues and voiceover text.`
+  }
 };

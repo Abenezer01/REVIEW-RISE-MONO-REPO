@@ -8,7 +8,7 @@ export interface BlueprintInput {
 }
 
 export interface KeywordCluster {
-    intent: 'Brand' | 'Service' | 'Competitor' | 'Problem';
+    intent: 'Brand' | 'Service' | 'Commercial' | 'Competitor' | 'Problem';
     theme: string;
     keywords: { term: string; matchType: 'Exact' | 'Phrase' | 'Broad' }[];
 }
@@ -31,6 +31,8 @@ export interface NegativeKeywordList {
 
 export interface LandingPageAnalysis {
     url: string;
+    isValid: boolean;
+    validationMessage?: string;
     score: number;
     mobileOptimized: boolean;
     trustSignalsDetected: string[];

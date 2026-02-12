@@ -107,6 +107,7 @@ model Business {
   plannerPlans         MonthlyPlannerPlan[]
   adriseSessions       AdriseSession[]
   creativeEngineAnalytics CreativeEngineAnalytics[]
+  creativeConcepts     CreativeConcept[]
 
   @@index([name])
   @@index([status])
@@ -1068,4 +1069,23 @@ model CreativeEngineAnalytics {
   @@index([userId])
   @@index([eventType])
   @@index([createdAt])
+}
+
+model CreativeConcept {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId    String   @db.Uuid
+  headline      String
+  visualIdea    String
+  primaryText   String
+  cta           String
+  imagePrompt   String?
+  imageUrl      String?
+  formatPrompts Json
+  tone          Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@index([businessId])
 }

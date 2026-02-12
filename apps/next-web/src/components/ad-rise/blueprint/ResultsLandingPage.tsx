@@ -72,6 +72,33 @@ export default function ResultsLandingPage({ analysis }: Props) {
                     </Box>
                 </Stack>
 
+                {/* Validation Error Alert */}
+                {!analysis.isValid && analysis.validationMessage && (
+                    <Box
+                        sx={{
+                            p: 2,
+                            mb: 3,
+                            bgcolor: alpha(theme.palette.error.main, 0.1),
+                            borderRadius: 2,
+                            border: `2px solid ${theme.palette.error.main}`
+                        }}
+                    >
+                        <Stack direction="row" spacing={2} alignItems="center">
+                            <Typography variant="h5" sx={{ color: 'error.main' }}>
+                                ⚠️
+                            </Typography>
+                            <Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'error.main', mb: 0.5 }}>
+                                    Invalid Landing Page URL
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {analysis.validationMessage}
+                                </Typography>
+                            </Box>
+                        </Stack>
+                    </Box>
+                )}
+
                 {/* Score Section */}
                 <Box
                     sx={{

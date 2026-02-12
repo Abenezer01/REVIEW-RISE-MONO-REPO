@@ -14,7 +14,7 @@ import {
     SystemMessageCode
 } from '@platform/contracts';
 import { llmService } from '../services/llm.service';
-import { generateConcepts, generateCreativeImage } from '../controllers/creative-engine.controller';
+import { generateConcepts, generateCreativeImage, saveConcept, getLibrary } from '../controllers/creative-engine.controller';
 
 const router = Router();
 
@@ -162,5 +162,7 @@ router.post('/reviews/analyze', validateRequest(AnalyzeReviewRequestSchema), asy
 // Creative Engine Routes
 router.post('/creative-engine/concepts', generateConcepts);
 router.post('/creative-engine/image', generateCreativeImage);
+router.post('/creative-engine/save', saveConcept);
+router.get('/creative-engine/library', getLibrary);
 
 export default router;

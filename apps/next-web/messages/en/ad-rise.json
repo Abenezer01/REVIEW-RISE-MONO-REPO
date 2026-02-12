@@ -209,14 +209,16 @@
         "headlines": "Headlines ({count})",
         "descriptions": "Descriptions ({count})",
         "copyAll": "Copy All",
-        "copyLabel": "Copy"
+        "copyLabel": "Copy",
+        "copied": "{label} copied to clipboard!"
       },
       "negatives": {
         "title": "Negative Keywords",
         "subtitle": "{count} keyword(s) to prevent wasted ad spend",
         "copyAll": "Copy All",
         "copy": "Copy",
-        "tip": "Tip: Add these negative keywords to your campaign to prevent your ads from showing for irrelevant searches and save your budget for qualified traffic."
+        "tipTitle": "Tip:",
+        "tipText": "Add these negative keywords to your campaign to prevent your ads from showing for irrelevant searches and save your budget for qualified traffic."
       },
       "landingPage": {
         "title": "Landing Page Analysis",
@@ -235,7 +237,12 @@
     "common": {
       "back": "Back",
       "passed": "Passed",
-      "failed": "Failed"
+      "failed": "Failed",
+      "disclaimer": {
+        "title": "Important Notice",
+        "message": "This blueprint is guidance only. Results may vary based on your industry, competition, and budget. Always review all recommendations against platform advertising policies before implementation.",
+        "show": "Show Guidance Disclaimer"
+      }
     },
     "meta": {
       "title": "Meta Ads Blueprint Generator",

@@ -20,6 +20,14 @@ export const generateAwarenessLayer = (vertical: VerticalType): FunnelStageConfi
     } else if (vertical === 'SaaS') {
         const override = FUNNEL_OVERRIDES.SAAS.AWARENESS;
         messageAngle = override.MESSAGE;
+    } else if (vertical === 'Restaurant') {
+        const override = FUNNEL_OVERRIDES.RESTAURANT.AWARENESS;
+        messageAngle = override.MESSAGE;
+        cta = override.CTA;
+    } else if (vertical === 'Healthcare') {
+        const override = FUNNEL_OVERRIDES.HEALTHCARE.AWARENESS;
+        messageAngle = override.MESSAGE;
+        cta = override.CTA;
     }
 
     return {
@@ -41,6 +49,14 @@ export const generateConsiderationLayer = (vertical: VerticalType): FunnelStageC
         messageAngle = override.MESSAGE;
     } else if (vertical === 'SaaS') {
         const override = FUNNEL_OVERRIDES.SAAS.CONSIDERATION;
+        messageAngle = override.MESSAGE;
+        cta = override.CTA;
+    } else if (vertical === 'Restaurant') {
+        const override = FUNNEL_OVERRIDES.RESTAURANT.CONSIDERATION;
+        messageAngle = override.MESSAGE;
+        cta = override.CTA;
+    } else if (vertical === 'Healthcare') {
+        const override = FUNNEL_OVERRIDES.HEALTHCARE.CONSIDERATION;
         messageAngle = override.MESSAGE;
         cta = override.CTA;
     }
@@ -66,6 +82,10 @@ export const generateConversionLayer = (vertical: VerticalType): FunnelStageConf
         const override = FUNNEL_OVERRIDES.SAAS.CONVERSION;
         cta = override.CTA;
         messageAngle = override.MESSAGE;
+    } else if (vertical === 'Restaurant') {
+        const override = FUNNEL_OVERRIDES.RESTAURANT.CONVERSION;
+        messageAngle = override.MESSAGE;
+        cta = override.CTA;
     } else if (vertical === 'Healthcare') {
         const override = FUNNEL_OVERRIDES.HEALTHCARE.CONVERSION;
         cta = override.CTA;
