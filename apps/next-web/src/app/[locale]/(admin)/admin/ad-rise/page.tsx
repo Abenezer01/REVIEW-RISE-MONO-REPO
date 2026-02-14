@@ -16,10 +16,6 @@ import {
   Stack,
   useTheme,
   alpha,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -31,15 +27,10 @@ import {
   ContentCopy as DuplicateIcon,
   Add as AddIcon,
   Campaign as CampaignIcon,
-  CheckCircle as CheckCircleIcon,
-  Pending as PendingIcon,
   AutoFixHigh as AutoFixHighIcon,
   Visibility as ViewIcon,
   ArrowBack as ArrowBackIcon,
-  CheckCircleOutline as ActiveIcon,
-  HistoryEdu as DraftIcon,
-  DoneAll as CompletedIcon,
-  PlaylistAddCheck as GuideIcon,
+  FactCheck as GuideIcon,
   Delete as DeleteIcon
 } from '@mui/icons-material';
 
@@ -48,7 +39,7 @@ import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
 import { usePermissions } from '@/hooks/usePermissions';
-import { getSessions, getSessionWithLatestVersion, updateSessionStatus, updateChecklist, deleteSession } from '@/app/actions/adrise';
+import { getSessions, getSessionWithLatestVersion, updateChecklist, deleteSession, duplicateSession, getChecklist } from '@/app/actions/adrise';
 import StatisticsCard from '@/components/statistics/StatisticsCard';
 import TableListing from '@/components/shared/listing/list-types/table-listing';
 
@@ -68,13 +59,31 @@ const AdminAdRisePage = () => {
   const [selectedSessionId, setSelectedSessionId] = useState<string | undefined>();
   const [initialData, setInitialData] = useState<any | undefined>();
 
-  const [statusMenuAnchor, setStatusMenuAnchor] = useState<{ el: HTMLElement, sessionId: string } | null>(null);
-
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [sessionForGuide, setSessionForGuide] = useState<any | null>(null);
   const [isUpdatingChecklist, setIsUpdatingChecklist] = useState(false);
+  const [budgetConfig, setBudgetConfig] = useState({ lowMax: 500, midMax: 1500 });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!businessId) return;
+    const storageKey = `adrise_budget_config_${businessId}`;
+    const stored = localStorage.getItem(storageKey);
+
+    if (!stored) return;
+
+    try {
+      const parsed = JSON.parse(stored);
+      const lowMax = Math.max(1, Number(parsed?.lowMax || 500));
+      const midMax = Math.max(lowMax + 1, Number(parsed?.midMax || 1500));
+      const nextConfig = { lowMax, midMax };
+
+      setBudgetConfig(nextConfig);
+    } catch (error) {
+      console.error('Failed to parse AdRise budget config:', error);
+    }
+  }, [businessId]);
 
   const fetchSessions = useCallback(async () => {
     if (!businessId) return;
@@ -105,8 +114,8 @@ const AdminAdRisePage = () => {
       icon: 'tabler-chart-pie-2'
     },
     {
-      stats: sessions.filter(s => s.status === 'active').length.toString(),
-      title: 'Active Plans',
+      stats: sessions.filter(s => Array.isArray(s.outputs) && s.outputs.length > 0).length.toString(),
+      title: 'Generated Plans',
       color: 'success' as const,
       icon: 'tabler-circle-check'
     },
@@ -117,21 +126,12 @@ const AdminAdRisePage = () => {
       icon: 'tabler-star'
     },
     {
-      stats: sessions.filter(s => s.status === 'draft').length.toString(),
-      title: 'Drafts',
+      stats: sessions.filter(s => s.mode === 'QUICK').length.toString(),
+      title: 'Quick Mode',
       color: 'warning' as const,
       icon: 'tabler-pencil'
     }
   ];
-
-  const getStatusColor = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'active': return 'success';
-      case 'draft': return 'warning';
-      case 'completed': return 'info';
-      default: return 'default';
-    }
-  };
 
   const handleCreateNew = useCallback(() => {
     setSelectedSessionId(undefined);
@@ -148,12 +148,32 @@ const AdminAdRisePage = () => {
       if (result.success && result.data) {
         const session = result.data;
 
+        const knownIndustries = new Set([
+          'ecommerce',
+          'saas',
+          'real_estate',
+          'healthcare',
+          'fashion',
+          'food_beverage',
+          'travel',
+          'automotive',
+          'finance',
+          'legal',
+          'education',
+          'local'
+        ]);
+
+        const industryCode = session.industryCode || '';
+
         // Use session.inputs as the primary source of truth for current state
         const inputs = (session.inputs || session.latestInputs || {}) as any;
+        const latestOutput = Array.isArray(session.outputs) && session.outputs.length > 0 ? (session.outputs[0] as any)?.output : null;
+        const latestPlan = latestOutput?.plan || null;
 
         setInitialData({
           sessionName: inputs.sessionName || '',
-          industry: session.industryCode || '',
+          industry: industryCode,
+          industryCustom: inputs.industryCustom || (industryCode && !knownIndustries.has(industryCode) ? industryCode : ''),
           offer: inputs.offer || '',
           goal: session.objective || '',
           budgetMonthly: session.budgetMonthly || 1000,
@@ -161,10 +181,20 @@ const AdminAdRisePage = () => {
           brandTone: inputs.brandTone || '',
           mode: session.mode || 'QUICK',
           competitors: inputs.competitors || [],
+          geoCenter: inputs.geoCenter || '',
           geoRadius: inputs.geoRadius || 10,
           audienceNotes: inputs.audienceNotes || '',
           seasonality: inputs.seasonality || 'none',
-          status: session.status || 'active'
+          seasonalityStart: inputs.seasonalityStart || '',
+          seasonalityEnd: inputs.seasonalityEnd || '',
+          promoWindow: inputs.promoWindow || 7,
+          landingPage: inputs.landingPage || '',
+          campaignStart: inputs.campaignStart || '',
+          campaignEnd: inputs.campaignEnd || '',
+          pacing: inputs.pacing || 'even',
+          strategyNarrative: inputs.strategyNarrative || latestPlan?.narrative || null,
+          planningAssumptions: inputs.planningAssumptions || latestPlan?.assumptions || [],
+          savedAllocation: latestPlan?.allocation || null
         });
         setSelectedSessionId(sessionId);
         setIsWizardOpen(true);
@@ -180,59 +210,37 @@ const AdminAdRisePage = () => {
     setLoading(true);
 
     try {
-      const result = await getSessionWithLatestVersion(sessionId);
+      const duplicateResult = await duplicateSession(sessionId);
 
-      if (result.success && result.data) {
-        const session = result.data;
-
-        // Use session.inputs as the primary source of truth for current state
-        const inputs = (session.inputs || session.latestInputs || {}) as any;
-
-        setInitialData({
-          sessionName: `${inputs.sessionName || ''} (Copy)`,
-          industry: session.industryCode || '',
-          offer: inputs.offer || '',
-          goal: session.objective || '',
-          budgetMonthly: session.budgetMonthly || 1000,
-          locations: session.geo || [],
-          brandTone: inputs.brandTone || '',
-          mode: session.mode || 'QUICK',
-          competitors: inputs.competitors || [],
-          geoRadius: inputs.geoRadius || 10,
-          audienceNotes: inputs.audienceNotes || '',
-          seasonality: inputs.seasonality || 'none',
-          status: 'active'
-        });
-        setSelectedSessionId(undefined); // Duplicating creates a new session
-        setIsWizardOpen(true);
+      if (duplicateResult.success && duplicateResult.data?.id) {
+        await fetchSessions();
+        await handleEdit(duplicateResult.data.id);
       }
     } catch (error) {
       console.error('Failed to load session for duplicating:', error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fetchSessions, handleEdit]);
 
-  const handleStatusUpdate = useCallback(async (sessionId: string, newStatus: string) => {
-    setLoading(true);
-    setStatusMenuAnchor(null);
-
+  const handleOpenGuide = useCallback(async (session: any) => {
     try {
-      const result = await updateSessionStatus(sessionId, newStatus);
+      const checklistResult = await getChecklist(session.id);
+      const checklist = checklistResult.success ? (checklistResult.data?.checklist || {}) : ((session.inputs as any)?.checklist || {});
 
-      if (result.success) {
-        await fetchSessions();
-      }
+      setSessionForGuide({
+        ...session,
+        inputs: {
+          ...(session.inputs || {}),
+          checklist
+        }
+      });
     } catch (error) {
-      console.error('Failed to update status:', error);
+      console.error('Failed to load checklist for guide:', error);
+      setSessionForGuide(session);
     } finally {
-      setLoading(false);
+      setIsGuideOpen(true);
     }
-  }, [fetchSessions]);
-
-  const handleOpenGuide = useCallback((session: any) => {
-    setSessionForGuide(session);
-    setIsGuideOpen(true);
   }, []);
 
   const handleToggleStep = useCallback(async (stepId: string, completed: boolean) => {
@@ -355,24 +363,17 @@ const AdminAdRisePage = () => {
       )
     },
     {
-      field: 'status',
-      headerName: t('adrise.sessions.status'),
-      width: 150,
+      field: 'latestVersion',
+      headerName: 'Version',
+      width: 110,
       renderCell: (params: GridRenderCellParams) => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
           <Chip
-            label={t(`adrise.status.${params.value || 'draft'}`)}
+            label={`v${params.value || 1}`}
             size="small"
-            color={getStatusColor(params.value)}
-            variant="tonal"
-            icon={params.value === 'active' ? <CheckCircleIcon /> : <PendingIcon />}
-            sx={{ fontWeight: 500, cursor: canEdit ? 'pointer' : 'default' }}
-            onClick={(e) => {
-              if (canEdit) {
-                e.stopPropagation();
-                setStatusMenuAnchor({ el: e.currentTarget, sessionId: params.row.id });
-              }
-            }}
+            variant="outlined"
+            color="primary"
+            sx={{ fontWeight: 600 }}
           />
         </Box>
       )
@@ -396,7 +397,7 @@ const AdminAdRisePage = () => {
     {
       field: 'actions',
       headerName: t('adrise.sessions.actions'),
-      width: 120,
+      width: 200,
       sortable: false,
       align: 'right',
       headerAlign: 'right',
@@ -457,7 +458,7 @@ const AdminAdRisePage = () => {
         </Stack>
       )
     }
-  ], [theme, t, tc, canEdit, handleEdit, handleDuplicate, handleDeleteClick, setStatusMenuAnchor, handleOpenGuide]);
+  ], [theme, t, tc, canEdit, handleEdit, handleDuplicate, handleDeleteClick, handleOpenGuide]);
 
   const handleWizardSuccess = () => {
     setIsWizardOpen(false);
@@ -477,23 +478,24 @@ const AdminAdRisePage = () => {
             </Typography>
           </Box>
           {!isWizardOpen && canEdit && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreateNew}
-              className="hide-on-print"
-              sx={{
-                px: 6,
-                py: 2.5,
-                borderRadius: 2,
-                boxShadow: theme.shadows[3],
-                '&:hover': {
-                  boxShadow: theme.shadows[6]
-                }
-              }}
-            >
-              {tc('common.add')}
-            </Button>
+            <Stack direction="row" spacing={2} className="hide-on-print">
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreateNew}
+                sx={{
+                  px: 6,
+                  py: 2.5,
+                  borderRadius: 2,
+                  boxShadow: theme.shadows[3],
+                  '&:hover': {
+                    boxShadow: theme.shadows[6]
+                  }
+                }}
+              >
+                {tc('common.add')}
+              </Button>
+            </Stack>
           )}
         </Box>
       </Grid>
@@ -582,6 +584,7 @@ const AdminAdRisePage = () => {
               initialData={initialData}
               onSuccess={handleWizardSuccess}
               readOnly={!canEdit}
+              budgetConfig={budgetConfig}
             />
           </Box>
         </Grid>
@@ -601,6 +604,14 @@ const AdminAdRisePage = () => {
             </Button>
             <ExecutionGuide
               sessionId={sessionForGuide.id}
+              sessionContext={{
+                sessionName: (sessionForGuide.inputs as any)?.sessionName,
+                industry: sessionForGuide.industryCode,
+                goal: sessionForGuide.objective,
+                budgetMonthly: sessionForGuide.budgetMonthly,
+                mode: sessionForGuide.mode,
+                locations: sessionForGuide.geo
+              }}
               initialChecklist={(sessionForGuide.inputs as any)?.checklist || {}}
               onToggleStep={handleToggleStep}
               isSaving={isUpdatingChecklist}
@@ -608,41 +619,6 @@ const AdminAdRisePage = () => {
           </Box>
         </Grid>
       )}
-
-      <Menu
-        anchorEl={statusMenuAnchor?.el}
-        open={Boolean(statusMenuAnchor)}
-        onClose={() => setStatusMenuAnchor(null)}
-        slotProps={{
-          paper: {
-            sx: {
-              minWidth: 160,
-              boxShadow: theme.shadows[4],
-              borderRadius: 2,
-              mt: 1
-            }
-          }
-        }}
-      >
-        <MenuItem onClick={() => statusMenuAnchor && handleStatusUpdate(statusMenuAnchor.sessionId, 'active')}>
-          <ListItemIcon>
-            <ActiveIcon fontSize="small" color="success" />
-          </ListItemIcon>
-          <ListItemText primary={t('adrise.status.active')} />
-        </MenuItem>
-        <MenuItem onClick={() => statusMenuAnchor && handleStatusUpdate(statusMenuAnchor.sessionId, 'draft')}>
-          <ListItemIcon>
-            <DraftIcon fontSize="small" color="warning" />
-          </ListItemIcon>
-          <ListItemText primary={t('adrise.status.draft')} />
-        </MenuItem>
-        <MenuItem onClick={() => statusMenuAnchor && handleStatusUpdate(statusMenuAnchor.sessionId, 'completed')}>
-          <ListItemIcon>
-            <CompletedIcon fontSize="small" color="info" />
-          </ListItemIcon>
-          <ListItemText primary={t('adrise.status.completed')} />
-        </MenuItem>
-      </Menu>
 
       <Dialog
         open={deleteDialogOpen}

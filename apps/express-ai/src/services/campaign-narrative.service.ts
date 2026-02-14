@@ -9,6 +9,16 @@ export interface NarrativeInput {
     budgetMonthly: number;
     mode: 'QUICK' | 'PRO';
     brandTone?: string;
+    channelSplit?: {
+        google?: number;
+        meta?: number;
+    };
+    pacingCurve?: Array<{
+        label: string;
+        weight: number;
+    }>;
+    budgetDaily?: number;
+    campaignDays?: number;
 }
 
 export interface NarrativeOutput {
@@ -18,6 +28,17 @@ export interface NarrativeOutput {
 
 export class CampaignNarrativeService {
     async generate(input: NarrativeInput): Promise<NarrativeOutput> {
+        const locations = Array.isArray(input.locations) && input.locations.length > 0 ? input.locations.join(', ') : 'Not specified';
+        const channelSplitText = input.channelSplit
+            ? `Google ${input.channelSplit.google ?? 50}% / Meta ${input.channelSplit.meta ?? 50}%`
+            : 'Not provided';
+        const pacingCurveText = input.pacingCurve && input.pacingCurve.length > 0
+            ? input.pacingCurve.map((point) => `${point.label}: ${point.weight}%`).join(' | ')
+            : 'Not provided';
+        const budgetMathText = input.budgetDaily && input.campaignDays
+            ? `~$${input.budgetDaily}/day over ${input.campaignDays} days`
+            : 'Derived from monthly budget only';
+
         const prompt = `
         You are a senior digital marketing strategist at ReviewRise.
         Generate a plain-language campaign explanation (narrative) and a list of planning assumptions for a client's upcoming ad campaign.
@@ -27,14 +48,20 @@ export class CampaignNarrativeService {
         - Industry: ${input.industry}
         - Offer/Promotion: ${input.offer}
         - Campaign Goal: ${input.goal}
-        - Locations: ${input.locations.join(', ')}
+        - Locations: ${locations}
         - Monthly Budget: $${input.budgetMonthly}
+        - Budget Math: ${budgetMathText}
         - Setup Mode: ${input.mode}
         - Brand Tone: ${input.brandTone || 'Professional'}
+        - Channel Split: ${channelSplitText}
+        - Pacing Curve: ${pacingCurveText}
 
         Output Requirements:
         1. Narrative: 2-3 short, encouraging paragraphs explaining the strategy in simple terms. Avoid marketing jargon. Focus on why this plan will work (e.g., "We're using Google to find people actively searching for [service] while Meta builds awareness...").
+           - If channel split and pacing are provided, explicitly reference them in plain language.
+           - If budget is small, explain tradeoffs clearly and what is intentionally deprioritized.
         2. Assumptions: A list of 4-6 key assumptions we are making for this plan (e.g., Average CPC, Benchmark CTR, Expected Conversion Rate for this industry, Lead quality expectations).
+           - Include one assumption about tracking quality and one about creative/landing-page alignment.
 
         Return the response as a valid JSON object with the following structure:
         {
@@ -51,7 +78,7 @@ export class CampaignNarrativeService {
             const jsonStr = jsonMatch ? jsonMatch[0] : response;
 
             return JSON.parse(jsonStr);
-        } catch (error) {
+        } catch {
             console.error('Failed to parse narrative JSON:', response);
             // Fallback
             return {

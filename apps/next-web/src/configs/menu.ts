@@ -139,6 +139,12 @@ const menuData: MenuItem[] = [
         allowedRoles: [ROLES.ADMIN]
       },
       {
+        title: 'navigation.ad-rise-configuration',
+        href: '/admin/ad-rise/configuration',
+        icon: 'tabler-settings',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
         title: 'navigation.google-blueprint',
         href: '/admin/ad-rise/blueprint',
         icon: 'tabler-brand-google',

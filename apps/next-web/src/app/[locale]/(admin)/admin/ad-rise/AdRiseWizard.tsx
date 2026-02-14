@@ -12,16 +12,11 @@ import {
   StepLabel,
   Card,
   CardContent,
-  Grid,
-  Stack,
   Alert,
   Divider,
-  Chip,
   CircularProgress,
   Skeleton,
   Fade,
-  Paper,
-  Tooltip,
   alpha,
   useTheme,
   useMediaQuery,
@@ -35,21 +30,11 @@ import {
   ArrowBack,
   ArrowForward,
   Check,
-  WarningAmber as WarningIcon,
-  FlashOn as QuickModeIcon,
-  SettingsSuggest as ProModeIcon,
   Save as SavedIcon,
-  AutoFixHigh,
   AttachMoney as BudgetIcon,
   TrendingUp as GoalIcon,
   LocalOffer as OfferIcon,
   RateReview as ReviewIcon,
-  FileDownload as DownloadIcon,
-  Print as PrintIcon,
-  Image as ImageIcon,
-  Timeline as TimelineIcon,
-  FactCheck as AssumptionsIcon,
-  AutoFixHigh as NarrativeIcon
 } from '@mui/icons-material';
 
 import { Formik, Form, useFormikContext } from 'formik';
@@ -57,14 +42,21 @@ import * as Yup from 'yup';
 import { useTranslations } from 'next-intl';
 
 import StepperWrapper from '@core/styles/stepper';
-import CustomInputVertical from '@core/components/custom-inputs/Vertical';
-
-import CustomTextBox from '@/components/shared/form/custom-text-box';
-import CustomSelect from '@/components/shared/form/custom-select';
-import CustomTagsInput from '@/components/shared/form/custom-tags-input';
-import { saveSession, getBrandTone, getBusinessDetails, scrapeOfferFromUrl, recommendGoal, generateCampaignNarrative } from '@/app/actions/adrise';
+import { saveSession, getBrandTone, getBusinessDetails, generateCampaignNarrative, generateChannelAllocation } from '@/app/actions/adrise';
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
-import { countries } from '@/shared/utils/countries';
+import {
+  getDailyBudget,
+  getPacingCurve,
+} from './wizard/planning';
+import type { AllocationResult, BudgetBandConfig } from './wizard/planning';
+import { downloadSimplePdf } from './wizard/pdf';
+import ReviewStep from './wizard/review/ReviewStep';
+import BasicsStep from './wizard/steps/BasicsStep';
+import BudgetStep from './wizard/steps/BudgetStep';
+import GeoStep from './wizard/steps/GeoStep';
+import GoalStep from './wizard/steps/GoalStep';
+import OfferStep from './wizard/steps/OfferStep';
+import ToneStep from './wizard/steps/ToneStep';
 
 const AUTOSAVE_KEY = 'adrise_wizard_draft';
 
@@ -127,19 +119,17 @@ interface AdRiseWizardProps {
   onSuccess?: (data: any) => void;
   businessId: string;
   readOnly?: boolean;
+  budgetConfig?: BudgetBandConfig;
 }
 
-const NarrativeTrigger = ({ values, fetchNarrative, narrativeData, isLoading }: any) => {
-  useEffect(() => {
-    if (!narrativeData && !isLoading) {
-      fetchNarrative(values);
-    }
-  }, [values, fetchNarrative, narrativeData, isLoading]);
-
-  return null;
-};
-
-const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly = false }: AdRiseWizardProps) => {
+const AdRiseWizard = ({
+  initialData,
+  sessionId,
+  onSuccess,
+  businessId,
+  readOnly = false,
+  budgetConfig = { lowMax: 500, midMax: 1500 }
+}: AdRiseWizardProps) => {
   const theme = useTheme();
   const t = useTranslations('dashboard.adrise');
   const tc = useTranslations('common');
@@ -155,6 +145,8 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
   ];
 
   const { notify } = useSystemMessages();
+  const shareLinkLabel = 'Share Link';
+  const copySharePrompt = 'Copy share URL';
   const [activeStep, setActiveStep] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | undefined>(sessionId);
@@ -165,31 +157,100 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
   const [businessBrandTone, setBusinessBrandTone] = useState<string | null>(null);
   const [businessWebsite, setBusinessWebsite] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [isScraping, setIsScraping] = useState(false);
-  const [recommendedGoal, setRecommendedGoal] = useState<string | null>(null);
-  const [isRecommending, setIsRecommending] = useState(false);
+  const [allocationData, setAllocationData] = useState<AllocationResult | null>(null);
+  const [isAllocationLoading, setIsAllocationLoading] = useState(false);
   const [narrativeData, setNarrativeData] = useState<{ narrative: string; assumptions: string[] } | null>(null);
   const [isNarrativeLoading, setIsNarrativeLoading] = useState(false);
+  const [hasReviewRegenerated, setHasReviewRegenerated] = useState(false);
 
-  // Fetch campaign narrative on review step
-  const fetchNarrative = useCallback(async (values: any) => {
-    setIsNarrativeLoading(true);
-    const res = await generateCampaignNarrative({
-      sessionName: values.sessionName,
+  const isValidAllocation = (payload: any): payload is AllocationResult => {
+    if (!payload || !payload.google || !payload.meta || !payload.channelSplit || !payload.tactics) return false;
+
+    const hasNumericStages = ['awareness', 'consideration', 'conversion'].every((stage) => (
+      typeof payload.google[stage] === 'number' && typeof payload.meta[stage] === 'number'
+    ));
+
+    const hasValidSplit = typeof payload.channelSplit.google === 'number' && typeof payload.channelSplit.meta === 'number';
+
+    const hasTactics = ['awareness', 'consideration', 'conversion'].every((stage) => (
+      Array.isArray(payload.tactics?.google?.[stage]) && Array.isArray(payload.tactics?.meta?.[stage])
+    ));
+
+    return hasNumericStages && hasValidSplit && hasTactics;
+  };
+
+  const resolveAllocation = useCallback(async (values: any) => {
+    const allocationRes = await generateChannelAllocation({
       industry: values.industry,
-      offer: values.offer,
       goal: values.goal,
-      locations: values.locations,
       budgetMonthly: values.budgetMonthly,
-      mode: values.mode,
-      brandTone: values.brandTone || businessBrandTone
+      seasonality: values.seasonality,
+      pacing: values.pacing,
+      promoWindow: values.promoWindow,
+      audienceNotes: values.audienceNotes,
+      competitors: values.competitors,
+      locations: values.locations
     });
 
-    if (res.success) {
-      setNarrativeData(res.data.data);
+    const payload = (allocationRes.data as any)?.data ?? allocationRes.data;
+
+    if (allocationRes.success && isValidAllocation(payload)) {
+      return payload;
     }
-    setIsNarrativeLoading(false);
-  }, [businessBrandTone]);
+
+    throw new Error('Failed to generate AI channel allocation');
+  }, []);
+
+  // Fetch AI allocation + campaign narrative on review step
+  const fetchNarrative = useCallback(async (values: any) => {
+    setIsAllocationLoading(true);
+    setIsNarrativeLoading(true);
+
+    try {
+      const { campaignDays, dailyBudget } = getDailyBudget(values);
+      const allocation = await resolveAllocation(values);
+
+      setAllocationData(allocation);
+
+      const pacingCurve = getPacingCurve(values);
+
+      const res = await generateCampaignNarrative({
+        sessionName: values.sessionName,
+        industry: values.industry,
+        offer: values.offer,
+        goal: values.goal,
+        locations: values.locations,
+        budgetMonthly: values.budgetMonthly,
+        budgetDaily: dailyBudget,
+        campaignDays,
+        mode: values.mode,
+        brandTone: values.brandTone || businessBrandTone,
+        channelSplit: allocation.channelSplit,
+        pacingCurve
+      });
+
+      if (res.success) {
+        const payload = (res.data as any)?.data ?? res.data;
+
+        if (payload?.narrative && Array.isArray(payload?.assumptions)) {
+          setNarrativeData(payload);
+          setHasReviewRegenerated(true);
+        } else {
+          setNarrativeData(null);
+        }
+      } else {
+        setNarrativeData(null);
+      }
+    } catch (error) {
+      console.error('Failed to generate review plan:', error);
+      setAllocationData(null);
+      setNarrativeData(null);
+      notify({ messageCode: 'errors.internalError' as any, variant: 'TOAST', severity: 'error' });
+    } finally {
+      setIsAllocationLoading(false);
+      setIsNarrativeLoading(false);
+    }
+  }, [businessBrandTone, notify, resolveAllocation]);
 
   // Sync currentSessionId with sessionId prop
   useEffect(() => {
@@ -197,6 +258,10 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
       setCurrentSessionId(sessionId);
     }
   }, [sessionId]);
+
+  useEffect(() => {
+    setHasReviewRegenerated(false);
+  }, [sessionId, initialData]);
 
   // Fetch business profile data (brand tone and website)
   useEffect(() => {
@@ -227,10 +292,19 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
 
   // Handle Narrative Fetching on review step (Step 6)
   useEffect(() => {
-    if (activeStep !== 6) {
-      setNarrativeData(null); // Reset when moving away to allow re-generation if inputs change
+    if (activeStep !== 6) return;
+
+    if (!narrativeData && typeof initialData?.strategyNarrative === 'string' && initialData.strategyNarrative.trim().length > 0) {
+      setNarrativeData({
+        narrative: initialData.strategyNarrative,
+        assumptions: Array.isArray(initialData?.planningAssumptions) ? initialData.planningAssumptions : []
+      });
     }
-  }, [activeStep]);
+
+    if (!allocationData && initialData?.savedAllocation) {
+      setAllocationData(initialData.savedAllocation as AllocationResult);
+    }
+  }, [activeStep, initialData, narrativeData, allocationData]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -276,12 +350,13 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
         objective: values.goal,
         budgetMonthly: values.budgetMonthly,
         geo: values.locations,
-        status: values.status,
         inputs: {
           sessionName: values.sessionName,
+          industryCustom: values.industryCustom,
           offer: values.offer,
           brandTone: values.brandTone,
           competitors: values.competitors,
+          geoCenter: values.geoCenter,
           geoRadius: values.geoRadius,
           audienceNotes: values.audienceNotes,
           seasonality: values.seasonality,
@@ -333,6 +408,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
     return {
       sessionName: '',
       industry: '',
+      industryCustom: '',
       offer: '',
       goal: '',
       budgetMonthly: 1000,
@@ -341,6 +417,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
       brandTone: businessBrandTone || '',
       mode: 'QUICK',
       competitors: [] as string[],
+      geoCenter: '',
       geoRadius: 10,
       audienceNotes: '',
       seasonality: 'none',
@@ -349,56 +426,11 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
       promoWindow: 7,
       landingPage: businessWebsite || '',
       campaignStart: '',
-      campaignEnd: '',
-      status: 'active'
+      campaignEnd: ''
     };
   };
 
   const initialValues = getInitialValues();
-
-  const getDaysInCurrentMonth = () => {
-    const now = new Date();
-
-    return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-  };
-
-  const calculatePromoWindow = (start: string, end: string) => {
-    if (!start || !end) return 7;
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    const diffTime = endDate.getTime() - startDate.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Inclusive
-
-    return isNaN(diffDays) || diffDays < 0 ? 0 : diffDays;
-  };
-
-  const getAllocation = (goal: string, budget: number) => {
-    const isLowBudget = budget < 500;
-
-    // Default allocations
-    const allocation = {
-      google: { awareness: 20, consideration: 40, conversion: 40 },
-      meta: { awareness: 30, consideration: 40, conversion: 30 }
-    };
-
-    if (goal === 'awareness') {
-      allocation.google = { awareness: 50, consideration: 30, conversion: 20 };
-      allocation.meta = { awareness: 60, consideration: 30, conversion: 10 };
-    } else if (goal === 'traffic') {
-      allocation.google = { awareness: 20, consideration: 60, conversion: 20 };
-      allocation.meta = { awareness: 30, consideration: 50, conversion: 20 };
-    }
-
-    // Adjust for low budget (prioritize conversion/consideration)
-    if (isLowBudget) {
-      allocation.google.awareness = Math.max(0, allocation.google.awareness - 10);
-      allocation.google.conversion = Math.min(100, allocation.google.conversion + 10);
-      allocation.meta.awareness = Math.max(0, allocation.meta.awareness - 10);
-      allocation.meta.conversion = Math.min(100, allocation.meta.conversion + 10);
-    }
-
-    return allocation;
-  };
 
   const validationSchema = useMemo(() => [
     // Step 0: Basics
@@ -408,9 +440,30 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
       landingPage: Yup.string()
         .url(t('validation.invalidUrl'))
         .required(t('validation.required')),
-      campaignStart: Yup.string().required(t('validation.required')),
+      campaignStart: Yup.string()
+        .required(t('validation.required'))
+        .test('start-not-in-past', t('validation.invalidDateRange'), function (value) {
+          if (!value) return true;
+          const selected = new Date(value);
+          const today = new Date();
+
+          today.setHours(0, 0, 0, 0);
+          selected.setHours(0, 0, 0, 0);
+
+          return selected >= today;
+        }),
       campaignEnd: Yup.string()
         .required(t('validation.required'))
+        .test('end-not-in-past', t('validation.invalidDateRange'), function (value) {
+          if (!value) return true;
+          const selected = new Date(value);
+          const today = new Date();
+
+          today.setHours(0, 0, 0, 0);
+          selected.setHours(0, 0, 0, 0);
+
+          return selected >= today;
+        })
         .test('is-after', t('validation.invalidDateRange'), function (value) {
           const { campaignStart } = this.parent;
 
@@ -435,38 +488,80 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
         .min(1, t('validation.minBudget')),
       seasonalityStart: Yup.string().when('seasonality', {
         is: (val: string) => val !== 'none',
-        then: (schema) => schema.required(t('validation.required')),
+        then: (schema) => schema
+          .required(t('validation.required'))
+          .test('seasonality-start-within-campaign', t('validation.invalidDateRange'), function (value) {
+            const { campaignStart, campaignEnd } = this.parent;
+
+            if (!value || !campaignStart || !campaignEnd) return true;
+
+            const seasonalityStart = new Date(value);
+            const campaignStartDate = new Date(campaignStart);
+            const campaignEndDate = new Date(campaignEnd);
+
+            return seasonalityStart >= campaignStartDate && seasonalityStart <= campaignEndDate;
+          })
+          .test('seasonality-start-before-end', t('validation.invalidDateRange'), function (value) {
+            const { seasonalityEnd } = this.parent;
+
+            if (!value || !seasonalityEnd) return true;
+
+            return new Date(value) <= new Date(seasonalityEnd);
+          }),
         otherwise: (schema) => schema.notRequired()
       }),
       seasonalityEnd: Yup.string().when('seasonality', {
         is: (val: string) => val !== 'none',
-        then: (schema) => schema.required(t('validation.required')),
+        then: (schema) => schema
+          .required(t('validation.required'))
+          .test('seasonality-end-within-campaign', t('validation.invalidDateRange'), function (value) {
+            const { campaignStart, campaignEnd } = this.parent;
+
+            if (!value || !campaignStart || !campaignEnd) return true;
+
+            const seasonalityEnd = new Date(value);
+            const campaignStartDate = new Date(campaignStart);
+            const campaignEndDate = new Date(campaignEnd);
+
+            return seasonalityEnd >= campaignStartDate && seasonalityEnd <= campaignEndDate;
+          })
+          .test('seasonality-end-after-start', t('validation.invalidDateRange'), function (value) {
+            const { seasonalityStart } = this.parent;
+
+            if (!value || !seasonalityStart) return true;
+
+            return new Date(value) >= new Date(seasonalityStart);
+          }),
         otherwise: (schema) => schema.notRequired()
       })
     }),
 
     // Step 4: Geo
     Yup.object({
-      locations: Yup.array().min(1, t('validation.required'))
+      locations: Yup.array().min(1, t('validation.required')),
+      geoCenter: Yup.string().when('mode', {
+        is: 'PRO',
+        then: (schema) => schema.required(t('validation.required')),
+        otherwise: (schema) => schema.notRequired()
+      })
     }),
 
     // Step 5: Brand Tone
     Yup.object({
-      brandTone: Yup.string().required(t('validation.required'))
+      brandTone: Yup.string().when('mode', {
+        is: 'PRO',
+        then: (schema) => schema.required(t('validation.required')),
+        otherwise: (schema) => schema.notRequired()
+      })
     }),
 
     // Step 6: Review
     Yup.object({})
   ], [t]);
 
-  const handleNext = (validateForm: any, setTouched: any, values: any) => {
+  const handleNext = (validateForm: any, setTouched: any) => {
     validateForm().then((errors: any) => {
       if (Object.keys(errors).length === 0) {
-        // If moving from Step 1 (Offer) to Step 2 (Goal), trigger recommendation
-        if (activeStep === 1) {
-          handleRecommendGoal(values);
-        }
-
         setActiveStep((prev) => prev + 1);
       } else {
         // Mark all fields in current step as touched to show errors
@@ -484,67 +579,197 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
     setActiveStep((prev) => prev - 1);
   };
 
-  const handleSmartFill = async (values: any, setFieldValue: any) => {
-    if (!values.landingPage) {
-      notify({ messageCode: 'errors.missingLandingPage' as any, variant: 'TOAST', severity: 'warning' });
+  const handleExportJSON = (values: any) => {
+    const fallbackPayload = {
+      schemaVersion: 'campaign-plan.v1',
+      exportedAt: new Date().toISOString(),
+      session: {
+        id: currentSessionId || null,
+        name: values.sessionName || 'Draft Campaign'
+      },
+      draft: values
+    };
+
+    const downloadJson = (payload: any, fileNameBase: string) => {
+      const data = JSON.stringify(payload, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+
+      link.href = url;
+      link.download = `${fileNameBase}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    if (!currentSessionId) {
+      downloadJson(fallbackPayload, `campaign-plan-${values.sessionName || 'draft'}-v1`);
 
       return;
     }
 
-    setIsScraping(true);
+    fetch(`/api/admin/adrise/sessions/${currentSessionId}/export`)
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error('Failed to export plan');
+        }
 
-    try {
-      const result = await scrapeOfferFromUrl(values.landingPage, values.industry);
+        const payload = await response.json();
+        const name = (payload?.session?.name || values.sessionName || 'campaign-plan').replace(/[^a-zA-Z0-9-_]/g, '_');
 
-      if (result.success && result.data) {
-        setFieldValue('offer', result.data);
-        notify({ messageCode: 'adrise.offer.smartFillSuccess' as any, variant: 'TOAST', severity: 'success' });
-      } else {
-        notify({ messageCode: 'errors.internalError' as any, variant: 'TOAST', severity: 'error' });
-      }
-    } catch (error: any) {
-      console.error('Smart Fill Error:', error);
-      notify({ messageCode: 'adrise.offer.smartFillError' as any, variant: 'TOAST', severity: 'error' });
-    } finally {
-      setIsScraping(false);
-    }
+        downloadJson(payload, `${name}-v1`);
+      })
+      .catch((error) => {
+        console.error('Export failed, falling back to local payload:', error);
+        downloadJson(fallbackPayload, `campaign-plan-${values.sessionName || 'draft'}-v1`);
+      });
   };
 
-  const handleRecommendGoal = async (values: any) => {
-    if (!values.offer) {
-      return;
-    }
-
-    setIsRecommending(true);
+  const handleShareLink = async () => {
+    if (!currentSessionId) return;
 
     try {
-      const result = await recommendGoal(values.offer, values.industry);
+      const response = await fetch(`/api/admin/adrise/sessions/${currentSessionId}/share`, { method: 'POST' });
 
-      if (result.success && result.data) {
-        setRecommendedGoal(result.data);
+      if (!response.ok) {
+        throw new Error('Failed to create share link');
+      }
+
+      const json = await response.json();
+      const shareUrl = json?.data?.shareUrl as string | undefined;
+
+      if (!shareUrl) {
+        throw new Error('Share URL missing from response');
+      }
+
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+      } else {
+        window.prompt(copySharePrompt, shareUrl);
       }
     } catch (error) {
-      console.error('Goal Recommendation Error:', error);
-    } finally {
-      setIsRecommending(false);
+      console.error('Failed to generate share URL:', error);
     }
   };
 
-  const handleExportJSON = (values: any) => {
-    const data = JSON.stringify(values, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+  const handlePrint = (values: any) => {
+    const allocation = allocationData;
+    const narrative = narrativeData?.narrative || 'Narrative is not available yet.';
+    const assumptions = narrativeData?.assumptions || [];
+    const tradeoffs = allocation?.tradeoffs?.length ? allocation.tradeoffs : ['No tradeoffs generated.'];
+    const campaignDays = getDailyBudget(values).campaignDays;
+    const dailyBudget = getDailyBudget(values).dailyBudget;
 
-    link.href = url;
-    link.download = `campaign-plan-${values.sessionName || 'draft'}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+    const formatPlatformLines = (platform: 'google' | 'meta') => {
+      if (!allocation) {
+        return ['Allocation is not available.'];
+      }
 
-  const handlePrint = () => {
-    window.print();
+      const platformLabel = platform === 'google' ? 'Google' : 'Meta';
+      const platformData = allocation[platform];
+      const stageOrder: Array<'awareness' | 'consideration' | 'conversion'> = ['awareness', 'consideration', 'conversion'];
+
+      const lines: string[] = [
+        `1. Channel split share: ${allocation.channelSplit[platform]}%`,
+        `2. Funnel mix: Awareness ${platformData.awareness}%, Consideration ${platformData.consideration}%, Conversion ${platformData.conversion}%`,
+        '3. Tactics by stage:'
+      ];
+
+      stageOrder.forEach((stage, stageIdx) => {
+        const tactics = allocation.tactics?.[platform]?.[stage] || [];
+
+        lines.push(`   ${stageIdx + 1}. ${stage.toUpperCase()} (${platformData[stage]}%)`);
+
+        if (tactics.length === 0) {
+          lines.push('      - No tactics generated.');
+        } else {
+          tactics.forEach((tactic, tacticIdx) => {
+            lines.push(`      - ${tacticIdx + 1}. ${tactic.label} (${tactic.weight}% of ${stage})`);
+          });
+        }
+      });
+
+      lines.push(`4. ${platformLabel} execution focus: prioritize high-intent tactics first, then scale winners.`);
+
+      return lines;
+    };
+
+    const strategyLines = [
+      `Session: ${values.sessionName || 'Unnamed session'}`,
+      `Mode: ${values.mode || 'N/A'}`,
+      `Industry: ${values.industryCustom || values.industry || 'N/A'}`,
+      `Goal: ${values.goal || 'N/A'}`,
+      `Offer: ${values.offer || 'N/A'}`,
+      '',
+      'Narrative:',
+      narrative,
+      '',
+      'Assumptions:'
+    ];
+
+    if (assumptions.length === 0) {
+      strategyLines.push('1. No assumptions generated.');
+    } else {
+      assumptions.forEach((item: string, idx: number) => {
+        strategyLines.push(`${idx + 1}. ${item}`);
+      });
+    }
+
+    downloadSimplePdf({
+      fileName: `${(values.sessionName || 'campaign-plan').replace(/[^a-zA-Z0-9-_]/g, '_')}-report`,
+      title: 'Campaign Plan Report',
+      sections: [
+        {
+          title: 'Strategy',
+          lines: strategyLines
+        },
+        {
+          title: 'Google',
+          lines: formatPlatformLines('google')
+        },
+        {
+          title: 'Meta',
+          lines: formatPlatformLines('meta')
+        },
+        {
+          title: 'Creatives',
+          lines: [
+            '1. Google Creative Plan:',
+            '   - Build responsive headlines and descriptions per intent cluster.',
+            '   - Add sitelinks/callouts/snippets matching the offer.',
+            '2. Meta Creative Plan:',
+            '   - Prepare feed and story/reel creatives.',
+            '   - Match hook, CTA, and landing message across all formats.'
+          ]
+        },
+        {
+          title: 'Budget',
+          lines: [
+            `1. Monthly budget: ${tc('common.currencySymbol') || '$'}${values.budgetMonthly || 0}`,
+            `2. Daily budget: ${tc('common.currencySymbol') || '$'}${dailyBudget}`,
+            `3. Campaign days: ${campaignDays}`,
+            `4. Pacing strategy: ${values.pacing || 'even'}`,
+            '5. Tradeoffs:',
+            ...tradeoffs.map((item: string, idx: number) => `   - ${idx + 1}. ${item}`)
+          ]
+        },
+        {
+          title: 'Execution',
+          lines: [
+            `1. Locations: ${Array.isArray(values.locations) && values.locations.length > 0 ? values.locations.join(', ') : 'N/A'}`,
+            `2. Campaign start: ${values.campaignStart || 'N/A'}`,
+            `3. Campaign end: ${values.campaignEnd || 'N/A'}`,
+            `4. Landing page: ${values.landingPage || 'N/A'}`,
+            '5. Launch checklist:',
+            '   - Confirm tracking is active.',
+            '   - Confirm creative and copy are approved.',
+            '   - Confirm budget and schedule are correct.',
+            '   - Confirm audience and location settings are correct.'
+          ]
+        }
+      ]
+    });
   };
 
   const renderStepContent = (step: number, values: any, setFieldValue: any) => {
@@ -560,809 +785,46 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
 
     switch (step) {
       case 0:
-        return (
-          <Fade in timeout={500}>
-            <Grid container spacing={5}>
-              <Grid size={{ xs: 12 }}>
-                <CustomTextBox
-                  name="sessionName"
-                  label={t('fields.sessionName')}
-                  tooltip={t('fields.sessionNameTooltip')}
-                  placeholder="My Summer Campaign"
-                  fullWidth
-                  autoFocus
-                />
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <CustomSelect
-                  name="industry"
-                  label={t('fields.industry')}
-                  tooltip={t('fields.industryTooltip')}
-                  placeholder="e.g. Health & Wellness"
-                  options={[
-                    { label: 'E-commerce', value: 'ecommerce' },
-                    { label: 'SaaS', value: 'saas' },
-                    { label: 'Real Estate', value: 'real_estate' },
-                    { label: 'Healthcare', value: 'healthcare' },
-                    { label: 'Fashion & Apparel', value: 'fashion' },
-                    { label: 'Food & Beverage', value: 'food_beverage' },
-                    { label: 'Travel & Hospitality', value: 'travel' },
-                    { label: 'Automotive', value: 'automotive' },
-                    { label: 'Financial Services', value: 'finance' },
-                    { label: 'Legal Services', value: 'legal' },
-                    { label: 'Education', value: 'education' },
-                    { label: 'Local Business', value: 'local' }
-                  ]}
-                  fullWidth
-                />
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <CustomSelect
-                  name="status"
-                  label={t('fields.status')}
-                  tooltip={t('fields.statusTooltip')}
-                  placeholder="Select status"
-                  options={[
-                    { label: t('status.active'), value: 'active' },
-                    { label: t('status.draft'), value: 'draft' },
-                    { label: t('status.completed'), value: 'completed' }
-                  ]}
-                  fullWidth
-                />
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <CustomTextBox
-                  name="landingPage"
-                  label={t('fields.landingPage')}
-                  tooltip={t('fields.landingPageTooltip')}
-                  placeholder="https://yourbrand.com/special-offer"
-                  fullWidth
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <CustomTextBox
-                  name="campaignStart"
-                  label={t('fields.campaignStart')}
-                  tooltip={t('fields.campaignTimelineTooltip')}
-                  type="date"
-                  placeholder="YYYY-MM-DD"
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <CustomTextBox
-                  name="campaignEnd"
-                  label={t('fields.campaignEnd')}
-                  tooltip={t('fields.campaignTimelineTooltip')}
-                  type="date"
-                  placeholder="YYYY-MM-DD"
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <Typography variant="subtitle2" sx={{ mb: 3, fontWeight: 600 }}>
-                  {t('basics.mode')}
-                </Typography>
-                <Grid container spacing={4}>
-                  {[
-                    {
-                      value: 'QUICK',
-                      title: t('basics.modeQuick'),
-                      content: t('basics.modeQuickDesc'),
-                      icon: <QuickModeIcon fontSize="large" color={values.mode === 'QUICK' ? 'primary' : 'action'} />
-                    },
-                    {
-                      value: 'PRO',
-                      title: t('basics.modePro'),
-                      content: t('basics.modeProDesc'),
-                      icon: <ProModeIcon fontSize="large" color={values.mode === 'PRO' ? 'primary' : 'action'} />
-                    }
-                  ].map((item) => (
-                    <Grid size={{ xs: 12, sm: 6 }} key={item.value}>
-                      <CustomInputVertical
-                        type="radio"
-                        name="mode"
-                        selected={values.mode}
-                        handleChange={(val) => setFieldValue('mode', val)}
-                        data={{
-                          value: item.value,
-                          title: item.title,
-                          content: item.content,
-                          asset: item.icon
-                        }}
-                      />
-                    </Grid>
-                  ))}
-                </Grid>
-              </Grid>
-              {values.mode === 'PRO' && (
-                <Grid size={{ xs: 12 }}>
-                  <CustomTagsInput
-                    name="competitors"
-                    label={t('fields.competitors')}
-                    tooltip={t('fields.competitorsTooltip')}
-                    placeholder={t('competitors.placeholder')}
-                    fullWidth
-                  />
-                </Grid>
-              )}
-            </Grid>
-          </Fade>
-        );
+        return <BasicsStep values={values} setFieldValue={setFieldValue} t={t} />;
       case 1:
-        return (
-          <Fade in timeout={500}>
-            <Grid container spacing={5}>
-              <Grid size={{ xs: 12 }}>
-                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                    {t('offer.title')}
-                  </Typography>
-                  <Tooltip title={t('offer.smartFillTooltip')}>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      startIcon={isScraping ? <CircularProgress size={16} color="inherit" /> : <AutoFixHigh />}
-                      onClick={() => handleSmartFill(values, setFieldValue)}
-                      disabled={isScraping || !values.landingPage}
-                      sx={{
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        fontWeight: 700,
-                        borderWidth: 1.5,
-                        '&:hover': { borderWidth: 1.5 }
-                      }}
-                    >
-                      {isScraping ? t('offer.smartFillLoading') : t('offer.smartFill')}
-                    </Button>
-                  </Tooltip>
-                </Box>
-                <CustomTextBox
-                  name="offer"
-                  label={t('fields.offer')}
-                  tooltip={t('fields.offerTooltip')}
-                  placeholder={t('offer.placeholder')}
-                  multiline
-                  rows={4}
-                  fullWidth
-                />
-              </Grid>
-              {values.mode === 'PRO' && (
-                <Grid size={{ xs: 12 }}>
-                  <CustomTextBox
-                    name="audienceNotes"
-                    label={t('fields.audienceNotes')}
-                    tooltip={t('fields.audienceNotesTooltip')}
-                    placeholder={t('offer.audiencePlaceholder')}
-                    multiline
-                    rows={4}
-                    fullWidth
-                  />
-                </Grid>
-              )}
-            </Grid>
-          </Fade>
-        );
+        return <OfferStep values={values} t={t} />;
       case 2:
-        return (
-          <Fade in timeout={500}>
-            <Grid container spacing={4}>
-              {isRecommending && (
-                <Grid size={{ xs: 12 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, bgcolor: alpha(theme.palette.primary.main, 0.05), borderRadius: 2 }}>
-                    <CircularProgress size={20} />
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {t('goal.recommending')}
-                    </Typography>
-                  </Box>
-                </Grid>
-              )}
-              {[
-                { value: 'traffic', title: t('goal.objectives.traffic'), content: t('goal.objectives.trafficSubtitle') },
-                { value: 'leads', title: t('goal.objectives.leads'), content: t('goal.objectives.leadsSubtitle') },
-                { value: 'sales', title: t('goal.objectives.sales'), content: t('goal.objectives.salesSubtitle') },
-                { value: 'awareness', title: t('goal.objectives.awareness'), content: t('goal.objectives.awarenessSubtitle') }
-              ].map((item) => (
-                <Grid size={{ xs: 12, sm: 6 }} key={item.value}>
-                  <Box sx={{ position: 'relative' }}>
-                    {recommendedGoal === item.value && (
-                      <Chip
-                        label={t('goal.recommended')}
-                        color="primary"
-                        size="small"
-                        icon={<AutoFixHigh sx={{ fontSize: '14px !important' }} />}
-                        sx={{
-                          position: 'absolute',
-                          top: -10,
-                          right: 10,
-                          zIndex: 1,
-                          fontWeight: 800,
-                          fontSize: '10px',
-                          height: 20,
-                          boxShadow: theme.shadows[2]
-                        }}
-                      />
-                    )}
-                    <CustomInputVertical
-                      type="radio"
-                      name="goal"
-                      selected={values.goal}
-                      handleChange={(val) => setFieldValue('goal', val)}
-                      data={{
-                        value: item.value,
-                        title: item.title,
-                        content: item.content,
-                        asset: <GoalIcon fontSize="large" color={values.goal === item.value ? 'primary' : 'action'} />
-                      }}
-                    />
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-          </Fade>
-        );
+        return <GoalStep values={values} setFieldValue={setFieldValue} t={t} />;
 
       case 3: {
-
-        // Calculate campaign duration if both dates are set
-        let campaignDays = getDaysInCurrentMonth(); // Default to ~30 days
-
-        if (values.campaignStart && values.campaignEnd) {
-          const startDate = new Date(values.campaignStart);
-          const endDate = new Date(values.campaignEnd);
-          const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-
-          campaignDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
-        }
-
-        const dailyBudget = Math.round((values.budgetMonthly || 0) / campaignDays);
-        const isLowBudget = values.budgetMonthly < 500;
-        const isVeryLowBudget = values.budgetMonthly < 200;
-
-        return (
-          <Fade in timeout={500}>
-            <Grid container spacing={5}>
-              <Grid size={{ xs: 12 }}>
-                <CustomTextBox
-                  name="budgetMonthly"
-                  label={t('fields.budgetMonthly')}
-                  tooltip={t('fields.budgetMonthlyTooltip')}
-                  type="number"
-                  placeholder="500"
-                  fullWidth
-                  InputProps={{
-                    startAdornment: <Typography sx={{ mr: 1 }}>{tc('common.currencySymbol') || '$'}</Typography>
-                  }}
-                />
-                <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('budget.dailyBudget')}:
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: 'success.main' }}>
-                    {tc('common.currencySymbol') || '$'}{dailyBudget}{t('budget.dailyUnit')}
-                  </Typography>
-                  {values.campaignStart && values.campaignEnd && (
-                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                      ({campaignDays} {t('budget.days')})
-                    </Typography>
-                  )}
-                </Box>
-
-                {isVeryLowBudget && (
-                  <Alert severity="error" icon={<WarningIcon />} sx={{ mt: 2 }}>
-                    {t('budget.lowBudgetWarning')}
-                  </Alert>
-                )}
-                {isLowBudget && !isVeryLowBudget && (
-                  <Alert severity="warning" icon={<WarningIcon />} sx={{ mt: 2 }}>
-                    {t('validation.lowBudgetWarning')}
-                  </Alert>
-                )}
-              </Grid>
-              {values.mode === 'PRO' && (
-                <>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <CustomSelect
-                      name="seasonality"
-                      label={t('fields.seasonality')}
-                      tooltip={t('fields.seasonalityTooltip')}
-                      options={[
-                        { label: t('budget.seasonalityNone'), value: 'none', description: t('budget.seasonalityNoneDesc') },
-                        { label: t('budget.seasonalityHoliday'), value: 'holiday', description: t('budget.seasonalityHolidayDesc') },
-                        { label: t('budget.seasonalitySummer'), value: 'summer', description: t('budget.seasonalitySummerDesc') },
-                        { label: t('budget.seasonalityBlackFriday'), value: 'black_friday', description: t('budget.seasonalityBlackFridayDesc') }
-                      ]}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <CustomSelect
-                      name="pacing"
-                      label={t('budget.allocation')}
-                      tooltip={t('fields.pacingTooltip')}
-                      options={[
-                        { label: t('budget.pacingEven'), value: 'even', description: t('budget.pacingEvenDesc') },
-                        { label: t('budget.pacingFrontLoad'), value: 'front_load', description: t('budget.pacingFrontLoadDesc') },
-                        { label: t('budget.pacingRampUp'), value: 'ramp_up', description: t('budget.pacingRampUpDesc') }
-                      ]}
-                      fullWidth
-                    />
-                  </Grid>
-
-                  {values.seasonality !== 'none' && (
-                    <>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <CustomTextBox
-                          name="seasonalityStart"
-                          label={t('fields.seasonalityStart')}
-                          tooltip={t('fields.seasonalityStartTooltip')}
-                          type="date"
-                          fullWidth
-                          InputLabelProps={{ shrink: true }}
-                          onValueChange={(val: string | number) => {
-                            const window = calculatePromoWindow(String(val), values.seasonalityEnd);
-
-                            setFieldValue('promoWindow', window);
-                          }}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <CustomTextBox
-                          name="seasonalityEnd"
-                          label={t('fields.seasonalityEnd')}
-                          tooltip={t('fields.seasonalityEndTooltip')}
-                          type="date"
-                          fullWidth
-                          InputLabelProps={{ shrink: true }}
-                          onValueChange={(val: string | number) => {
-                            const window = calculatePromoWindow(values.seasonalityStart, String(val));
-
-                            setFieldValue('promoWindow', window);
-                          }}
-                        />
-                      </Grid>
-                    </>
-                  )}
-                </>
-              )}
-            </Grid>
-          </Fade>
-        );
+        return <BudgetStep values={values} setFieldValue={setFieldValue} t={t} tc={tc} budgetConfig={budgetConfig} />;
       }
 
       case 4:
-        return (
-          <Fade in timeout={500}>
-            <Grid container spacing={5}>
-              <Grid size={{ xs: 12 }}>
-                <CustomTagsInput
-                  name="locations"
-                  label={t('fields.locations')}
-                  tooltip={t('fields.locationsTooltip')}
-                  placeholder={t('geo.countryPlaceholder') || 'Select target countries...'}
-                  options={countries}
-                  fullWidth
-                />
-              </Grid>
-              {values.mode === 'PRO' && (
-                <Grid size={{ xs: 12 }}>
-                  <CustomTextBox
-                    name="geoRadius"
-                    label={t('fields.geoRadius')}
-                    tooltip={t('fields.geoRadiusTooltip')}
-                    type="number"
-                    placeholder="10"
-                    fullWidth
-                    InputProps={{
-                      endAdornment: <Typography sx={{ ml: 1 }}>{tc('common.distanceUnit') || 'km'}</Typography>
-                    }}
-                  />
-                </Grid>
-              )}
-            </Grid>
-          </Fade>
-        );
+        return <GeoStep values={values} t={t} tc={tc} />;
 
       case 5:
-        return (
-          <Fade in timeout={500}>
-            <Grid container spacing={5}>
-              <Grid size={{ xs: 12 }}>
-                {values.mode === 'PRO' ? (
-                  <CustomTextBox
-                    name="brandTone"
-                    label={t('fields.brandTone')}
-                    tooltip={t('fields.brandToneTooltip')}
-                    placeholder={t('tone.placeholder')}
-                    multiline
-                    rows={4}
-                    fullWidth
-                  />
-                ) : (
-                  <CustomTextBox
-                    name="brandTone"
-                    label={t('fields.brandTone')}
-                    tooltip={t('fields.brandToneTooltip')}
-                    placeholder={businessBrandTone || t('tone.placeholder')}
-                    disabled
-                    fullWidth
-                    helperText={businessBrandTone ? t('tone.fromProfile') : t('tone.notSet')}
-                  />
-                )}
-              </Grid>
-            </Grid>
-          </Fade>
-        );
+        return <ToneStep values={values} t={t} businessBrandTone={businessBrandTone} />;
 
       case 6:
         return (
           <Fade in timeout={500}>
-            <Grid container spacing={6}>
-              <Grid size={{ xs: 12 }}>
-                <Box sx={{ mb: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <ReviewIcon color="primary" sx={{ fontSize: 32 }} />
-                    <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: -1 }}>
-                      {t('review.title')}
-                    </Typography>
-                  </Box>
-                  <Box className="hide-on-print" sx={{ display: 'flex', gap: 2 }}>
-                    <Button
-                      variant="outlined"
-                      startIcon={<DownloadIcon />}
-                      onClick={() => handleExportJSON(values)}
-                    >
-                      {t('review.exportJson')}
-                    </Button>
-                    <Button
-                      variant="contained"
-                      startIcon={<PrintIcon />}
-                      onClick={handlePrint}
-                    >
-                      {t('review.print')}
-                    </Button>
-                  </Box>
-                </Box>
-
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {/* Primary Info Blueprint */}
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 8,
-                      borderRadius: 5,
-                      background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.primary.main, 0.01)} 100%)`,
-                      border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                      position: 'relative',
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <Box sx={{
-                      position: 'absolute',
-                      bottom: -40,
-                      right: -40,
-                      opacity: 0.03,
-                      transform: 'rotate(-15deg)'
-                    }}>
-                      <ReviewIcon sx={{ fontSize: 240 }} />
-                    </Box>
-
-                    <Grid container spacing={6}>
-                      <Grid size={{ xs: 12, md: 8 }}>
-                        <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2 }}>
-                          {t('review.sessionName')}
-                        </Typography>
-                        <Typography variant="h3" sx={{ mt: 1, fontWeight: 800, letterSpacing: -1 }}>{values.sessionName}</Typography>
-
-                        <Stack direction="row" spacing={3} sx={{ mt: 4 }}>
-                          <Chip
-                            label={t(`status.${values.status || 'draft'}`)}
-                            color={values.status === 'active' ? 'success' : 'warning'}
-                            variant="tonal"
-                            sx={{ fontWeight: 700, px: 2 }}
-                          />
-                          <Chip
-                            label={values.mode}
-                            color="primary"
-                            variant="tonal"
-                            sx={{ fontWeight: 700, px: 2 }}
-                            icon={values.mode === 'PRO' ? <ProModeIcon /> : <QuickModeIcon />}
-                          />
-                        </Stack>
-                      </Grid>
-                      <Grid size={{ xs: 12, md: 4 }} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 800 }}>
-                          {t('fields.landingPage')}
-                        </Typography>
-                        <Typography variant="body1" sx={{ mt: 1, color: 'primary.main', fontWeight: 700, textDecoration: 'underline', wordBreak: 'break-all' }}>
-                          {values.landingPage || '—'}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Paper>
-
-                  {/* Secondary Details Grid */}
-                  <Grid container spacing={6}>
-                    {/* Strategy Column */}
-                    <Grid size={{ xs: 12, md: 7 }}>
-                      <Card sx={{ height: '100%', p: 2 }}>
-                        <CardContent>
-                          <Typography variant="h6" sx={{ mb: 6, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(theme.palette.primary.main, 0.1), display: 'flex' }}>
-                              <GoalIcon color="primary" />
-                            </Box>
-                            {t('review.campaignStrategy')}
-                          </Typography>
-                          <Grid container spacing={6}>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1 }}>
-                                {t('review.objective')}
-                              </Typography>
-                              <Typography variant="h6" sx={{ mt: 1, fontWeight: 700, color: 'primary.main' }}>
-                                {t(`goal.objectives.${values.goal}`)}
-                              </Typography>
-                            </Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1 }}>
-                                {t('fields.campaignStart')} / {t('fields.campaignEnd')}
-                              </Typography>
-                              <Typography variant="h6" sx={{ mt: 1, fontWeight: 700 }}>
-                                {values.campaignStart || '—'} — {values.campaignEnd || '—'}
-                              </Typography>
-                            </Grid>
-                            <Grid size={{ xs: 12 }}>
-                              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, mb: 1, display: 'block' }}>
-                                {t('review.locations')}
-                              </Typography>
-                              <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
-                                {values.locations.map((loc: string) => (
-                                  <Chip key={loc} label={loc} size="small" variant="outlined" sx={{ borderRadius: 1, fontWeight: 600 }} />
-                                ))}
-                                {values.mode === 'PRO' && (
-                                  <Chip label={`+${values.geoRadius}km radius`} size="small" color="primary" variant="tonal" sx={{ borderRadius: 1, fontWeight: 600 }} />
-                                )}
-                              </Stack>
-                            </Grid>
-                          </Grid>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-
-                    {/* Financial Column */}
-                    <Grid size={{ xs: 12, md: 5 }}>
-                      <Card sx={{ height: '100%', p: 2, bgcolor: alpha(theme.palette.success.main, 0.02) }}>
-                        <CardContent>
-                          <Typography variant="h6" sx={{ mb: 6, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(theme.palette.success.main, 0.1), display: 'flex' }}>
-                              <BudgetIcon color="success" />
-                            </Box>
-                            {t('review.budgetLogistics')}
-                          </Typography>
-
-                          <Box sx={{ mb: 6 }}>
-                            <Typography variant="h3" sx={{ color: 'success.main', fontWeight: 900 }}>
-                              {tc('common.currencySymbol') || '$'}{values.budgetMonthly}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                              {t('review.totalMonthly')} / {tc('common.currencySymbol') || '$'}{Math.round((values.budgetMonthly || 0) / getDaysInCurrentMonth())} {t('budget.dailyUnit')}
-                            </Typography>
-                          </Box>
-
-                          <Stack spacing={3}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>{t('fields.industry')}</Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 800, textTransform: 'capitalize' }}>{values.industry}</Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>{t('fields.brandTone')}</Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 800, textTransform: 'capitalize' }}>{values.brandTone || businessBrandTone}</Typography>
-                            </Box>
-                          </Stack>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  </Grid>
-
-                  {/* AI Narrative & Assumptions */}
-                  <Grid container spacing={6}>
-                    <Grid size={{ xs: 12, md: 8 }}>
-                      <Card sx={{ height: '100%', p: 2, position: 'relative', overflow: 'hidden' }}>
-                        <Box sx={{
-                          position: 'absolute',
-                          top: -20,
-                          right: -20,
-                          opacity: 0.05,
-                          transform: 'rotate(-10deg)'
-                        }}>
-                          <NarrativeIcon sx={{ fontSize: 120 }} />
-                        </Box>
-                        <CardContent>
-                          <Typography variant="h6" sx={{ mb: 4, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(theme.palette.primary.main, 0.1), display: 'flex' }}>
-                              <NarrativeIcon color="primary" />
-                            </Box>
-                            {t('review.strategyNarrative') || 'Strategy Narrative'}
-                          </Typography>
-
-                          {isNarrativeLoading ? (
-                            <Box sx={{ py: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                              <CircularProgress size={24} />
-                              <Typography variant="body2" color="text.secondary">{t('review.generatingNarrative') || 'Generating strategy explanation...'}</Typography>
-                            </Box>
-                          ) : narrativeData ? (
-                            <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
-                              {narrativeData.narrative}
-                            </Typography>
-                          ) : (
-                            <Button variant="tonal" onClick={() => fetchNarrative(values)}>
-                              {t('review.generateNarrative') || 'Generate Explanation'}
-                            </Button>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <Card sx={{ height: '100%', p: 2, bgcolor: alpha(theme.palette.info.main, 0.02) }}>
-                        <CardContent>
-                          <Typography variant="h6" sx={{ mb: 4, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(theme.palette.info.main, 0.1), display: 'flex' }}>
-                              <AssumptionsIcon color="info" />
-                            </Box>
-                            {t('review.assumptions') || 'Planning Assumptions'}
-                          </Typography>
-
-                          {isNarrativeLoading ? (
-                            <Stack spacing={2} sx={{ mt: 2 }}>
-                              {[1, 2, 3, 4].map((i) => (
-                                <Skeleton key={i} variant="text" height={20} />
-                              ))}
-                            </Stack>
-                          ) : narrativeData?.assumptions ? (
-                            <Stack spacing={2}>
-                              {narrativeData.assumptions.map((assumption, idx) => (
-                                <Box key={idx} sx={{ display: 'flex', gap: 2 }}>
-                                  <Box sx={{ mt: 0.5, width: 6, height: 6, borderRadius: '50%', bgcolor: 'info.main', flexShrink: 0 }} />
-                                  <Typography variant="body2" sx={{ fontWeight: 600 }}>{assumption}</Typography>
-                                </Box>
-                              ))}
-                            </Stack>
-                          ) : (
-                            <Typography variant="body2" color="text.secondary">
-                              {t('review.noAssumptions') || 'Complete the narrative to see planning assumptions.'}
-                            </Typography>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  </Grid>
-
-                  {/* Allocation Visualizer */}
-                  <NarrativeTrigger
-                    values={values}
-                    fetchNarrative={fetchNarrative}
-                    narrativeData={narrativeData}
-                    isLoading={isNarrativeLoading}
-                  />
-
-                  {/* Allocation Visualizer */}
-                  <Card sx={{ p: 2 }}>
-                    <CardContent>
-                      <Typography variant="h6" sx={{ mb: 6, fontWeight: 800 }}>
-                        {t('review.channelAllocation')}
-                      </Typography>
-                      {(() => {
-                        const allocation = getAllocation(values.goal, values.budgetMonthly);
-
-                        return (
-                          <Grid container spacing={8}>
-                            {[
-                              { platform: 'Google Ads', icon: <GoalIcon />, color: theme.palette.primary.main, data: allocation.google },
-                              { platform: 'Meta (FB/IG)', icon: <OfferIcon />, color: theme.palette.secondary.main, data: allocation.meta }
-                            ].map((item) => (
-                              <Grid size={{ xs: 12, md: 6 }} key={item.platform}>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 900, mb: 4, color: item.color, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                  {item.icon} {item.platform}
-                                </Typography>
-                                <Stack spacing={4}>
-                                  {['awareness', 'consideration', 'conversion'].map((stage) => (
-                                    <Box key={stage}>
-                                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
-                                        <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 800, color: 'text.secondary', letterSpacing: 0.5 }}>
-                                          {t(`budget.${stage}`)}
-                                        </Typography>
-                                        <Typography variant="caption" sx={{ fontWeight: 900 }}>{item.data[stage as keyof typeof item.data]}%</Typography>
-                                      </Box>
-                                      <Box sx={{ height: 8, width: '100%', bgcolor: 'action.hover', borderRadius: 10, overflow: 'hidden' }}>
-                                        <Box sx={{
-                                          height: '100%',
-                                          width: `${item.data[stage as keyof typeof item.data]}%`,
-                                          bgcolor: item.color,
-                                          borderRadius: 10,
-                                          boxShadow: `0 0 10px ${alpha(item.color, 0.4)}`
-                                        }} />
-                                      </Box>
-                                    </Box>
-                                  ))}
-                                </Stack>
-                              </Grid>
-                            ))}
-                          </Grid>
-                        );
-                      })()}
-                    </CardContent>
-                  </Card>
-                </Box>
-
-                {/* Creatives & Execution Grid */}
-                <Grid container spacing={6} sx={{ mt: 2 }}>
-                  {/* Creatives Column */}
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <Card sx={{ height: '100%', p: 2 }}>
-                      <CardContent>
-                        <Typography variant="h6" sx={{ mb: 6, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(theme.palette.warning.main, 0.1), display: 'flex' }}>
-                            <ImageIcon color="warning" />
-                          </Box>
-                          {t('review.creatives')}
-                        </Typography>
-                        <Stack spacing={3}>
-                          <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.default', border: `1px dashed ${theme.palette.divider}` }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>{t('review.creativeSpecs.googleTitle')}</Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              • {t('review.creativeSpecs.googleHeadlines')}<br />
-                              • {t('review.creativeSpecs.googleDescriptions')}<br />
-                              • {t('review.creativeSpecs.googleSitelinks')}
-                            </Typography>
-                          </Box>
-                          <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.default', border: `1px dashed ${theme.palette.divider}` }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>{t('review.creativeSpecs.metaTitle')}</Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              • {t('review.creativeSpecs.metaFeed')}<br />
-                              • {t('review.creativeSpecs.metaStories')}<br />
-                              • {t('review.creativeSpecs.metaText')}
-                            </Typography>
-                          </Box>
-                        </Stack>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-
-                  {/* Execution Column */}
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <Card sx={{ height: '100%', p: 2 }}>
-                      <CardContent>
-                        <Typography variant="h6" sx={{ mb: 6, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(theme.palette.info.main, 0.1), display: 'flex' }}>
-                            <TimelineIcon color="info" />
-                          </Box>
-                          {t('review.execution')}
-                        </Typography>
-                        <Stack spacing={4}>
-                          {[
-                            { day: 'Day 1', task: t('review.timeline.setup'), color: theme.palette.primary.main },
-                            { day: 'Day 3', task: t('review.timeline.review'), color: theme.palette.info.main },
-                            { day: 'Day 7', task: t('review.timeline.optimize'), color: theme.palette.success.main }
-                          ].map((item, i) => (
-                            <Box key={i} sx={{ display: 'flex', gap: 3 }}>
-                              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: item.color, border: `3px solid ${alpha(item.color, 0.2)}` }} />
-                                {i < 2 && <Box sx={{ width: 2, height: '100%', bgcolor: 'divider', my: 0.5 }} />}
-                              </Box>
-                              <Box>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{item.day}</Typography>
-                                <Typography variant="body2" color="text.secondary">{item.task}</Typography>
-                              </Box>
-                            </Box>
-                          ))}
-                        </Stack>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
+            <Box>
+              <ReviewStep
+                values={values}
+                t={t}
+                tc={tc}
+                theme={theme}
+                readOnly={readOnly}
+                currentSessionId={currentSessionId}
+                businessBrandTone={businessBrandTone}
+                narrativeData={narrativeData}
+                isNarrativeLoading={isNarrativeLoading}
+                allocationData={allocationData}
+                isAllocationLoading={isAllocationLoading}
+                onRetryAllocation={() => fetchNarrative(values)}
+                fetchNarrative={fetchNarrative}
+                onShare={handleShareLink}
+                onExport={() => handleExportJSON(values)}
+                onPrint={() => handlePrint(values)}
+                shareLabel={shareLinkLabel}
+              />
+            </Box>
           </Fade>
         );
       default:
@@ -1507,6 +969,90 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
             enableReinitialize
             onSubmit={async (values, { setSubmitting }) => {
               try {
+                const { campaignDays, dailyBudget } = getDailyBudget(values);
+                const shouldIncrementVersion = !currentSessionId || hasReviewRegenerated;
+                let allocation = allocationData || (initialData?.savedAllocation as AllocationResult | null) || null;
+                const pacingCurve = getPacingCurve(values);
+                let finalNarrative = narrativeData || (
+                  initialData?.strategyNarrative
+                    ? {
+                        narrative: initialData.strategyNarrative,
+                        assumptions: Array.isArray(initialData?.planningAssumptions) ? initialData.planningAssumptions : []
+                      }
+                    : null
+                );
+
+                if (shouldIncrementVersion && !allocation) {
+                  allocation = await resolveAllocation(values);
+                  setAllocationData(allocation);
+                }
+
+                if (shouldIncrementVersion && !finalNarrative && allocation) {
+                  const narrativeRes = await generateCampaignNarrative({
+                    sessionName: values.sessionName,
+                    industry: values.industry,
+                    offer: values.offer,
+                    goal: values.goal,
+                    locations: values.locations,
+                    budgetMonthly: values.budgetMonthly,
+                    mode: values.mode,
+                    brandTone: values.brandTone || businessBrandTone,
+                    channelSplit: allocation?.channelSplit,
+                    pacingCurve
+                  });
+
+                  const payload = (narrativeRes.data as any)?.data ?? narrativeRes.data;
+
+                  if (narrativeRes.success && payload?.narrative && Array.isArray(payload?.assumptions)) {
+                    finalNarrative = payload;
+                  }
+                }
+
+                if (shouldIncrementVersion && (!allocation || !finalNarrative)) {
+                  throw new Error('Failed to generate AI review output');
+                }
+
+                const outputPayload = {
+                  generatedAt: new Date().toISOString(),
+                  session: {
+                    name: values.sessionName,
+                    mode: values.mode
+                  },
+                  inputs: {
+                    industry: values.industry,
+                    industryCustom: values.industryCustom,
+                    offer: values.offer,
+                    goal: values.goal,
+                    budgetMonthly: values.budgetMonthly,
+                    budgetDaily: dailyBudget,
+                    campaignDays,
+                    locations: values.locations,
+                    landingPage: values.landingPage,
+                    timeline: {
+                      campaignStart: values.campaignStart,
+                      campaignEnd: values.campaignEnd
+                    },
+                    brandTone: values.brandTone || businessBrandTone || '',
+                    pro: values.mode === 'PRO' ? {
+                      competitors: values.competitors,
+                      geoCenter: values.geoCenter,
+                      geoRadius: values.geoRadius,
+                      audienceNotes: values.audienceNotes,
+                      seasonality: values.seasonality,
+                      seasonalityStart: values.seasonalityStart,
+                      seasonalityEnd: values.seasonalityEnd,
+                      promoWindow: values.promoWindow,
+                      pacing: values.pacing
+                    } : null
+                  },
+                  plan: {
+                    allocation: allocation || null,
+                    pacingCurve,
+                    narrative: finalNarrative?.narrative || null,
+                    assumptions: finalNarrative?.assumptions || []
+                  }
+                };
+
                 const result = await saveSession({
                   sessionId: currentSessionId,
                   businessId,
@@ -1517,17 +1063,27 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                   geo: values.locations,
                   inputs: {
                     sessionName: values.sessionName,
+                    industryCustom: values.industryCustom,
                     offer: values.offer,
                     brandTone: values.brandTone,
                     competitors: values.competitors,
+                    geoCenter: values.geoCenter,
                     geoRadius: values.geoRadius,
                     audienceNotes: values.audienceNotes,
                     seasonality: values.seasonality,
+                    seasonalityStart: values.seasonalityStart,
+                    seasonalityEnd: values.seasonalityEnd,
+                    promoWindow: values.promoWindow,
                     landingPage: values.landingPage,
                     campaignStart: values.campaignStart,
-                    campaignEnd: values.campaignEnd
+                    campaignEnd: values.campaignEnd,
+                    pacing: values.pacing,
+                    strategyNarrative: finalNarrative?.narrative || initialData?.strategyNarrative || null,
+                    planningAssumptions: finalNarrative?.assumptions || initialData?.planningAssumptions || []
                   },
-                  incrementVersion: true
+                  incrementVersion: shouldIncrementVersion,
+                  output: shouldIncrementVersion ? outputPayload : undefined,
+                  outputStatus: shouldIncrementVersion ? 'success' : undefined
                 });
 
                 if (result.success) {
@@ -1535,9 +1091,11 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                   onSuccess?.(result.data);
                 } else {
                   console.error('Failed to save session:', result.error);
+                  notify({ messageCode: 'errors.internalError' as any, variant: 'TOAST', severity: 'error' });
                 }
               } catch (error) {
                 console.error('Error submitting form:', error);
+                notify({ messageCode: 'errors.internalError' as any, variant: 'TOAST', severity: 'error' });
               } finally {
                 setSubmitting(false);
               }
@@ -1570,7 +1128,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                   </Alert>
                 )}
 
-                <Box sx={{ minHeight: 300, py: 4, pointerEvents: readOnly ? 'none' : 'auto' }}>
+                <Box sx={{ minHeight: 300, py: 4 }}>
                   {renderStepContent(activeStep, values, setFieldValue)}
                 </Box>
 
@@ -1619,7 +1177,7 @@ const AdRiseWizard = ({ initialData, sessionId, onSuccess, businessId, readOnly 
                         key='next-button'
                         type='button'
                         variant='contained'
-                        onClick={() => handleNext(validateForm, setTouched, values)}
+                        onClick={() => handleNext(validateForm, setTouched)}
                         endIcon={<ArrowForward />}
                       >
                         {tc('common.next')}
