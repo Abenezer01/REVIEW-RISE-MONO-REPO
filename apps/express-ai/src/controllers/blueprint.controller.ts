@@ -14,12 +14,15 @@ export class BlueprintController {
                 vertical: z.enum(['Local Service', 'E-commerce', 'SaaS', 'Healthcare', 'Other']),
                 geoTargeting: z.array(z.string()),
                 painPoints: z.array(z.string()),
-                landingPageUrl: z.string().url().optional()
+                landingPageUrl: z.string().url().optional(),
+                objective: z.enum(['Leads', 'Sales', 'Brand Awareness', 'Website Traffic', 'Local Store Visits']).optional(),
+                budgetTier: z.enum(['Low', 'Mid', 'High']).optional()
             });
 
             const input = schema.parse(req.body);
 
-            const result = await blueprintService.generate(input);
+            // Cast to any because zod inference might be slightly different than BlueprintInput interface which has optional fields
+            const result = await blueprintService.generate(input as any);
 
             const response = createSuccessResponse(result, 'Blueprint generated successfully', 200, { requestId: req.id });
             res.status(response.statusCode).json(response);
