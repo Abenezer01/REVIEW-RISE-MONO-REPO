@@ -134,6 +134,26 @@ export default function ResultsKeywords({ clusters }: Props) {
                                                 size="small"
                                                 sx={{ fontWeight: 500 }}
                                             />
+                                            {/* Funnel Stage Badge */}
+                                            {cluster.funnelStage && (
+                                                <Chip
+                                                    label={cluster.funnelStage}
+                                                    size="small"
+                                                    icon={cluster.funnelStage === 'BOF' ? <span>🔥</span> : undefined}
+                                                    sx={{
+                                                        fontWeight: 500,
+                                                        bgcolor: cluster.funnelStage === 'BOF' ? alpha(theme.palette.error.main, 0.1) :
+                                                            cluster.funnelStage === 'MOF' ? alpha(theme.palette.warning.main, 0.1) :
+                                                                alpha(theme.palette.info.main, 0.1),
+                                                        color: cluster.funnelStage === 'BOF' ? 'error.main' :
+                                                            cluster.funnelStage === 'MOF' ? 'warning.main' :
+                                                                'info.main',
+                                                        border: `1px solid ${cluster.funnelStage === 'BOF' ? theme.palette.error.main :
+                                                            cluster.funnelStage === 'MOF' ? theme.palette.warning.main :
+                                                                theme.palette.info.main}`,
+                                                    }}
+                                                />
+                                            )}
                                             <Badge
                                                 badgeContent={cluster.keywords.length}
                                                 color="default"

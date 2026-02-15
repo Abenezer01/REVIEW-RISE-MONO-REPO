@@ -26,11 +26,12 @@ import aiRoutes from './routes/ai.routes';
 import contentStudioRoutes from './routes/content-studio.routes';
 import blueprintRoutes from './routes/blueprint.routes';
 
-import analyticsRoutes from './routes/analytics.routes';
+// import analyticsRoutes from './routes/analytics.routes';
 
 app.use('/api/v1', aiRoutes);
 app.use('/api/v1/studio', contentStudioRoutes);
 app.use('/api/v1/blueprint', blueprintRoutes);
+// app.use('/api/v1/analytics', analyticsRoutes);
 
 app.get('/', (req, res) => {
     const response = createSuccessResponse(null, 'Express AI Service is running', 200, { requestId: req.id });

@@ -3,16 +3,17 @@ import { z } from 'zod';
 import { CampaignPlanSchema, CampaignInputSchema } from '../../src/schema/campaign-plan';
 
 describe('Campaign Plan Schema Validation', () => {
-    
+
     it('should validate a correct campaign input', () => {
         const validInput = {
             businessName: 'TechCorp',
-            website: 'techcorp.io',
+            websiteUrl: 'https://techcorp.io',
             budget: 5000,
             objective: 'Leads',
-            targetAudience: 'CTOs',
-            locations: ['US', 'CA'],
-            vertical: 'SaaS'
+            vertical: 'SaaS',
+            services: ['Cloud Software', 'API Platform'],
+            offer: 'Free 30-Day Trial',
+            geo: 'United States'
         };
 
         const result = CampaignInputSchema.safeParse(validInput);

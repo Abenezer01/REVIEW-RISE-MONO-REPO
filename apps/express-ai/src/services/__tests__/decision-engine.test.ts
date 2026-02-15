@@ -20,16 +20,19 @@ describe('Decision Engine Components', () => {
         }));
 
         const baseInput: BlueprintInput = {
-            offerOrService: 'Service',
+            offer: 'Service',
+            businessName: 'My Business',
+            services: ['Service A', 'Service B'],
             vertical: 'Local Service',
-            geoTargeting: ['City'],
+            geo: 'City',
             painPoints: [],
-            budgetTier: 'Mid'
+            budget: 1500, // Mid tier default
+            objective: 'Leads'
         };
 
         it('should create 1 campaign for Low budget', () => {
             const result = strategyCompiler.compile(
-                { ...baseInput, budgetTier: 'Low' },
+                { ...baseInput, budget: 500 }, // Low < 1000
                 mockClusters,
                 mockAdGroups
             );
@@ -40,7 +43,7 @@ describe('Decision Engine Components', () => {
 
         it('should create separate Brand and Service campaigns for Mid budget', () => {
             const result = strategyCompiler.compile(
-                { ...baseInput, budgetTier: 'Mid' },
+                { ...baseInput, budget: 1500 }, // Mid 1000-5000
                 mockClusters,
                 mockAdGroups
             );
@@ -55,7 +58,7 @@ describe('Decision Engine Components', () => {
 
         it('should create 3 campaigns for High budget', () => {
             const result = strategyCompiler.compile(
-                { ...baseInput, budgetTier: 'High' },
+                { ...baseInput, budget: 6000 }, // High > 5000
                 mockClusters,
                 mockAdGroups
             );

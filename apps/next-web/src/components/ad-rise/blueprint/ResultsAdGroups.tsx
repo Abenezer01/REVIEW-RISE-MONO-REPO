@@ -129,7 +129,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                         }}
                                     >
                                         <Stack direction="row" alignItems="center" justifyContent="space-between">
-                                            <Stack direction="row" alignItems="center" spacing={2}>
+                                            <Stack direction="row" alignItems="center" spacing={2} flexWrap="wrap">
                                                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                                                     {group.name}
                                                 </Typography>
@@ -138,6 +138,38 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                     size="small"
                                                     variant="outlined"
                                                 />
+                                                {/* Budget Allocation Display */}
+                                                {group.budgetAllocation && (
+                                                    <>
+                                                        <Chip
+                                                            label={`${(group.budgetAllocation.percentage * 100).toFixed(1)}% Budget`}
+                                                            size="small"
+                                                            sx={{
+                                                                bgcolor: alpha(theme.palette.success.main, 0.1),
+                                                                color: 'success.main',
+                                                                fontWeight: 600
+                                                            }}
+                                                        />
+                                                        <Chip
+                                                            label={`$${group.budgetAllocation.amount.toFixed(0)}/mo`}
+                                                            size="small"
+                                                            sx={{
+                                                                bgcolor: alpha(theme.palette.info.main, 0.1),
+                                                                color: 'info.main',
+                                                                fontWeight: 600
+                                                            }}
+                                                        />
+                                                        <Chip
+                                                            label={`~${group.budgetAllocation.estimatedClicks} clicks`}
+                                                            size="small"
+                                                            sx={{
+                                                                bgcolor: alpha(theme.palette.secondary.main, 0.1),
+                                                                color: 'secondary.main',
+                                                                fontWeight: 600
+                                                            }}
+                                                        />
+                                                    </>
+                                                )}
                                             </Stack>
                                             <IconButton size="small">
                                                 <Typography sx={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>

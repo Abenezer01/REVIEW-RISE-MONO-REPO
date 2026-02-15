@@ -12,6 +12,8 @@ import ResultsAdGroups from './ResultsAdGroups';
 import ResultsKeywords from './ResultsKeywords';
 import ResultsLandingPage from './ResultsLandingPage';
 import ResultsNegatives from './ResultsNegatives';
+import ResultsStrategy from './ResultsStrategy';
+import ResultsCampaigns from './ResultsCampaigns';
 
 interface Props {
     results: BlueprintOutput | null;
@@ -92,6 +94,19 @@ export default function BlueprintResults({ results }: Props) {
 
             {/* Results Sections */}
             <Stack spacing={3}>
+                {/* Strategy & Budget */}
+                {results.strategySummary && results.budgetModeling && (
+                    <ResultsStrategy
+                        strategy={results.strategySummary}
+                        budget={results.budgetModeling}
+                    />
+                )}
+
+                {/* Campaign Structure */}
+                {results.campaigns && results.campaigns.length > 0 && (
+                    <ResultsCampaigns campaigns={results.campaigns} />
+                )}
+
                 {/* Keywords Section */}
                 <ResultsKeywords clusters={results.clusters} />
 

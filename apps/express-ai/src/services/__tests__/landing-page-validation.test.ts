@@ -20,10 +20,13 @@ describe('Landing Page Validation Tests', () => {
 
     const baseInput: BlueprintInput = {
         businessName: 'Test Business',
-        offerOrService: 'Premium Services',
+        offer: 'Premium Services',
+        services: ['Service 1'],
         vertical: 'Local Service',
-        geoTargeting: ['Test City'],
-        painPoints: ['Problem 1', 'Problem 2']
+        geo: 'Test City',
+        painPoints: ['Problem 1', 'Problem 2'],
+        objective: 'Leads',
+        budget: 1000
     };
 
     const mockCluster: KeywordCluster = {

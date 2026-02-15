@@ -2,8 +2,9 @@ import { BlueprintInput, Campaign, AdGroup, KeywordCluster } from '@platform/con
 
 export class StrategyCompiler {
     compile(input: BlueprintInput, clusters: KeywordCluster[], sourceAdGroups: AdGroup[]): Campaign[] {
-        const structure = this.determineBudgetStructure(input.budgetTier || 'Mid');
+        const structure = this.determineBudgetStructure(input.budget);
         const campaigns: Campaign[] = [];
+        const offerName = input.offer || input.services[0] || input.businessName || 'Service';
 
         // Helper to find ad group for a cluster by theme
         const getAdGroupsForIntent = (intents: string[]): AdGroup[] => {
@@ -17,14 +18,22 @@ export class StrategyCompiler {
             });
         };
 
+        // Helper to calculate campaign budget from ad groups
+        const calculateCampaignBudget = (adGroups: AdGroup[]): string => {
+            const totalPercentage = adGroups.reduce((sum, ag) => {
+                return sum + (ag.budgetAllocation?.percentage || 0);
+            }, 0);
+            return `${(totalPercentage * 100).toFixed(0)}%`;
+        };
+
         if (structure === 'Simple') {
             // Low Budget: 1 Campaign for everything
             const allAdGroups = sourceAdGroups;
 
             campaigns.push({
-                name: `${input.offerOrService} - Core Campaign`,
+                name: `${offerName} - Core Campaign`,
                 objective: input.objective || 'Leads',
-                budgetRecommendation: '100%',
+                budgetRecommendation: calculateCampaignBudget(allAdGroups),
                 adGroups: allAdGroups
             });
         } else if (structure === 'Standard') {
@@ -37,16 +46,16 @@ export class StrategyCompiler {
                 campaigns.push({
                     name: `${input.businessName || 'Brand'} - Brand Protection`,
                     objective: 'Brand Awareness',
-                    budgetRecommendation: '15%',
+                    budgetRecommendation: calculateCampaignBudget(brandAdGroups),
                     adGroups: brandAdGroups
                 });
             }
 
             if (nonBrandAdGroups.length > 0) {
                 campaigns.push({
-                    name: `${input.offerOrService} - General Service`,
+                    name: `${offerName} - General Service`,
                     objective: input.objective || 'Leads',
-                    budgetRecommendation: brandAdGroups.length > 0 ? '85%' : '100%',
+                    budgetRecommendation: calculateCampaignBudget(nonBrandAdGroups),
                     adGroups: nonBrandAdGroups
                 });
             }
@@ -67,25 +76,25 @@ export class StrategyCompiler {
                 campaigns.push({
                     name: `${input.businessName || 'Brand'} - Brand`,
                     objective: 'Brand Awareness',
-                    budgetRecommendation: '10%',
+                    budgetRecommendation: calculateCampaignBudget(brandAdGroups),
                     adGroups: brandAdGroups
                 });
             }
 
             if (highIntentAdGroups.length > 0) {
                 campaigns.push({
-                    name: `${input.offerOrService} - High Intent (BOF)`,
+                    name: `${offerName} - High Intent (BOF)`,
                     objective: 'Conversions',
-                    budgetRecommendation: '60%',
+                    budgetRecommendation: calculateCampaignBudget(highIntentAdGroups),
                     adGroups: highIntentAdGroups
                 });
             }
 
             if (researchAdGroups.length > 0) {
                 campaigns.push({
-                    name: `${input.offerOrService} - Research (TOF/MOF)`,
+                    name: `${offerName} - Research (TOF/MOF)`,
                     objective: 'Traffic',
-                    budgetRecommendation: '30%',
+                    budgetRecommendation: calculateCampaignBudget(researchAdGroups),
                     adGroups: researchAdGroups
                 });
             }
@@ -94,9 +103,9 @@ export class StrategyCompiler {
         // Final check: ensure at least one campaign exists
         if (campaigns.length === 0) {
             campaigns.push({
-                name: `${input.offerOrService} - Core Campaign`,
+                name: `${offerName} - Core Campaign`,
                 objective: input.objective || 'Leads',
-                budgetRecommendation: '100%',
+                budgetRecommendation: calculateCampaignBudget(sourceAdGroups),
                 adGroups: sourceAdGroups
             });
         }
@@ -104,12 +113,10 @@ export class StrategyCompiler {
         return campaigns;
     }
 
-    determineBudgetStructure(tier: 'Low' | 'Mid' | 'High'): 'Simple' | 'Standard' | 'Segmented' {
-        switch (tier) {
-            case 'Low': return 'Simple';
-            case 'High': return 'Segmented';
-            case 'Mid': default: return 'Standard';
-        }
+    determineBudgetStructure(budget: number): 'Simple' | 'Standard' | 'Segmented' {
+        if (budget < 1000) return 'Simple';
+        if (budget > 5000) return 'Segmented';
+        return 'Standard';
     }
 
     mapFunnelStage(intent: string): 'TOF' | 'MOF' | 'BOF' {

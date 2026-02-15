@@ -1,14 +1,20 @@
+/// <reference types="jest" />
 
 import { generateCampaignPlan } from '../src/index';
 
 describe('Strategy Engine', () => {
 
-    test('SaaS - High Budget - Leads', () => {
-        const plan = generateCampaignPlan({
+    test('SaaS - High Budget - Leads', async () => {
+        const plan = await generateCampaignPlan({
             vertical: 'SaaS',
             objective: 'Leads',
             budget: 10000,
-            currency: 'USD'
+            currency: 'USD',
+            businessName: 'CloudTech',
+            services: ['Cloud Platform', 'API Services'],
+            offer: 'Start Free Trial',
+            geo: 'United States',
+            conversionTrackingEnabled: true
         });
 
         expect(plan.summary.vertical).toBe('SaaS');
@@ -24,12 +30,17 @@ describe('Strategy Engine', () => {
         expect(conversionCampaign?.description).toContain('Start Free Trial');
     });
 
-    test('Restaurant - Small Budget - Local Visits', () => {
-        const plan = generateCampaignPlan({
+    test('Restaurant - Small Budget - Local Visits', async () => {
+        const plan = await generateCampaignPlan({
             vertical: 'Restaurant',
             objective: 'Local Visits',
             budget: 600,
-            currency: 'USD'
+            currency: 'USD',
+            businessName: 'Bella Restaurant',
+            services: ['Fine Dining', 'Catering'],
+            offer: 'Book Tonight - 10% Off',
+            geo: 'New York, NY',
+            conversionTrackingEnabled: true
         });
 
         // Small budget trigger
@@ -50,12 +61,17 @@ describe('Strategy Engine', () => {
         }
     });
 
-    test('Healthcare - Conversion Overrides', () => {
-        const plan = generateCampaignPlan({
+    test('Healthcare - Conversion Overrides', async () => {
+        const plan = await generateCampaignPlan({
             vertical: 'Healthcare',
             objective: 'Leads',
             budget: 5000,
-            currency: 'USD'
+            currency: 'USD',
+            businessName: 'HealthFirst Clinic',
+            services: ['General Practice', 'Urgent Care'],
+            offer: 'Book Appointment Online',
+            geo: 'Los Angeles, CA',
+            conversionTrackingEnabled: true
         });
 
         const conversionValues = plan.campaigns.filter(c => c.stage === 'Conversion');

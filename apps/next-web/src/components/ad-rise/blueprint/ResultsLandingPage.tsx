@@ -30,234 +30,195 @@ export default function ResultsLandingPage({ analysis }: Props) {
         return null;
     }
 
-    const getScoreColor = (score: number) => {
-        if (score >= 80) return theme.palette.success.main;
-        if (score >= 60) return theme.palette.warning.main;
-
+    const getScoreColor = (score: number, isScale10 = false) => {
+        const value = isScale10 ? score * 10 : score;
+        if (value >= 80) return theme.palette.success.main;
+        if (value >= 60) return theme.palette.warning.main;
         return theme.palette.error.main;
     };
 
     const scoreColor = getScoreColor(analysis.score);
+    const qsColor = getScoreColor(analysis.qualityScorePrediction || 0, true);
 
     return (
         <Card
             sx={{
                 bgcolor: 'background.paper',
-                borderRadius: 2,
-                boxShadow: theme.shadows[2]
+                borderRadius: 3,
+                boxShadow: theme.shadows[4],
+                overflow: 'hidden',
+                border: `1px solid ${theme.palette.divider}`
             }}
         >
-            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-                <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
-                    <Box
-                        sx={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: 1,
-                            bgcolor: alpha(theme.palette.info.main, 0.1),
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}
-                    >
-                        <Typography variant="h6">{t('icons.wizard')}</Typography>
-                    </Box>
-                    <Box sx={{ flex: 1 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                            {t('results.landingPage.title')}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" noWrap>
-                            {analysis.url}
-                        </Typography>
-                    </Box>
-                </Stack>
-
-                {/* Validation Error Alert */}
-                {!analysis.isValid && analysis.validationMessage && (
-                    <Box
-                        sx={{
-                            p: 2,
-                            mb: 3,
-                            bgcolor: alpha(theme.palette.error.main, 0.1),
-                            borderRadius: 2,
-                            border: `2px solid ${theme.palette.error.main}`
-                        }}
-                    >
-                        <Stack direction="row" spacing={2} alignItems="center">
-                            <Typography variant="h5" sx={{ color: 'error.main' }}>
-                                ⚠️
+            <CardContent sx={{ p: 0 }}>
+                {/* Header with Type Badge */}
+                <Box sx={{ p: 3, borderBottom: `1px solid ${theme.palette.divider}`, bgcolor: alpha(theme.palette.primary.main, 0.02) }}>
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                        <Box
+                            sx={{
+                                width: 48,
+                                height: 48,
+                                borderRadius: 1.5,
+                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '1.5rem'
+                            }}
+                        >
+                            🎯
+                        </Box>
+                        <Box sx={{ flex: 1 }}>
+                            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                                    {t('results.landingPage.title')}
+                                </Typography>
+                                <Chip
+                                    label={(analysis.landingPageType || 'Web Page').toUpperCase()}
+                                    size="small"
+                                    color="primary"
+                                    variant="outlined"
+                                    sx={{ fontWeight: 700, fontSize: '0.65rem', height: 20 }}
+                                />
+                            </Stack>
+                            <Typography variant="body2" color="text.secondary" noWrap sx={{ maxWidth: 300 }}>
+                                {analysis.url}
                             </Typography>
+                        </Box>
+                    </Stack>
+                </Box>
+
+                <Box sx={{ p: 3 }}>
+                    {/* Top Strategic Metrics Grid */}
+                    <Box
+                        display="grid"
+                        gridTemplateColumns={{ xs: '1fr', md: '1fr 1.5fr' }}
+                        gap={3}
+                        sx={{ mb: 4 }}
+                    >
+                        {/* Quality Score Tooltip Style Box */}
+                        <Box
+                            sx={{
+                                p: 2.5,
+                                borderRadius: 2,
+                                bgcolor: alpha(qsColor, 0.05),
+                                border: `1px solid ${alpha(qsColor, 0.2)}`,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                textAlign: 'center'
+                            }}
+                        >
+                            <Typography variant="overline" sx={{ fontWeight: 700, color: qsColor, letterSpacing: 1 }}>
+                                Google Ads Quality Score
+                            </Typography>
+                            <Typography variant="h2" sx={{ fontWeight: 800, color: qsColor, my: 1 }}>
+                                {analysis.qualityScorePrediction || 0}<Typography component="span" variant="h5" sx={{ opacity: 0.6 }}>/10</Typography>
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                Predicted based on relevance, CTR, and experience logic.
+                            </Typography>
+                        </Box>
+
+                        {/* Conversion & Friction */}
+                        <Stack spacing={2} justifyContent="center">
                             <Box>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'error.main', mb: 0.5 }}>
-                                    Invalid Landing Page URL
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {analysis.validationMessage}
-                                </Typography>
+                                <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>🚀 Conversion Readiness</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'success.main' }}>
+                                        {analysis.conversionReadinessScore || 0}/10
+                                    </Typography>
+                                </Stack>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={(analysis.conversionReadinessScore || 0) * 10}
+                                    sx={{ height: 8, borderRadius: 4, bgcolor: alpha(theme.palette.success.main, 0.1), '& .MuiLinearProgress-bar': { bgcolor: 'success.main' } }}
+                                />
+                            </Box>
+                            <Box>
+                                <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>🛑 Conversion Friction</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'error.main' }}>
+                                        {analysis.frictionScore || 0}/10
+                                    </Typography>
+                                </Stack>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={(analysis.frictionScore || 0) * 10}
+                                    sx={{ height: 8, borderRadius: 4, bgcolor: alpha(theme.palette.error.main, 0.1), '& .MuiLinearProgress-bar': { bgcolor: 'error.main' } }}
+                                />
                             </Box>
                         </Stack>
                     </Box>
-                )}
 
-                {/* Score Section */}
-                <Box
-                    sx={{
-                        p: 3,
-                        mb: 3,
-                        bgcolor: alpha(scoreColor, 0.05),
-                        borderRadius: 2,
-                        border: `1px solid ${alpha(scoreColor, 0.2)}`
-                    }}
-                >
-                    <Stack direction="row" alignItems="center" spacing={3}>
-                        {/* Circular Score */}
-                        <Box
-                            sx={{
-                                position: 'relative',
-                                width: 100,
-                                height: 100,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    position: 'absolute',
-                                    width: '100%',
-                                    height: '100%',
-                                    borderRadius: '50%',
-                                    border: `8px solid ${alpha(scoreColor, 0.2)}`
-                                }}
-                            />
-                            <Box
-                                sx={{
-                                    position: 'absolute',
-                                    width: '100%',
-                                    height: '100%',
-                                    borderRadius: '50%',
-                                    border: `8px solid ${scoreColor}`,
-                                    borderTopColor: 'transparent',
-                                    borderRightColor: 'transparent',
-                                    transform: `rotate(${(analysis.score / 100) * 360}deg)`,
-                                    transition: 'transform 1s ease'
-                                }}
-                            />
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: scoreColor }}>
-                                {analysis.score}
+                    {/* Recommendations Section (Gems) */}
+                    {analysis.recommendations && analysis.recommendations.length > 0 && (
+                        <Box sx={{ mb: 4, p: 2.5, bgcolor: alpha(theme.palette.warning.main, 0.03), borderRadius: 2, border: `1px dashed ${alpha(theme.palette.warning.main, 0.3)}` }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                💡 Strategic Recommendations
                             </Typography>
+                            <Stack spacing={1.5}>
+                                {analysis.recommendations.map((rec, i) => (
+                                    <Stack key={i} direction="row" spacing={1.5} alignItems="flex-start">
+                                        <Typography variant="body2" sx={{ color: 'warning.dark' }}>•</Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: 1.4 }}>
+                                            {rec}
+                                        </Typography>
+                                    </Stack>
+                                ))}
+                            </Stack>
+                        </Box>
+                    )}
+
+                    {/* Secondary Metrics Grid */}
+                    <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr' }} gap={2}>
+                        {/* Trust Signals */}
+                        <Box>
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 1.5, textTransform: 'uppercase' }}>
+                                Trust & Authority
+                            </Typography>
+                            <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                                {(analysis.trustSignalsDetected || []).map((signal, i) => (
+                                    <Chip
+                                        key={i}
+                                        label={signal}
+                                        size="small"
+                                        sx={{
+                                            bgcolor: alpha(theme.palette.success.main, 0.05),
+                                            color: 'success.dark',
+                                            border: `1px solid ${alpha(theme.palette.success.main, 0.1)}`,
+                                            fontWeight: 600,
+                                            fontSize: '0.75rem'
+                                        }}
+                                    />
+                                ))}
+                            </Stack>
                         </Box>
 
-                        {/* Score Details */}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                                {t('results.landingPage.matchQuality')}
+                        {/* Missing/Warnings */}
+                        <Box>
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 1.5, textTransform: 'uppercase' }}>
+                                Optimization Gaps
                             </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                {analysis.score >= 80 && t('results.landingPage.score.excellent')}
-                                {analysis.score >= 60 && analysis.score < 80 && t('results.landingPage.score.good')}
-                                {analysis.score < 60 && t('results.landingPage.score.fair')}
-                            </Typography>
-                            <LinearProgress
-                                variant="determinate"
-                                value={analysis.score}
-                                sx={{
-                                    height: 8,
-                                    borderRadius: 4,
-                                    bgcolor: alpha(scoreColor, 0.2),
-                                    '& .MuiLinearProgress-bar': {
-                                        bgcolor: scoreColor,
-                                        borderRadius: 4
-                                    }
-                                }}
-                            />
+                            <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                                {(analysis.missingElements || []).map((el, i) => (
+                                    <Chip
+                                        key={i}
+                                        label={el}
+                                        size="small"
+                                        sx={{
+                                            bgcolor: alpha(theme.palette.error.main, 0.05),
+                                            color: 'error.dark',
+                                            border: `1px solid ${alpha(theme.palette.error.main, 0.1)}`,
+                                            fontWeight: 600,
+                                            fontSize: '0.75rem'
+                                        }}
+                                    />
+                                ))}
+                            </Stack>
                         </Box>
-                    </Stack>
-                </Box>
-
-                {/* Page Checklist */}
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
-                        {t('results.landingPage.checklist')}
-                    </Typography>
-                    <Stack spacing={1.5}>
-                        {/* Mobile Optimized */}
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                p: 1.5,
-                                bgcolor: analysis.mobileOptimized
-                                    ? alpha(theme.palette.success.main, 0.05)
-                                    : alpha(theme.palette.error.main, 0.05),
-                                borderRadius: 1,
-                                border: `1px solid ${analysis.mobileOptimized
-                                    ? alpha(theme.palette.success.main, 0.2)
-                                    : alpha(theme.palette.error.main, 0.2)
-                                    }`
-                            }}
-                        >
-                            <Typography sx={{ mr: 1 }}>
-                                {analysis.mobileOptimized ? '✓' : '✗'}
-                            </Typography>
-                            <Typography variant="body2" sx={{ flex: 1 }}>
-                                {t('results.landingPage.mobileOptimized')}
-                            </Typography>
-                            <Chip
-                                label={analysis.mobileOptimized ? t('common.passed') : t('common.failed')}
-                                size="small"
-                                color={analysis.mobileOptimized ? 'success' : 'error'}
-                                sx={{ fontWeight: 500 }}
-                            />
-                        </Box>
-                    </Stack>
-                </Box>
-
-                {/* Trust Signals */}
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: 'success.main' }}>
-                        {t('results.landingPage.trustSignals', { count: analysis.trustSignalsDetected?.length || 0 })}
-                    </Typography>
-                    <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                        {(analysis.trustSignalsDetected || []).map((signal, i) => (
-                            <Chip
-                                key={i}
-                                label={signal}
-                                size="small"
-                                sx={{
-                                    bgcolor: alpha(theme.palette.success.main, 0.1),
-                                    color: 'success.dark',
-                                    border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
-                                    fontWeight: 500
-                                }}
-                            />
-                        ))}
-                    </Stack>
-                </Box>
-
-                {/* Missing Elements */}
-                {analysis.missingElements && analysis.missingElements.length > 0 && (
-                    <Box>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: 'warning.main' }}>
-                            {t('results.landingPage.missingElements', { count: analysis.missingElements.length })}
-                        </Typography>
-                        <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                            {analysis.missingElements.map((el, i) => (
-                                <Chip
-                                    key={i}
-                                    label={el}
-                                    size="small"
-                                    sx={{
-                                        bgcolor: alpha(theme.palette.warning.main, 0.1),
-                                        color: 'warning.dark',
-                                        border: `1px solid ${alpha(theme.palette.warning.main, 0.3)}`,
-                                        fontWeight: 500
-                                    }}
-                                />
-                            ))}
-                        </Stack>
                     </Box>
-                )}
+                </Box>
             </CardContent>
         </Card>
     );

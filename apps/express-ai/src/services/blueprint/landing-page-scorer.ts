@@ -10,7 +10,13 @@ export class LandingPageScorer {
                 score: 0,
                 mobileOptimized: false,
                 trustSignalsDetected: [],
-                missingElements: ['URL']
+                missingElements: ['URL'],
+                qualityScorePrediction: 0,
+                conversionReadinessScore: 0,
+                frictionScore: 10,
+                recommendations: ['Provide a URL'],
+                landingPageType: 'homepage',
+                adToLandingConsistencyScore: 0
             };
         }
 
@@ -39,7 +45,13 @@ export class LandingPageScorer {
             ctaStrength: 'Medium',
             mobileOptimized: true, // Assumed
             trustSignalsDetected: trustSignals,
-            missingElements: missing
+            missingElements: missing,
+            qualityScorePrediction: 7,
+            conversionReadinessScore: 6,
+            frictionScore: 4,
+            recommendations: ['Improve page load speed.', 'Add customer testimonials.'],
+            landingPageType: 'lead_gen',
+            adToLandingConsistencyScore: 8
         };
     }
 }

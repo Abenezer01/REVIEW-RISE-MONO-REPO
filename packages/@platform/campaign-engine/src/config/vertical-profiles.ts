@@ -1,4 +1,4 @@
-export type VerticalType = 'Local Service' | 'E-commerce' | 'SaaS' | 'Restaurant' | 'Healthcare';
+export type VerticalType = 'Local Service' | 'E-commerce' | 'SaaS' | 'Restaurant' | 'Healthcare' | 'Other';
 
 export interface FunnelSplit {
     awareness: number;
@@ -11,6 +11,9 @@ export interface VerticalProfile {
     recommendedFunnelSplit: FunnelSplit;
     conversionType: string;
     typicalKPIs: string[];
+    // v4 Data
+    avgCpc: number;
+    negativeKeywords: string[];
 }
 
 export const VERTICAL_PROFILES: Record<VerticalType, VerticalProfile> = {
@@ -18,30 +21,48 @@ export const VERTICAL_PROFILES: Record<VerticalType, VerticalProfile> = {
         name: 'Local Service',
         recommendedFunnelSplit: { awareness: 0.1, consideration: 0.2, conversion: 0.7 },
         conversionType: 'Lead Form / Call',
-        typicalKPIs: ['CPA', 'Call Volume', 'Lead Quality']
+        typicalKPIs: ['CPA', 'Call Volume', 'Lead Quality'],
+        avgCpc: 12.50,
+        negativeKeywords: ['job', 'hiring', 'salary', 'career', 'diy', 'course', 'training']
     },
     'E-commerce': {
         name: 'E-commerce',
         recommendedFunnelSplit: { awareness: 0.4, consideration: 0.4, conversion: 0.2 }, // Heavy prospecting
         conversionType: 'Purchase',
-        typicalKPIs: ['ROAS', 'AOV', 'CAC']
+        typicalKPIs: ['ROAS', 'AOV', 'CAC'],
+        avgCpc: 2.50,
+        negativeKeywords: ['free', 'hack', 'torrent', 'review']
     },
     'SaaS': {
         name: 'SaaS',
         recommendedFunnelSplit: { awareness: 0.3, consideration: 0.3, conversion: 0.4 },
         conversionType: 'Free Trial / Demo',
-        typicalKPIs: ['CPL', 'SQL', 'Trial-to-Paid']
+        typicalKPIs: ['CPL', 'SQL', 'Trial-to-Paid'],
+        avgCpc: 15.00,
+        negativeKeywords: ['login', 'support', 'careers', 'stock', 'share price']
     },
     'Restaurant': {
         name: 'Restaurant',
         recommendedFunnelSplit: { awareness: 0.6, consideration: 0.3, conversion: 0.1 }, // Heavy local awareness
         conversionType: 'Reservation / Walk-in',
-        typicalKPIs: ['Reach', 'Engagement', 'Reservations']
+        typicalKPIs: ['Reach', 'Engagement', 'Reservations'],
+        avgCpc: 1.50, // Usually cheap on Search, but mostly Maps
+        negativeKeywords: ['recipe', 'delivery job', 'waiter salary']
     },
     'Healthcare': {
         name: 'Healthcare',
         recommendedFunnelSplit: { awareness: 0.2, consideration: 0.3, conversion: 0.5 },
         conversionType: 'Appointment',
-        typicalKPIs: ['CPA', 'Appointment Rate', 'Patient LTV']
+        typicalKPIs: ['CPA', 'Appointment Rate', 'Patient LTV'],
+        avgCpc: 8.00,
+        negativeKeywords: ['school', 'degree', 'salary', 'research']
+    },
+    'Other': {
+        name: 'Other',
+        recommendedFunnelSplit: { awareness: 0.3, consideration: 0.3, conversion: 0.4 }, // Balanced approach
+        conversionType: 'Conversion',
+        typicalKPIs: ['CPA', 'CTR', 'Conversion Rate'],
+        avgCpc: 5.00, // Generic mid-range CPC
+        negativeKeywords: ['free', 'job', 'salary', 'career']
     }
 };

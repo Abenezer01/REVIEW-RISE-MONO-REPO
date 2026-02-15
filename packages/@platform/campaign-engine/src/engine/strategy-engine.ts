@@ -1,6 +1,5 @@
 import { CampaignInput, CampaignPlan, CampaignNode } from '../schema/campaign-plan';
 import { VERTICAL_PROFILES } from '../config/vertical-profiles';
-import { getBudgetTier } from './budget-allocator';
 import { calculateChannelAllocations, ChannelRule } from './channel-selector';
 import { generateAwarenessLayer, generateConsiderationLayer, generateConversionLayer } from './funnel-generator';
 import { CampaignPlanSchema } from '../schema/campaign-plan';
@@ -18,7 +17,9 @@ export class StrategyEngine {
         }
 
         // 2. Financial Constraints & Tiers
-        const budgetTier = getBudgetTier(input.budget);
+        const budgetTier = {
+            tier: input.budget < 1000 ? 'Small' : input.budget < 5000 ? 'Medium' : 'Large' as 'Small' | 'Medium' | 'Large'
+        };
 
         // 3. Channel Strategy
         const channelAllocations = calculateChannelAllocations(input);

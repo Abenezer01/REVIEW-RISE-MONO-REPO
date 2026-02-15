@@ -1,12 +1,16 @@
 export interface BlueprintInput {
-    businessName?: string;
-    offerOrService: string;
-    vertical: 'Local Service' | 'E-commerce' | 'SaaS' | 'Healthcare' | 'Other';
-    geoTargeting: string[];
-    painPoints: string[];
-    landingPageUrl?: string;
-    objective?: 'Leads' | 'Sales' | 'Brand Awareness' | 'Website Traffic' | 'Local Store Visits';
-    budgetTier?: 'Low' | 'Mid' | 'High';
+    businessName: string; // Required
+    services: string[]; // Array of services (min 1)
+    offer: string; // Distinct offer/promotion (min 5 chars)
+    vertical: 'Local Service' | 'E-commerce' | 'SaaS' | 'Healthcare' | 'Restaurant' | 'Other';
+    geo: string; // Single location string (e.g., "Austin, TX")
+    painPoints?: string[]; // Optional
+    landingPageUrl?: string; // Optional (websiteUrl in engine)
+    objective: 'Leads' | 'Sales' | 'Awareness' | 'Local Visits'; // Required
+    budget: number; // Required (positive number)
+    currency?: string; // Optional, defaults to USD
+    expectedAvgCpc?: number; // Optional fallback CPC
+    conversionTrackingEnabled?: boolean; // Optional, defaults to true
 }
 
 export interface KeywordCluster {
@@ -25,6 +29,11 @@ export interface AdGroup {
     name: string;
     keywords: KeywordCluster;
     assets: RSAAssets;
+    budgetAllocation?: {
+        percentage: number;
+        amount: number;
+        estimatedClicks: number;
+    };
 }
 
 export interface Campaign {
@@ -48,12 +57,20 @@ export interface LandingPageAnalysis {
     url: string;
     isValid: boolean;
     validationMessage?: string;
-    score: number;
+    score: number; // Legacy score
     messageMatchScore?: number;
     ctaStrength?: 'Weak' | 'Medium' | 'Strong';
     mobileOptimized: boolean;
     trustSignalsDetected: string[];
     missingElements: string[];
+
+    // Google Ads Quality Score & Strategy
+    qualityScorePrediction: number; // 1-10
+    conversionReadinessScore: number; // 1-10
+    frictionScore: number; // 1-10 (lower is better)
+    recommendations: string[];
+    landingPageType: 'lead_gen' | 'ecommerce' | 'homepage' | 'informational';
+    adToLandingConsistencyScore: number; // 1-10
 }
 
 export interface ValidationWarning {
@@ -68,7 +85,23 @@ export interface PerformanceAssumptions {
     conversionDifficulty: number; // 1-10 scale
 }
 
+export interface StrategySummary {
+    goal: string;
+    totalBudget: number;
+    vertical: string;
+    bidStrategy: string;
+}
+
+export interface BudgetModeling {
+    clickCapacity: number;
+    budgetTier: 'Low' | 'Medium' | 'High';
+    recommendedCampaignCount: number;
+    avgCpc?: number; // For transparency in UI
+}
+
 export interface BlueprintOutput {
+    strategySummary?: StrategySummary;
+    budgetModeling?: BudgetModeling;
     campaigns?: Campaign[]; // New structure
     clusters: KeywordCluster[];
     adGroups: AdGroup[];

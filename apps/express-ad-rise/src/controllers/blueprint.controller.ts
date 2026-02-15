@@ -8,13 +8,17 @@ export class BlueprintController {
     async generate(req: Request, res: Response) {
         try {
             // Validation schema matching BlueprintInput
+            // Validation schema matching BlueprintInput
             const schema = z.object({
-                businessName: z.string().optional(),
-                offerOrService: z.string().min(1),
-                vertical: z.enum(['Local Service', 'E-commerce', 'SaaS', 'Healthcare', 'Other']),
-                geoTargeting: z.array(z.string()),
-                painPoints: z.array(z.string()),
-                landingPageUrl: z.union([z.string().url(), z.literal('')]).optional()
+                businessName: z.string().min(1),
+                services: z.array(z.string()),
+                offer: z.string().min(1),
+                vertical: z.enum(['Local Service', 'E-commerce', 'SaaS', 'Healthcare', 'Restaurant', 'Other']),
+                geo: z.string().min(1),
+                painPoints: z.array(z.string()).optional(),
+                landingPageUrl: z.string().optional().or(z.literal('')),
+                objective: z.enum(['Leads', 'Sales', 'Awareness', 'Local Visits']),
+                budget: z.number().positive(),
             });
 
             const input = schema.parse(req.body);

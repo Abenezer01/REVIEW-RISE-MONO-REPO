@@ -8,7 +8,6 @@ import {
     ChannelDistribution
 } from './schema/campaign-plan';
 import { calculateChannelAllocations } from './engine/channel-selector';
-import { getBudgetTier } from './engine/budget-allocator';
 import { VERTICAL_PROFILES } from './config/vertical-profiles';
 import { generateAwarenessLayer, generateConsiderationLayer, generateConversionLayer } from './engine/funnel-generator';
 
@@ -56,3 +55,13 @@ export const generateCampaignPlan = (input: CampaignInput): CampaignPlan => {
 // Export types and config
 export * from './schema/campaign-plan';
 export * from './config/vertical-profiles';
+
+// v4 Exports
+export * from './engine/blueprint-engine-v4';
+import { blueprintEngineV4 } from './engine/blueprint-engine-v4';
+
+export const generateBlueprintV4 = async (input: CampaignInput): Promise<CampaignPlan> => {
+    // Validate Input
+    const validatedInput = CampaignInputSchema.parse(input);
+    return await blueprintEngineV4.generateBlueprint(validatedInput);
+};
