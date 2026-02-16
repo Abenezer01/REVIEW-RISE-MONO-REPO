@@ -39,21 +39,31 @@ const getRoleFromToken = (token: string): string | null => {
 }
 
 const matchMenu = (items: typeof menuData, path: string): { allowedRoles?: string[] } | null => {
-  for (const item of items) {
-    const href = item.href || '/'
+  let bestHrefLength = -1
+  let bestAllowedRoles: string[] | undefined
 
-    if (path === href || path.startsWith(href + '/')) {
-      return { allowedRoles: item.allowedRoles as string[] | undefined }
-    }
+  const visit = (nodes: any[]) => {
+    for (const item of nodes) {
+      const href = item.href as string | undefined
 
-    if (item.children) {
-      const child = matchMenu(item.children as any, path)
+      if (href && (path === href || path.startsWith(`${href}/`))) {
+        if (href.length > bestHrefLength) {
+          bestHrefLength = href.length
+          bestAllowedRoles = item.allowedRoles as string[] | undefined
+        }
+      }
 
-      if (child) return child
+      if (item.children) {
+        visit(item.children as any[])
+      }
     }
   }
 
-  return null
+  visit(items as any[])
+
+  if (bestHrefLength < 0) return null
+
+  return { allowedRoles: bestAllowedRoles }
 }
 
 const findFirstAllowedMenuPath = (items: typeof menuData, role: string | null): string | null => {

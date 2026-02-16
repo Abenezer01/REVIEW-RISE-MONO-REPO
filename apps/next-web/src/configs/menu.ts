@@ -130,7 +130,7 @@ const menuData: MenuItem[] = [
     title: 'navigation.ad-rise',
     href: '/admin/ad-rise',
     icon: 'tabler-badge-ad',
-    allowedRoles: [ROLES.ADMIN],
+    allowedRoles: [ROLES.ADMIN, ROLES.VIEW],
     children: [
       {
         title: 'navigation.platform-overview',

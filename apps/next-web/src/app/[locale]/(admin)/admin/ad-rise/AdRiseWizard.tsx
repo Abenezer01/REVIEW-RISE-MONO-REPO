@@ -201,56 +201,73 @@ const AdRiseWizard = ({
     throw new Error('Failed to generate AI channel allocation');
   }, []);
 
-  // Fetch AI allocation + campaign narrative on review step
-  const fetchNarrative = useCallback(async (values: any) => {
+  const resolveNarrative = useCallback(async (values: any, allocation: AllocationResult) => {
+    const { campaignDays, dailyBudget } = getDailyBudget(values);
+    const pacingCurve = getPacingCurve(values);
+    
+    const res = await generateCampaignNarrative({
+      sessionName: values.sessionName,
+      industry: values.industry,
+      offer: values.offer,
+      goal: values.goal,
+      locations: values.locations,
+      budgetMonthly: values.budgetMonthly,
+      budgetDaily: dailyBudget,
+      campaignDays,
+      mode: values.mode,
+      brandTone: values.brandTone || businessBrandTone,
+      channelSplit: allocation.channelSplit,
+      pacingCurve
+    });
+
+    const payload = (res.data as any)?.data ?? res.data;
+
+    if (res.success && payload?.narrative && Array.isArray(payload?.assumptions)) {
+      return payload as { narrative: string; assumptions: string[] };
+    }
+
+    throw new Error('Failed to generate AI narrative');
+  }, [businessBrandTone]);
+
+  const regenerateAllocationOnly = useCallback(async (values: any) => {
     setIsAllocationLoading(true);
-    setIsNarrativeLoading(true);
 
     try {
-      const { campaignDays, dailyBudget } = getDailyBudget(values);
       const allocation = await resolveAllocation(values);
 
       setAllocationData(allocation);
-
-      const pacingCurve = getPacingCurve(values);
-
-      const res = await generateCampaignNarrative({
-        sessionName: values.sessionName,
-        industry: values.industry,
-        offer: values.offer,
-        goal: values.goal,
-        locations: values.locations,
-        budgetMonthly: values.budgetMonthly,
-        budgetDaily: dailyBudget,
-        campaignDays,
-        mode: values.mode,
-        brandTone: values.brandTone || businessBrandTone,
-        channelSplit: allocation.channelSplit,
-        pacingCurve
-      });
-
-      if (res.success) {
-        const payload = (res.data as any)?.data ?? res.data;
-
-        if (payload?.narrative && Array.isArray(payload?.assumptions)) {
-          setNarrativeData(payload);
-          setHasReviewRegenerated(true);
-        } else {
-          setNarrativeData(null);
-        }
-      } else {
-        setNarrativeData(null);
-      }
+      setHasReviewRegenerated(true);
     } catch (error) {
-      console.error('Failed to generate review plan:', error);
+      console.error('Failed to generate allocation:', error);
       setAllocationData(null);
-      setNarrativeData(null);
       notify({ messageCode: 'errors.internalError' as any, variant: 'TOAST', severity: 'error' });
     } finally {
       setIsAllocationLoading(false);
+    }
+  }, [notify, resolveAllocation]);
+
+  const regenerateNarrativeOnly = useCallback(async (values: any) => {
+    setIsNarrativeLoading(true);
+
+    try {
+      const allocation = allocationData || await resolveAllocation(values);
+
+      if (!allocationData) {
+        setAllocationData(allocation);
+      }
+
+      const narrative = await resolveNarrative(values, allocation);
+
+      setNarrativeData(narrative);
+      setHasReviewRegenerated(true);
+    } catch (error) {
+      console.error('Failed to generate narrative:', error);
+      setNarrativeData(null);
+      notify({ messageCode: 'errors.internalError' as any, variant: 'TOAST', severity: 'error' });
+    } finally {
       setIsNarrativeLoading(false);
     }
-  }, [businessBrandTone, notify, resolveAllocation]);
+  }, [allocationData, notify, resolveAllocation, resolveNarrative]);
 
   // Sync currentSessionId with sessionId prop
   useEffect(() => {
@@ -817,8 +834,9 @@ const AdRiseWizard = ({
                 isNarrativeLoading={isNarrativeLoading}
                 allocationData={allocationData}
                 isAllocationLoading={isAllocationLoading}
-                onRetryAllocation={() => fetchNarrative(values)}
-                fetchNarrative={fetchNarrative}
+                onRetryAllocation={() => regenerateAllocationOnly(values)}
+                onRegenerateNarrative={() => regenerateNarrativeOnly(values)}
+                onRegenerateAssumptions={() => regenerateNarrativeOnly(values)}
                 onShare={handleShareLink}
                 onExport={() => handleExportJSON(values)}
                 onPrint={() => handlePrint(values)}

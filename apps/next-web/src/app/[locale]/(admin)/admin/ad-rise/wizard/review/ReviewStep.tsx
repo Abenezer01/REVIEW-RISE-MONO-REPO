@@ -39,7 +39,8 @@ type Props = {
   allocationData: AllocationResult | null;
   isAllocationLoading: boolean;
   onRetryAllocation: () => void;
-  fetchNarrative: (values: any) => Promise<void>;
+  onRegenerateNarrative: () => void;
+  onRegenerateAssumptions: () => void;
   onShare: () => void;
   onExport: () => void;
   onPrint: () => void;
@@ -59,7 +60,8 @@ const ReviewStep = ({
   allocationData,
   isAllocationLoading,
   onRetryAllocation,
-  fetchNarrative,
+  onRegenerateNarrative,
+  onRegenerateAssumptions,
   onShare,
   onExport,
   onPrint,
@@ -216,7 +218,7 @@ const ReviewStep = ({
                 {t('review.strategyNarrative') || 'Strategy Narrative'}
               </Typography>
               <Box sx={{ mb: 3 }}>
-                <Button variant="outlined" size="small" onClick={() => fetchNarrative(values)} disabled={isNarrativeLoading}>
+                <Button variant="outlined" size="small" onClick={onRegenerateNarrative} disabled={isNarrativeLoading}>
                   {regenerateLabel}
                 </Button>
               </Box>
@@ -231,7 +233,7 @@ const ReviewStep = ({
                   {narrativeData.narrative}
                 </Typography>
               ) : (
-                <Button variant="tonal" onClick={() => fetchNarrative(values)}>
+                <Button variant="tonal" onClick={onRegenerateNarrative}>
                   {t('review.generateNarrative') || 'Generate Explanation'}
                 </Button>
               )}
@@ -247,6 +249,11 @@ const ReviewStep = ({
                 </Box>
                 {t('review.assumptions') || 'Planning Assumptions'}
               </Typography>
+              <Box sx={{ mb: 3 }}>
+                <Button variant="outlined" size="small" onClick={onRegenerateAssumptions} disabled={isNarrativeLoading}>
+                  {regenerateLabel}
+                </Button>
+              </Box>
 
               {isNarrativeLoading ? (
                 <Stack spacing={2} sx={{ mt: 2 }}>

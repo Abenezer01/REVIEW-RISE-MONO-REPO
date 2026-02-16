@@ -60,9 +60,28 @@ export class CampaignNarrativeService {
         1. Narrative: 2-3 short, encouraging paragraphs explaining the strategy in simple terms. Avoid marketing jargon. Focus on why this plan will work (e.g., "We're using Google to find people actively searching for [service] while Meta builds awareness...").
            - If channel split and pacing are provided, explicitly reference them in plain language.
            - If budget is small, explain tradeoffs clearly and what is intentionally deprioritized.
-        2. Assumptions: A list of 4-6 key assumptions we are making for this plan (e.g., Average CPC, Benchmark CTR, Expected Conversion Rate for this industry, Lead quality expectations).
-           - Include one assumption about tracking quality and one about creative/landing-page alignment.
+        2. Assumptions: Generate 5–6 specific, performance-related assumptions that justify the campaign projections.
+            Rules:
 
+            Each assumption must support the forecasting model (budget → reach → clicks → conversions).
+
+            Use realistic ranges or qualitative benchmarks (avoid vague phrases like “large audience” or “good performance”).
+
+            At least 3 assumptions must be quantitative benchmarks:
+            • expected CPC or CPM range for the vertical and location
+            • expected CTR range
+            • expected conversion/engagement rate (message, lead, or purchase depending on objective)
+
+            Include one assumption about audience size/saturation relative to budget and duration.
+
+            Include one assumption about tracking reliability (pixel, analytics, or message attribution).
+
+            Include one assumption about creative and landing-page alignment affecting conversion performance.
+
+            Write in clear plain language for a business owner, not marketing jargon.
+
+            Do not describe the business; only describe the conditions required for the projections to be realistic.
+            
         Return the response as a valid JSON object with the following structure:
         {
             "narrative": "...",

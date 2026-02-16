@@ -35,6 +35,7 @@ import {
 } from '@mui/icons-material';
 
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
@@ -50,6 +51,7 @@ const AdminAdRisePage = () => {
   const theme = useTheme();
   const t = useTranslations('dashboard');
   const tc = useTranslations('common');
+  const searchParams = useSearchParams();
   const { businessId } = useBusinessId();
   const { canEdit, loading: permissionsLoading } = usePermissions();
 
@@ -65,6 +67,7 @@ const AdminAdRisePage = () => {
   const [budgetConfig, setBudgetConfig] = useState({ lowMax: 500, midMax: 1500 });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
+  const [hasHandledSharedSession, setHasHandledSharedSession] = useState(false);
 
   useEffect(() => {
     if (!businessId) return;
@@ -205,6 +208,16 @@ const AdminAdRisePage = () => {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (hasHandledSharedSession) return;
+    const sharedSessionId = searchParams.get('sharedSession');
+
+    if (!sharedSessionId) return;
+
+    setHasHandledSharedSession(true);
+    handleEdit(sharedSessionId);
+  }, [hasHandledSharedSession, handleEdit, searchParams]);
 
   const handleDuplicate = useCallback(async (sessionId: string) => {
     setLoading(true);

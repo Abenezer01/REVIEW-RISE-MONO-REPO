@@ -25,6 +25,21 @@ export async function GET(
       if (!match) {
         return NextResponse.json({ error: 'Invalid or revoked share link' }, { status: 403 });
       }
+
+      const accept = request.headers.get('accept') || '';
+      const secFetchDest = request.headers.get('sec-fetch-dest');
+      const isDocumentNavigation = secFetchDest === 'document' || accept.includes('text/html');
+
+      // Backward compatibility for previously generated share links that pointed to export API.
+      if (isDocumentNavigation) {
+        const locale = request.cookies.get('NEXT_LOCALE')?.value || 'en';
+        const viewUrl = new URL(`/${locale}/admin/ad-rise`, request.url);
+
+        viewUrl.searchParams.set('sharedSession', sessionId);
+        viewUrl.searchParams.set('shareToken', shareToken);
+
+        return NextResponse.redirect(viewUrl);
+      }
     }
 
     const payload = buildCampaignPlanV1(access.session);

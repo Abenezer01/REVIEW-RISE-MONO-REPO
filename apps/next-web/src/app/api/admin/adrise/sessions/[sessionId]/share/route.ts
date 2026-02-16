@@ -51,7 +51,8 @@ export async function POST(
       }
     });
 
-    const shareUrl = `${request.nextUrl.origin}/api/admin/adrise/sessions/${sessionId}/export?shareToken=${token}`;
+    const locale = request.cookies.get('NEXT_LOCALE')?.value || 'en';
+    const shareUrl = `${request.nextUrl.origin}/${locale}/admin/ad-rise?sharedSession=${sessionId}&shareToken=${token}`;
 
     return NextResponse.json({
       success: true,
