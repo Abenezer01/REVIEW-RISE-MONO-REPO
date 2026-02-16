@@ -1,13 +1,19 @@
-import { alpha, Box, Button, Card, CardContent, Grid, IconButton, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material'
-import type { MetaCopyVariation } from '@platform/contracts'
+import { alpha, Box, Button, Card, CardContent, Grid, IconButton, Stack, Tab, Tabs, Typography, useTheme, Chip } from '@mui/material'
+import type { MetaCreative, MetaAdSet } from '@platform/contracts'
 import { useState } from 'react'
 
 import { useTranslation } from '@/hooks/useTranslation'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 
+interface CreativeWithContext {
+    creative: MetaCreative;
+    audienceName: string;
+    stage: string;
+}
+
 interface Props {
-    data: MetaCopyVariation[]
+    data: CreativeWithContext[]
 }
 
 export default function AdCopyVariations({ data }: Props) {
@@ -19,7 +25,8 @@ export default function AdCopyVariations({ data }: Props) {
         navigator.clipboard.writeText(text)
     }
 
-    const current = data[tabIndex]
+    const currentItem = data[tabIndex]
+    const currentCreative = currentItem?.creative;
 
     const PreviewBox = ({ label, text, limit }: { label: string, text: string, limit: number }) => {
         const charCount = text.length;
@@ -68,30 +75,48 @@ export default function AdCopyVariations({ data }: Props) {
         )
     }
 
+    if (!data || data.length === 0) return null;
+
     return (
         <Grid container spacing={3}>
             {/* Input / Variations Side */}
             <Grid size={{ xs: 12, md: 8 }}>
-                <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box sx={{ mb: 2 }}>
                     <Tabs
                         value={tabIndex}
                         onChange={(_, v) => setTabIndex(v)}
+                        variant="scrollable"
+                        scrollButtons="auto"
                         sx={{ minHeight: 40 }}
                     >
                         {data.map((d, i) => (
-                            <Tab key={d.id} label={`${t('meta.results.adCopy.variation')} ${i + 1}`} sx={{ minHeight: 40, py: 1 }} />
+                            <Tab
+                                key={i}
+                                label={
+                                    <Box sx={{ textAlign: 'left' }}>
+                                        <Typography variant="caption" display="block" color="text.secondary">{d.stage} - {d.audienceName.slice(0, 15)}...</Typography>
+                                        <Typography variant="body2" fontWeight="bold">{t('meta.results.adCopy.variation')} {i + 1}</Typography>
+                                    </Box>
+                                }
+                                sx={{ minHeight: 50, py: 1, alignItems: 'flex-start' }}
+                            />
                         ))}
                     </Tabs>
-                    <Button
-                        startIcon={<ContentCopyIcon />}
-                        size="small"
-                        onClick={() => handleCopy(`${current.primaryText}\n\n${current.headline}\n\n${current.description}`)}
-                    >
-                        {t('meta.results.adCopy.copyAll')}
-                    </Button>
                 </Box>
 
-                {current && (
+                {currentItem && (
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                        <Button
+                            startIcon={<ContentCopyIcon />}
+                            size="small"
+                            onClick={() => handleCopy(`${currentCreative.primaryText[0]}\n\n${currentCreative.headlines[0]}\n\n${currentCreative.descriptions?.[0] || ''}`)}
+                        >
+                            {t('meta.results.adCopy.copyAll')}
+                        </Button>
+                    </Box>
+                )}
+
+                {currentCreative && (
                     <Card variant="outlined">
                         <CardContent>
                             <Box sx={{
@@ -109,21 +134,26 @@ export default function AdCopyVariations({ data }: Props) {
                                 <Box>
                                     <Typography variant="subtitle2" color="success.main" fontWeight="bold">{t('meta.results.adCopy.compliant')}</Typography>
                                     <Typography variant="caption" color="text.secondary">
-                                        {t('meta.results.adCopy.guide.optimized')}
+                                        {t('meta.results.adCopy.guide.optimized')} for {currentItem.stage}
                                     </Typography>
                                 </Box>
                             </Box>
 
-                            <PreviewBox label={t('meta.results.adCopy.primaryText')} text={current.primaryText} limit={125} />
+                            <PreviewBox label={t('meta.results.adCopy.primaryText')} text={currentCreative.primaryText[0]} limit={125} />
 
                             <Grid container spacing={2}>
                                 <Grid size={{ xs: 12, md: 6 }}>
-                                    <PreviewBox label={t('meta.results.adCopy.headline')} text={current.headline} limit={40} />
+                                    <PreviewBox label={t('meta.results.adCopy.headline')} text={currentCreative.headlines[0]} limit={40} />
                                 </Grid>
                                 <Grid size={{ xs: 12, md: 6 }}>
-                                    <PreviewBox label={t('meta.results.adCopy.description')} text={current.description} limit={25} />
+                                    <PreviewBox label={t('meta.results.adCopy.description')} text={currentCreative.descriptions?.[0] || ''} limit={25} />
                                 </Grid>
                             </Grid>
+
+                            <Box sx={{ mt: 2, pt: 2, borderTop: '1px dashed', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Typography variant="caption" color="text.secondary">{t('meta.results.adCopy.callToAction')}</Typography>
+                                <Chip label={currentCreative.callToAction} size="small" color="primary" />
+                            </Box>
                         </CardContent>
                     </Card>
                 )}

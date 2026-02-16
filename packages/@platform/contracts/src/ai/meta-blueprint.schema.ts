@@ -9,53 +9,88 @@ export interface MetaBlueprintInput {
     };
     painPoints: string[];
     landingPageUrl?: string;
+    budget?: number; // Added budget input
+    objective?: string; // Added objective input
+}
+
+export interface MetaGeoTargeting {
+    city: string;
+    zip?: string;
+    radius: number;
+    unit: 'mile' | 'km';
+    audienceSizeEstimate?: number;
 }
 
 export interface MetaInterestCluster {
-    name: string; // Display name for the cluster
     theme: string;
     interests: string[];
-    exclusions: string[];
-    type: 'Primary' | 'Secondary';
+    exclusions?: string[];
+    audienceSizeEstimate?: number;
+    predictedIntentScore?: number;
 }
 
-export interface MetaAudienceSet {
-    type: 'Prospecting' | 'Retargeting';
+export interface MetaAudience {
+    type: 'Core' | 'Lookalike' | 'Custom' | 'Retargeting';
     name: string;
-    demographics: {
-        ageRange: string;
-        gender: 'All' | 'Men' | 'Women';
-        parents?: boolean;
-        homeowners?: boolean;
-        languages?: string[]; // Added for UI
+    funnelStage: 'TOF' | 'MOF' | 'BOF';
+    geo?: MetaGeoTargeting;
+    interests?: MetaInterestCluster[];
+    lookalike?: {
+        source: string;
+        percentage: number;
     };
-    geoLocations: string[]; // Changed from 'geo' string to array
-    interests?: string[]; // Simplified to string array for prospecting
-    customAudiences?: string[]; // For retargeting
-    lookalikeSources?: string[]; // Added for UI
-    estimatedReach: string;
+    retargeting?: {
+        source: 'Website' | 'Instagram' | 'Facebook' | 'Video';
+        windowDays: number;
+        engagementType?: 'PageView' | 'AddToCart' | 'Purchase' | 'Engaged Shopper';
+    };
+    priorityScore?: number;
+    audienceSizeEstimate?: number;
+    predictedValue?: number;
 }
 
-export interface MetaCopyVariation {
-    id: string;
-    primaryText: string; // ~125 chars
-    headline: string; // ~40 chars
-    description: string; // ~25 chars
-    ctas: string[];
-    tone: string;
+export interface MetaCreative {
+    primaryText: string[];
+    headlines: string[];
+    descriptions?: string[];
+    callToAction: string;
+    placementAssetCustomization?: Record<string, string>;
 }
 
-export interface PlacementRecommendation {
-    platform: 'Facebook' | 'Instagram' | 'Audience Network' | 'Messenger';
-    format: 'Feed' | 'Stories' | 'Reels' | 'Right Column';
-    objective: 'Awareness' | 'Traffic' | 'Conversion';
-    rationale: string;
-    recommended: boolean;
+export interface MetaAdSet {
+    name: string;
+    optimizationGoal: 'Leads' | 'Conversions' | 'Link Clicks' | 'Reach';
+    budget: {
+        amount: number;
+        period: 'Daily' | 'Lifetime';
+        strategy: 'LowestCost' | 'CostCap';
+    };
+    placements: string[];
+    audience: MetaAudience;
+    creatives: MetaCreative[];
+    learningPhaseInfo?: {
+        minDailyBudget: number;
+        estimatedWeeklyEvents: number;
+    };
 }
 
 export interface MetaBlueprintOutput {
-    audiences: MetaAudienceSet[];
-    interestClusters: MetaInterestCluster[];
-    copyVariations: MetaCopyVariation[];
-    placements: PlacementRecommendation[];
+    campaignName: string;
+    objective: string;
+    totalBudget: number;
+    structure: {
+        prospecting: {
+            audiences: MetaAudience[];
+            adSets: MetaAdSet[];
+        };
+        retargeting: {
+            audiences: MetaAudience[];
+            adSets: MetaAdSet[];
+        };
+    };
+    recommendations: {
+        budgetStrategy: string;
+        dailySpend: number;
+        learningPhaseEstimate: string;
+    };
 }

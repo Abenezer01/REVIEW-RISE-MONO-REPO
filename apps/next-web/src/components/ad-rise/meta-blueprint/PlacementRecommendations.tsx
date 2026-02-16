@@ -1,55 +1,50 @@
 import LightbulbIcon from '@mui/icons-material/Lightbulb'
 import { alpha, Box, Card, CardContent, Chip, Stack, Typography, useTheme } from '@mui/material'
-import type { PlacementRecommendation } from '@platform/contracts'
+import type { MetaAdSet } from '@platform/contracts'
 
 import { useTranslation } from '@/hooks/useTranslation'
 
 interface Props {
-    data: PlacementRecommendation[]
+    adSets: MetaAdSet[]
 }
 
-export default function PlacementRecommendations({ data }: Props) {
+export default function PlacementRecommendations({ adSets }: Props) {
     const theme = useTheme()
     const t = useTranslation('blueprint')
 
+    const formatPlacementName = (p: string) => {
+        return p.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
     return (
         <Stack spacing={2}>
-            {data.map((placement, index) => (
+            {adSets.map((adSet, index) => (
                 <Card
                     key={index}
                     variant="outlined"
-                    sx={{
-                        borderColor: placement.recommended ? alpha(theme.palette.success.main, 0.5) : undefined,
-                        bgcolor: placement.recommended ? alpha(theme.palette.success.main, 0.02) : undefined
-                    }}
                 >
                     <CardContent>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                            <Box>
-                                <Typography variant="subtitle1" fontWeight="bold">
-                                    {placement.platform} {placement.format}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {placement.rationale?.slice(0, 60)}...
-                                </Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', gap: 1 }}>
-                                {placement.recommended && (
-                                    <Chip
-                                        label={t('meta.results.placements.highImpact')}
-                                        size="small"
-                                        color="warning"
-                                        sx={{ fontWeight: 'bold' }}
-                                    />
-                                )}
-                                <Chip
-                                    label={t(`meta.results.placements.objectives.${placement.objective}`)}
-                                    size="small"
-                                    color="success"
-                                />
-                            </Box>
+                        <Box sx={{ mb: 2 }}>
+                            <Typography variant="subtitle1" fontWeight="bold">
+                                {adSet.name}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                {adSet.optimizationGoal} • {adSet.budget.strategy}
+                            </Typography>
                         </Box>
 
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                            {adSet.placements.map((placement, i) => (
+                                <Chip
+                                    key={i}
+                                    label={formatPlacementName(placement)}
+                                    size="small"
+                                    icon={placement.includes('facebook') ? <Box component="span" sx={{ ml: 1 }}>F</Box> : <Box component="span" sx={{ ml: 1 }}>I</Box>}
+                                />
+                            ))}
+                        </Box>
+
+                        {/* Rationale Placeholder - Ideally comes from backend */}
                         <Box sx={{
                             p: 1.5,
                             borderRadius: 1,
@@ -60,7 +55,7 @@ export default function PlacementRecommendations({ data }: Props) {
                         }}>
                             <LightbulbIcon fontSize="small" color="primary" />
                             <Typography variant="caption" sx={{ lineHeight: 1.4 }}>
-                                <strong>{t('meta.results.placements.why')}:</strong> {placement.rationale}
+                                <strong>{t('meta.results.placements.strategyLabel')}</strong> {t('meta.results.placements.strategyText', { goal: adSet.optimizationGoal.toLowerCase() })}
                             </Typography>
                         </Box>
                     </CardContent>

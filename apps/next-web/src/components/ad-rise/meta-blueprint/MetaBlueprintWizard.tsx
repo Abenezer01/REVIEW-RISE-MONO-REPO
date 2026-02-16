@@ -39,6 +39,8 @@ import AdCopyVariations from './AdCopyVariations'
 import AudienceResults from './AudienceResults'
 import InterestClusters from './InterestClusters'
 import PlacementRecommendations from './PlacementRecommendations'
+import { MetaQuickTemplatesSection } from './sections/MetaQuickTemplatesSection'
+import type { MetaQuickTemplate } from './data/meta-quick-templates'
 
 
 
@@ -109,6 +111,10 @@ export default function MetaBlueprintWizard() {
             try {
                 const result = await MetaBlueprintService.generate(input);
 
+                console.log('🔍 Meta Blueprint API Response:', result);
+                console.log('🔍 Has structure?', !!result.structure);
+                console.log('🔍 Response keys:', Object.keys(result));
+
                 setOutput(result);
                 trackWizardComplete({ type: 'meta_blueprint', businessName: input.businessName });
                 setActiveStep(2);
@@ -118,6 +124,13 @@ export default function MetaBlueprintWizard() {
                 setLoading(false);
             }
         }
+    };
+
+    const applyTemplate = (template: MetaQuickTemplate) => {
+        setInput({
+            ...input,
+            ...template.data
+        });
     };
 
     const addPainPoint = () => {
@@ -166,7 +179,10 @@ export default function MetaBlueprintWizard() {
             </Typography>
             <Stack spacing={1}>
                 {[
-                    t('meta.results.audiences.prospecting') + ' + ' + t('meta.results.audiences.retargeting'),
+                    t('meta.results.benefits.combinedAudiences', {
+                        prospecting: t('meta.results.audiences.prospecting'),
+                        retargeting: t('meta.results.audiences.retargeting')
+                    }),
                     t('meta.results.benefits.coreAudiences'),
                     t('meta.results.benefits.interestClusters'),
                     t('meta.results.benefits.optimizedCopy'),
@@ -254,6 +270,12 @@ export default function MetaBlueprintWizard() {
                                         {/* Since offerOrService might be English from DB/Mock, we keep it as is, but we could localize metadata */}
                                         {input.offerOrService} • {input.geoTargeting.center} • {input.geoTargeting.radius} {t(`meta.form.radiusUnit.${input.geoTargeting.unit}`)}
                                     </Typography>
+                                    {output.recommendations && (
+                                        <Box sx={{ mt: 1, display: 'flex', gap: 2 }}>
+                                            <Chip label={t('meta.results.sections.estDailySpend', { amount: output.recommendations.dailySpend })} color="primary" variant="outlined" size="small" />
+                                            <Chip label={t('meta.results.sections.budgetStrategy', { strategy: output.recommendations.budgetStrategy })} color="secondary" variant="outlined" size="small" />
+                                        </Box>
+                                    )}
                                 </Box>
                                 <Box sx={{ display: 'flex', gap: 1 }}>
                                     <Button variant="contained" color="primary" startIcon={<SaveAltIcon />}>
@@ -273,7 +295,10 @@ export default function MetaBlueprintWizard() {
                                     <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: 'primary.main', color: 'white', display: 'flex' }}><StoreIcon /></Box>
                                     {t('meta.results.sections.audiences')}
                                 </Typography>
-                                <AudienceResults data={output.audiences} />
+                                <AudienceResults
+                                    prospecting={output.structure?.prospecting?.audiences || []}
+                                    retargeting={output.structure?.retargeting?.audiences || []}
+                                />
                             </Box>
 
                             {/* Section: Interests */}
@@ -282,7 +307,12 @@ export default function MetaBlueprintWizard() {
                                     <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: 'primary.main', color: 'white', display: 'flex' }}><CheckCircleIcon /></Box>
                                     {t('meta.results.sections.interests')}
                                 </Typography>
-                                <InterestClusters data={output.interestClusters} />
+                                <InterestClusters
+                                    data={(output.structure?.prospecting?.audiences || [])
+                                        .flatMap(a => a.interests || [])
+                                        .filter((v, i, a) => a.findIndex(t => t.theme === v.theme) === i) // Unique by theme
+                                    }
+                                />
                             </Box>
 
                             {/* Section: Placements */}
@@ -291,7 +321,9 @@ export default function MetaBlueprintWizard() {
                                     <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: 'primary.main', color: 'white', display: 'flex' }}><ShoppingBagIcon /></Box>
                                     {t('meta.results.sections.placements')}
                                 </Typography>
-                                <PlacementRecommendations data={output.placements} />
+                                <PlacementRecommendations
+                                    adSets={[...(output.structure?.prospecting?.adSets || []), ...(output.structure?.retargeting?.adSets || [])]}
+                                />
                             </Box>
 
                             {/* Section: Copy */}
@@ -300,7 +332,12 @@ export default function MetaBlueprintWizard() {
                                     <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: 'primary.main', color: 'white', display: 'flex' }}><BoltIcon /></Box>
                                     {t('meta.results.sections.adCopy')}
                                 </Typography>
-                                <AdCopyVariations data={output.copyVariations} />
+                                <AdCopyVariations
+                                    data={[
+                                        ...(output.structure?.prospecting?.adSets || []).flatMap(adSet => adSet.creatives.map(c => ({ creative: c, audienceName: adSet.audience.name, stage: adSet.audience.funnelStage }))),
+                                        ...(output.structure?.retargeting?.adSets || []).flatMap(adSet => adSet.creatives.map(c => ({ creative: c, audienceName: adSet.audience.name, stage: adSet.audience.funnelStage })))
+                                    ]}
+                                />
                             </Box>
                         </Grid>
                     </Grid>
@@ -311,98 +348,101 @@ export default function MetaBlueprintWizard() {
                         {/* Left Column - Form */}
                         <Grid size={{ xs: 12, md: 7 }}>
                             {activeStep === 0 && (
-                                <Card variant="outlined" sx={{ p: 0, bgcolor: 'background.paper', overflow: 'hidden' }}>
-                                    <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <Typography variant="h6" fontWeight="bold">
-                                            {t('meta.steps.businessInfo')}
-                                        </Typography>
-                                        <Chip label={t('form.required')} size="small" color="primary" />
-                                    </Box>
-                                    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 4, p: 3 }}>
-                                        <Box>
-                                            <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.offerOrService')}</Typography>
-                                            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>{t('form.offerServiceHelp')}</Typography>
-                                            <TextField
-                                                placeholder={t('meta.form.offerOrServicePlaceholder')}
-                                                value={input.offerOrService}
-                                                onChange={(e) => setInput({ ...input, offerOrService: e.target.value })}
-                                                fullWidth
-                                                variant="outlined"
-                                                sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
-                                            />
+                                <>
+                                    <MetaQuickTemplatesSection onSelectTemplate={applyTemplate} t={t} />
+                                    <Card variant="outlined" sx={{ p: 0, bgcolor: 'background.paper', overflow: 'hidden' }}>
+                                        <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <Typography variant="h6" fontWeight="bold">
+                                                {t('meta.steps.businessInfo')}
+                                            </Typography>
+                                            <Chip label={t('form.required')} size="small" color="primary" />
                                         </Box>
-
-                                        <Box>
-                                            <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.vertical')}</Typography>
-                                            <VerticalSelection
-                                                value={input.vertical}
-                                                onChange={(v) => setInput({ ...input, vertical: v as any })}
-                                            />
-                                        </Box>
-
-                                        <Box>
-                                            <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.painPoints')}</Typography>
-                                            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>{t('form.painPointsHelp')}</Typography>
-                                            <TextField
-                                                multiline
-                                                rows={3}
-                                                placeholder={t('meta.form.painPointsPlaceholder')}
-                                                value={painPointInput}
-                                                onChange={(e) => setPainPointInput(e.target.value)}
-                                                fullWidth
-                                                sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        e.preventDefault();
-                                                        addPainPoint();
-                                                    }
-                                                }}
-                                            />
-                                            <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                                {input.painPoints.map((p, i) => (
-                                                    <Chip key={i} label={p} onDelete={() => setInput(prev => ({ ...prev, painPoints: prev.painPoints.filter((_, idx) => idx !== i) }))} />
-                                                ))}
-                                            </Box>
-                                            <Button size="small" onClick={addPainPoint} sx={{ mt: 1 }}>{t('form.addPainPoint')}</Button>
-                                        </Box>
-
-                                        <Box>
-                                            <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.geoCenter')}</Typography>
-                                            <TextField
-                                                placeholder={t('meta.form.geoCenterPlaceholder')}
-                                                value={input.geoTargeting.center}
-                                                onChange={(e) => setInput({ ...input, geoTargeting: { ...input.geoTargeting, center: e.target.value } })}
-                                                fullWidth
-                                                sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
-                                            />
-                                        </Box>
-
-                                        <Box sx={{ p: 3, bgcolor: 'background.default', borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                                <Typography variant="body2" fontWeight="bold">{t('meta.form.radius')}</Typography>
-                                                <Chip label={`${input.geoTargeting.radius} ${t(`meta.form.radiusUnit.${input.geoTargeting.unit}`)}`} color="primary" size="small" />
-                                            </Box>
-                                            <Box sx={{ px: 1 }}>
-                                                <Slider
-                                                    value={input.geoTargeting.radius}
-                                                    onChange={(_, val) => setInput({
-                                                        ...input,
-                                                        geoTargeting: { ...input.geoTargeting, radius: val as number }
-                                                    })}
-                                                    min={5}
-                                                    max={100}
-                                                    step={5}
-                                                    marks={[
-                                                        { value: 5, label: '5' },
-                                                        { value: 25, label: '25' },
-                                                        { value: 50, label: '50' },
-                                                        { value: 100, label: '100' }
-                                                    ]}
+                                        <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 4, p: 3 }}>
+                                            <Box>
+                                                <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.offerOrService')}</Typography>
+                                                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>{t('form.offerServiceHelp')}</Typography>
+                                                <TextField
+                                                    placeholder={t('meta.form.offerOrServicePlaceholder')}
+                                                    value={input.offerOrService}
+                                                    onChange={(e) => setInput({ ...input, offerOrService: e.target.value })}
+                                                    fullWidth
+                                                    variant="outlined"
+                                                    sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
                                                 />
                                             </Box>
-                                        </Box>
-                                    </CardContent>
-                                </Card>
+
+                                            <Box>
+                                                <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.vertical')}</Typography>
+                                                <VerticalSelection
+                                                    value={input.vertical}
+                                                    onChange={(v) => setInput({ ...input, vertical: v as any })}
+                                                />
+                                            </Box>
+
+                                            <Box>
+                                                <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.painPoints')}</Typography>
+                                                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>{t('form.painPointsHelp')}</Typography>
+                                                <TextField
+                                                    multiline
+                                                    rows={3}
+                                                    placeholder={t('meta.form.painPointsPlaceholder')}
+                                                    value={painPointInput}
+                                                    onChange={(e) => setPainPointInput(e.target.value)}
+                                                    fullWidth
+                                                    sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault();
+                                                            addPainPoint();
+                                                        }
+                                                    }}
+                                                />
+                                                <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                                    {input.painPoints.map((p, i) => (
+                                                        <Chip key={i} label={p} onDelete={() => setInput(prev => ({ ...prev, painPoints: prev.painPoints.filter((_, idx) => idx !== i) }))} />
+                                                    ))}
+                                                </Box>
+                                                <Button size="small" onClick={addPainPoint} sx={{ mt: 1 }}>{t('form.addPainPoint')}</Button>
+                                            </Box>
+
+                                            <Box>
+                                                <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.geoCenter')}</Typography>
+                                                <TextField
+                                                    placeholder={t('meta.form.geoCenterPlaceholder')}
+                                                    value={input.geoTargeting.center}
+                                                    onChange={(e) => setInput({ ...input, geoTargeting: { ...input.geoTargeting, center: e.target.value } })}
+                                                    fullWidth
+                                                    sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
+                                                />
+                                            </Box>
+
+                                            <Box sx={{ p: 3, bgcolor: 'background.default', borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                                    <Typography variant="body2" fontWeight="bold">{t('meta.form.radius')}</Typography>
+                                                    <Chip label={`${input.geoTargeting.radius} ${t(`meta.form.radiusUnit.${input.geoTargeting.unit}`)}`} color="primary" size="small" />
+                                                </Box>
+                                                <Box sx={{ px: 1 }}>
+                                                    <Slider
+                                                        value={input.geoTargeting.radius}
+                                                        onChange={(_, val) => setInput({
+                                                            ...input,
+                                                            geoTargeting: { ...input.geoTargeting, radius: val as number }
+                                                        })}
+                                                        min={5}
+                                                        max={100}
+                                                        step={5}
+                                                        marks={[
+                                                            { value: 5, label: '5' },
+                                                            { value: 25, label: '25' },
+                                                            { value: 50, label: '50' },
+                                                            { value: 100, label: '100' }
+                                                        ]}
+                                                    />
+                                                </Box>
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                </>
                             )}
 
                             {activeStep === 1 && (

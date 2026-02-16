@@ -264,6 +264,17 @@
         "geoTargeting": "Geographic Targeting",
         "results": "Your Blueprint"
       },
+      "stages": {
+        "TOF": "Top of Funnel (Awareness)",
+        "MOF": "Middle of Funnel (Consideration)",
+        "BOF": "Bottom of Funnel (Conversion)"
+      },
+      "quickTemplates": {
+        "title": "Quick Start Templates",
+        "subtitle": "Get started faster with pre-filled industry examples",
+        "tip": "Tip:",
+        "tipText": "Templates are just starting points - you can modify all fields after selecting one"
+      },
       "form": {
         "businessName": "Business Name (Optional)",
         "businessNamePlaceholder": "e.g., Joe's Plumbing",
@@ -287,7 +298,17 @@
         "painPoints": "Customer Pain Points (Optional)",
         "painPointsPlaceholder": "e.g., Burst pipes, clogged drains",
         "landingPageUrl": "Landing Page URL (Optional)",
-        "landingPageUrlPlaceholder": "https://example.com"
+        "landingPageUrlPlaceholder": "https://example.com",
+        "addPainPoint": "Add Pain Point",
+        "templates": {
+            "plumbing": "Plumbing Service",
+            "law": "Law Firm",
+            "dentist": "Dental Practice",
+            "restaurant": "Restaurant",
+            "saas": "SaaS Product",
+            "ecommerce": "E-commerce Store",
+            "roofing": "Roofing Service"
+        }
       },
       "buttons": {
         "next": "Next",
@@ -302,14 +323,17 @@
           "audiences": "Audience Sets",
           "interests": "Interest Clusters",
           "adCopy": "Ad Copy Variations",
-          "placements": "Placement Recommendations"
+          "placements": "Placement Recommendations",
+          "estDailySpend": "Est. Daily Spend: ${amount}",
+          "budgetStrategy": "Strategy: {strategy}"
         },
         "benefits": {
           "coreAudiences": "Core audience definitions",
           "interestClusters": "Interest cluster recommendations",
           "optimizedCopy": "Optimized copy variations",
           "placementStrategy": "Placement strategy guide",
-          "exportReady": "Export-ready JSON format"
+          "exportReady": "Export-ready JSON format",
+          "combinedAudiences": "{prospecting} + {retargeting}"
         },
         "audiences": {
           "prospecting": "Prospecting (Cold Traffic)",
@@ -322,7 +346,11 @@
           "geoLocations": "Geo Locations",
           "interests": "Interests",
           "customAudiences": "Custom Audiences",
-          "lookalikeSources": "Lookalike Sources"
+          "lookalikeSources": "Lookalike Sources",
+          "geo": "Geographic Targeting",
+          "retargetingSource": "Retargeting Source",
+          "size": "Est. Size",
+          "predictedValue": "Predicted Value"
         },
         "interests": {
           "primary": "Primary",
@@ -330,7 +358,8 @@
           "exclusions": "Exclusions",
           "includedInterests": "Included Interests",
           "interestsCount": "{count} interests",
-          "more": "+{count} more"
+          "more": "+{count} more",
+          "intentScore": "Intent Score: {score}/10"
         },
         "adCopy": {
           "variation": "Variation",
@@ -338,6 +367,7 @@
           "headline": "Headline",
           "description": "Description",
           "ctas": "Call-to-Actions",
+          "callToAction": "Call to Action",
           "tone": "Tone",
           "compliant": "Meta Ads Compliant",
           "characterLimits": "Character Limits Guide",
@@ -364,7 +394,9 @@
             "Awareness": "Awareness",
             "Traffic": "Traffic",
             "Conversion": "Conversion"
-          }
+          },
+          "strategyLabel": "Strategy:",
+          "strategyText": "Selected placements to maximize {goal} for this audience stage."
         }
       },
       "loading": "Generating your Meta Ads Blueprint...",

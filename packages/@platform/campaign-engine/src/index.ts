@@ -65,3 +65,7 @@ export const generateBlueprintV4 = async (input: CampaignInput): Promise<Campaig
     const validatedInput = CampaignInputSchema.parse(input);
     return await blueprintEngineV4.generateBlueprint(validatedInput);
 };
+
+// Meta Engine Exports
+export * from './meta-engine/meta-blueprint-engine';
+export * from './schema/meta-plan';

@@ -3,7 +3,10 @@ import { aiIntegrationService } from '../services/ai-integration.service';
 import { z } from 'zod';
 import { createSuccessResponse, createErrorResponse, SystemMessageCode } from '@platform/contracts';
 
+import { MetaBlueprintEngine } from '@platform/campaign-engine';
+
 export class BlueprintController {
+    private metaEngine = new MetaBlueprintEngine();
 
     async generate(req: Request, res: Response) {
         try {
@@ -58,7 +61,22 @@ export class BlueprintController {
 
             const input = schema.parse(req.body);
 
-            const result = await aiIntegrationService.generateMetaBlueprint(input as any);
+            // Map 'Other' vertical to a safe default if needed, or cast if engine supports it.
+            // CampaignInput expects specific verticals.
+            const sVertical = input.vertical === 'Other' ? 'Local Service' : input.vertical;
+
+            const result = this.metaEngine.generateBlueprint({
+                businessName: input.businessName || 'Your Business',
+                services: [input.offerOrService],
+                offer: input.offerOrService,
+                vertical: sVertical as any, // Cast to satisfy type if exact enum match is tricky
+                geo: input.geoTargeting.center,
+                painPoints: input.painPoints || [],
+                landingPageUrl: input.landingPageUrl || '',
+                objective: 'Leads', // Fixed default for now
+                budget: 100, // Fixed default
+                currency: 'USD'
+            });
 
             const response = createSuccessResponse(result, 'Meta Blueprint generated successfully', 200, { requestId: req.id });
             res.status(response.statusCode).json(response);
