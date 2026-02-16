@@ -13,38 +13,28 @@ export interface PerformanceEstimates {
 export class PerformanceEstimator {
 
     public estimate(input: CampaignInput, clickCapacity: number): PerformanceEstimates {
-        const profile = VERTICAL_PROFILES[input.vertical];
+        const profile = VERTICAL_PROFILES[input.vertical] || VERTICAL_PROFILES['Other'];
         const avgCpc = profile.avgCpc || input.expectedAvgCpc || 5.0; // Fallback
 
-        // Base metrics (mocked ranges based on profile if we had them, otherwise generics)
-        // Vertical Profiles currently have `avgCpc`. We can add CTR/CVR later or use hardcoded heuristics here.
-
-        // Heuristic Benchmarks
-        const benchmarks = {
-            'Local Service': { ctr: '4-6%', cvr: '10-15%' },
-            'E-commerce': { ctr: '2-3%', cvr: '1-3%' },
-            'SaaS': { ctr: '2-4%', cvr: '2-5%' },
-            'Restaurant': { ctr: '5-8%', cvr: '8-12%' },
-            'Healthcare': { ctr: '3-5%', cvr: '5-10%' },
-            'Other': { ctr: '3-5%', cvr: '2-5%' }
+        // 1. Get Benchmarks from Vertical Profile
+        const metrics = {
+            ctr: (input.vertical === 'Local Service') ? '4-6%' : '3-5%', // Simple heuristic for CTR
+            cvr: profile.benchmarks?.cvr || { BOF: 0.05, MOF: 0.03, TOF: 0.01 },
+            cpaTarget: profile.benchmarks?.cpa_target || 50.00
         };
 
-        const metrics = benchmarks[input.vertical] || { ctr: '3-5%', cvr: '2-5%' };
+        // 2. Calculate Weighted Average CVR
+        // Assumption: 60% BOF, 30% MOF, 10% TOF traffic mix for a healthy campaign
+        const weightedCvr = (metrics.cvr.BOF * 0.6) + (metrics.cvr.MOF * 0.3) + (metrics.cvr.TOF * 0.1);
 
-        // Lead Volume
-        // Simple: Budget / CPA.   CPA = CPC / CVR.
-        // Let's use the click capacity.
-        // Clicks * CVR = Conversions.
-        // CVR (midpoint of range)
-        const cvrStr = metrics.cvr.replace('%', ''); // e.g. "10-15"
-        const [minC, maxC] = cvrStr.split('-').map(s => parseFloat(s));
-        const avgCvrPercent = (minC + maxC) / 2;
-        const estimatedConversions = Math.floor(clickCapacity * (avgCvrPercent / 100));
+        // 3. Lead Volume Projection
+        // Clicks * Weighted CVR = Conversions
+        const estimatedConversions = Math.floor(clickCapacity * weightedCvr);
 
         return {
             expectedCtr: metrics.ctr,
             expectedCpc: `$${(avgCpc * 0.8).toFixed(2)} - $${(avgCpc * 1.2).toFixed(2)}`,
-            expectedCvr: metrics.cvr,
+            expectedCvr: `${(weightedCvr * 100).toFixed(1)}%`,
             leadVolumeProjection: `${Math.floor(estimatedConversions * 0.8)} - ${Math.ceil(estimatedConversions * 1.2)} / month`,
             conversionDifficulty: this.calculateDifficulty(input.budget, avgCpc),
             competitionLevel: 'Medium' // Placeholder

@@ -133,12 +133,6 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                                                     {group.name}
                                                 </Typography>
-                                                <Chip
-                                                    label={t('results.adGroups.keywordsCount', { count: group.keywords.keywords.length })}
-                                                    size="small"
-                                                    variant="outlined"
-                                                />
-                                                {/* Budget Allocation Display */}
                                                 {group.budgetAllocation && (
                                                     <>
                                                         <Chip
@@ -159,15 +153,35 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                                 fontWeight: 600
                                                             }}
                                                         />
-                                                        <Chip
-                                                            label={`~${group.budgetAllocation.estimatedClicks} clicks`}
-                                                            size="small"
-                                                            sx={{
-                                                                bgcolor: alpha(theme.palette.secondary.main, 0.1),
-                                                                color: 'secondary.main',
-                                                                fontWeight: 600
-                                                            }}
-                                                        />
+                                                        {/* ROI Metrics */}
+                                                        {group.budgetAllocation.estimatedConversions !== undefined && (
+                                                            <Chip
+                                                                label={`~${group.budgetAllocation.estimatedConversions} leads`}
+                                                                size="small"
+                                                                sx={{
+                                                                    bgcolor: alpha(theme.palette.warning.main, 0.1),
+                                                                    color: 'warning.main',
+                                                                    fontWeight: 600
+                                                                }}
+                                                            />
+                                                        )}
+                                                        {group.budgetAllocation.estimatedCpa !== undefined && (
+                                                            <Chip
+                                                                label={`$${group.budgetAllocation.estimatedCpa.toFixed(0)} CPA`}
+                                                                size="small"
+                                                                variant="outlined"
+                                                                sx={{ borderColor: theme.palette.divider }}
+                                                            />
+                                                        )}
+                                                        {/* Learning Phase Warning */}
+                                                        {group.budgetAllocation.learningPhaseStatus === 'Starved' && (
+                                                            <Chip
+                                                                label="Low volume"
+                                                                size="small"
+                                                                color="error"
+                                                                variant="outlined"
+                                                            />
+                                                        )}
                                                     </>
                                                 )}
                                             </Stack>

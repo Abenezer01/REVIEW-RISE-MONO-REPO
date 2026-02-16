@@ -42,8 +42,11 @@ export class BlueprintAiEnhancer {
         try {
             const enhancedJson = await llmService.generateJSON(prompt, { temperature: 0.7 });
 
-            // 3. Validation Layer (ensure AI didn't break structure)
-            const validatedPatch = EnhancementResponseSchema.parse(enhancedJson);
+            // 3. Robust Cleaning Layer (Truncate if AI ignores limits)
+            const cleanJson = this.enforceLimits(enhancedJson);
+
+            // 4. Validation Layer
+            const validatedPatch = EnhancementResponseSchema.parse(cleanJson);
 
             // 4. Merge Patch into Original Plan
             return this.applyEnhancements(plan, validatedPatch);
@@ -178,6 +181,30 @@ Return VALID JSON only. Do not return the full plan, only the enhancements.
             'Other': 'Focus on unique value proposition, clear benefits, and strong call to action.'
         };
         return guidanceMap[vertical] || 'Focus on unique value proposition and clear call to action.';
+    }
+
+    /**
+     * Enforce strict character limits by truncating if necessary.
+     * Google Ads Limits: Headlines = 30, Descriptions = 90.
+     */
+    private enforceLimits(json: any): any {
+        if (!json || typeof json !== 'object') return json;
+
+        if (json.adGroupEnhancements && Array.isArray(json.adGroupEnhancements)) {
+            json.adGroupEnhancements.forEach((enhancement: any) => {
+                if (enhancement.newHeadlines && Array.isArray(enhancement.newHeadlines)) {
+                    enhancement.newHeadlines = enhancement.newHeadlines.map((h: string) =>
+                        h.length > 30 ? h.substring(0, 30) : h
+                    );
+                }
+                if (enhancement.newDescriptions && Array.isArray(enhancement.newDescriptions)) {
+                    enhancement.newDescriptions = enhancement.newDescriptions.map((d: string) =>
+                        d.length > 90 ? d.substring(0, 90) : d
+                    );
+                }
+            });
+        }
+        return json;
     }
 }
 

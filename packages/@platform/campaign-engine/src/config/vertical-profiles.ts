@@ -14,6 +14,11 @@ export interface VerticalProfile {
     // v4 Data
     avgCpc: number;
     negativeKeywords: string[];
+    // ROI Benchmarks
+    benchmarks: {
+        cvr: { BOF: number; MOF: number; TOF: number };
+        cpa_target: number;
+    };
 }
 
 export const VERTICAL_PROFILES: Record<VerticalType, VerticalProfile> = {
@@ -23,7 +28,11 @@ export const VERTICAL_PROFILES: Record<VerticalType, VerticalProfile> = {
         conversionType: 'Lead Form / Call',
         typicalKPIs: ['CPA', 'Call Volume', 'Lead Quality'],
         avgCpc: 12.50,
-        negativeKeywords: ['job', 'hiring', 'salary', 'career', 'diy', 'course', 'training']
+        negativeKeywords: ['job', 'hiring', 'salary', 'career', 'diy', 'course', 'training'],
+        benchmarks: {
+            cvr: { BOF: 0.15, MOF: 0.05, TOF: 0.01 }, // High intent = high CVR
+            cpa_target: 45.00
+        }
     },
     'E-commerce': {
         name: 'E-commerce',
@@ -31,7 +40,11 @@ export const VERTICAL_PROFILES: Record<VerticalType, VerticalProfile> = {
         conversionType: 'Purchase',
         typicalKPIs: ['ROAS', 'AOV', 'CAC'],
         avgCpc: 2.50,
-        negativeKeywords: ['free', 'hack', 'torrent', 'review']
+        negativeKeywords: ['free', 'hack', 'torrent', 'review'],
+        benchmarks: {
+            cvr: { BOF: 0.04, MOF: 0.02, TOF: 0.005 }, // Volume play
+            cpa_target: 30.00
+        }
     },
     'SaaS': {
         name: 'SaaS',
@@ -39,7 +52,11 @@ export const VERTICAL_PROFILES: Record<VerticalType, VerticalProfile> = {
         conversionType: 'Free Trial / Demo',
         typicalKPIs: ['CPL', 'SQL', 'Trial-to-Paid'],
         avgCpc: 15.00,
-        negativeKeywords: ['login', 'support', 'careers', 'stock', 'share price']
+        negativeKeywords: ['login', 'support', 'careers', 'stock', 'share price'],
+        benchmarks: {
+            cvr: { BOF: 0.08, MOF: 0.03, TOF: 0.01 },
+            cpa_target: 120.00
+        }
     },
     'Restaurant': {
         name: 'Restaurant',
@@ -47,7 +64,11 @@ export const VERTICAL_PROFILES: Record<VerticalType, VerticalProfile> = {
         conversionType: 'Reservation / Walk-in',
         typicalKPIs: ['Reach', 'Engagement', 'Reservations'],
         avgCpc: 1.50, // Usually cheap on Search, but mostly Maps
-        negativeKeywords: ['recipe', 'delivery job', 'waiter salary']
+        negativeKeywords: ['recipe', 'delivery job', 'waiter salary'],
+        benchmarks: {
+            cvr: { BOF: 0.12, MOF: 0.06, TOF: 0.02 },
+            cpa_target: 15.00
+        }
     },
     'Healthcare': {
         name: 'Healthcare',
@@ -55,7 +76,11 @@ export const VERTICAL_PROFILES: Record<VerticalType, VerticalProfile> = {
         conversionType: 'Appointment',
         typicalKPIs: ['CPA', 'Appointment Rate', 'Patient LTV'],
         avgCpc: 8.00,
-        negativeKeywords: ['school', 'degree', 'salary', 'research']
+        negativeKeywords: ['school', 'degree', 'salary', 'research'],
+        benchmarks: {
+            cvr: { BOF: 0.10, MOF: 0.04, TOF: 0.01 },
+            cpa_target: 60.00
+        }
     },
     'Other': {
         name: 'Other',
@@ -63,6 +88,10 @@ export const VERTICAL_PROFILES: Record<VerticalType, VerticalProfile> = {
         conversionType: 'Conversion',
         typicalKPIs: ['CPA', 'CTR', 'Conversion Rate'],
         avgCpc: 5.00, // Generic mid-range CPC
-        negativeKeywords: ['free', 'job', 'salary', 'career']
+        negativeKeywords: ['free', 'job', 'salary', 'career'],
+        benchmarks: {
+            cvr: { BOF: 0.05, MOF: 0.02, TOF: 0.01 },
+            cpa_target: 50.00
+        }
     }
 };

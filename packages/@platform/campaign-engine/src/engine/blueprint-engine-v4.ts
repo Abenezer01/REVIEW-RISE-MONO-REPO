@@ -1,4 +1,5 @@
 import { CampaignInput, CampaignPlan } from '../schema/campaign-plan';
+import { VERTICAL_PROFILES } from '../config/vertical-profiles';
 import { blueprintStrategyEngine } from './blueprint-strategy-engine';
 import { keywordClusteringEngine } from './keyword-clustering-engine';
 import { negativeKeywordEngine } from './negative-keyword-engine';
@@ -20,9 +21,12 @@ export class BlueprintEngineV4 {
         // 3. Ad Layer
         let adGroups = adGroupBuilder.buildAdGroups(clusters, input);
 
-        // 4. Budget Allocation (NEW)
+        // 4. Budget Allocation (Weighted Additive Model)
         const { budgetAllocator } = require('./budget-allocator');
-        adGroups = budgetAllocator.allocateBudget(adGroups, input.budget, strategy.avgCpc);
+        const verticalProfile = VERTICAL_PROFILES[input.vertical] || VERTICAL_PROFILES['Other'];
+        const cvrBenchmarks = verticalProfile.benchmarks?.cvr || { BOF: 0.05, MOF: 0.03, TOF: 0.01 };
+
+        adGroups = budgetAllocator.allocateBudget(adGroups, input.budget, strategy.avgCpc, cvrBenchmarks);
 
         // 5. Advanced Analysis (with real website crawling)
         const landingPageAnalysis = await landingPageScorer.analyze(input);

@@ -76,7 +76,10 @@ export const AdGroupSchema = z.object({
     budgetAllocation: z.object({
         percentage: z.number(),
         amount: z.number(),
-        estimatedClicks: z.number()
+        estimatedClicks: z.number(),
+        estimatedConversions: z.number(),
+        estimatedCpa: z.number(),
+        learningPhaseStatus: z.enum(['Healthy', 'Risk', 'Starved'])
     }).optional() // Budget allocation (added by budget allocator)
 });
 
