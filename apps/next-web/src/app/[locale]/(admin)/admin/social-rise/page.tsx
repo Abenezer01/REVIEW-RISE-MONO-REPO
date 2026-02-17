@@ -27,6 +27,9 @@ import ContentCalendar from './ContentCalendar';
 import PostEditorDialog from './PostEditorDialog';
 import PublishingLogsTable from './PublishingLogsTable';
 
+const isUuid = (value: string | null | undefined): value is string =>
+  Boolean(value && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
+
 const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [key: string]: any }) => {
     return <i className={icon} style={{ fontSize }} {...rest} />
 }
@@ -41,6 +44,7 @@ const ContentPage = () => {
     const { businessId } = useBusinessId();
     const { locationId } = useLocationFilter();
     const { user } = useAuth();
+    const normalizedLocationId = isUuid(locationId) ? locationId : undefined;
 
     const tabFromUrl = searchParams.get('tab');
     const [activeTab, setActiveTab] = useState(tabFromUrl || 'calendar');
@@ -76,18 +80,18 @@ const ContentPage = () => {
         if (!businessId) return;
 
         try {
-            const postsData = await BrandService.listScheduledPosts(businessId);
+            const postsData = await BrandService.listScheduledPosts(businessId, normalizedLocationId);
 
-            // If locationId is present, filter posts by locationId
-            const filteredByLocation = locationId 
-                ? postsData.filter(p => p.locationId === locationId)
+            // Keep a defensive filter in case mixed legacy data is returned.
+            const filteredByLocation = normalizedLocationId
+                ? postsData.filter(p => p.locationId === normalizedLocationId)
                 : postsData;
 
             setScheduledPosts(filteredByLocation);
         } catch (error) {
             console.error('Failed to fetch scheduled posts', error);
         }
-    }, [businessId, locationId]);
+    }, [businessId, normalizedLocationId]);
 
     useEffect(() => {
         fetchData();
@@ -143,15 +147,15 @@ const ContentPage = () => {
                 // Include locationId if present when creating new post
                 const postData = {
                     ...data,
-                    locationId: locationId || undefined
+                    locationId: normalizedLocationId
                 };
 
                 await BrandService.createScheduledPost(businessId, postData);
             }
 
             fetchData();
-        } catch (error) {
-            console.error('Failed to save post', error);
+        } catch (error: any) {
+            console.error('Failed to save post', error?.response?.data || error);
         }
     };
 

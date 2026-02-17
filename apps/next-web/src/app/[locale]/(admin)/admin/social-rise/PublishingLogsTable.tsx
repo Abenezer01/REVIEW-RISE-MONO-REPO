@@ -24,6 +24,9 @@ interface PublishingLogsTableProps {
   onViewPost: (postId: string) => void;
 }
 
+const isUuid = (value: string | null | undefined): value is string =>
+  Boolean(value && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
+
 const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [key: string]: any }) => {
   return <i className={icon} style={{ fontSize }} {...rest} />;
 };
@@ -43,6 +46,8 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
     endDate: '',
   });
 
+  const normalizedLocationId = isUuid(locationId) ? locationId : undefined;
+
   const fetchLogs = useCallback(async () => {
     if (!businessId) return;
 
@@ -54,7 +59,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
         status: filters.status === 'ALL' ? undefined : filters.status,
         startDate: filters.startDate || undefined,
         endDate: filters.endDate || undefined,
-        locationId: locationId || undefined,
+        locationId: normalizedLocationId,
       });
 
       setLogs(data);
@@ -63,7 +68,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
     } finally {
       setLoading(false);
     }
-  }, [businessId, locationId, filters]);
+  }, [businessId, normalizedLocationId, filters]);
 
   useEffect(() => {
     fetchLogs();
