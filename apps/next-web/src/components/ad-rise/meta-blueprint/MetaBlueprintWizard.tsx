@@ -72,7 +72,7 @@ const CustomStepIcon = (props: StepIconProps) => {
 }
 
 export default function MetaBlueprintWizard() {
-    const t = useTranslation('blueprint')
+    const t = useTranslation('ad-rise')
     const theme = useTheme()
     const [activeStep, setActiveStep] = useState(0)
     const [loading, setLoading] = useState(false)
@@ -145,7 +145,7 @@ export default function MetaBlueprintWizard() {
 
     const steps = [
         t('meta.steps.businessInfo'), // Now contains both Info & Geo
-        t('steps.generate'),
+        t('blueprint.steps.generate'),
         t('meta.steps.results')
     ]
 
@@ -178,7 +178,7 @@ export default function MetaBlueprintWizard() {
             borderColor: alpha(theme.palette.success.main, 0.1)
         }}>
             <Typography variant="subtitle2" color="success.main" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <AutoAwesomeIcon fontSize="small" /> {t('preview.whatYouGet')}
+                <AutoAwesomeIcon fontSize="small" /> {t('blueprint.preview.whatYouGet')}
             </Typography>
             <Stack spacing={1}>
                 {[
@@ -233,9 +233,9 @@ export default function MetaBlueprintWizard() {
                     </Box>
 
                     <Stack direction="row" spacing={1}>
-                        <Button startIcon={<HistoryIcon />} color="inherit" size="small">{t('header.history')}</Button>
-                        <Button startIcon={<BookmarkBorderIcon />} color="inherit" size="small">{t('header.myBlueprints')}</Button>
-                        <Button variant="contained" startIcon={<AccountCircleIcon />} size="small" sx={{ borderRadius: 10 }}>{t('header.account')}</Button>
+                        <Button startIcon={<HistoryIcon />} color="inherit" size="small">{t('blueprint.header.history')}</Button>
+                        <Button startIcon={<BookmarkBorderIcon />} color="inherit" size="small">{t('blueprint.header.myBlueprints')}</Button>
+                        <Button variant="contained" startIcon={<AccountCircleIcon />} size="small" sx={{ borderRadius: 10 }}>{t('blueprint.header.account')}</Button>
                     </Stack>
                 </Stack>
             </Box>
@@ -259,7 +259,7 @@ export default function MetaBlueprintWizard() {
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 15 }}>
                         <CircularProgress size={60} thickness={4} sx={{ mb: 3 }} />
                         <Typography variant="h5" fontWeight="bold">{t('meta.loading')}</Typography>
-                        <Typography color="text.secondary" sx={{ mt: 1 }}>{t('generate.loadingText')}</Typography>
+                        <Typography color="text.secondary" sx={{ mt: 1 }}>{t('blueprint.generate.loadingText')}</Typography>
                     </Box>
                 ) : output && activeStep === 2 ? (
 
@@ -304,12 +304,15 @@ export default function MetaBlueprintWizard() {
                         <Grid size={{ xs: 12 }}>
                             {output.recommendations?.budgetTier && (() => {
                                 const tier = output.recommendations.budgetTier
+
                                 const tierConfig = {
                                     CONSOLIDATE: { color: 'warning', label: '⚡ CONSOLIDATE MODE', desc: '1 Campaign · 1 Ad Set · Broad Targeting · No Retargeting. Signal density over fragmentation at this budget.' },
                                     STANDARD: { color: 'info', label: '📊 STANDARD MODE', desc: '1 Prospecting Campaign · 2 Ad Sets (Intent + Broad) · No Retargeting. Increase to $1,500+/mo to unlock full funnel.' },
                                     FULL_FUNNEL: { color: 'success', label: '🚀 FULL FUNNEL MODE', desc: 'Prospecting (CBO) + Retargeting (ABO). Full senior media buyer structure active.' },
                                 } as const
+
                                 const config = tierConfig[tier]
+
                                 return (
                                     <Box sx={{ p: 2.5, borderRadius: 2, border: 1, borderColor: `${config.color}.main`, bgcolor: `${config.color}.50` }}>
                                         <Typography variant="subtitle2" fontWeight="bold" color={`${config.color}.dark`}>
@@ -356,10 +359,9 @@ export default function MetaBlueprintWizard() {
                                                 <AutoAwesomeIcon />
                                             </Box>
                                             <Box>
-                                                <Typography variant="subtitle1" fontWeight="bold">Algorithms over Targeting</Typography>
+                                                <Typography variant="subtitle1" fontWeight="bold">{t('meta.form.algorithmsOverTargeting')}</Typography>
                                                 <Typography variant="body2" color="text.secondary">
-                                                    In Consolidate Mode ($100/mo), we skip specific interest clusters to give Meta's AI maximum freedom.
-                                                    Specific interest targeting starts at the <strong>Standard Tier ($600+/mo)</strong>.
+                                                    {t('meta.form.consolidateModeDesc')} <strong>{t('meta.form.standardTier')}</strong>.
                                                 </Typography>
                                             </Box>
                                         </Stack>
@@ -397,9 +399,11 @@ export default function MetaBlueprintWizard() {
                                             adSet.creatives.flatMap(c => {
                                                 // Explode text variations into separate viewable items
                                                 const variationsCount = Math.max(c.primaryText.length, c.headlines.length, c.descriptions?.length || 0);
+
                                                 return Array.from({ length: variationsCount }).map((_, i) => ({
                                                     creative: {
                                                         ...c,
+
                                                         // Create a synthetic creative with just the i-th option as the first element
                                                         primaryText: [c.primaryText[i] || c.primaryText[0]],
                                                         headlines: [c.headlines[i] || c.headlines[0]],
@@ -413,7 +417,9 @@ export default function MetaBlueprintWizard() {
                                         ...(output.structure?.retargeting?.adSets || []).flatMap(adSet =>
                                             adSet.creatives.flatMap(c => {
                                                 const variationsCount = Math.max(c.primaryText.length, c.headlines.length, c.descriptions?.length || 0);
-                                                return Array.from({ length: variationsCount }).map((_, i) => ({
+
+
+return Array.from({ length: variationsCount }).map((_, i) => ({
                                                     creative: {
                                                         ...c,
                                                         primaryText: [c.primaryText[i] || c.primaryText[0]],
@@ -459,12 +465,12 @@ export default function MetaBlueprintWizard() {
                                             <Typography variant="h6" fontWeight="bold">
                                                 {t('meta.steps.businessInfo')}
                                             </Typography>
-                                            <Chip label={t('form.required')} size="small" color="primary" />
+                                            <Chip label={t('blueprint.form.required')} size="small" color="primary" />
                                         </Box>
                                         <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 4, p: 3 }}>
                                             <Box>
                                                 <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.offerOrService')}</Typography>
-                                                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>{t('form.offerServiceHelp')}</Typography>
+                                                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>{t('blueprint.form.offerServiceHelp')}</Typography>
                                                 <TextField
                                                     placeholder={t('meta.form.offerOrServicePlaceholder')}
                                                     value={input.offerOrService}
@@ -476,20 +482,20 @@ export default function MetaBlueprintWizard() {
 
                                                 <Stack direction="row" spacing={2}>
                                                     <Box sx={{ flex: 1 }}>
-                                                        <Typography variant="body2" fontWeight="bold" sx={{ mb: 1 }}>{t('meta.form.budget') || 'Monthly Budget'}</Typography>
+                                                        <Typography variant="body2" fontWeight="bold" sx={{ mb: 1 }}>{t('meta.form.budget')}</Typography>
                                                         <TextField
                                                             type="number"
                                                             value={input.budget}
                                                             onChange={(e) => setInput({ ...input, budget: Number(e.target.value) })}
                                                             fullWidth
                                                             InputProps={{
-                                                                startAdornment: <Typography color="text.secondary" sx={{ mr: 1 }}>$</Typography>
+                                                                startAdornment: <Typography color="text.secondary" sx={{ mr: 1 }}>{t('blueprint.icons.currency', { defaultValue: '$' })}</Typography>
                                                             }}
                                                             sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
                                                         />
                                                     </Box>
                                                     <Box sx={{ flex: 1 }}>
-                                                        <Typography variant="body2" fontWeight="bold" sx={{ mb: 1 }}>{t('meta.form.objective') || 'Campaign Objective'}</Typography>
+                                                        <Typography variant="body2" fontWeight="bold" sx={{ mb: 1 }}>{t('meta.form.objective')}</Typography>
                                                         <TextField
                                                             select
                                                             value={input.objective}
@@ -498,9 +504,9 @@ export default function MetaBlueprintWizard() {
                                                             SelectProps={{ native: true }}
                                                             sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
                                                         >
-                                                            <option value="Leads">Leads & Form Fills</option>
-                                                            <option value="Sales">Sales & Conversions</option>
-                                                            <option value="Awareness">Awareness & Reach</option>
+                                                            <option value="Leads">{t('meta.form.objectives.Leads')}</option>
+                                                            <option value="Sales">{t('meta.form.objectives.Sales')}</option>
+                                                            <option value="Awareness">{t('meta.form.objectives.Awareness')}</option>
                                                         </TextField>
                                                     </Box>
                                                 </Stack>
@@ -516,7 +522,7 @@ export default function MetaBlueprintWizard() {
 
                                             <Box>
                                                 <Typography variant="body2" fontWeight="bold" gutterBottom>{t('meta.form.painPoints')}</Typography>
-                                                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>{t('form.painPointsHelp')}</Typography>
+                                                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>{t('blueprint.form.painPointsHelp')}</Typography>
                                                 <TextField
                                                     multiline
                                                     rows={3}
@@ -537,7 +543,7 @@ export default function MetaBlueprintWizard() {
                                                         <Chip key={i} label={p} onDelete={() => setInput(prev => ({ ...prev, painPoints: prev.painPoints.filter((_, idx) => idx !== i) }))} />
                                                     ))}
                                                 </Box>
-                                                <Button size="small" onClick={addPainPoint} sx={{ mt: 1 }}>{t('form.addPainPoint')}</Button>
+                                                <Button size="small" onClick={addPainPoint} sx={{ mt: 1 }}>{t('blueprint.form.addPainPoint')}</Button>
                                             </Box>
 
                                             <Box>
@@ -585,12 +591,12 @@ export default function MetaBlueprintWizard() {
                                     <Box sx={{ width: 80, height: 80, borderRadius: '50%', bgcolor: alpha(theme.palette.primary.main, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 3 }}>
                                         <CheckCircleIcon sx={{ fontSize: 40, color: 'primary.main' }} />
                                     </Box>
-                                    <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>{t('generate.readyTitle')}</Typography>
-                                    <Typography color="text.secondary" sx={{ mb: 4, maxWidth: 500, mx: 'auto' }}>{t('generate.readyText')}</Typography>
+                                    <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>{t('blueprint.generate.readyTitle')}</Typography>
+                                    <Typography color="text.secondary" sx={{ mb: 4, maxWidth: 500, mx: 'auto' }}>{t('blueprint.generate.readyText')}</Typography>
                                     <Paper sx={{ bgcolor: 'background.default', p: 2, maxWidth: 500, mx: 'auto', textAlign: 'left', border: 1, borderColor: 'divider' }}>
                                         <Typography variant="body2" color="text.secondary">
-                                            <strong>{t('generate.service')}</strong> {input.offerOrService}<br />
-                                            <strong>{t('generate.vertical')}</strong> {input.vertical}<br />
+                                            <strong>{t('blueprint.generate.service')}</strong> {input.offerOrService}<br />
+                                            <strong>{t('blueprint.generate.vertical')}</strong> {input.vertical}<br />
                                             <strong>{t('meta.form.geoCenter')}:</strong> {input.geoTargeting.center} ({input.geoTargeting.radius} {t(`meta.form.radiusUnit.${input.geoTargeting.unit}`)})
                                         </Typography>
                                     </Paper>
@@ -631,7 +637,7 @@ export default function MetaBlueprintWizard() {
                                         <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: 'primary.main', color: 'white' }}>
                                             <BoltIcon fontSize="small" />
                                         </Box>
-                                        <Typography variant="h6" fontWeight="bold">{t('preview.title')}</Typography>
+                                        <Typography variant="h6" fontWeight="bold">{t('blueprint.preview.title')}</Typography>
                                     </Box>
                                     <CardContent>
                                         <SidebarStats />

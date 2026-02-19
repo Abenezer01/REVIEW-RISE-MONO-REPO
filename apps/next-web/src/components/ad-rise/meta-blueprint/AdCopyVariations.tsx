@@ -1,5 +1,5 @@
 import { alpha, Box, Button, Card, CardContent, Grid, IconButton, Stack, Tab, Tabs, Typography, useTheme, Chip } from '@mui/material'
-import type { MetaCreative, MetaAdSet } from '@platform/contracts'
+import type { MetaCreative } from '@platform/contracts'
 import { useState } from 'react'
 
 import { useTranslation } from '@/hooks/useTranslation'
@@ -18,7 +18,7 @@ interface Props {
 
 export default function AdCopyVariations({ data }: Props) {
     const theme = useTheme()
-    const t = useTranslation('blueprint')
+    const t = useTranslation('ad-rise')
     const [tabIndex, setTabIndex] = useState(0)
 
     const handleCopy = (text: string) => {
@@ -127,14 +127,13 @@ export default function AdCopyVariations({ data }: Props) {
                                 border: '1px solid',
                                 borderColor: alpha(theme.palette.success.main, 0.2),
                                 display: 'flex',
-                                alignItems: 'center',
-                                gap: 2
+                                alignItems: 'center', gap: 2
                             }}>
                                 <CheckCircleIcon color="success" />
                                 <Box>
                                     <Typography variant="subtitle2" color="success.main" fontWeight="bold">{t('meta.results.adCopy.compliant')}</Typography>
                                     <Typography variant="caption" color="text.secondary">
-                                        {t('meta.results.adCopy.guide.optimized')} for {currentItem.stage}
+                                        {t('meta.results.adCopy.guide.optimized')} {t('meta.results.adCopy.for')} {currentItem.stage}
                                     </Typography>
                                 </Box>
                             </Box>

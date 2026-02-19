@@ -36,14 +36,14 @@ export function TargetingSection({
             {/* Geographic Targeting */}
             <Box sx={{ mb: 3 }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    Geographic Location
+                    {t('form.geoTargetingTitle')}
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block' }}>
-                    Enter your primary target location (e.g., "Austin, TX" or "United States")
+                    {t('form.geoTargetingInputHelp')}
                 </Typography>
                 <TextField
                     fullWidth
-                    placeholder="e.g., Austin, TX or United States"
+                    placeholder={t('form.geoTargetingPlaceholder')}
                     value={formData.geo}
                     onChange={(e) => setFormData({ ...formData, geo: e.target.value })}
                     sx={{

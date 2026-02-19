@@ -1,5 +1,5 @@
 
-import { Alert, Box, Typography, Button, Collapse } from '@mui/material';
+import { Alert, Typography, Button, Collapse } from '@mui/material';
 import { Info as InfoIcon } from '@mui/icons-material';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';

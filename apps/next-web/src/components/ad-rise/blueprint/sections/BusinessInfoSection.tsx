@@ -40,11 +40,11 @@ export function BusinessInfoSection({
             {/* Business Name */}
             <Box sx={{ mb: 3 }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    Business Name
+                    {t('form.businessName')}
                 </Typography>
                 <TextField
                     fullWidth
-                    placeholder="e.g., Austin Plumbing Pros"
+                    placeholder={t('form.businessNamePlaceholder')}
                     value={formData.businessName}
                     onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                     sx={{
@@ -58,16 +58,16 @@ export function BusinessInfoSection({
             {/* Services */}
             <Box sx={{ mb: 3 }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    Services Offered
+                    {t('form.servicesOffered')}
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block' }}>
-                    Add the main services you provide (e.g., Plumbing, Water Heater Repair)
+                    {t('form.servicesHelp')}
                 </Typography>
                 <Stack direction="row" spacing={1} sx={{ mb: 1.5 }}>
                     <TextField
                         fullWidth
                         size="small"
-                        placeholder="Enter a service"
+                        placeholder={t('form.enterService')}
                         value={serviceInput}
                         onChange={(e) => setServiceInput(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), onAddService())}
@@ -83,7 +83,7 @@ export function BusinessInfoSection({
                         disabled={!serviceInput.trim()}
                         sx={{ minWidth: 80 }}
                     >
-                        Add
+                        {t('form.add')}
                     </Button>
                 </Stack>
                 <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
@@ -107,14 +107,14 @@ export function BusinessInfoSection({
             {/* Offer */}
             <Box sx={{ mb: 3 }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    Special Offer or Promotion
+                    {t('form.specialOffer')}
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block' }}>
-                    What makes your offer compelling? (e.g., "10% Off First Service")
+                    {t('form.specialOfferHelp')}
                 </Typography>
                 <TextField
                     fullWidth
-                    placeholder="e.g., Free Consultation, 10% Off"
+                    placeholder={t('form.specialOfferPlaceholder')}
                     value={formData.offer}
                     onChange={(e) => setFormData({ ...formData, offer: e.target.value })}
                     sx={{
@@ -129,7 +129,7 @@ export function BusinessInfoSection({
             <Grid container spacing={2} sx={{ mb: 3 }}>
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        Monthly Budget ($)
+                        {t('form.monthlyBudget')}
                     </Typography>
                     <TextField
                         fullWidth
@@ -146,7 +146,7 @@ export function BusinessInfoSection({
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        Campaign Objective
+                        {t('form.campaignObjective')}
                     </Typography>
                     <TextField
                         fullWidth
@@ -160,10 +160,10 @@ export function BusinessInfoSection({
                         }}
                         SelectProps={{ native: true }}
                     >
-                        <option value="Leads">Leads</option>
-                        <option value="Sales">Sales</option>
-                        <option value="Awareness">Awareness</option>
-                        <option value="Local Visits">Local Visits</option>
+                        <option value="Leads">{t('form.objectives.Leads')}</option>
+                        <option value="Sales">{t('form.objectives.Sales')}</option>
+                        <option value="Awareness">{t('form.objectives.Awareness')}</option>
+                        <option value="Local Visits">{t('form.objectives.Local Visits')}</option>
                     </TextField>
                 </Grid>
             </Grid>

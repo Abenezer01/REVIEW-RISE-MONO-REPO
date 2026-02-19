@@ -11,7 +11,6 @@ import { TargetingSection } from './sections/TargetingSection';
 import { LandingPageSection } from './sections/LandingPageSection';
 import { GenerateSection } from './sections/GenerateSection';
 import { BlueprintPreviewPanel } from './sections/BlueprintPreviewPanel';
-import { QuickTemplatesSection } from './sections/QuickTemplatesSection';
 import { useTranslations } from 'next-intl';
 
 export default function BlueprintWizard() {
@@ -37,8 +36,10 @@ export default function BlueprintWizard() {
         if (activeStep === 0) {
             if (!formLogic.validateStep(0)) {
                 setError(t('form.required'));
+
                 return;
             }
+
             setError(null);
             setActiveStep(1);
         } else if (activeStep === 1) {

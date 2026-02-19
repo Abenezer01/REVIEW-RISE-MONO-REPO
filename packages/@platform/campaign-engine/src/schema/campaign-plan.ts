@@ -18,7 +18,7 @@ export type CampaignObjective = z.infer<typeof CampaignObjectiveSchema>;
  */
 export const CampaignInputSchema = z.object({
     vertical: z.enum([
-        'Local Service', 'E-commerce', 'SaaS', 'Restaurant', 'Healthcare'
+        'Local Service', 'E-commerce', 'SaaS', 'Restaurant', 'Healthcare', 'Real Estate', 'Legal', 'Other'
     ] as [VerticalType, ...VerticalType[]]),
     objective: CampaignObjectiveSchema,
     budget: z.number().positive(),

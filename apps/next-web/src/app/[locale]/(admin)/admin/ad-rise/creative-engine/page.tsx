@@ -57,6 +57,7 @@ export default function CreativeEnginePage() {
                 businessId,
                 concept
             });
+
             // Optional: Show success toast
         } catch (error) {
             console.error('Failed to save concept', error);

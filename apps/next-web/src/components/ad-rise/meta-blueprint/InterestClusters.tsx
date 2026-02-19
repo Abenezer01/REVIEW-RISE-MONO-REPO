@@ -10,7 +10,7 @@ interface Props {
 
 export default function InterestClusters({ data }: Props) {
     const theme = useTheme()
-    const t = useTranslation('blueprint')
+    const t = useTranslation('ad-rise')
 
     return (
         <Grid container spacing={3}>

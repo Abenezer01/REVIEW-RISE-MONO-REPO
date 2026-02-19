@@ -1,8 +1,6 @@
 
 import { useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-// @ts-ignore
-import { apiClient } from '@core/utils/api-client';
 
 const ANALYTICS_ENDPOINT = '/api/v1/analytics/track';
 
@@ -49,6 +47,7 @@ export const useCreativeAnalytics = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+
                     // Add auth token if available in session
                 },
                 body: JSON.stringify(payload)

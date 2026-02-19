@@ -12,7 +12,7 @@ export interface PreviewStats {
 export interface BlueprintPreviewPanelProps {
     getPreviewStats: () => PreviewStats;
     onSelectTemplate: (template: QuickTemplate) => void;
-    t: (key: string) => string;
+    t: any;
 }
 
 export function BlueprintPreviewPanel({ getPreviewStats, onSelectTemplate, t }: BlueprintPreviewPanelProps) {
@@ -114,7 +114,7 @@ export function BlueprintPreviewPanel({ getPreviewStats, onSelectTemplate, t }: 
 
             <Box>
                 <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
-                    ⚡ Quick Start Templates
+                    {t('icons.lightning')} {t('preview.quickStart')}
                 </Typography>
                 <Stack spacing={1.5}>
                     {QUICK_TEMPLATES.slice(0, 4).map((template) => (
@@ -142,21 +142,20 @@ export function BlueprintPreviewPanel({ getPreviewStats, onSelectTemplate, t }: 
                                         </Typography>
                                     </Stack>
                                     <Typography variant="caption" color="text.secondary">
-                                        ${(template.data.budget || 0).toLocaleString()} • {template.data.services?.length || 0} services
+                                        {t('icons.currency')}{(template.data.budget || 0).toLocaleString()} • {template.data.services?.length || 0} {t('preview.services')}
                                     </Typography>
                                 </Box>
                                 <Button size="small" variant="text" sx={{ minWidth: 'auto', px: 1 }}>
-                                    Use →
+                                    {t('preview.useArrow')}
                                 </Button>
                             </Stack>
                         </Paper>
                     ))}
                 </Stack>
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1.5, textAlign: 'center' }}>
-                    💡 Click any template to auto-fill the form
+                    {t('preview.clickTemplateHelp')}
                 </Typography>
             </Box>
         </Paper>
     );
 }
-

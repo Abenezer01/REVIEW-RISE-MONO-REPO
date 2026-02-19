@@ -1,14 +1,12 @@
 import { BlueprintService } from '../blueprint.service';
-import { BlueprintInput, BlueprintOutput, KeywordCluster } from '@platform/contracts';
-import { llmService } from '../llm.service';
+import type { BlueprintInput } from '@platform/contracts';
 
-// Mock LLM Service to avoid API calls and ensure predictable results
-jest.mock('../llm.service', () => ({
-    llmService: {
-        generateJSON: jest.fn(),
-        generateText: jest.fn()
-    }
+// Mock the campaign engine to avoid real crawling and ensure predictable results
+jest.mock('@platform/campaign-engine', () => ({
+    generateBlueprintV4: jest.fn()
 }));
+
+import { generateBlueprintV4 } from '@platform/campaign-engine';
 
 describe('Landing Page Validation Tests', () => {
     let blueprintService: BlueprintService;
@@ -29,39 +27,20 @@ describe('Landing Page Validation Tests', () => {
         budget: 1000
     };
 
-    const mockCluster: KeywordCluster = {
-        intent: 'Service',
-        theme: 'Test Theme',
-        keywords: [{ term: 'term', matchType: 'Exact' }]
-    };
-
-    // Helper to create valid structure with custom analysis
-    const createMockResponse = (landingPageAnalysis: any): BlueprintOutput => ({
-        clusters: [mockCluster],
-        adGroups: [{
-            name: 'Group 1',
-            keywords: mockCluster,
-            assets: { headlines: ['H1', 'H2', 'H3'], descriptions: ['D1', 'D2'] }
-        }],
-        negatives: [],
-        landingPageAnalysis: {
-            url: 'https://test.com',
-            score: 85,
-            mobileOptimized: true,
-            trustSignalsDetected: ['HTTPS'],
-            missingElements: [],
-            isValid: true,
-            ...landingPageAnalysis
-        }
-    });
 
     describe('Invalid Domain Detection', () => {
         it('should reject generic domains like google.com', async () => {
-            (llmService.generateJSON as jest.Mock).mockResolvedValue(createMockResponse({
-                isValid: false,
-                validationMessage: 'Generic domain not allowed',
-                score: 0
-            }));
+            (generateBlueprintV4 as jest.Mock).mockResolvedValue({
+                summary: { goal: 'test', totalBudget: 1000, vertical: 'Other' },
+                landingPageAnalysis: {
+                    score: 0,
+                    isValid: false,
+                    warnings: ['Generic domain not allowed']
+                },
+                keywordClusters: [],
+                adGroups: [],
+                negativeKeywords: []
+            });
 
             const input: BlueprintInput = {
                 ...baseInput,
@@ -78,11 +57,17 @@ describe('Landing Page Validation Tests', () => {
         });
 
         it('should reject facebook.com as landing page', async () => {
-            (llmService.generateJSON as jest.Mock).mockResolvedValue(createMockResponse({
-                isValid: false,
-                validationMessage: 'Social media profiles not relevant',
-                score: 0
-            }));
+            (generateBlueprintV4 as jest.Mock).mockResolvedValue({
+                summary: { goal: 'test', totalBudget: 1000, vertical: 'Other' },
+                landingPageAnalysis: {
+                    score: 0,
+                    isValid: false,
+                    warnings: ['Social media profiles not relevant']
+                },
+                keywordClusters: [],
+                adGroups: [],
+                negativeKeywords: []
+            });
 
             const input: BlueprintInput = {
                 ...baseInput,
@@ -98,11 +83,17 @@ describe('Landing Page Validation Tests', () => {
         });
 
         it('should reject example.com placeholder domains', async () => {
-            (llmService.generateJSON as jest.Mock).mockResolvedValue(createMockResponse({
-                isValid: false,
-                validationMessage: 'Placeholder domain',
-                score: 0
-            }));
+            (generateBlueprintV4 as jest.Mock).mockResolvedValue({
+                summary: { goal: 'test', totalBudget: 1000, vertical: 'Other' },
+                landingPageAnalysis: {
+                    score: 0,
+                    isValid: false,
+                    warnings: ['Placeholder domain']
+                },
+                keywordClusters: [],
+                adGroups: [],
+                negativeKeywords: []
+            });
 
             const input: BlueprintInput = {
                 ...baseInput,
@@ -119,11 +110,17 @@ describe('Landing Page Validation Tests', () => {
 
     describe('Valid Domain Handling', () => {
         it('should accept valid business-specific domains', async () => {
-            (llmService.generateJSON as jest.Mock).mockResolvedValue(createMockResponse({
-                url: 'https://premiumplumbing.com/emergency-services',
-                isValid: true,
-                score: 85
-            }));
+            (generateBlueprintV4 as jest.Mock).mockResolvedValue({
+                summary: { goal: 'test', totalBudget: 1000, vertical: 'Other' },
+                landingPageAnalysis: {
+                    score: 85,
+                    isValid: true,
+                    warnings: []
+                },
+                keywordClusters: [],
+                adGroups: [],
+                negativeKeywords: []
+            });
 
             const input: BlueprintInput = {
                 ...baseInput,
@@ -140,13 +137,19 @@ describe('Landing Page Validation Tests', () => {
         });
 
         it('should provide analysis for valid URLs', async () => {
-            (llmService.generateJSON as jest.Mock).mockResolvedValue(createMockResponse({
-                isValid: true,
-                score: 88,
-                mobileOptimized: true,
-                trustSignalsDetected: ['HTTPS', 'Phone Number'],
-                missingElements: ['Testimonials']
-            }));
+            (generateBlueprintV4 as jest.Mock).mockResolvedValue({
+                summary: { goal: 'test', totalBudget: 1000, vertical: 'Other' },
+                landingPageAnalysis: {
+                    score: 88,
+                    isValid: true,
+                    mobileOptimized: true,
+                    trustSignalsDetected: ['HTTPS', 'Phone Number'],
+                    warnings: ['Testimonials']
+                },
+                keywordClusters: [],
+                adGroups: [],
+                negativeKeywords: []
+            });
 
             const input: BlueprintInput = {
                 ...baseInput,
@@ -166,11 +169,17 @@ describe('Landing Page Validation Tests', () => {
 
     describe('Missing URL Handling', () => {
         it('should handle missing landing page URL gracefully', async () => {
-            (llmService.generateJSON as jest.Mock).mockResolvedValue(createMockResponse({
-                url: '',
-                isValid: true,
-                score: 50
-            }));
+            (generateBlueprintV4 as jest.Mock).mockResolvedValue({
+                summary: { goal: 'test', totalBudget: 1000, vertical: 'Other' },
+                landingPageAnalysis: {
+                    score: 50,
+                    isValid: true,
+                    warnings: []
+                },
+                keywordClusters: [],
+                adGroups: [],
+                negativeKeywords: []
+            });
 
             const input: BlueprintInput = {
                 ...baseInput
@@ -189,10 +198,17 @@ describe('Landing Page Validation Tests', () => {
 
     describe('URL Format Validation', () => {
         it('should handle URLs without protocol', async () => {
-            (llmService.generateJSON as jest.Mock).mockResolvedValue(createMockResponse({
-                url: 'http://mybusiness.com/services', // LLM might normalize it
-                isValid: true
-            }));
+            (generateBlueprintV4 as jest.Mock).mockResolvedValue({
+                summary: { goal: 'test', totalBudget: 1000, vertical: 'Other' },
+                landingPageAnalysis: {
+                    score: 70,
+                    isValid: true,
+                    warnings: []
+                },
+                keywordClusters: [],
+                adGroups: [],
+                negativeKeywords: []
+            });
 
             const input: BlueprintInput = {
                 ...baseInput,

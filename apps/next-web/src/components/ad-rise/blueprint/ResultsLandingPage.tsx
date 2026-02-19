@@ -32,12 +32,13 @@ export default function ResultsLandingPage({ analysis }: Props) {
 
     const getScoreColor = (score: number, isScale10 = false) => {
         const value = isScale10 ? score * 10 : score;
+
         if (value >= 80) return theme.palette.success.main;
         if (value >= 60) return theme.palette.warning.main;
+
         return theme.palette.error.main;
     };
 
-    const scoreColor = getScoreColor(analysis.score);
     const qsColor = getScoreColor(analysis.qualityScorePrediction || 0, true);
 
     return (
@@ -66,7 +67,7 @@ export default function ResultsLandingPage({ analysis }: Props) {
                                 fontSize: '1.5rem'
                             }}
                         >
-                            🎯
+                            {t('icons.target')}
                         </Box>
                         <Box sx={{ flex: 1 }}>
                             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
@@ -110,13 +111,13 @@ export default function ResultsLandingPage({ analysis }: Props) {
                             }}
                         >
                             <Typography variant="overline" sx={{ fontWeight: 700, color: qsColor, letterSpacing: 1 }}>
-                                Google Ads Quality Score
+                                {t('results.landingPage.metrics.qualityScore')}
                             </Typography>
                             <Typography variant="h2" sx={{ fontWeight: 800, color: qsColor, my: 1 }}>
                                 {analysis.qualityScorePrediction || 0}<Typography component="span" variant="h5" sx={{ opacity: 0.6 }}>/10</Typography>
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
-                                Predicted based on relevance, CTR, and experience logic.
+                                {t('results.landingPage.metrics.qualityScoreHelp')}
                             </Typography>
                         </Box>
 
@@ -124,7 +125,7 @@ export default function ResultsLandingPage({ analysis }: Props) {
                         <Stack spacing={2} justifyContent="center">
                             <Box>
                                 <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>🚀 Conversion Readiness</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{t('icons.rocket')} {t('results.landingPage.metrics.conversionReadiness')}</Typography>
                                     <Typography variant="body2" sx={{ fontWeight: 700, color: 'success.main' }}>
                                         {analysis.conversionReadinessScore || 0}/10
                                     </Typography>
@@ -137,7 +138,7 @@ export default function ResultsLandingPage({ analysis }: Props) {
                             </Box>
                             <Box>
                                 <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>🛑 Conversion Friction</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{t('icons.stop')} {t('results.landingPage.metrics.conversionFriction')}</Typography>
                                     <Typography variant="body2" sx={{ fontWeight: 700, color: 'error.main' }}>
                                         {analysis.frictionScore || 0}/10
                                     </Typography>
@@ -155,7 +156,7 @@ export default function ResultsLandingPage({ analysis }: Props) {
                     {analysis.recommendations && analysis.recommendations.length > 0 && (
                         <Box sx={{ mb: 4, p: 2.5, bgcolor: alpha(theme.palette.warning.main, 0.03), borderRadius: 2, border: `1px dashed ${alpha(theme.palette.warning.main, 0.3)}` }}>
                             <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                💡 Strategic Recommendations
+                                {t('icons.lightbulb')} {t('results.landingPage.metrics.strategicRecommendations')}
                             </Typography>
                             <Stack spacing={1.5}>
                                 {analysis.recommendations.map((rec, i) => (
@@ -175,7 +176,7 @@ export default function ResultsLandingPage({ analysis }: Props) {
                         {/* Trust Signals */}
                         <Box>
                             <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 1.5, textTransform: 'uppercase' }}>
-                                Trust & Authority
+                                {t('results.landingPage.metrics.trustAuthority')}
                             </Typography>
                             <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
                                 {(analysis.trustSignalsDetected || []).map((signal, i) => (
@@ -198,7 +199,7 @@ export default function ResultsLandingPage({ analysis }: Props) {
                         {/* Missing/Warnings */}
                         <Box>
                             <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 1.5, textTransform: 'uppercase' }}>
-                                Optimization Gaps
+                                {t('results.landingPage.metrics.optimizationGaps')}
                             </Typography>
                             <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
                                 {(analysis.missingElements || []).map((el, i) => (

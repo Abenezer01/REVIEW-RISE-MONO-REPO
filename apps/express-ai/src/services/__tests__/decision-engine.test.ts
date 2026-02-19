@@ -1,7 +1,7 @@
 import { strategyCompiler } from '../blueprint/strategy-compiler';
 import { validationEngine } from '../blueprint/validation-engine';
 import { performanceEstimator } from '../blueprint/performance-estimator';
-import { BlueprintInput, KeywordCluster, AdGroup, RSA_CONSTRAINTS } from '@platform/contracts';
+import { BlueprintInput, KeywordCluster, AdGroup } from '@platform/contracts';
 
 describe('Decision Engine Components', () => {
 

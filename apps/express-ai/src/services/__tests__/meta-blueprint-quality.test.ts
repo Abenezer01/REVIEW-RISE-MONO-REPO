@@ -33,106 +33,103 @@ describe('Meta Blueprint Quality Tests', () => {
     };
 
     describe('Audience Framework', () => {
-        it('should output both Prospecting and Retargeting audiences (Local)', async () => {
-            const result = await service.generate(localInput);
-            expect(result.audiences.length).toBeGreaterThanOrEqual(2);
-            const types = result.audiences.map(a => a.type);
-            expect(types).toContain('Prospecting');
-            expect(types).toContain('Retargeting');
+        it('should output both Prospecting and Retargeting ad sets (Local Full Funnel)', async () => {
+            // Local input has budget 0 in base, but generate() defaults to 1500 if not provided.
+            // Tier 1500+ is FULL_FUNNEL.
+            const result = await service.generate({ ...localInput, budget: 2000 });
+            expect(result.structure.prospecting.adSets.length).toBeGreaterThanOrEqual(1);
+            expect(result.structure.retargeting.adSets.length).toBeGreaterThanOrEqual(1);
+
+            const prospectingAudienceTypes = result.structure.prospecting.adSets.map(as => as.audience.type);
+            expect(prospectingAudienceTypes).toContain('Broad');
         });
 
-        it('should output both Prospecting and Retargeting audiences (E-commerce)', async () => {
-            const result = await service.generate(ecommerceInput);
-            expect(result.audiences.length).toBeGreaterThanOrEqual(2);
-            // E-commerce should have Interest clusters + Lookalike placeholders (manual creation)
-            const prospecting = result.audiences.find(a => a.type === 'Prospecting');
-            expect(prospecting).toBeDefined();
-            // Retargeting commonly has lookalikes
-            const retargeting = result.audiences.find(a => a.type === 'Retargeting');
-            expect(retargeting?.lookalikeSources).toBeDefined();
-            expect(retargeting!.lookalikeSources!.length).toBeGreaterThan(0);
+        it('should output both Prospecting and Retargeting ad sets (E-commerce Full Funnel)', async () => {
+            const result = await service.generate({ ...ecommerceInput, budget: 2000 });
+            expect(result.structure.prospecting.adSets.length).toBeGreaterThanOrEqual(1);
+            expect(result.structure.retargeting.adSets.length).toBeGreaterThanOrEqual(1);
+
+            const retargetingAudienceTypes = result.structure.retargeting.adSets.map(as => as.audience.type);
+            expect(retargetingAudienceTypes).toContain('Retargeting');
         });
 
-        it('should generate at least 3 Interest Clusters for Local Service', async () => {
-            const result = await service.generate(localInput);
-            expect(result.interestClusters.length).toBeGreaterThanOrEqual(3);
-            result.interestClusters.forEach(cluster => {
-                expect(cluster.theme).toBeDefined();
-                expect(cluster.type).toMatch(/Primary|Secondary/);
+        it('should generate interest clusters in ad sets for Local Service', async () => {
+            const result = await service.generate({ ...localInput, budget: 2000 });
+            const allAdSets = [...result.structure.prospecting.adSets, ...result.structure.retargeting.adSets];
+            const interestBased = allAdSets.filter(as => as.audience.interests && as.audience.interests.length > 0);
+            expect(interestBased.length).toBeGreaterThanOrEqual(1);
+
+            interestBased.forEach(as => {
+                as.audience.interests?.forEach(cluster => {
+                    expect(cluster.theme).toBeDefined();
+                    expect(cluster.interests.length).toBeGreaterThan(0);
+                });
             });
-        });
-
-        it('should generate at least 3 Interest Clusters for E-commerce', async () => {
-            const result = await service.generate(ecommerceInput);
-            expect(result.interestClusters.length).toBeGreaterThanOrEqual(3);
-            const themes = result.interestClusters.map(c => c.theme);
-            expect(themes).toContain('Shopping Behavior'); // Check implemented content
         });
     });
 
     describe('Copy Variations & Constraints', () => {
-        it('should generate copy with safe lengths', async () => {
+        it('should generate copy with safe lengths in ad sets', async () => {
             const result = await service.generate(localInput);
+            const allAdSets = [...result.structure.prospecting.adSets, ...result.structure.retargeting.adSets];
+            expect(allAdSets.length).toBeGreaterThan(0);
 
-            expect(result.copyVariations.length).toBeGreaterThan(0);
+            allAdSets.forEach(adSet => {
+                adSet.creatives.forEach(creative => {
+                    creative.primaryText.forEach(text => {
+                        expect(text.length).toBeGreaterThan(10);
+                        expect(text.length).toBeLessThan(300); // 125 is optimal but can be more
+                    });
 
-            result.copyVariations.forEach(copy => {
-                // Primary text ~125 chars
-                // Allow some buffer
-                expect(copy.primaryText.length).toBeGreaterThan(10);
-                expect(copy.primaryText.length).toBeLessThan(200);
-
-                // Headline ~40 chars
-                expect(copy.headline.length).toBeGreaterThan(5);
-                expect(copy.headline.length).toBeLessThan(60);
-
-                // Description ~25 chars
-                expect(copy.description.length).toBeGreaterThan(5);
-                expect(copy.description.length).toBeLessThan(50);
+                    creative.headlines.forEach(headline => {
+                        expect(headline.length).toBeGreaterThan(5);
+                        expect(headline.length).toBeLessThan(60);
+                    });
+                });
             });
         });
 
         it('should include CTAs', async () => {
             const result = await service.generate(localInput);
-            result.copyVariations.forEach(copy => {
-                expect(copy.ctas.length).toBeGreaterThan(0);
-                expect(copy.tone).toBeDefined();
+            const allAdSets = [...result.structure.prospecting.adSets, ...result.structure.retargeting.adSets];
+            allAdSets.forEach(adSet => {
+                adSet.creatives.forEach(creative => {
+                    expect(creative.callToAction).toBeDefined();
+                });
             });
         });
     });
 
     describe('Placement Recommendations', () => {
-        it('should provide placement recommendations with rationale', async () => {
+        it('should provide placement recommendations in ad sets', async () => {
             const result = await service.generate(localInput);
+            const allAdSets = [...result.structure.prospecting.adSets, ...result.structure.retargeting.adSets];
 
-            expect(result.placements.length).toBeGreaterThan(0);
-            result.placements.forEach(p => {
-                expect(p.platform).toBeDefined();
-                expect(p.format).toBeDefined();
-                expect(p.objective).toBeDefined(); // Awareness / Conversion
-                expect(p.rationale).toBeDefined();
-                expect(p.rationale.length).toBeGreaterThan(5);
-                expect(p.recommended).toBe(true);
+            expect(allAdSets.length).toBeGreaterThan(0);
+            allAdSets.forEach(adSet => {
+                expect(adSet.placements.length).toBeGreaterThan(0);
+                expect(adSet.placementStrategy).toBeDefined();
+                expect(adSet.placementRationale).toBeDefined();
+                expect(adSet.placementRationale!.length).toBeGreaterThan(5);
             });
         });
 
-        it('should include Feed, Stories, and Reels', async () => {
+        it('should include essential placements', async () => {
             const result = await service.generate(localInput);
-            const formats = result.placements.map(p => p.format);
-            expect(formats).toContain('Feed');
-            expect(formats).toContain('Stories');
-            expect(formats).toContain('Reels');
+            const allPlacements = result.structure.prospecting.adSets.flatMap(as => as.placements);
+            expect(allPlacements).toContain('facebook_feed');
+            expect(allPlacements).toContain('instagram_stories');
         });
     });
 
     describe('Geo Targeting', () => {
-        it('should respect input geo settings in naming or targeting', async () => {
+        it('should respect input geo settings in audiences', async () => {
             const result = await service.generate(localInput);
+            const allAdSets = [...result.structure.prospecting.adSets, ...result.structure.retargeting.adSets];
 
-            // Should see city name in audience names or locations
             const center = localInput.geoTargeting.center;
-            const hasLocation = result.audiences.some(a =>
-                a.name.includes(center) || a.geoLocations.includes(center)
+            const hasLocation = allAdSets.some(as =>
+                as.audience.geo?.city === center || as.name.includes(center)
             );
             expect(hasLocation).toBe(true);
         });

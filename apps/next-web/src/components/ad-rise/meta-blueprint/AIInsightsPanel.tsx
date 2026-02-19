@@ -4,18 +4,22 @@ import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import type { MetaBlueprintAIInsights } from '@platform/contracts';
+import { useTranslation } from '@/hooks/useTranslation';
 
-const PRIORITY_CONFIG = {
-    high: { color: 'error', icon: <WarningAmberIcon fontSize="small" />, label: 'High Priority' },
-    medium: { color: 'warning', icon: <TipsAndUpdatesIcon fontSize="small" />, label: 'Consider' },
-    low: { color: 'info', icon: <CheckCircleOutlineIcon fontSize="small" />, label: 'Nice to Have' },
-} as const;
+const PRIORITY_CONFIG = (t: any) => ({
+    high: { color: 'error', icon: <WarningAmberIcon fontSize="small" />, label: t('meta.results.priorities.high') },
+    medium: { color: 'warning', icon: <TipsAndUpdatesIcon fontSize="small" />, label: t('meta.results.priorities.medium') },
+    low: { color: 'info', icon: <CheckCircleOutlineIcon fontSize="small" />, label: t('meta.results.priorities.low') },
+}) as const;
 
 interface Props {
     insights: MetaBlueprintAIInsights;
 }
 
 export default function AIInsightsPanel({ insights }: Props) {
+    const t = useTranslation('ad-rise');
+    const priorities = PRIORITY_CONFIG(t);
+
     const scoreColor =
         (insights.overallScore ?? 0) >= 90 ? 'success' :
             (insights.overallScore ?? 0) >= 70 ? 'warning' : 'error';
@@ -26,12 +30,12 @@ export default function AIInsightsPanel({ insights }: Props) {
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <AutoAwesomeIcon color="primary" fontSize="small" />
-                    <Typography variant="h6" fontWeight="bold">AI Analysis</Typography>
+                    <Typography variant="h6" fontWeight="bold">{t('meta.results.sections.aiAnalysis')}</Typography>
                     <Chip label="Gemini-Powered" size="small" color="primary" variant="outlined" sx={{ fontSize: '0.65rem', height: 20 }} />
                 </Box>
                 {insights.overallScore !== undefined && (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="caption" color="text.secondary">Agency Readiness</Typography>
+                        <Typography variant="caption" color="text.secondary">{t('meta.results.sections.agencyReadiness')}</Typography>
                         <Chip
                             label={`${insights.overallScore}/100`}
                             color={scoreColor}
@@ -51,11 +55,12 @@ export default function AIInsightsPanel({ insights }: Props) {
             {insights.optimizations.length > 0 && (
                 <Box>
                     <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        ⚠️ Potential Optimizations
+                        {t('meta.results.sections.potentialOptimizations')}
                     </Typography>
                     <Stack spacing={1.5}>
                         {insights.optimizations.map((opt, i) => {
-                            const cfg = PRIORITY_CONFIG[opt.priority] ?? PRIORITY_CONFIG.medium;
+                            const cfg = priorities[opt.priority as keyof typeof priorities] ?? priorities.medium;
+
                             return (
                                 <Paper
                                     key={i}
@@ -89,7 +94,7 @@ export default function AIInsightsPanel({ insights }: Props) {
                 <Box>
                     <Divider sx={{ mb: 2 }} />
                     <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1.5 }}>
-                        🔥 Key Takeaways
+                        {t('meta.results.sections.keyTakeaways')}
                     </Typography>
                     <Stack spacing={1}>
                         {insights.takeaways.map((t, i) => (

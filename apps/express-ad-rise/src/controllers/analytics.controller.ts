@@ -1,6 +1,5 @@
 
 import { Request, Response } from 'express';
-// @ts-ignore
 import { prisma } from '@platform/db';
 import { createSuccessResponse, createErrorResponse, SystemMessageCode } from '@platform/contracts';
 import { z } from 'zod';
