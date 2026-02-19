@@ -231,4 +231,38 @@ router.post('/recommend-goal', async (req, res) => {
     }
 });
 
+import { campaignNarrativeService } from '../services/campaign-narrative.service';
+import { channelAllocationService } from '../services/channel-allocation.service';
+import { troubleshootingAdvisorService } from '../services/troubleshooting-advisor.service';
+
+router.post('/generate-channel-allocation', async (req, res) => {
+    try {
+        const result = await channelAllocationService.generate(req.body);
+        res.json(createSuccessResponse(result, 'Channel allocation generated', 200, {}, SystemMessageCode.SUCCESS));
+    } catch (error: any) {
+        console.error('Channel Allocation Error:', error);
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
+    }
+});
+
+router.post('/generate-campaign-narrative', async (req, res) => {
+    try {
+        const result = await campaignNarrativeService.generate(req.body);
+        res.json(createSuccessResponse(result, 'Campaign narrative generated', 200, {}, SystemMessageCode.SUCCESS));
+    } catch (error: any) {
+        console.error('Narrative Generation Error:', error);
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
+    }
+});
+
+router.post('/generate-troubleshooting-advice', async (req, res) => {
+    try {
+        const result = await troubleshootingAdvisorService.generate(req.body);
+        res.json(createSuccessResponse(result, 'Troubleshooting advice generated', 200, {}, SystemMessageCode.SUCCESS));
+    } catch (error: any) {
+        console.error('Troubleshooting Advice Error:', error);
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
+    }
+});
+
 export default router;
