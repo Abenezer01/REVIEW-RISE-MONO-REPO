@@ -96,9 +96,13 @@ export const FUNNEL_OVERRIDES = {
         CONVERSION: { MESSAGE: 'Risk Reversal (No CC required)', CTA: 'Start Free Trial' }
     },
     RESTAURANT: {
-        // Add if needed based on original logic implies mainly conversion overrides, keeping minimal for now to match current logic
+        AWARENESS: { MESSAGE: 'Mouth-watering Visuals & Atmosphere', CTA: 'View Menu' },
+        CONSIDERATION: { MESSAGE: 'Chef Specials & Reviews', CTA: 'Reserve Table' },
+        CONVERSION: { MESSAGE: 'Book Tonight / Order Online', CTA: 'Book Now' }
     },
     HEALTHCARE: {
+        AWARENESS: { MESSAGE: 'Compassionate Care & Expertise', CTA: 'Learn More' },
+        CONSIDERATION: { MESSAGE: 'Patient Stories & Success Rates', CTA: 'Meet Our Team' },
         CONVERSION: { MESSAGE: 'Availability & Expert Care', CTA: 'Book Appointment' }
     }
 };

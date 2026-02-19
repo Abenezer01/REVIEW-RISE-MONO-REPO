@@ -29,7 +29,11 @@ export interface CreativeConcept {
         feed: string;
         story: string;
         reel: string;
+        carousel?: string;
     };
+    tone?: BrandToneProfile;
+    createdAt?: Date;
+    businessId?: string;
 }
 
 export interface PromptTemplate {

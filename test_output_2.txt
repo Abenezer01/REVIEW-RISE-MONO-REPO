@@ -1,0 +1,18 @@
+
+> @platform/campaign-engine@0.1.0 test C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\packages\@platform\campaign-engine
+> jest
+
+● Multiple configurations found:
+
+    * C:/Users/REAB/Documents/Projects/ReviewRise/REVIEW-MONO-REPO/REVIEW-RISE-MONO-REPO/packages/@platform/campaign-engine/jest.config.js
+    * `jest` key in C:/Users/REAB/Documents/Projects/ReviewRise/REVIEW-MONO-REPO/REVIEW-RISE-MONO-REPO/packages/@platform/campaign-engine/package.json
+
+  Implicit config resolution does not allow multiple configuration files.
+  Either remove unused config files or select one explicitly with `--config`.
+
+  Configuration Documentation:
+  https://jestjs.io/docs/configuration
+
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\packages\@platform\campaign-engine:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @platform/campaign-engine@0.1.0 test: `jest`
+Exit status 1

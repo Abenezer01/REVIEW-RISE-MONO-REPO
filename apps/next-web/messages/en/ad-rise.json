@@ -88,7 +88,13 @@
     "library": {
       "comingSoon": "Creative Library Coming Soon",
       "description": "Save your best concepts and reuse them later. This feature is currently under development.",
-      "browse": "Browse Library"
+      "browse": "Browse Library",
+      "fetchError": "Failed to fetch creative library",
+      "retry": "Retry",
+      "emptyTitle": "Your Library is Empty",
+      "emptyDescription": "Generate and save creative concepts to see them here.",
+      "refresh": "Refresh",
+      "reuse": "Reuse Concept"
     }
   },
   "blueprint": {
@@ -110,25 +116,45 @@
       "memo": "📝",
       "caret": "▼",
       "key": "🔑",
-      "block": "🚫"
+      "block": "🚫",
+      "target": "🎯",
+      "lightbulb": "💡",
+      "currency": "$",
+      "rocket": "🚀",
+      "stop": "🛑",
+      "fire": "🔥"
     },
     "steps": {
       "campaignDetails": "Campaign Details",
       "generate": "Generate Blueprint",
-      "review": "Review & Export"
+      "review": "Review & Export",
+      "details": "Campaign Details",
+      "results": "Blueprint Results"
     },
     "form": {
       "businessInfo": "Business Information",
       "required": "Required",
+      "businessName": "Business Name",
+      "businessNamePlaceholder": "e.g., Austin Plumbing Pros",
       "offerService": "Offer / Services",
       "offerServicePlaceholder": "Premium Plumbing Services - Emergency & Repairs",
       "offerServiceHelp": "What products or services are you promoting?",
+      "servicesOffered": "Services Offered",
+      "servicesHelp": "Add the main services you provide (e.g., Plumbing, Water Heater Repair)",
+      "enterService": "Enter a service",
+      "add": "Add",
+      "specialOffer": "Special Offer or Promotion",
+      "specialOfferHelp": "What makes your offer compelling? (e.g., \"10% Off First Service\")",
+      "specialOfferPlaceholder": "e.g., Free Consultation, 10% Off",
+      "monthlyBudget": "Monthly Budget ($)",
+      "campaignObjective": "Campaign Objective",
       "industryVertical": "Industry Vertical",
       "targetingKeywords": "Targeting & Keywords",
       "geoTargeting": "Geographic Targeting",
+      "geoTargetingTitle": "Geographic Location",
       "geoTargetingPlaceholder": "Los Angeles, CA",
       "geoTargetingHelp": "Enter cities, states, or regions you serve",
-      "add": "Add",
+      "geoTargetingInputHelp": "Enter your primary target location (e.g., \"Austin, TX\" or \"United States\")",
       "painPoints": "Customer Pain Points",
       "painPointsPlaceholder": "Emergency plumbing issues, leaking pipes, burst pipes, clogged drains, water heater failures, sewer backups, 24/7 urgent repairs needed",
       "painPointsHelp": "What problems do your customers face? (helps generate problem-focused keywords)",
@@ -143,7 +169,16 @@
         "ecommerce": "E-commerce",
         "saas": "SaaS",
         "healthcare": "Healthcare",
+        "realEstate": "Real Estate",
+        "legal": "Legal",
+        "restaurant": "Restaurant",
         "other": "Other"
+      },
+      "objectives": {
+        "Leads": "Leads",
+        "Sales": "Sales",
+        "Awareness": "Awareness",
+        "Local Visits": "Local Visits"
       }
     },
     "generate": {
@@ -154,6 +189,11 @@
       "service": "Service:",
       "vertical": "Vertical:",
       "locations": "Locations:",
+      "location": "Location:",
+      "businessName": "Business Name:",
+      "offer": "Offer:",
+      "budget": "Budget:",
+      "objective": "Objective:",
       "painPoints": "Pain Points:",
       "button": "Generate Complete Blueprint",
       "continue": "Continue"
@@ -175,19 +215,37 @@
         "exportable": "Exportable JSON format"
       },
       "quickStart": "Quick Start Templates",
+      "quickStartHelp": "Get started faster with pre-filled industry examples",
+      "clickTemplateHelp": "💡 Click any template to auto-fill the form",
       "templates": {
         "emergency": "Emergency Services",
         "emergencyDesc": "24/7 urgent service keywords",
         "local": "Local Service Pro",
         "localDesc": "Geo-targeted campaigns",
         "competitor": "Competitor Targeting",
-        "competitorDesc": "Capture competitor traffic"
+        "competitorDesc": "Capture competitor traffic",
+        "tipTitle": "Tip:",
+        "tipText": "Templates are just starting points - you can modify all fields after selecting one"
       },
-      "use": "Use"
+      "use": "Use",
+      "useArrow": "Use →",
+      "services": "services"
     },
     "results": {
       "successTitle": "Your Google Ads Blueprint is Ready",
       "successText": "Review your campaign structure, keywords, and ad copy below",
+      "strategyTitle": "Strategic Approach",
+      "campaignGoal": "Campaign Goal",
+      "bidStrategy": "Bid Strategy",
+      "vertical": "Vertical Focus",
+      "totalBudget": "Monthly Budget",
+      "budgetTier": "Tier: {tier}",
+      "clickCapacity": "Est. Monthly Clicks",
+      "clickCapacitySub": "Based on market CPC",
+      "assumedCpc": "Assumed CPC",
+      "campaignCount": "Campaign Structure",
+      "campaignCountSub": "Recommended Campaigns",
+      "campaignStructureTitle": "Campaign Structure",
       "noBlueprint": "No blueprint generated yet.",
       "exportCsv": "Export CSV",
       "exportGoogleAds": "Export to Google Ads",
@@ -209,14 +267,33 @@
         "headlines": "Headlines ({count})",
         "descriptions": "Descriptions ({count})",
         "copyAll": "Copy All",
-        "copyLabel": "Copy"
+        "copyLabel": "Copy",
+        "copied": "{label} copied to clipboard!",
+        "objective": "Objective",
+        "included": "{count} Ad Groups Included",
+        "summary": "Ad Groups Summary:",
+        "more": "more",
+        "budgetLabel": "Budget",
+        "monthlyLabel": "mo",
+        "leadsLabel": "leads",
+        "cpaLabel": "CPA",
+        "lowVolume": "Low volume",
+        "allHeadlines": "All headlines",
+        "allDescriptions": "All descriptions",
+        "headlinePrefix": "Headline",
+        "descriptionPrefix": "Description",
+        "estimatedConversions": "Est. Conversions",
+        "estimatedCpa": "Est. CPA",
+        "learningPhase": "Learning Phase",
+        "status": "Status"
       },
       "negatives": {
         "title": "Negative Keywords",
         "subtitle": "{count} keyword(s) to prevent wasted ad spend",
         "copyAll": "Copy All",
         "copy": "Copy",
-        "tip": "Tip: Add these negative keywords to your campaign to prevent your ads from showing for irrelevant searches and save your budget for qualified traffic."
+        "tipTitle": "Tip:",
+        "tipText": "Add these negative keywords to your campaign to prevent your ads from showing for irrelevant searches and save your budget for qualified traffic."
       },
       "landingPage": {
         "title": "Landing Page Analysis",
@@ -229,13 +306,27 @@
         "checklist": "Page Checklist",
         "mobileOptimized": "Mobile Optimized",
         "trustSignals": "Detected Trust Signals ({count})",
-        "missingElements": "Recommended Trust Elements ({count})"
+        "missingElements": "Recommended Trust Elements ({count})",
+        "metrics": {
+          "qualityScore": "Google Ads Quality Score",
+          "qualityScoreHelp": "Predicted based on relevance, CTR, and experience logic.",
+          "conversionReadiness": "Conversion Readiness",
+          "conversionFriction": "Conversion Friction",
+          "strategicRecommendations": "Strategic Recommendations",
+          "trustAuthority": "Trust & Authority",
+          "optimizationGaps": "Optimization Gaps"
+        }
       }
     },
     "common": {
       "back": "Back",
       "passed": "Passed",
-      "failed": "Failed"
+      "failed": "Failed",
+      "disclaimer": {
+        "title": "Important Notice",
+        "message": "This blueprint is guidance only. Results may vary based on your industry, competition, and budget. Always review all recommendations against platform advertising policies before implementation.",
+        "show": "Show Guidance Disclaimer"
+      }
     },
     "meta": {
       "title": "Meta Ads Blueprint Generator",
@@ -244,6 +335,17 @@
         "businessInfo": "Business Information",
         "geoTargeting": "Geographic Targeting",
         "results": "Your Blueprint"
+      },
+      "stages": {
+        "TOF": "Top of Funnel (Awareness)",
+        "MOF": "Middle of Funnel (Consideration)",
+        "BOF": "Bottom of Funnel (Conversion)"
+      },
+      "quickTemplates": {
+        "title": "Quick Start Templates",
+        "subtitle": "Get started faster with pre-filled industry examples",
+        "tip": "Tip:",
+        "tipText": "Templates are just starting points - you can modify all fields after selecting one"
       },
       "form": {
         "businessName": "Business Name (Optional)",
@@ -256,6 +358,9 @@
           "ecommerce": "E-commerce",
           "saas": "SaaS",
           "healthcare": "Healthcare",
+          "realEstate": "Real Estate",
+          "legal": "Legal",
+          "restaurant": "Restaurant",
           "other": "Other"
         },
         "geoCenter": "Target Location",
@@ -268,7 +373,25 @@
         "painPoints": "Customer Pain Points (Optional)",
         "painPointsPlaceholder": "e.g., Burst pipes, clogged drains",
         "landingPageUrl": "Landing Page URL (Optional)",
-        "landingPageUrlPlaceholder": "https://example.com"
+        "landingPageUrlPlaceholder": "https://example.com",
+        "addPainPoint": "Add Pain Point",
+        "templates": {
+          "plumbing": "Plumbing Service",
+          "law": "Law Firm",
+          "dentist": "Dental Practice",
+          "restaurant": "Restaurant",
+          "saas": "SaaS Product",
+          "ecommerce": "E-commerce Store",
+          "roofing": "Roofing Service"
+        },
+        "algorithmsOverTargeting": "Algorithms over Targeting",
+        "consolidateModeDesc": "In Consolidate Mode ($100/mo), we skip specific interest clusters to give Meta's AI maximum freedom. Specific interest targeting starts at the",
+        "standardTier": "Standard Tier ($600+/mo)",
+        "objectives": {
+          "Leads": "Leads & Form Fills",
+          "Sales": "Sales & Conversions",
+          "Awareness": "Awareness & Reach"
+        }
       },
       "buttons": {
         "next": "Next",
@@ -283,14 +406,26 @@
           "audiences": "Audience Sets",
           "interests": "Interest Clusters",
           "adCopy": "Ad Copy Variations",
-          "placements": "Placement Recommendations"
+          "placements": "Placement Recommendations",
+          "estDailySpend": "Est. Daily Spend: ${amount}",
+          "budgetStrategy": "Strategy: {strategy}",
+          "aiAnalysis": "AI Analysis",
+          "agencyReadiness": "Agency Readiness",
+          "potentialOptimizations": "Potential Optimizations",
+          "keyTakeaways": "Key Takeaways"
+        },
+        "priorities": {
+          "high": "High Priority",
+          "medium": "Consider",
+          "low": "Nice to Have"
         },
         "benefits": {
           "coreAudiences": "Core audience definitions",
           "interestClusters": "Interest cluster recommendations",
           "optimizedCopy": "Optimized copy variations",
           "placementStrategy": "Placement strategy guide",
-          "exportReady": "Export-ready JSON format"
+          "exportReady": "Export-ready JSON format",
+          "combinedAudiences": "{prospecting} + {retargeting}"
         },
         "audiences": {
           "prospecting": "Prospecting (Cold Traffic)",
@@ -301,9 +436,26 @@
           "gender": "Gender",
           "languages": "Languages",
           "geoLocations": "Geo Locations",
+          "geoTarget": "Geo Target",
           "interests": "Interests",
+          "interestCluster": "Interest Cluster:",
+          "excludes": "Excludes:",
+          "algorithmLed": "Algorithm-Led Targeting",
+          "algorithmLedDesc": "— No interest restrictions. Meta finds the buyers.",
           "customAudiences": "Custom Audiences",
-          "lookalikeSources": "Lookalike Sources"
+          "lookalikeSources": "Lookalike Sources",
+          "geo": "Geographic Targeting",
+          "retargetingSource": "Retargeting Source",
+          "size": "Est. Size",
+          "predictedValue": "Predicted Value",
+          "days": "Days",
+          "minAudience": "Min audience:",
+          "pausesIfBelow": "(pauses if below)",
+          "estAudienceSize": "Est. Audience Size",
+          "prospectingCampaign": "Prospecting Campaign —",
+          "retargetingCampaign": "Retargeting Campaign — ABO (Always)",
+          "retargetingLocked": "Retargeting Locked — Requires $1,500+/mo",
+          "retargetingLockedDesc": "At your current budget, retargeting would cause audience burnout before generating enough signal. Increase budget to unlock full-funnel structure."
         },
         "interests": {
           "primary": "Primary",
@@ -311,14 +463,17 @@
           "exclusions": "Exclusions",
           "includedInterests": "Included Interests",
           "interestsCount": "{count} interests",
-          "more": "+{count} more"
+          "more": "+{count} more",
+          "intentScore": "Intent Score: {score}/10"
         },
         "adCopy": {
           "variation": "Variation",
           "primaryText": "Primary Text",
           "headline": "Headline",
           "description": "Description",
+          "for": "for",
           "ctas": "Call-to-Actions",
+          "callToAction": "Call to Action",
           "tone": "Tone",
           "compliant": "Meta Ads Compliant",
           "characterLimits": "Character Limits Guide",
@@ -345,7 +500,9 @@
             "Awareness": "Awareness",
             "Traffic": "Traffic",
             "Conversion": "Conversion"
-          }
+          },
+          "strategyLabel": "Strategy:",
+          "strategyText": "Selected placements to maximize {goal} for this audience stage."
         }
       },
       "loading": "Generating your Meta Ads Blueprint...",

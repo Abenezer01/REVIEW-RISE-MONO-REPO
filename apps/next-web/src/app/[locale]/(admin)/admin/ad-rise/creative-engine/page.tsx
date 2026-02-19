@@ -9,9 +9,11 @@ import ConceptResultCard from '@/components/ad-rise/creative-engine/ConceptResul
 import type { CreativeConcept } from '@platform/contracts';
 import { Image as ImageIcon, AutoAwesome, CollectionsBookmark } from '@mui/icons-material';
 import apiClient from '@/lib/apiClient';
+import { useBusinessId } from '@/hooks/useBusinessId';
 
 export default function CreativeEnginePage() {
     const t = useTranslations('ad-rise.creativeEngine');
+    const { businessId } = useBusinessId();
 
     // Tabs
     const [activeTab, setActiveTab] = useState(0);
@@ -19,6 +21,7 @@ export default function CreativeEnginePage() {
     // Results
     const [concepts, setConcepts] = useState<CreativeConcept[]>([]);
     const [isGeneratingImageId, setIsGeneratingImageId] = useState<string | null>(null);
+    const [savingConceptId, setSavingConceptId] = useState<string | null>(null);
 
     // View State
     const [view, setView] = useState<'input' | 'results'>('input');
@@ -35,19 +38,38 @@ export default function CreativeEnginePage() {
             const response = await apiClient.post('/api/ai/creative-engine/image', { prompt });
             const imageUrl = response.data.url;
 
-            setConcepts(concepts.map(c => 
+            setConcepts(concepts.map(c =>
                 c.id === conceptId ? { ...c, imageUrl } : c
             ));
         } catch (error) {
-             console.error('Failed to generate image', error);
+            console.error('Failed to generate image', error);
         } finally {
             setIsGeneratingImageId(null);
+        }
+    };
+
+    const handleSaveConcept = async (concept: CreativeConcept) => {
+        if (!businessId) return;
+        setSavingConceptId(concept.id || 'temp'); // Handle potentially missing ID on legacy/temp concepts
+
+        try {
+            await apiClient.post('/api/ai/creative-engine/save', {
+                businessId,
+                concept
+            });
+
+            // Optional: Show success toast
+        } catch (error) {
+            console.error('Failed to save concept', error);
+        } finally {
+            setSavingConceptId(null);
         }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleReuseConcept = (concept: CreativeConcept) => {
         // Implementation for library reuse would go here
+        // For now, just switch tab, maybe populate state in future
         setActiveTab(0);
     };
 
@@ -60,7 +82,7 @@ export default function CreativeEnginePage() {
             <Box sx={{ p: 3, maxWidth: 1600, margin: '0 auto' }}>
                 <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Box>
-                         <Button 
+                        <Button
                             onClick={() => setView('input')}
                             variant="outlined"
                             sx={{ mb: 2 }}
@@ -86,10 +108,12 @@ export default function CreativeEnginePage() {
                 <Grid container spacing={3}>
                     {concepts.map((concept, index) => (
                         <Grid size={{ xs: 12, md: 6, xl: 4 }} key={index}>
-                             <ConceptResultCard 
-                                concept={concept} 
-                                onGenerateImage={(prompt) => handleGenerateImage(concept.id || index.toString(), prompt)} 
+                            <ConceptResultCard
+                                concept={concept}
+                                onGenerateImage={(prompt) => handleGenerateImage(concept.id || index.toString(), prompt)}
                                 isGeneratingImage={isGeneratingImageId === (concept.id || index.toString())}
+                                onSave={handleSaveConcept}
+                                isSaving={savingConceptId === (concept.id || 'temp')} // Approximation for temp IDs
                             />
                         </Grid>
                     ))}
@@ -100,10 +124,10 @@ export default function CreativeEnginePage() {
 
     return (
         <Box sx={{ p: 3, maxWidth: 1600, margin: '0 auto' }}>
-             <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Box sx={{ p: 1.5, bgcolor: 'primary.main', borderRadius: 2, color: 'white', display: 'flex' }}>
-                         <ImageIcon />
+                        <ImageIcon />
                     </Box>
                     <Box>
                         <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
@@ -128,7 +152,7 @@ export default function CreativeEnginePage() {
             )}
 
             {activeTab === 1 && (
-                <CreativeLibrary onReuse={handleReuseConcept} />
+                <CreativeLibrary businessId={businessId} onReuse={handleReuseConcept} />
             )}
         </Box>
     );

@@ -118,3 +118,8 @@ Logic is centrally managed in:
 *   `src/config/vertical-profiles.ts`: Industry definitions.
 *   `src/engine/channel-selector.ts`: Objective-to-Channel mapping rules.
 *   `src/engine/budget-allocator.ts`: Budget tier thresholds.
+
+## 📚 Documentation
+*   [**Google Ads Blueprint Architecture (V4)**](./docs/google-ads-blueprint.md): Detailed breakdown of the Strategy, Keyword, and Ad Group engines.
+*   [**AI-Guided Budget Engine**](./docs/budget-engine.md): Deep dive into the Weighted Additive Scoring model, ROI calculations, and Learning Phase logic.
+*   [**Meta Ads Blueprint Architecture**](./docs/meta-ads-blueprint.md): Design of the Audience, Creative, and Budget Intelligence engines for Facebook/Instagram.

@@ -9,17 +9,24 @@ export class BlueprintController {
     async generate(req: Request, res: Response) {
         try {
             const schema = z.object({
-                businessName: z.string().optional(),
-                offerOrService: z.string().min(1),
-                vertical: z.enum(['Local Service', 'E-commerce', 'SaaS', 'Healthcare', 'Other']),
-                geoTargeting: z.array(z.string()),
-                painPoints: z.array(z.string()),
-                landingPageUrl: z.string().url().optional()
+                businessName: z.string().min(1),
+                services: z.array(z.string()),
+                offer: z.string().min(1),
+                vertical: z.enum(['Local Service', 'E-commerce', 'SaaS', 'Healthcare', 'Restaurant', 'Other']),
+                geo: z.string().min(1),
+                painPoints: z.array(z.string()).optional(),
+                landingPageUrl: z.string().optional().or(z.literal('')),
+                objective: z.enum(['Leads', 'Sales', 'Awareness', 'Local Visits']),
+                budget: z.number().positive(),
+                currency: z.string().optional(),
+                expectedAvgCpc: z.number().optional(),
+                conversionTrackingEnabled: z.boolean().optional()
             });
 
             const input = schema.parse(req.body);
 
-            const result = await blueprintService.generate(input);
+            // Cast to any because zod inference might be slightly different than BlueprintInput interface which has optional fields
+            const result = await blueprintService.generate(input as any);
 
             const response = createSuccessResponse(result, 'Blueprint generated successfully', 200, { requestId: req.id });
             res.status(response.statusCode).json(response);
@@ -32,7 +39,7 @@ export class BlueprintController {
 
     async generateMeta(req: Request, res: Response) {
         try {
-            // Validation schema for Meta Blueprint
+            // Validation schema for Meta Blueprint — accepts budget + objective from frontend
             const schema = z.object({
                 businessName: z.string().optional(),
                 offerOrService: z.string().min(1),
@@ -43,12 +50,14 @@ export class BlueprintController {
                     unit: z.enum(['miles', 'km'])
                 }),
                 painPoints: z.array(z.string()),
-                landingPageUrl: z.string().url().optional().or(z.literal(''))
+                landingPageUrl: z.string().url().optional().or(z.literal('')),
+                budget: z.number().optional().default(1500),
+                objective: z.enum(['Leads', 'Sales', 'Awareness']).optional().default('Leads')
             });
 
             const input = schema.parse(req.body);
 
-            // Use the new service
+            // AI-enhanced service: deterministic engine structure + LLM insights layer
             const result = await metaBlueprintService.generate(input as any);
 
             const response = createSuccessResponse(result, 'Meta Blueprint generated successfully', 200, { requestId: req.id });

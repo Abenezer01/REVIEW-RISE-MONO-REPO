@@ -1,10 +1,11 @@
 import type { MetaBlueprintInput, MetaBlueprintOutput } from '@platform/contracts';
-
+import { SERVICES_CONFIG } from '@/configs/services';
 import apiClient from '@/lib/apiClient';
 
 export const MetaBlueprintService = {
     generate: async (data: MetaBlueprintInput) => {
-        const baseURL = process.env.NEXT_PUBLIC_AD_RISE_API_URL || 'http://localhost:3005/api/v1';
+        // Route through express-ai which combines deterministic engine + AI insights layer
+        const baseURL = SERVICES_CONFIG.ai.url;
         const response = await apiClient.post<MetaBlueprintOutput>('/blueprint/meta/generate', data, { baseURL });
 
         return response.data;

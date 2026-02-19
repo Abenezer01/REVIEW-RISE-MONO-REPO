@@ -23,7 +23,12 @@ runTest('Small Local Dentist', {
     vertical: 'Local Service',
     objective: 'Leads',
     budget: 800,
-    currency: 'USD'
+    currency: 'USD',
+    businessName: 'Smile Bright',
+    services: ['Teeth Cleaning', 'Root Canal'],
+    offer: 'Free Consultation',
+    geo: 'Austin, TX',
+    conversionTrackingEnabled: true
 });
 
 // Scenario 2: SaaS Scale
@@ -31,7 +36,12 @@ runTest('SaaS Platform Scale', {
     vertical: 'SaaS',
     objective: 'Leads',
     budget: 6000,
-    currency: 'USD'
+    currency: 'USD',
+    businessName: 'CloudScale',
+    services: ['Cloud Storage', 'Compute'],
+    offer: 'Start Free Trial',
+    geo: 'US, UK, CA',
+    conversionTrackingEnabled: true
 });
 
 // Scenario 3: E-commerce Growth
@@ -39,5 +49,10 @@ runTest('Fashion Brand Growth', {
     vertical: 'E-commerce',
     objective: 'Sales',
     budget: 3000,
-    currency: 'USD'
+    currency: 'USD',
+    businessName: 'TrendSetter',
+    services: ['Shoes', 'Jackets'],
+    offer: '20% Off First Order',
+    geo: 'Global',
+    conversionTrackingEnabled: true
 });

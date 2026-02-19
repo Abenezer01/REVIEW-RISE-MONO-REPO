@@ -10,7 +10,9 @@
     "test": "jest --passWithNoTests"
   },
   "dependencies": {
+    "@platform/campaign-engine": "workspace:*",
     "@platform/contracts": "workspace:*",
+    "@platform/db": "workspace:*",
     "@platform/middleware": "workspace:*",
     "@platform/utils": "workspace:*",
     "axios": "^1.13.4",

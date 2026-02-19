@@ -15,5 +15,6 @@ pnpm-debug.log*
 dist
 *.js
 *.d.ts
+.map
 # But keep config files
 !*.config.js

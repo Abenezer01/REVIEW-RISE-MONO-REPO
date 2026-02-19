@@ -54,13 +54,13 @@ export default function ResultsAdGroups({ adGroups }: Props) {
     const copyAllHeadlines = (headlines: string[]) => {
         const text = headlines.join('\n');
 
-        copyToClipboard(text, 'All headlines');
+        copyToClipboard(text, t('results.adGroups.allHeadlines'));
     };
 
     const copyAllDescriptions = (descriptions: string[]) => {
         const text = descriptions.join('\n');
 
-        copyToClipboard(text, 'All descriptions');
+        copyToClipboard(text, t('results.adGroups.allDescriptions'));
     };
 
     return (
@@ -129,15 +129,61 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                         }}
                                     >
                                         <Stack direction="row" alignItems="center" justifyContent="space-between">
-                                            <Stack direction="row" alignItems="center" spacing={2}>
+                                            <Stack direction="row" alignItems="center" spacing={2} flexWrap="wrap">
                                                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                                                     {group.name}
                                                 </Typography>
-                                                <Chip
-                                                    label={t('results.adGroups.keywordsCount', { count: group.keywords.keywords.length })}
-                                                    size="small"
-                                                    variant="outlined"
-                                                />
+                                                {group.budgetAllocation && (
+                                                    <>
+                                                        <Chip
+                                                            label={`${(group.budgetAllocation.percentage * 100).toFixed(1)}% ${t('results.adGroups.budgetLabel')}`}
+                                                            size="small"
+                                                            sx={{
+                                                                bgcolor: alpha(theme.palette.success.main, 0.1),
+                                                                color: 'success.main',
+                                                                fontWeight: 600
+                                                            }}
+                                                        />
+                                                        <Chip
+                                                            label={`${t('icons.currency')}${group.budgetAllocation.amount.toFixed(0)}/${t('results.adGroups.monthlyLabel')}`}
+                                                            size="small"
+                                                            sx={{
+                                                                bgcolor: alpha(theme.palette.info.main, 0.1),
+                                                                color: 'info.main',
+                                                                fontWeight: 600
+                                                            }}
+                                                        />
+                                                        {/* ROI Metrics */}
+                                                        {group.budgetAllocation.estimatedConversions !== undefined && (
+                                                            <Chip
+                                                                label={`~${group.budgetAllocation.estimatedConversions} ${t('results.adGroups.leadsLabel')}`}
+                                                                size="small"
+                                                                sx={{
+                                                                    bgcolor: alpha(theme.palette.warning.main, 0.1),
+                                                                    color: 'warning.main',
+                                                                    fontWeight: 600
+                                                                }}
+                                                            />
+                                                        )}
+                                                        {group.budgetAllocation.estimatedCpa !== undefined && (
+                                                            <Chip
+                                                                label={`${t('icons.currency')}${group.budgetAllocation.estimatedCpa.toFixed(0)} ${t('results.adGroups.cpaLabel')}`}
+                                                                size="small"
+                                                                variant="outlined"
+                                                                sx={{ borderColor: theme.palette.divider }}
+                                                            />
+                                                        )}
+                                                        {/* Learning Phase Warning */}
+                                                        {group.budgetAllocation.learningPhaseStatus === 'Starved' && (
+                                                            <Chip
+                                                                label={t('results.adGroups.lowVolume')}
+                                                                size="small"
+                                                                color="error"
+                                                                variant="outlined"
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
                                             </Stack>
                                             <IconButton size="small">
                                                 <Typography sx={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
@@ -207,7 +253,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                                     className="copy-btn"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        copyToClipboard(h, `Headline ${idx + 1}`);
+                                                                        copyToClipboard(h, `${t('results.adGroups.headlinePrefix')} ${idx + 1}`);
                                                                     }}
                                                                     sx={{ opacity: 0, transition: 'opacity 0.2s' }}
                                                                 >
@@ -276,7 +322,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                                     className="copy-btn"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        copyToClipboard(d, `Description ${idx + 1}`);
+                                                                        copyToClipboard(d, `${t('results.adGroups.descriptionPrefix')} ${idx + 1}`);
                                                                     }}
                                                                     sx={{ opacity: 0, transition: 'opacity 0.2s' }}
                                                                 >
