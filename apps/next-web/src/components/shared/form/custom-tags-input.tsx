@@ -28,7 +28,7 @@ const CustomTagsInput: React.FC<CustomTagsInputProps> = ({
 }) => {
   const textFieldProps = { ...props };
   const externalOnChange = textFieldProps.onChange;
-  
+
   // Remove these to prevent them from leaking to the internal CustomTextField
   // and causing circular reference errors if they are event-based
   delete (textFieldProps as any).onChange;
@@ -56,7 +56,7 @@ const CustomTagsInput: React.FC<CustomTagsInputProps> = ({
       multiple
       freeSolo
       autoSelect
-      options={[]}
+      options={props.options || []}
       value={value}
       inputValue={inputValue}
       onInputChange={(event, newInputValue, reason) => {
