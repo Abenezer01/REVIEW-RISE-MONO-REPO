@@ -24,6 +24,7 @@ import Button from '@mui/material/Button'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
+import { useTranslation } from '@/hooks/useTranslation'
 
 // Context Imports
 import { useAuth } from '@/contexts/AuthContext'
@@ -39,6 +40,8 @@ const BadgeContentSpan = styled('span')({
 })
 
 const UserDropdown = () => {
+  const t = useTranslation('common')
+
   // States
   const [open, setOpen] = useState(false)
 
@@ -157,11 +160,11 @@ const UserDropdown = () => {
                   <Divider className='mlb-1' />
                   <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e)}>
                     <i className='tabler-user' />
-                    <Typography color='text.primary'>My Profile</Typography>
+                    <Typography color='text.primary'>{t('userDropdown.myProfile')}</Typography>
                   </MenuItem>
                   <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e)}>
                     <i className='tabler-settings' />
-                    <Typography color='text.primary'>Settings</Typography>
+                    <Typography color='text.primary'>{t('userDropdown.settings')}</Typography>
                   </MenuItem>
                   <div className='flex items-center plb-2 pli-3'>
                     <Button
@@ -173,7 +176,7 @@ const UserDropdown = () => {
                       onClick={handleUserLogout}
                       sx={{ '& .MuiButton-endIcon': { marginInlineStart: 1.5 } }}
                     >
-                      Logout
+                      {t('navigation.logout')}
                     </Button>
                   </div>
                 </MenuList>

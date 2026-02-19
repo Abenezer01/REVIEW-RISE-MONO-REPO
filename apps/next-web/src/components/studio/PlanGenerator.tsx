@@ -13,7 +13,10 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { formatDate } from '@platform/utils'
 import { useTranslations } from 'next-intl'
-import { toast } from 'react-toastify'
+
+import { SystemMessageCode } from '@platform/contracts'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import { SERVICES } from '@/configs/services'
 import { useBusinessId } from '@/hooks/useBusinessId'
@@ -25,31 +28,33 @@ import PlanSidebar from './planner/PlanSidebar'
 import ScheduledPostList from './planner/ScheduledPostList'
 
 const TOPICS = [
-    'Product Launch',
-    'Brand Awareness',
-    'Educational Series',
-    'Community Engagement',
-    'Holiday Promotion',
-    'Industry News'
+    'launch',
+    'awareness',
+    'educational',
+    'engagement',
+    'holiday',
+    'news'
 ]
 
 const BUSINESS_TYPES = [
-    'E-commerce Store',
-    'Local Business',
-    'Consultant / Coach',
-    'Service Provider',
-    'Tech Startup'
+    'ecommerce',
+    'local',
+    'consultant',
+    'service',
+    'startup'
 ]
 
 export default function PlanGenerator() {
+    const { notify } = useSystemMessages()
     const t = useTranslations('studio.planner')
+    const tc = useTranslations('common')
     const { businessId } = useBusinessId()
     const [loading, setLoading] = useState(false)
     const [dialogOpen, setDialogOpen] = useState(false)
     
     // Generator Config
-    const [topic, setTopic] = useState('Brand Awareness')
-    const [businessType, setBusinessType] = useState('Local Business')
+    const [topic, setTopic] = useState('awareness')
+    const [businessType, setBusinessType] = useState('local')
 
     // Data State
     const [plan, setPlan] = useState<any[]>([])
@@ -100,7 +105,7 @@ return {
                         
                         return {
                             day: date.getDate(),
-                            topic: topic || 'Untitled Post',
+                            topic: topic || t('untitledPost'),
                             contentType: contentType || '',
                             platform: post.platform,
                             id: post.id // store ID to avoid duplicates or for updates
@@ -117,7 +122,7 @@ return {
         }
 
         fetchPosts()
-    }, [businessId])
+    }, [businessId, t])
 
     const handleGenerate = async () => {
         setLoading(true)
@@ -139,10 +144,10 @@ return {
             }))
             
             setPlan(newPlan)
-            toast.success('30-Day Plan generated!')
+            notify(SystemMessageCode.AI_PLAN_GENERATED)
         } catch (error) {
             console.error(error)
-            toast.error('Failed to generate plan')
+            notify(SystemMessageCode.GENERIC_ERROR)
         } finally {
             setLoading(false)
         }
@@ -172,10 +177,10 @@ return {
                 businessId,
                 posts: formattedPosts
             })
-            toast.success('Plan saved to drafts successfully!')
+            notify(SystemMessageCode.SAVE_SUCCESS)
         } catch (error) {
             console.error('Failed to save plan:', error)
-            toast.error('Failed to save plan')
+            notify(SystemMessageCode.SAVE_FAILED)
         }
     }
 
@@ -206,7 +211,7 @@ return {
                     </Button>
                     <StudioGenerateButton 
                         onClick={() => setDialogOpen(true)}
-                        label="Generate New Plan"
+                        label={t('generateNewPlan')}
                     />
                 </Box>
             </Box>
@@ -214,23 +219,23 @@ return {
             {loading ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 400 }}>
                     <CircularProgress size={48} color="secondary" />
-                    <Typography variant="h6" sx={{ mt: 3, fontWeight: 'medium' }}>Creating your 30-day strategy...</Typography>
-                    <Typography color="text.secondary">Analyzing market trends and best times to post.</Typography>
+                    <Typography variant="h6" sx={{ mt: 3, fontWeight: 'medium' }}>{t('creatingStrategy')}</Typography>
+                    <Typography color="text.secondary">{t('analyzingMarket')}</Typography>
                 </Box>
             ) : plan.length === 0 ? (
                  <Box sx={{ p: 10, textAlign: 'center', border: '1px dashed', borderColor: 'divider', borderRadius: 4, bgcolor: 'background.paper' }}>
                      <Box sx={{ mb: 3, width: 80, height: 80, borderRadius: '50%', bgcolor: 'action.hover', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto' }}>
                         <i className="tabler-calendar-plus" style={{ fontSize: 40, opacity: 0.5 }} />
                      </Box>
-                    <Typography variant="h5" fontWeight="bold" gutterBottom>No Active Plan</Typography>
+                    <Typography variant="h5" fontWeight="bold" gutterBottom>{t('noActivePlan')}</Typography>
                     <Typography color="text.secondary" sx={{ mb: 4, maxWidth: 400, mx: 'auto' }}>
-                        Start by generating a comprehensive content strategy tailored to your niche.
+                        {t('noActivePlanDesc')}
                     </Typography>
                     <StudioGenerateButton 
                         variant="contained" 
                         size="large"
                         onClick={() => setDialogOpen(true)}
-                        label="Generate 30-Day Plan"
+                        label={t('generatePlan')}
                     />
                 </Box>
             ) : (
@@ -238,7 +243,7 @@ return {
                     {/* Full Width Calendar */}
                     <Grid size={{ xs: 12 }}>
                         <Box>
-                            <Typography variant="h6" fontWeight="bold" mb={2}>Content Calendar</Typography>
+                            <Typography variant="h6" fontWeight="bold" mb={2}>{t('resultsTitle')}</Typography>
                             <CalendarGrid 
                                 days={plan} 
                                 selectedDay={selectedDay} 
@@ -269,7 +274,7 @@ return {
             {/* Generation Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
                 <DialogContent sx={{ p: 4 }}>
-                    <Typography variant="h5" fontWeight="bold" mb={3}>Generate New Plan</Typography>
+                    <Typography variant="h5" fontWeight="bold" mb={3}>{t('generateNewPlan')}</Typography>
                     <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                          <TextField
                             select
@@ -278,8 +283,8 @@ return {
                             onChange={(e) => setTopic(e.target.value)}
                             fullWidth
                         >
-                            {TOPICS.map((t) => (
-                                <MenuItem key={t} value={t}>{t}</MenuItem>
+                            {TOPICS.map((topicKey) => (
+                                <MenuItem key={topicKey} value={topicKey}>{t(`topics.${topicKey}`)}</MenuItem>
                             ))}
                         </TextField>
 
@@ -290,8 +295,8 @@ return {
                             onChange={(e) => setBusinessType(e.target.value)}
                             fullWidth
                         >
-                            {BUSINESS_TYPES.map((t) => (
-                                <MenuItem key={t} value={t}>{t}</MenuItem>
+                            {BUSINESS_TYPES.map((typeKey) => (
+                                <MenuItem key={typeKey} value={typeKey}>{t(`businessTypes.${typeKey}`)}</MenuItem>
                             ))}
                         </TextField>
                         
@@ -299,7 +304,7 @@ return {
                             onClick={handleGenerate}
                             loading={loading}
                             label={t('submitButton')}
-                            loadingLabel="Generating..."
+                            loadingLabel={tc('common.generating')}
                             sx={{ mt: 2 }}
                         />
                     </Box>

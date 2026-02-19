@@ -16,9 +16,14 @@ import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
-import { toast } from 'react-toastify'
+
+import { SystemMessageCode } from '@platform/contracts'
 import type { GridColDef } from '@mui/x-data-grid'
 import { useTheme } from '@mui/material/styles'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+
+import { useTranslation } from '@/hooks/useTranslation'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -46,7 +51,9 @@ type Props = {
 }
 
 const JobList = ({ initialType = '' }: Props) => {
+  const { notify } = useSystemMessages()
   const theme = useTheme()
+  const t = useTranslation('dashboard')
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
@@ -76,11 +83,11 @@ const JobList = ({ initialType = '' }: Props) => {
       setData(res.data)
       setTotal(res.meta.total)
     } else {
-      toast.error(res.error || 'Failed to fetch jobs')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
 
     setLoading(false)
-  }, [page, rowsPerPage, filters])
+  }, [page, rowsPerPage, filters, notify])
 
   useEffect(() => {
     fetchData()
@@ -95,40 +102,47 @@ const JobList = ({ initialType = '' }: Props) => {
     const res = await retryJob(id)
 
     if (res.success) {
-      toast.success('Job queued for retry')
+      notify(SystemMessageCode.SUCCESS)
       fetchData()
       if (selectedJob?.id === id) setOpenDetail(false)
     } else {
-      toast.error(res.error || 'Failed to retry job')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 
   const handleResolve = async (id: string) => {
-    const res = await resolveJob(id, 'Resolved by admin')
+    const res = await resolveJob(id, t('jobs.failed.actions.resolvedByAdmin'))
 
     if (res.success) {
-      toast.success('Job marked as resolved')
+      notify(SystemMessageCode.SUCCESS)
       fetchData()
       if (selectedJob?.id === id) setOpenDetail(false)
     } else {
-      toast.error(res.error || 'Failed to resolve job')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 
   const handleIgnore = async (id: string) => {
-    const res = await ignoreJob(id, 'Ignored by admin')
+    const res = await ignoreJob(id, t('jobs.failed.actions.ignoredByAdmin'))
 
     if (res.success) {
-      toast.success('Job ignored')
+      notify(SystemMessageCode.SUCCESS)
       fetchData()
       if (selectedJob?.id === id) setOpenDetail(false)
     } else {
-      toast.error(res.error || 'Failed to ignore job')
+      notify(SystemMessageCode.GENERIC_ERROR)
     }
   }
 
   const convertToCSV = (data: any[]) => {
-    const headers = ['Job ID', 'Type', 'Business', 'Error Details', 'Retries', 'Created At']
+    const headers = [
+      t('jobs.failed.csv.jobId'),
+      t('jobs.failed.csv.type'),
+      t('jobs.failed.csv.business'),
+      t('jobs.failed.csv.errorDetails'),
+      t('jobs.failed.csv.retries'),
+      t('jobs.failed.csv.createdAt')
+    ]
 
     const rows = data.map(job => [
       job.id,
@@ -173,15 +187,15 @@ const JobList = ({ initialType = '' }: Props) => {
         const csvContent = convertToCSV(res.data)
 
         downloadCSV(csvContent, `failed_jobs_${new Date().toISOString().split('T')[0]}.csv`)
-        toast.success(`Exported ${res.data.length} jobs`)
+        notify(SystemMessageCode.DOWNLOAD_SUCCESS)
       } else if (res.success && res.data.length === 0) {
-        toast.info('No jobs to export')
+        notify(SystemMessageCode.SUCCESS)
       } else {
-        toast.error(res.error || 'Failed to fetch jobs for export')
+        notify(SystemMessageCode.GENERIC_ERROR)
       }
     } catch (error) {
       console.error('Export error:', error)
-      toast.error('An error occurred during export')
+      notify(SystemMessageCode.GENERIC_ERROR)
     } finally {
       setLoadingExport(false)
     }
@@ -190,7 +204,7 @@ const JobList = ({ initialType = '' }: Props) => {
   const columns: GridColDef[] = [
     {
       field: 'id',
-      headerName: 'Job ID',
+      headerName: t('jobs.failed.csv.jobId'),
       minWidth: 120,
       renderCell: (params) => (
         <Tooltip title={params.value}>
@@ -202,7 +216,7 @@ const JobList = ({ initialType = '' }: Props) => {
     },
     {
       field: 'type',
-      headerName: 'Type',
+      headerName: t('jobs.failed.csv.type'),
       minWidth: 150,
       renderCell: (params) => (
         <CustomChip
@@ -216,7 +230,7 @@ const JobList = ({ initialType = '' }: Props) => {
     },
     {
       field: 'business',
-      headerName: 'Business',
+      headerName: t('jobs.failed.csv.business'),
       minWidth: 200,
       valueGetter: (value, row) => row?.business?.name || 'N/A',
       renderCell: (params) => (
@@ -227,15 +241,15 @@ const JobList = ({ initialType = '' }: Props) => {
     },
     {
       field: 'error',
-      headerName: 'Error Details',
+      headerName: t('jobs.failed.csv.errorDetails'),
       flex: 1,
       minWidth: 250,
       renderCell: (params) => (
-        <Tooltip title={params.row.error?.message || 'Unknown error'} placement="top">
+        <Tooltip title={params.row.error?.message || t('dashboard.jobs.social.detail.unknownError')} placement="top">
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <i className='tabler-alert-circle' style={{ color: theme.palette.error.main, fontSize: '1.1rem' }} />
             <Typography variant='body2' noWrap color='text.secondary'>
-              {params.row.error?.message || 'Unknown error'}
+              {params.row.error?.message || t('dashboard.jobs.social.detail.unknownError')}
             </Typography>
           </Box>
         </Tooltip>
@@ -243,7 +257,7 @@ const JobList = ({ initialType = '' }: Props) => {
     },
     {
       field: 'retryCount',
-      headerName: 'Retries',
+      headerName: t('jobs.failed.csv.retries'),
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -255,7 +269,7 @@ const JobList = ({ initialType = '' }: Props) => {
     },
     {
       field: 'createdAt',
-      headerName: 'Created At',
+      headerName: t('jobs.failed.csv.createdAt'),
       minWidth: 180,
       valueFormatter: (value: string) => new Date(value).toLocaleString(),
       renderCell: (params) => (
@@ -271,14 +285,14 @@ const JobList = ({ initialType = '' }: Props) => {
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('dashboard.jobs.social.columns.actions'),
       sortable: false,
       minWidth: 120,
       align: 'right',
       headerAlign: 'right',
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-          <Tooltip title='View Details'>
+          <Tooltip title={t('jobs.failed.actions.viewDetails')}>
             <IconButton
               size='small'
               onClick={() => {
@@ -291,7 +305,7 @@ const JobList = ({ initialType = '' }: Props) => {
             </IconButton>
           </Tooltip>
           {params.row.status === 'failed' && (
-            <Tooltip title='Retry Job'>
+            <Tooltip title={t('jobs.failed.actions.retryJob')}>
               <IconButton
                 size='small'
                 onClick={() => handleRetry(params.row.id)}
@@ -325,10 +339,10 @@ const JobList = ({ initialType = '' }: Props) => {
               </Box>
               <Box>
                 <Typography variant='h5' fontWeight={600} sx={{ mb: 0.5 }}>
-                  Failed Jobs Management
+                  {t('jobs.failed.title')}
                 </Typography>
                 <Typography variant='body2' color='text.secondary'>
-                  Monitor, investigate and retry failed background tasks
+                  {t('jobs.failed.subtitle')}
                 </Typography>
               </Box>
             </Box>
@@ -336,7 +350,7 @@ const JobList = ({ initialType = '' }: Props) => {
           action={
             <Box sx={{ display: 'flex', gap: 1, mt: 1, mr: 1 }}>
               <CustomChip
-                label={`${total} Jobs Found`}
+                label={t('jobs.failed.jobsFound', { count: total })}
                 size='small'
                 variant='tonal'
                 color='primary'
@@ -352,7 +366,7 @@ const JobList = ({ initialType = '' }: Props) => {
               <CustomTextField
                 id='job-search-input'
                 fullWidth
-                placeholder='Search by ID or Error...'
+                placeholder={t('jobs.failed.searchPlaceholder')}
                 value={filters.search}
                 onChange={e => handleFilterChange('search', e.target.value)}
                 InputProps={{
@@ -376,34 +390,34 @@ const JobList = ({ initialType = '' }: Props) => {
                   displayEmpty: true,
                   renderValue: (selected: any) => {
                     if (!selected) {
-                      return <Typography color='text.secondary'>Filter by Type</Typography>
+                      return <Typography color='text.secondary'>{t('jobs.failed.filterByType')}</Typography>
                     }
 
-                    return selected.replace('_', ' ');
+                    return t(`jobs.failed.types.${selected as string}`);
                   }
                 }}
               >
                 <MenuItem value=''>
-                  <Typography color='text.secondary'>All Types</Typography>
+                  <Typography color='text.secondary'>{t('jobs.failed.allTypes')}</Typography>
                 </MenuItem>
                 <MenuItem value='reviews'>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <i className='tabler-star' /> Reviews
+                    <i className='tabler-star' /> {t('jobs.failed.types.reviews')}
                   </Box>
                 </MenuItem>
                 <MenuItem value='social_posts'>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <i className='tabler-brand-twitter' /> Social Posts
+                    <i className='tabler-brand-twitter' /> {t('jobs.failed.types.social_posts')}
                   </Box>
                 </MenuItem>
                 <MenuItem value='seo_crawls'>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <i className='tabler-seo' /> SEO Crawls
+                    <i className='tabler-seo' /> {t('jobs.failed.types.seo_crawls')}
                   </Box>
                 </MenuItem>
                 <MenuItem value='ai_tasks'>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <i className='tabler-brain' /> AI Tasks
+                    <i className='tabler-brain' /> {t('jobs.failed.types.ai_tasks')}
                   </Box>
                 </MenuItem>
               </CustomTextField>
@@ -416,7 +430,7 @@ const JobList = ({ initialType = '' }: Props) => {
                 loadingPosition='start'
                 onClick={handleExport}
               >
-                Export CSV
+                {t('jobs.failed.exportCsv')}
               </LoadingButton>
             </Grid>
           </Grid>

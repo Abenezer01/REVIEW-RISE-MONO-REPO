@@ -4,6 +4,7 @@ import React from 'react';
 
 import Grid from '@mui/material/Grid';
 import type { VisibilityMetricDTO } from '@platform/contracts';
+import { useTranslations } from 'next-intl';
 
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -45,12 +46,15 @@ const StarIcon = () => (
 );
 
 const VisibilitySummaryCards: React.FC<VisibilitySummaryCardsProps> = ({ metrics, loading }) => {
+  const t = useTranslations('dashboard.seo.visibility');
+  const tc = useTranslations('common');
+
   if (loading || !metrics) {
     return (
       <Grid container spacing={3}>
         {[1, 2, 3, 4].map((item) => (
           <Grid size={{ xs: 12, md: 3 }} key={item}>
-            <MetricCard title="Loading..." value="-" loading={true} />
+            <MetricCard title={tc('common.loading')} value="-" loading={true} />
           </Grid>
         ))}
       </Grid>
@@ -62,7 +66,7 @@ const VisibilitySummaryCards: React.FC<VisibilitySummaryCardsProps> = ({ metrics
       {/* Map Pack Visibility */}
       <Grid size={{ xs: 12, md: 3 }}>
         <MetricCard
-           title="Map Pack Visibility"
+           title={t('mapPack')}
            value={`${metrics.mapPackVisibility.toFixed(1)}%`}
            icon={<MapIcon />}
            color="primary"
@@ -70,7 +74,7 @@ const VisibilitySummaryCards: React.FC<VisibilitySummaryCardsProps> = ({ metrics
              <Box>
                  <LinearProgress variant="determinate" value={metrics.mapPackVisibility} color="primary" sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }} />
                  <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
-                    {metrics.mapPackAppearances} appearances
+                    {t('mapPackAppearances', { count: metrics.mapPackAppearances })}
                  </p>
              </Box>
            }
@@ -80,7 +84,7 @@ const VisibilitySummaryCards: React.FC<VisibilitySummaryCardsProps> = ({ metrics
       {/* Share of Voice */}
       <Grid size={{ xs: 12, md: 3 }}>
         <MetricCard
-           title="Share of Voice"
+           title={t('shareOfVoice')}
            value={`${metrics.shareOfVoice.toFixed(1)}%`}
            icon={<ChartIcon />}
            color="secondary"
@@ -88,7 +92,7 @@ const VisibilitySummaryCards: React.FC<VisibilitySummaryCardsProps> = ({ metrics
              <Box>
                  <LinearProgress variant="determinate" value={metrics.shareOfVoice} color="secondary" sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }} />
                  <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
-                    Weighted by volume
+                    {t('weightedByVolume')}
                  </p>
              </Box>
            }
@@ -98,14 +102,14 @@ const VisibilitySummaryCards: React.FC<VisibilitySummaryCardsProps> = ({ metrics
       {/* Organic Rankings */}
       <Grid size={{ xs: 12, md: 3 }}>
         <MetricCard
-           title="Organic Rankings"
+           title={t('organicTitle')}
            value={metrics.top3Count}
            icon={<TrophyIcon />}
            color="success"
            footer={
              <Box sx={{ display: 'flex', gap: 2, fontSize: '0.875rem', color: 'text.secondary' }}>
-                <span>Top 10: <strong>{metrics.top10Count}</strong></span>
-                <span>Top 20: <strong>{metrics.top20Count}</strong></span>
+                <span>{t('top10')} <strong>{metrics.top10Count}</strong></span>
+                <span>{t('top20')} <strong>{metrics.top20Count}</strong></span>
              </Box>
            }
         />
@@ -114,14 +118,14 @@ const VisibilitySummaryCards: React.FC<VisibilitySummaryCardsProps> = ({ metrics
       {/* SERP Features */}
       <Grid size={{ xs: 12, md: 3 }}>
         <MetricCard
-           title="SERP Features"
+           title={t('serpFeaturesTitle')}
            value={metrics.featuredSnippetCount + metrics.localPackCount}
            icon={<StarIcon />}
            color="warning"
            footer={
              <Box sx={{ display: 'flex', gap: 2, fontSize: '0.875rem', color: 'text.secondary' }}>
-                <span>Local: <strong>{metrics.localPackCount}</strong></span>
-                <span>Snippets: <strong>{metrics.featuredSnippetCount}</strong></span>
+                <span>{t('local')} <strong>{metrics.localPackCount}</strong></span>
+                <span>{t('snippets')} <strong>{metrics.featuredSnippetCount}</strong></span>
              </Box>
            }
         />

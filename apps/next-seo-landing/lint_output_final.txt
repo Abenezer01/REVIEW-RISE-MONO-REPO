@@ -1,0 +1,1711 @@
+
+> @apps/next-seo-landing@0.1.0 lint /app/apps/next-seo-landing
+> next lint
+
+`next lint` is deprecated and will be removed in Next.js 16.
+For new projects, use create-next-app to choose your preferred linter.
+For existing projects, migrate to the ESLint CLI:
+npx @next/codemod@canary next-lint-to-eslint-cli .
+
+----------------------------------------
+DEBUG (next-seo-landing): Configuring output
+DEBUG: NODE_ENV: production
+DEBUG: NEXT_OUTPUT: undefined
+----------------------------------------
+
+./components/AnalysisLoader.tsx
+58:77  Error: Strings not allowed in JSX files: "%"  react/jsx-no-literals
+83:65  Error: Strings not allowed in JSX files: "✓"  react/jsx-no-literals
+120:19  Error: Strings not allowed in JSX files: "`
+        .loader-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .progress-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        .app-icon-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .app-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.5);
+        }
+        .ripple {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid rgba(245, 158, 11, 0.3);
+            animation: ripple 2s infinite;
+        }
+        @keyframes ripple {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        .progress-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+        .percentage {
+            color: var(--text-primary);
+        }
+        .progress-bar-bg {
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 32px;
+            max-width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            text-align: left;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        .step-item.active, .step-item.completed {
+            opacity: 1;
+        }
+        .step-content {
+            display: flex;
+            flex-direction: column;
+        }
+        .step-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .step-time {
+            font-size: 12px;
+            color: #10b981;
+        }
+        .circle-placeholder {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+        }
+
+        .insights-card {
+            background: rgba(168, 85, 247, 0.05);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .insights-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            font-weight: 700;
+            color: #e9d5ff; /* Light purple text */
+        }
+        .insight-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .insight-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+      `"  react/jsx-no-literals
+
+./components/CTA.tsx
+16:24  Error: Strings not allowed in JSX files: "→"  react/jsx-no-literals
+20:19  Error: Strings not allowed in JSX files: "`
+        .cta {
+          padding: 120px 0;
+          text-align: center;
+        }
+        .container {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 0 24px;
+        }
+        .title {
+          font-size: 48px;
+          font-weight: 700;
+          margin-bottom: 16px;
+          letter-spacing: -0.02em;
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .subtitle {
+          font-size: 18px;
+          color: var(--text-secondary);
+          margin-bottom: 32px;
+        }
+        .cta-button {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: var(--accent);
+          color: white;
+          padding: 14px 28px;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 15px;
+          transition: all 0.2s;
+        }
+        .cta-button:hover {
+          background: var(--accent-hover);
+          transform: translateY(-2px);
+        }
+        @media (max-width: 768px) {
+          .cta {
+            padding: 80px 0;
+          }
+          .title {
+            font-size: 32px;
+          }
+        }
+      `"  react/jsx-no-literals
+
+./components/Features.tsx
+62:19  Error: Strings not allowed in JSX files: "`
+        .features {
+          padding: 120px 0;
+          background: var(--bg-primary);
+        }
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 24px;
+        }
+        .header {
+          text-align: center;
+          margin-bottom: 64px;
+        }
+        .title {
+          font-size: 48px;
+          font-weight: 700;
+          margin-bottom: 16px;
+          letter-spacing: -0.02em;
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .subtitle {
+          font-size: 18px;
+          color: var(--text-secondary);
+        }
+        .grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+        }
+        .feature-card {
+          padding: 32px;
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          transition: all 0.2s;
+        }
+        .feature-card:hover {
+          border-color: var(--accent);
+          transform: translateY(-4px);
+        }
+        .icon {
+          font-size: 32px;
+          margin-bottom: 16px;
+        }
+        .feature-title {
+          font-size: 18px;
+          font-weight: 600;
+          margin-bottom: 8px;
+          color: var(--text-primary);
+        }
+        .feature-description {
+          font-size: 14px;
+          color: var(--text-secondary);
+          line-height: 1.6;
+        }
+        @media (max-width: 768px) {
+          .features {
+            padding: 80px 0;
+          }
+          .title {
+            font-size: 32px;
+          }
+          .grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+          .feature-card {
+            padding: 24px;
+          }
+        }
+      `"  react/jsx-no-literals
+
+./components/Footer.tsx
+16:19  Error: Strings not allowed in JSX files: "ReviewRise"  react/jsx-no-literals
+25:36  Error: Strings not allowed in JSX files: "©"  react/jsx-no-literals
+26:41  Error: Strings not allowed in JSX files: "ReviewRise."  react/jsx-no-literals
+35:19  Error: Strings not allowed in JSX files: "`
+        .footer {
+          padding: 64px 0 32px;
+          border-top: 1px solid var(--border-color);
+          background: var(--bg-primary);
+        }
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 24px;
+        }
+        .top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 48px;
+        }
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 15px;
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+        .brand svg {
+          color: var(--accent);
+        }
+        .links {
+          display: flex;
+          gap: 32px;
+        }
+        .links a {
+          color: var(--text-secondary);
+          font-size: 14px;
+          font-weight: 500;
+          transition: color 0.2s;
+        }
+        .links a:hover {
+          color: var(--accent);
+        }
+        .bottom {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-top: 32px;
+          border-top: 1px solid var(--border-color);
+        }
+        .copyright {
+          font-size: 13px;
+          color: var(--text-tertiary);
+        }
+        .legal {
+          display: flex;
+          gap: 24px;
+        }
+        .legal a {
+          font-size: 13px;
+          color: var(--text-tertiary);
+          transition: color 0.2s;
+        }
+        .legal a:hover {
+          color: var(--accent);
+        }
+        @media (max-width: 768px) {
+          .top {
+            flex-direction: column;
+            gap: 24px;
+            align-items: flex-start;
+          }
+          .links {
+            flex-direction: column;
+            gap: 16px;
+          }
+          .bottom {
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-start;
+          }
+        }
+      `"  react/jsx-no-literals
+
+./components/Header.tsx
+16:17  Error: Strings not allowed in JSX files: "ReviewRise"  react/jsx-no-literals
+22:90  Error: Strings not allowed in JSX files: "→"  react/jsx-no-literals
+25:19  Error: Strings not allowed in JSX files: "`
+        .header {
+          padding: 16px 0;
+          position: sticky;
+          top: 0;
+          background: var(--bg-primary);
+          border-bottom: 1px solid var(--border-color);
+          z-index: 100;
+          backdrop-filter: saturate(180%) blur(20px);
+        }
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 24px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .logo {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+        .logo svg {
+          color: var(--accent);
+        }
+        .nav {
+          display: flex;
+          align-items: center;
+          gap: 24px;
+        }
+        .nav a {
+          color: var(--text-secondary);
+          font-size: 14px;
+          font-weight: 500;
+          transition: color 0.2s;
+        }
+        .nav a:hover {
+          color: var(--text-primary);
+        }
+        .cta-button {
+          background: var(--bg-primary);
+          color: var(--text-primary);
+          border: 1px solid var(--border-color);
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-weight: 500;
+          font-size: 14px;
+          transition: all 0.2s;
+        }
+        .cta-button:hover {
+          border-color: var(--text-secondary);
+        }
+        @media (max-width: 768px) {
+          .nav a:not(.cta-button) {
+            display: none;
+          }
+        }
+      `"  react/jsx-no-literals
+
+./components/Hero.tsx
+51:46  Error: Strings not allowed in JSX files: "AI-Powered SEO Analysis"  react/jsx-no-literals
+55:31  Error: Strings not allowed in JSX files: "Instant SEO Insights for"  react/jsx-no-literals
+56:41  Error: Strings not allowed in JSX files: "Your Website"  react/jsx-no-literals
+59:36  Error: Strings not allowed in JSX files: "Get a comprehensive SEO analysis in seconds. No signup required."  react/jsx-no-literals
+79:16  Error: Strings not allowed in JSX files: "Analyze"  react/jsx-no-literals
+85:42  Error: Strings not allowed in JSX files: "Free • Instant Results • No Signup"  react/jsx-no-literals
+98:43  Error: Strings not allowed in JSX files: "50K+"  react/jsx-no-literals
+99:43  Error: Strings not allowed in JSX files: "Sites Analyzed"  react/jsx-no-literals
+102:43  Error: Strings not allowed in JSX files: "98%"  react/jsx-no-literals
+103:43  Error: Strings not allowed in JSX files: "Accuracy"  react/jsx-no-literals
+106:43  Error: Strings not allowed in JSX files: "4.9"  react/jsx-no-literals
+107:43  Error: Strings not allowed in JSX files: "Rating"  react/jsx-no-literals
+119:19  Error: Strings not allowed in JSX files: "`
+        .hero {
+          padding: 120px 0 80px;
+          text-align: center;
+          position: relative;
+        }
+        .container {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 0 24px;
+        }
+        .badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(249, 160, 48, 0.1);
+          border: 1px solid rgba(249, 160, 48, 0.3);
+          border-radius: 100px;
+          padding: 6px 14px;
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--accent);
+          margin-bottom: 32px;
+        }
+        .badge-dot {
+          width: 6px;
+          height: 6px;
+          background: var(--accent);
+          border-radius: 50%;
+          animation: pulse 2s ease-in-out infinite;
+        }
+        .title {
+          font-size: 64px;
+          font-weight: 700;
+          line-height: 1.1;
+          margin-bottom: 24px;
+          letter-spacing: -0.03em;
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .description {
+          font-size: 20px;
+          color: var(--text-secondary);
+          margin-bottom: 48px;
+          line-height: 1.5;
+        }
+        .input-wrapper {
+          display: flex;
+          gap: 12px;
+          margin-bottom: 16px;
+        }
+        .input-container {
+          flex: 1;
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+        .input-icon {
+          color: var(--accent);
+          position: absolute;
+          left: 16px;
+          z-index: 1;
+        }
+        input {
+          width: 100%;
+          padding: 14px 16px 14px 44px;
+          border-radius: 8px;
+          border: 1px solid var(--border-color);
+          background: var(--bg-primary);
+          color: var(--text-primary);
+          font-size: 15px;
+          outline: none;
+          transition: all 0.2s;
+        }
+        input:focus {
+          border-color: var(--brand-primary);
+          box-shadow: 0 0 0 3px rgba(5, 64, 118, 0.1);
+        }
+        input::placeholder {
+          color: var(--text-tertiary);
+        }
+        .analyze-button {
+          background: var(--accent);
+          color: white;
+          border: none;
+          padding: 14px 24px;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 15px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+        .analyze-button:hover {
+          background: var(--accent-hover);
+          transform: translateY(-1px);
+        }
+        .features-text {
+          color: var(--text-tertiary);
+          font-size: 14px;
+          margin-bottom: 64px;
+        }
+        .error {
+          background: rgba(239, 68, 68, 0.1);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          color: #ef4444;
+          padding: 12px 16px;
+          border-radius: 8px;
+          margin-top: 16px;
+          font-size: 14px;
+        }
+        .stats {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+          margin-top: 64px;
+        }
+        .stat {
+          text-align: center;
+          padding: 24px;
+          background: var(--bg-secondary);
+          border-radius: 12px;
+          border: 1px solid var(--border-color);
+          transition: all 0.2s;
+        }
+        .stat:hover {
+          border-color: var(--accent);
+          transform: translateY(-2px);
+        }
+        .stat-value {
+          font-size: 36px;
+          font-weight: 700;
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin-bottom: 8px;
+          letter-spacing: -0.02em;
+        }
+        .stat-label {
+          font-size: 13px;
+          color: var(--text-secondary);
+          font-weight: 500;
+        }
+        @media (max-width: 768px) {
+          .hero {
+            padding: 80px 0 60px;
+          }
+          .title {
+            font-size: 40px;
+          }
+          .description {
+            font-size: 18px;
+          }
+          .input-wrapper {
+            flex-direction: column;
+          }
+          .analyze-button {
+            width: 100%;
+            justify-content: center;
+          }
+          .stats {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+        }
+      `"  react/jsx-no-literals
+
+./components/HowItWorks.tsx
+47:19  Error: Strings not allowed in JSX files: "`
+        .how-it-works {
+          padding: 120px 0;
+          background: var(--bg-secondary);
+          border-top: 1px solid var(--border-color);
+          border-bottom: 1px solid var(--border-color);
+        }
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 24px;
+        }
+        .header {
+          text-align: center;
+          margin-bottom: 64px;
+        }
+        .title {
+          font-size: 48px;
+          font-weight: 700;
+          margin-bottom: 16px;
+          letter-spacing: -0.02em;
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .subtitle {
+          font-size: 18px;
+          color: var(--text-secondary);
+        }
+        .steps {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 48px;
+        }
+        .step {
+          text-align: center;
+        }
+        .step-number {
+          font-size: 64px;
+          font-weight: 700;
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin-bottom: 16px;
+          letter-spacing: -0.03em;
+        }
+        .step-title {
+          font-size: 20px;
+          font-weight: 600;
+          margin-bottom: 8px;
+          color: var(--text-primary);
+        }
+        .step-description {
+          font-size: 14px;
+          color: var(--text-secondary);
+          line-height: 1.6;
+        }
+        @media (max-width: 768px) {
+          .how-it-works {
+            padding: 80px 0;
+          }
+          .title {
+            font-size: 32px;
+          }
+          .steps {
+            grid-template-columns: 1fr;
+            gap: 32px;
+          }
+        }
+      `"  react/jsx-no-literals
+
+./components/ResultsDisplay.tsx
+107:44  Error: Strings not allowed in JSX files: "/ 100"  react/jsx-no-literals
+144:91  Error: Strings not allowed in JSX files: "ms"  react/jsx-no-literals
+240:121  Error: Strings not allowed in JSX files: "sec"  react/jsx-no-literals
+284:55  Error: Strings not allowed in JSX files: "%"  react/jsx-no-literals
+290:54  Error: Strings not allowed in JSX files: "issue"  react/jsx-no-literals
+335:64  Error: Strings not allowed in JSX files: ":"  react/jsx-no-literals
+373:105  Error: Strings not allowed in JSX files: "AI"  react/jsx-no-literals
+385:59  Error: Strings not allowed in JSX files: "+15-20% CTR"  react/jsx-no-literals
+386:63  Error: Strings not allowed in JSX files: "Easy Fix"  react/jsx-no-literals
+424:51  Error: Strings not allowed in JSX files: "#"  react/jsx-no-literals
+469:63  Error: Strings not allowed in JSX files: "/100"  react/jsx-no-literals
+482:19  Error: Strings not allowed in JSX files: "`
+        .results-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 24px 120px;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* Context Bar */
+        .context-bar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: var(--card-bg);
+          backdrop-filter: blur(10px);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          padding: 20px 24px;
+          margin-bottom: 32px;
+        }
+        .context-info {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .context-label {
+          font-size: 11px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: var(--text-secondary);
+        }
+        .context-url {
+          font-size: 18px;
+          font-weight: 700;
+          color: var(--text-primary);
+        }
+        .context-meta {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 13px;
+          color: var(--text-secondary);
+        }
+        .btn-rescan {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: transparent;
+          border: 1px solid var(--border-color);
+          color: var(--text-primary);
+          padding: 10px 20px;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 600;
+          transition: all 0.2s;
+        }
+        .btn-rescan:hover {
+          background: var(--card-bg);
+          border-color: var(--accent-solid);
+        }
+
+        /* Score Hero */
+        .score-hero {
+          background: rgba(249, 160, 48, 0.05);
+          border: 1px solid rgba(249, 160, 48, 0.2);
+          border-radius: 20px;
+          padding: 48px;
+          margin-bottom: 48px;
+          display: flex;
+          justify-content: space-between;
+          gap: 48px;
+        }
+        .score-left {
+          flex: 1;
+        }
+        .score-label {
+          font-size: 13px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 1.5px;
+          color: var(--text-secondary);
+          margin-bottom: 16px;
+        }
+        .score-display {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+          margin-bottom: 20px;
+        }
+        .score-number {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 80px;
+          font-weight: 900;
+          line-height: 1;
+          background: var(--accent);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-variant-numeric: tabular-nums;
+        }
+        .score-total {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 28px;
+          font-weight: 600;
+          color: var(--text-secondary);
+          font-variant-numeric: tabular-nums;
+        }
+        .score-verdict {
+          display: inline-flex;
+          padding: 8px 20px;
+          border-radius: 8px;
+          margin-bottom: 32px;
+          font-size: 15px;
+          font-weight: 700;
+        }
+        .score-legend {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .legend-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .legend-bar {
+          width: 40px;
+          height: 6px;
+          border-radius: 3px;
+        }
+        .legend-bar.poor { background: #ef4444; }
+        .legend-bar.fair { background: #f59e0b; }
+        .legend-bar.good { background: #10b981; }
+        .legend-bar.excellent { background: #10b981; }
+        .legend-item span {
+          font-size: 13px;
+          color: var(--text-secondary);
+        }
+
+        .score-right {
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+        }
+        .score-stats {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+        }
+        .stat-box {
+          background: var(--card-bg);
+          backdrop-filter: blur(10px);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          padding: 20px;
+          text-align: center;
+        }
+        .stat-box.critical {
+          border-color: rgba(239, 68, 68, 0.3);
+          background: rgba(239, 68, 68, 0.05);
+        }
+        .stat-number {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 32px;
+          font-weight: 800;
+          line-height: 1;
+          margin-bottom: 8px;
+          font-variant-numeric: tabular-nums;
+        }
+        .stat-box.critical .stat-number {
+          color: #ef4444;
+        }
+        .stat-label {
+          font-size:12px;
+          font-weight: 600;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .cta-group {
+          display: flex;
+          gap: 12px;
+        }
+        .btn-primary-cta {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          background: var(--accent-solid);
+          color: white;
+          border: none;
+          padding: 16px 32px;
+          border-radius: 12px;
+          font-size: 16px;
+          font-weight: 700;
+          box-shadow: 0 8px 24px var(--glow);
+          transition: all 0.3s;
+        }
+        .btn-primary-cta:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 32px var(--glow);
+        }
+        .btn-secondary-cta {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: transparent;
+          border: 1px solid var(--border-color);
+          color: var(--text-primary);
+          padding: 16px 24px;
+          border-radius: 12px;
+          font-size: 15px;
+          font-weight: 600;
+          transition: all 0.2s;
+        }
+        .btn-secondary-cta:hover {
+          background: var(--card-bg);
+          border-color: var(--accent-solid);
+        }
+
+        /* Content Grid */
+        .content-grid {
+          display: grid;
+          grid-template-columns: 1.5fr 1fr;
+          gap: 32px;
+        }
+
+        .section {
+          margin-bottom: 40px;
+        }
+        .section-title {
+          font-size: 24px;
+          font-weight: 800;
+          margin-bottom: 24px;
+          letter-spacing: -0.02em;
+        }
+        .section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+        }
+        .issues-count {
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--text-secondary);
+          background: rgba(239, 68, 68, 0.1);
+          padding: 4px 12px;
+          border-radius: 6px;
+        }
+
+        /* HTML Page Details */
+        .html-page-details {
+          background: var(--card-bg);
+          backdrop-filter: blur(10px);
+          border: 1px solid var(--border-color);
+          border-radius: 16px;
+          padding: 24px;
+          margin-bottom: 24px;
+        }
+        .details-title {
+          font-size: 18px;
+          font-weight: 700;
+          margin-bottom: 16px;
+        }
+        .details-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 16px;
+        }
+        .detail-item {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .detail-label {
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        .detail-value {
+          font-size: 14px;
+          color: var(--text-primary);
+          font-weight: 500;
+        }
+        .url-value {
+          word-break: break-all;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 12px;
+        }
+
+        /* Breakdown */
+        .breakdown-list {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+        .breakdown-row {
+          display: flex;
+          align-items: flex-start;
+          gap: 16px;
+          background: var(--card-bg);
+          backdrop-filter: blur(10px);
+          border: 1px solid var(--border-color);
+          border-radius: 16px;
+          padding: 24px;
+          transition: all 0.3s;
+        }
+        .breakdown-row:hover {
+          border-color: var(--accent-solid);
+        }
+        .breakdown-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .breakdown-content {
+          flex: 1;
+        }
+        .breakdown-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+        .breakdown-title-group {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .breakdown-title-group h3 {
+          font-size: 18px;
+          font-weight: 700;
+          margin: 0;
+        }
+        .breakdown-percentage {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 20px;
+          font-weight: 800;
+          font-variant-numeric: tabular-nums;
+        }
+        .breakdown-meta-group {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .issues-badge {
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--text-secondary);
+          background: rgba(255, 255, 255, 0.05);
+          padding: 4px 12px;
+          border-radius: 6px;
+        }
+        .expand-toggle {
+          background: transparent;
+          border: none;
+          color: var(--text-secondary);
+          padding: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          transition: color 0.2s;
+        }
+        .expand-toggle:hover {
+          color: var(--text-primary);
+        }
+        .breakdown-desc {
+          font-size: 14px;
+          color: var(--text-secondary);
+          margin-bottom: 16px;
+          line-height: 1.5;
+        }
+
+        /* Breakdown Details (Expanded) */
+        .breakdown-details {
+          margin-top: 20px;
+          padding-top: 20px;
+          border-top: 1px solid var(--border-color);
+        }
+        .details-subtitle {
+          font-size: 16px;
+          font-weight: 700;
+          margin-bottom: 16px;
+        }
+        .checks-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .check-item {
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 12px;
+          padding: 16px;
+          border-left: 3px solid transparent;
+        }
+        .check-item.check-error {
+          border-left-color: #ef4444;
+        }
+        .check-item.check-warning {
+          border-left-color: #f59e0b;
+        }
+        .check-item.check-tip {
+          border-left-color: #6366f1;
+        }
+        .check-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 12px;
+        }
+        .check-left {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          flex: 1;
+        }
+        .check-icon {
+          flex-shrink: 0;
+          display: flex;
+          margin-top: 2px;
+        }
+        .check-item.check-error .check-icon {
+          color: #ef4444;
+        }
+        .check-item.check-warning .check-icon {
+          color: #f59e0b;
+        }
+        .check-item.check-tip .check-icon {
+          color: #6366f1;
+        }
+        .check-title {
+          font-size: 15px;
+          font-weight: 600;
+          color: var(--text-primary);
+          line-height: 1.4;
+        }
+        .check-badge {
+          font-size: 11px;
+          font-weight: 700;
+          padding: 4px 10px;
+          border-radius: 6px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          flex-shrink: 0;
+        }
+        .check-badge.error {
+          background: rgba(239, 68, 68, 0.15);
+          color: #ef4444;
+        }
+        .check-badge.warning {
+          background: rgba(245, 158, 11, 0.15);
+          color: #f59e0b;
+        }
+        .check-badge.tip {
+          background: rgba(99, 102, 241, 0.15);
+          color: #6366f1;
+        }
+        .check-body {
+          padding-left: 26px;
+        }
+        .check-recommendation {
+          font-size: 14px;
+          color: var(--text-secondary);
+          line-height: 1.6;
+          margin-bottom: 8px;
+        }
+        .check-impact {
+          font-size: 13px;
+          color: var(--text-secondary);
+          margin: 0;
+        }
+        .check-impact strong {
+          color: var(--text-primary);
+        }
+        .breakdown-findings {
+          margin-bottom: 16px;
+          padding: 12px;
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 8px;
+          border: 1px solid var(--border-color);
+        }
+        .findings-header {
+          margin-bottom: 8px;
+        }
+        .findings-count {
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        .findings-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .finding-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          font-size: 13px;
+          line-height: 1.5;
+        }
+        .finding-priority {
+          flex-shrink: 0;
+          font-size: 14px;
+        }
+        .finding-text {
+          color: var(--text-primary);
+          flex: 1;
+        }
+        .finding-more {
+          font-size: 12px;
+          color: var(--text-secondary);
+          font-style: italic;
+          padding-left: 22px;
+        }
+        .progress-track {
+          height: 6px;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 3px;
+          overflow: hidden;
+        }
+        .progress-fill {
+          height: 100%;
+          border-radius: 3px;
+          transition: width 0.6s ease;
+        }
+
+        /* Issues */
+        .issues-list {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .issue-card {
+          background: var(--card-bg);
+          backdrop-filter: blur(10px);
+          border: 1px solid var(--border-color);
+          border-radius: 16px;
+          padding: 24px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .issue-card:hover {
+          border-color: rgba(239, 68, 68, 0.4);
+        }
+        .issue-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 16px;
+        }
+        .issue-left {
+          display: flex;
+          gap: 16px;
+          flex: 1;
+        }
+        .issue-icon-critical {
+          width: 40px;
+          height: 40px;
+          background: rgba(239, 68, 68, 0.1);
+          color: #ef4444;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .issue-title {
+          font-size: 18px;
+          font-weight: 700;
+          margin-bottom: 6px;
+        }
+        .issue-desc {
+          font-size: 14px;
+          color: var(--text-secondary);
+          line-height: 1.6;
+        }
+        .expand-btn {
+          background: transparent;
+          border: none;
+          color: var(--text-secondary);
+          padding: 4px;
+          cursor: pointer;
+        }
+        .issue-meta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 16px;
+        }
+        .meta-tag {
+          font-size: 12px;
+          font-weight: 700;
+          padding: 6px 12px;
+          border-radius: 6px;
+        }
+        .meta-tag.critical {
+          background: rgba(239, 68, 68, 0.15);
+          color: #ef4444;
+        }
+        .meta-tag.impact {
+          background: rgba(16, 185, 129, 0.15);
+          color: #10b981;
+        }
+        .meta-tag.difficulty {
+          background: rgba(249, 160, 48, 0.15);
+          color: var(--accent-solid);
+        }
+        .issue-actions {
+          display: flex;
+          gap: 12px;
+          padding-top: 16px;
+          border-top: 1px solid var(--border-color);
+        }
+        .action-btn {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: transparent;
+          border: 1px solid var(--border-color);
+          color: var(--text-primary);
+          padding: 10px 16px;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 600;
+          transition: all 0.2s;
+        }
+        .action-btn.primary {
+          background: var(--accent-solid);
+          border-color: var(--accent-solid);
+          color: white;
+        }
+        .action-btn:hover {
+          background: var(--card-bg);
+        }
+
+        .locked-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          background: rgba(249, 160, 48, 0.05);
+          border: 1px dashed rgba(249, 160, 48, 0.3);
+          border-radius: 12px;
+          padding: 24px;
+          margin-top: 16px;
+          font-size: 14px;
+          color: var(--text-secondary);
+        }
+        .unlock-btn {
+          background: var(--accent-solid);
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-size: 14px;
+          font-weight: 600;
+          margin-left: auto;
+        }
+
+        /* Recommendations */
+        .recommendations-list {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .rec-card {
+          display: flex;
+          gap: 16px;
+          background: var(--card-bg);
+          backdrop-filter: blur(10px);
+          border: 1px solid var(--border-color);
+          border-radius: 16px;
+          padding: 20px;
+          transition: all 0.3s;
+        }
+        .rec-card:hover {
+          border-color: var(--accent-solid);
+          transform: translateY(-2px);
+        }
+        .rec-number {
+          width: 32px;
+          height: 32px;
+          background: var(--accent);
+          color: white;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 16px;
+          font-weight: 800;
+          flex-shrink: 0;
+        }
+        .rec-content {
+          flex: 1;
+        }
+        .rec-title {
+          font-size: 16px;
+          font-weight: 700;
+          margin-bottom: 10px;
+        }
+        .rec-description {
+          font-size: 14px;
+          color: var(--text-secondary);
+          line-height: 1.6;
+          margin-bottom: 12px;
+        }
+        .rec-meta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .rec-badge {
+          font-size: 11px;
+          font-weight: 700;
+          padding: 4px 10px;
+          border-radius: 6px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        .rec-badge.high {
+          background: rgba(239, 68, 68, 0.15);
+          color: #ef4444;
+        }
+        .rec-badge.medium {
+          background: rgba(249, 160, 48, 0.15);
+          color: var(--accent-solid);
+        }
+        .rec-badge.low {
+          background: rgba(99, 102, 241, 0.15);
+          color: #6366f1;
+        }
+        .rec-badge.type {
+          background: rgba(139, 92, 246, 0.15);
+          color: #8b5cf6;
+        }
+        .rec-badge.priority {
+          background: rgba(139, 92, 246, 0.15);
+          color: #8b5cf6;
+        }
+        .rec-badge.impact {
+          background: rgba(16, 185, 129, 0.15);
+          color: #10b981;
+        }
+        .rec-badge.effort {
+          background: rgba(99, 102, 241, 0.15);
+          color: #6366f1;
+        }
+        .no-insights {
+          text-align: center;
+          padding: 32px;
+          color: var(--text-secondary);
+          font-style: italic;
+        }
+
+        /* Upgrade Card */
+        .upgrade-card {
+          background: var(--accent);
+          color: white;
+          border-radius: 20px;
+          padding: 32px;
+        }
+        .upgrade-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 12px;
+        }
+        .upgrade-header h3 {
+          font-size: 20px;
+          font-weight: 800;
+        }
+        .upgrade-card p {
+          font-size: 15px;
+          margin-bottom: 20px;
+          opacity: 0.9;
+          line-height: 1.5;
+        }
+        .upgrade-features {
+          list-style: none;
+          padding: 0;
+          margin: 0 0 24px 0;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .upgrade-features li {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 15px;
+        }
+        .btn-upgrade {
+          width: 100%;
+          background: white;
+          color: var(--accent-solid);
+          border: none;
+          padding: 14px;
+          border-radius: 10px;
+          font-size: 16px;
+          font-weight: 700;
+          transition: all 0.2s;
+        }
+        .btn-upgrade:hover {
+          transform: translateY(-2px);
+        }
+
+        /* Sticky CTA */
+        .sticky-cta {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: var(--card-bg);
+          backdrop-filter: blur(20px);
+          border-top: 1px solid var(--border-color);
+          padding: 16px 24px;
+          z-index: 50;
+          box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .sticky-content {
+          max-width: 1200px;
+          margin: 0 auto;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .sticky-left {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+        .sticky-score {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 32px;
+          font-weight: 900;
+          background: linear-gradient(to right, var(--brand-primary), var(--accent));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-variant-numeric: tabular-nums;
+        }
+        .sticky-info {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .sticky-label {
+          font-size: 13px;
+          font-weight: 700;
+          color: var(--text-primary);
+        }
+        .sticky-issues {
+          font-size: 12px;
+          color: #ef4444;
+          font-weight: 600;
+        }
+        .sticky-btn {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          background: var(--accent);
+          color: white;
+          border: none;
+          padding: 12px 32px;
+          border-radius: 10px;
+          font-size: 15px;
+          font-weight: 700;
+          box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        /* HTML Page Details Styles */
+        .detail-header-group {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+        }
+
+        .ai-badge {
+          font-size: 10px;
+          font-weight: 700;
+          background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+          color: white;
+          padding: 2px 8px;
+          border-radius: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .detail-description {
+          font-size: 12px;
+          color: var(--text-secondary);
+          margin-top: 8px;
+          line-height: 1.5;
+          opacity: 0.8;
+        }
+
+        @media (max-width: 1024px) {
+          .content-grid {
+            grid-template-columns: 1fr;
+          }
+          .score-hero {
+            flex-direction: column;
+          }
+          .score-stats {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+
+        @media (max-width: 768px) {
+          .context-bar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+          }
+          .score-number {
+            font-size: 64px;
+          }
+          .score-stats {
+            grid-template-columns: 1fr;
+          }
+          .cta-group {
+            flex-direction: column;
+          }
+        }
+      `"  react/jsx-no-literals
+
+./components/ScoreGauge.tsx
+75:10  Error: Strings not allowed in JSX files: "/ 100"  react/jsx-no-literals
+86:19  Error: Strings not allowed in JSX files: "`
+        .score-gauge {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+        }
+        .gauge-svg {
+          filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        }
+        .progress-circle {
+          transition: stroke-dashoffset 1s ease-in-out;
+        }
+        .score-text {
+          font-size: 48px;
+          font-weight: 800;
+        }
+        .score-label {
+          font-size: 18px;
+          font-weight: 600;
+        }
+        .score-status {
+          font-size: 18px;
+          font-weight: 700;
+        }
+      `"  react/jsx-no-literals
+
+./components/ThemeToggle.tsx
+16:19  Error: Strings not allowed in JSX files: "`
+        .theme-toggle {
+          background: var(--card-bg);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          padding: 10px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          backdrop-filter: blur(10px);
+          transition: all 0.3s ease;
+        }
+        .theme-toggle:hover {
+          transform: scale(1.05);
+          border-color: var(--accent);
+        }
+      `"  react/jsx-no-literals
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+ ELIFECYCLE  Command failed with exit code 1.

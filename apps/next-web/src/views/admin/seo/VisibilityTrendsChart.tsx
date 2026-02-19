@@ -7,9 +7,12 @@ import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
 
+
 // Types
 import type { ApexOptions } from 'apexcharts'
 import type { VisibilityMetricDTO } from '@platform/contracts'
+
+import { useTranslation } from '@/hooks/useTranslation'
 
 // Styled Component Imports
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
@@ -21,14 +24,15 @@ interface VisibilityTrendsChartProps {
 
 const VisibilityTrendsChart = ({ data, loading }: VisibilityTrendsChartProps) => {
   const theme = useTheme()
+  const t = useTranslation('dashboard')
 
   const series = [
     {
-      name: 'Map Pack Visibility',
+      name: t('seo.visibility.mapPack'),
       data: data.map(d => Number(d.mapPackVisibility.toFixed(1)))
     },
     {
-      name: 'Share of Voice',
+      name: t('seo.visibility.shareOfVoice'),
       data: data.map(d => Number(d.shareOfVoice.toFixed(1)))
     }
   ]
@@ -87,14 +91,14 @@ const VisibilityTrendsChart = ({ data, loading }: VisibilityTrendsChartProps) =>
   if (loading) {
     return (
       <Card sx={{ height: 460, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        Loading Chart...
+        {t('seo.visibility.loading')}
       </Card>
     )
   }
 
   return (
     <Card sx={{ height: '100%' }}>
-      <CardHeader title="Visibility Trends (30 Days)" />
+      <CardHeader title={t('seo.visibility.trendsTitle')} />
       <CardContent>
         <AppReactApexCharts type='line' height={400} width='100%' series={series} options={options} />
       </CardContent>

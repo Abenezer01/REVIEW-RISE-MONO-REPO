@@ -1,6 +1,8 @@
+/* eslint-disable import/no-unresolved */
 import React from 'react';
 
-import { FormHelperText } from '@mui/material';
+import { FormHelperText, Tooltip, IconButton, InputAdornment } from '@mui/material';
+import { Info as InfoIcon } from '@mui/icons-material';
 import { useField, useFormikContext } from 'formik';
 
 import { useRequiredFields } from '@/context/required-fields-context';
@@ -14,6 +16,7 @@ interface CustomTextBoxProps {
   maxLength?: number;
   multilineMaxLength?: number;
   multiline?: boolean;
+  tooltip?: string;
   [key: string]: any;
   formatAsName?: boolean;
 }
@@ -26,6 +29,7 @@ const CustomTextBox: React.FC<CustomTextBoxProps> = ({
   maxLength = 50,
   multilineMaxLength = 150,
   multiline = false,
+  tooltip,
   formatAsName = false,
   ...props
 }) => {
@@ -86,6 +90,24 @@ const CustomTextBox: React.FC<CustomTextBoxProps> = ({
     helpers.setValue(finalValue);
   };
 
+  const inputProps = {
+    ...props.InputProps,
+    endAdornment: (
+      <>
+        {props.InputProps?.endAdornment}
+        {tooltip && (
+          <InputAdornment position="end">
+            <Tooltip title={tooltip} arrow>
+              <IconButton size="small" edge="end">
+                <InfoIcon fontSize="small" color="action" />
+              </IconButton>
+            </Tooltip>
+          </InputAdornment>
+        )}
+      </>
+    )
+  };
+
   return (
     <>
       <CustomTextField
@@ -97,6 +119,7 @@ const CustomTextBox: React.FC<CustomTextBoxProps> = ({
         onChange={handleChange}
         value={field.value || ''}
         required={isRequired}
+        InputProps={inputProps}
         inputProps={{
           maxLength: effectiveMaxLength,
           ...props.inputProps

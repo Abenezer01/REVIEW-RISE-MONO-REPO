@@ -8,6 +8,7 @@ import {
   Switch,
   Button,
 } from '@mui/material'
+import { useTranslations } from 'next-intl'
 import { PageHeader } from '@platform/shared-ui'
 
 import { type GridColDef } from '@mui/x-data-grid'
@@ -29,6 +30,8 @@ export default function FeatureFlagsClient({
 }: {
   initialFlags: FeatureFlag[]
 }) {
+  const t = useTranslations('admin.featureFlags')
+  const tc = useTranslations('common')
   const [searchTerm, setSearchTerm] = useState('')
   const [open, setOpen] = useState(false)
   const [editingFlag, setEditingFlag] = useState<FeatureFlag | null>(null)
@@ -90,18 +93,18 @@ export default function FeatureFlagsClient({
   }
 
   const columns: GridColDef[] = useMemo(() => [
-    { field: 'name', headerName: 'Name', flex: 1 },
-    { field: 'description', headerName: 'Description', flex: 1.5 },
+    { field: 'name', headerName: t('name'), flex: 1 },
+    { field: 'description', headerName: t('description'), flex: 1.5 },
     {
       field: 'rolloutPercentage',
-      headerName: 'Rollout %',
+      headerName: t('rolloutPercent'),
       width: 120,
       valueFormatter: (params) => `${params}%`,
     },
 
     {
       field: 'isEnabled',
-      headerName: 'Enabled',
+      headerName: t('enabled'),
       width: 100,
       renderCell: (params) => (
         <Switch
@@ -112,7 +115,7 @@ export default function FeatureFlagsClient({
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('actions'),
       width: 180,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -120,13 +123,13 @@ export default function FeatureFlagsClient({
             size="small"
             onClick={() => handleEdit(params.row)}
           >
-            Edit
+            {tc('common.edit')}
           </Button>
           <Button
             color="error"
             size="small"
             onClick={async () => {
-              if (confirm('Are you sure?')) {
+              if (confirm(tc('common.confirmDelete'))) {
                 setLoading(true)
                 await deleteFeatureFlag(params.row.id)
                 const refreshed = await getFeatureFlags()
@@ -136,18 +139,18 @@ export default function FeatureFlagsClient({
               }
             }}
           >
-            Delete
+            {tc('common.delete')}
           </Button>
         </Box>
       ),
     },
-  ], [])
+  ], [t, tc])
   
   return (
     <Box>
       <PageHeader
-        title="Feature Flags"
-        subtitle="Manage global feature flags and toggles"
+        title={t('title')}
+        subtitle={t('subtitle')}
       />
 
       <ItemsListing
@@ -177,7 +180,7 @@ export default function FeatureFlagsClient({
         features={{
           search: {
             enabled: true,
-            placeholder: 'Search feature flags...',
+            placeholder: t('searchPlaceholder'),
             onSearch: (term) => {
               setSearchTerm(term)
               setPagination({ ...pagination, page: 1 }) // Reset to first page on search

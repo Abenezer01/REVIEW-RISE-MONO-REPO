@@ -8,6 +8,7 @@ import CardContent from '@mui/material/CardContent'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import { useTheme, alpha } from '@mui/material/styles'
+import { useTranslations } from 'next-intl'
 
 interface Keyword {
   keyword: string
@@ -22,6 +23,7 @@ interface KeywordCloudProps {
 
 const KeywordCloud = ({ title, subtitle, keywords }: KeywordCloudProps) => {
   const theme = useTheme()
+  const tc = useTranslations('common')
 
   if (!keywords || keywords.length === 0) {
     return (
@@ -29,7 +31,7 @@ const KeywordCloud = ({ title, subtitle, keywords }: KeywordCloudProps) => {
         <CardHeader title={title} subheader={subtitle} />
         <CardContent>
           <Box display="flex" alignItems="center" justifyContent="center" minHeight={200}>
-            No keywords available
+            {tc('common.no-items')}
           </Box>
         </CardContent>
       </Card>

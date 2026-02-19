@@ -6,6 +6,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Card from '@mui/material/Card'
 import TextField from '@mui/material/TextField'
+import { useTranslations } from 'next-intl'
 
 const DURATIONS = [
     { value: 15, label: '15s', subtitle: 'SHORTS' },
@@ -19,6 +20,7 @@ interface VideoDurationSelectorProps {
 }
 
 export default function VideoDurationSelector({ selected, onChange }: VideoDurationSelectorProps) {
+    const t = useTranslations('studio.scripts')
     const [customDuration, setCustomDuration] = useState('')
     const isCustom = !DURATIONS.some(d => d.value === selected)
 
@@ -34,7 +36,7 @@ export default function VideoDurationSelector({ selected, onChange }: VideoDurat
     return (
         <Box>
             <Typography variant="body2" fontWeight="bold" mb={1.5}>
-                Video Duration
+                {t('duration')}
             </Typography>
             <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                 {DURATIONS.map((duration) => (
@@ -81,8 +83,8 @@ export default function VideoDurationSelector({ selected, onChange }: VideoDurat
                 ))}
             </Box>
             <TextField
-                label="Custom Duration (seconds)"
-                placeholder="e.g., 120 for 2 minutes"
+                label={t('duration')}
+                placeholder={'e.g., 120'}
                 type="number"
                 value={customDuration}
                 onChange={(e) => handleCustomChange(e.target.value)}

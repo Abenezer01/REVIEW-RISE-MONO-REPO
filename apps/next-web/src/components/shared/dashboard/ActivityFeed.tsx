@@ -13,6 +13,7 @@ import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
+import { useTranslations } from 'next-intl'
 
 interface Activity {
   id: string
@@ -28,9 +29,11 @@ interface ActivityFeedProps {
 }
 
 const ActivityFeed = ({ activities }: ActivityFeedProps) => {
+  const t = useTranslations('dashboard')
+
   return (
     <Card sx={{ height: '100%' }}>
-      <CardHeader title="Recent Activity" subheader="Latest updates" />
+      <CardHeader title={t('overview.activityFeed.title')} subheader={t('overview.activityFeed.subheader')} />
       <CardContent>
         <Timeline position="right">
           {activities.map((activity, index) => (

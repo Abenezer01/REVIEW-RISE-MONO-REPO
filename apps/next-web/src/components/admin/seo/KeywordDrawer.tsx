@@ -4,6 +4,8 @@ import Box from '@mui/material/Box'
 
 import type { KeywordDTO } from '@platform/contracts'
 
+import { useTranslations } from 'next-intl'
+
 import CustomSideDrawer from '@/components/shared/drawer/side-drawer'
 import KeywordForm from './KeywordForm'
 
@@ -17,8 +19,10 @@ interface KeywordDrawerProps {
 }
 
 const KeywordDrawer = ({ open, initialData, businessId, onClose, onSuccess }: KeywordDrawerProps) => {
+  const t = useTranslations('dashboard')
+
   return (
-    <CustomSideDrawer open={open} title="Keyword" handleClose={onClose} width={700}>
+    <CustomSideDrawer open={open} title={t('seo.keywords.formTitle')} handleClose={onClose} width={700}>
       {() => (
         <Box>
           <KeywordForm

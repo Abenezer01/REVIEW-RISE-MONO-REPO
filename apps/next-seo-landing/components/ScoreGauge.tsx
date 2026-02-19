@@ -6,7 +6,10 @@ interface ScoreGaugeProps {
   showLabel?: boolean;
 }
 
+import { useTranslations } from 'next-intl';
+
 export default function ScoreGauge({ score, size = 200, showLabel = true }: ScoreGaugeProps) {
+  const t = useTranslations('landing.results');
   const strokeWidth = 12;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -20,9 +23,9 @@ export default function ScoreGauge({ score, size = 200, showLabel = true }: Scor
   };
   
   const getStatus = () => {
-    if (score >= 75) return 'Excellent';
-    if (score >= 50) return 'Good';
-    return 'Needs Improvement';
+    if (score >= 75) return t('verdicts.excellent');
+    if (score >= 50) return t('verdicts.good');
+    return t('verdicts.poor');
   };
 
   return (
@@ -70,7 +73,7 @@ export default function ScoreGauge({ score, size = 200, showLabel = true }: Scor
           className="score-label"
           fill="var(--text-secondary)"
         >
-          / 100
+          {'/ 100'}
         </text>
       </svg>
       

@@ -10,6 +10,9 @@ export * from './auth.schema';
 // Response types
 export * from './responses';
 
+// System messages
+export * from './system-messages';
+
 // Utilities
 export * from './utils/encryption.util';
 
@@ -28,6 +31,8 @@ export * from './ai/prompts/recommendations.prompts';
 export * from './ai/prompts/review-sentiment.prompts';
 export * from './ai/prompts/review-reply.prompts';
 export * from './ai/content-studio';
+export * from './ai/blueprint.schema';
+
 
 // Social Media Integration Schemas
 export * from './social';
@@ -67,3 +72,12 @@ export type {
     ApiError,
     ApiMeta
 } from './responses';
+
+// AI Schemas
+export * from './ai/blueprint.schema';
+export * from './ai/meta-blueprint.schema';
+export * from './ai/creative-engine.schema';
+
+// Constants
+export * from './constants/ad-constraints';
+

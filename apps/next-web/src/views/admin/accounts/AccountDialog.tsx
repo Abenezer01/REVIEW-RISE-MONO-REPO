@@ -36,17 +36,17 @@ interface AccountDialogProps {
   account?: any
 }
 
-const validationSchema = yup.object({
-  name: yup.string().required('Account name is required'),
-  email: yup.string().email('Enter a valid email').required('Email is required'),
-  status: yup.string().required('Status is required'),
-  plan: yup.string().required('Plan is required'),
-  description: yup.string().max(250, 'Description too long')
-})
-
 const AccountDialog = ({ open, onClose, onSuccess, account }: AccountDialogProps) => {
   const t = useTranslation('dashboard')
- 
+
+  const validationSchema = useMemo(() => yup.object({
+    name: yup.string().required(t('accounts.accountDialog.validation.nameRequired')),
+    email: yup.string().email(t('accounts.accountDialog.validation.invalidEmail')).required(t('accounts.accountDialog.validation.emailRequired')),
+    status: yup.string().required(t('accounts.accountDialog.validation.statusRequired')),
+    plan: yup.string().required(t('accounts.accountDialog.validation.planRequired')),
+    description: yup.string().max(250, t('accounts.accountDialog.validation.descriptionTooLong'))
+  }), [t])
+
   const initialValues = useMemo(
     () => ({
       name: account?.name || '',
@@ -190,9 +190,9 @@ const AccountDialog = ({ open, onClose, onSuccess, account }: AccountDialogProps
                     }
                   }}
                 >
-                  <MenuItem value='active'>Active</MenuItem>
-                  <MenuItem value='inactive'>Inactive</MenuItem>
-                  <MenuItem value='pending'>Pending</MenuItem>
+                  <MenuItem value='active'>{t('accounts.accountDialog.fields.active')}</MenuItem>
+                  <MenuItem value='inactive'>{t('accounts.accountDialog.fields.inactive')}</MenuItem>
+                  <MenuItem value='pending'>{t('accounts.accountDialog.fields.pending')}</MenuItem>
                 </CustomTextField>
               </Grid>
               <Grid size={{ xs: 6 }}>
@@ -213,9 +213,9 @@ const AccountDialog = ({ open, onClose, onSuccess, account }: AccountDialogProps
                     }
                   }}
                 >
-                  <MenuItem value='free'>Free</MenuItem>
-                  <MenuItem value='pro'>Pro</MenuItem>
-                  <MenuItem value='enterprise'>Enterprise</MenuItem>
+                  <MenuItem value='free'>{t('accounts.accountDialog.fields.free')}</MenuItem>
+                  <MenuItem value='pro'>{t('accounts.accountDialog.fields.pro')}</MenuItem>
+                  <MenuItem value='enterprise'>{t('accounts.accountDialog.fields.enterprise')}</MenuItem>
                 </CustomTextField>
               </Grid>
               <Grid size={{ xs: 12 }}>

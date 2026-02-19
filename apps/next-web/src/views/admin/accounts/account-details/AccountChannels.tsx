@@ -21,8 +21,8 @@ const AccountChannels = () => {
   return (
     <Card>
       <CardHeader
-        title='Connected Platforms'
-        subheader='Manage integrations with third-party platforms'
+        title={t('accounts.channels.title')}
+        subheader={t('accounts.channels.subtitle')}
         avatar={
           <CustomAvatar skin='light' variant='rounded' color='secondary' sx={{ width: 48, height: 48 }}>
             <i className='tabler-share' style={{ fontSize: '1.5rem' }} />
@@ -52,7 +52,7 @@ const AccountChannels = () => {
                 <i className='tabler-brand-google' style={{ fontSize: '2rem' }} />
               </CustomAvatar>
               <Box sx={{ flexGrow: 1 }}>
-                <Typography variant='h6' sx={{ mb: 0.5 }}>Google</Typography>
+                <Typography variant='h6' sx={{ mb: 0.5 }}>{t('common.channel.google')}</Typography>
                 <Typography variant='body2' color='text.secondary'>
                   {t('accounts.channels.googleSubtitle')}
                 </Typography>
@@ -82,7 +82,7 @@ const AccountChannels = () => {
                 <i className='tabler-brand-facebook' style={{ fontSize: '2rem' }} />
               </CustomAvatar>
               <Box sx={{ flexGrow: 1 }}>
-                <Typography variant='h6' sx={{ mb: 0.5 }}>Facebook</Typography>
+                <Typography variant='h6' sx={{ mb: 0.5 }}>{t('common.channel.facebook')}</Typography>
                 <Typography variant='body2' color='text.secondary'>
                   {t('accounts.channels.facebookSubtitle')}
                 </Typography>

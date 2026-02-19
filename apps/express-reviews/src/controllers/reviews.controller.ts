@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
+import { createSuccessResponse, createErrorResponse, SystemMessageCode } from '@platform/contracts';
 import { reviewSourceRepository, reviewRepository } from '@platform/db';
 import { reviewSyncService } from '../services/review-sync.service';
 
@@ -20,11 +20,11 @@ export const listReviewSources = async (req: Request, res: Response) => {
             // Exclude tokens
         }));
 
-        const response = createSuccessResponse(sanitizedSources, 'Review sources fetched successfully', 200, { requestId: req.id });
+        const response = createSuccessResponse(sanitizedSources, 'Review sources fetched successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
         res.status(response.statusCode).json(response);
     } catch (error: any) {
         console.error('List review sources error:', error);
-        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        const response = createErrorResponse('Internal server error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
         res.status(response.statusCode).json(response);
     }
 };
@@ -34,11 +34,11 @@ export const listLocationReviews = async (req: Request, res: Response) => {
         const { locationId } = req.params;
         const reviews = await reviewRepository.findByLocationId(locationId);
 
-        const response = createSuccessResponse(reviews, 'Reviews fetched successfully', 200, { requestId: req.id });
+        const response = createSuccessResponse(reviews, 'Reviews fetched successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
         res.status(response.statusCode).json(response);
     } catch (error: any) {
         console.error('List reviews error:', error);
-        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        const response = createErrorResponse('Internal server error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
         res.status(response.statusCode).json(response);
     }
 };
@@ -53,11 +53,11 @@ export const disconnectReviewSource = async (req: Request, res: Response) => {
         // Let's delete it for now to allow re-connection cleanly, or introduce status update.
         await reviewSourceRepository.delete(id);
 
-        const response = createSuccessResponse({}, 'Review source disconnected successfully', 200, { requestId: req.id });
+        const response = createSuccessResponse({}, 'Review source disconnected successfully', 200, { requestId: req.id }, SystemMessageCode.REVIEWS_SOURCE_DISCONNECTED);
         res.status(response.statusCode).json(response);
     } catch (error: any) {
         console.error('Disconnect review source error:', error);
-        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        const response = createErrorResponse('Internal server error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
         res.status(response.statusCode).json(response);
     }
 };
@@ -77,11 +77,11 @@ export const getReviewStats = async (req: Request, res: Response) => {
             totalReviews,
             averageRating: Number(averageRating.toFixed(1)),
             platforms: ['google', 'yelp'] // Mock or derive from sources
-        }, 'Review stats fetched successfully', 200, { requestId: req.id });
+        }, 'Review stats fetched successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
         res.status(response.statusCode).json(response);
     } catch (error: any) {
         console.error('Get review stats error:', error);
-        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        const response = createErrorResponse('Internal server error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
         res.status(response.statusCode).json(response);
     }
 };
@@ -95,11 +95,11 @@ export const syncReviews = async (req: Request, res: Response) => {
         // Let's await for now as MVP.
         const results = await reviewSyncService.syncReviewsForLocation(locationId);
 
-        const response = createSuccessResponse(results, 'Sync completed', 200, { requestId: req.id });
+        const response = createSuccessResponse(results, 'Sync completed', 200, { requestId: req.id }, SystemMessageCode.REVIEWS_SYNC_COMPLETED);
         res.status(response.statusCode).json(response);
     } catch (error: any) {
         console.error('Sync reviews error:', error);
-        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        const response = createErrorResponse('Internal server error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
         res.status(response.statusCode).json(response);
     }
 };
@@ -152,11 +152,11 @@ export const getLocationKeywords = async (req: Request, res: Response) => {
             .sort((a, b) => b.count - a.count)
             .slice(0, 20); // Top 20 keywords
 
-        const response = createSuccessResponse({ keywords }, 'Keywords fetched successfully', 200, { requestId: req.id });
+        const response = createSuccessResponse({ keywords }, 'Keywords fetched successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
         res.status(response.statusCode).json(response);
     } catch (error: any) {
         console.error('Get location keywords error:', error);
-        const response = createErrorResponse('Internal server error', ErrorCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        const response = createErrorResponse('Internal server error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
         res.status(response.statusCode).json(response);
     }
 };

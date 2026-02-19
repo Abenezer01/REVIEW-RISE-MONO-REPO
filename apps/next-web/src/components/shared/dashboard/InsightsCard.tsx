@@ -10,12 +10,13 @@ import ListItemAvatar from '@mui/material/ListItemAvatar'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import { useTranslations } from 'next-intl'
 
 interface Insight {
   id: string
   title: string
   description: string
-  severity: 'info' | 'warning' | 'success'
+  severity: 'INFO' | 'warning' | 'success'
   icon?: React.ReactNode
 }
 
@@ -24,40 +25,42 @@ interface InsightsCardProps {
 }
 
 const InsightsCard = ({ insights }: InsightsCardProps) => {
+  const t = useTranslations('dashboard.brandRise.overview.insights')
+
   return (
     <Card sx={{ height: '100%' }}>
-      <CardHeader 
-        title="Key Insights" 
-        subheader="AI-powered recommendations"
+      <CardHeader
+        title={t('title')}
+        subheader={t('subtitle')}
         action={
-            <Typography variant="caption" sx={{ bgcolor: 'secondary.light', color: 'secondary.dark', px: 1, py: 0.5, borderRadius: 1 }}>
-                AI Generated
-            </Typography>
+          <Typography variant="caption" sx={{ bgcolor: 'secondary.light', color: 'secondary.dark', px: 1, py: 0.5, borderRadius: 1 }}>
+            {t('aiGenerated')}
+          </Typography>
         }
       />
       <CardContent>
         <List disablePadding>
           {insights.map((insight, index) => (
             <Box key={insight.id} sx={{ mb: index !== insights.length - 1 ? 2 : 0, bgcolor: 'action.hover', borderRadius: 1 }}>
-                <ListItem alignItems="flex-start">
+              <ListItem alignItems="flex-start">
                 <ListItemAvatar>
-                    <Avatar 
-                        variant="rounded"
-                        sx={{ 
-                            bgcolor: insight.severity === 'success' ? 'success.light' : insight.severity === 'warning' ? 'warning.light' : 'info.light',
-                            color: insight.severity === 'success' ? 'success.main' : insight.severity === 'warning' ? 'warning.main' : 'info.main'
-                        }}
-                    >
+                  <Avatar
+                    variant="rounded"
+                    sx={{
+                      bgcolor: insight.severity === 'success' ? 'success.light' : insight.severity === 'warning' ? 'warning.light' : 'info.light',
+                      color: insight.severity === 'success' ? 'success.main' : insight.severity === 'warning' ? 'warning.main' : 'info.main'
+                    }}
+                  >
                     {insight.icon || (insight.severity === 'success' ? '✓' : '!')}
-                    </Avatar>
+                  </Avatar>
                 </ListItemAvatar>
                 <ListItemText
-                    primary={insight.title}
-                    secondary={insight.description}
-                    primaryTypographyProps={{ variant: 'subtitle2', fontWeight: 600 }}
-                    secondaryTypographyProps={{ variant: 'body2', noWrap: false }}
+                  primary={insight.title}
+                  secondary={insight.description}
+                  primaryTypographyProps={{ variant: 'subtitle2', fontWeight: 600 }}
+                  secondaryTypographyProps={{ variant: 'body2', noWrap: false }}
                 />
-                </ListItem>
+              </ListItem>
             </Box>
           ))}
         </List>

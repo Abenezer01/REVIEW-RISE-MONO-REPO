@@ -3,8 +3,13 @@
 import React, { useState } from 'react'
 
 import { Box, Card, CardContent, Grid, TextField, MenuItem, Typography, Button } from '@mui/material'
-import { toast } from 'react-toastify'
 import { keyframes } from '@mui/material/styles'
+
+import { SystemMessageCode } from '@platform/contracts'
+
+import { useTranslations } from 'next-intl'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import { SERVICES } from '@/configs/services'
 import apiClient from '@/lib/apiClient'
@@ -20,30 +25,30 @@ const float = keyframes`
 `
 
 const GOALS = [
-    { value: 'engagement', label: 'Engagement' },
-    { value: 'awareness', label: 'Brand Awareness' },
-    { value: 'sales', label: 'Sales / Conversion' },
-    { value: 'education', label: 'Education' },
+    'engagement',
+    'awareness',
+    'sales',
+    'education',
 ]
 
 const LANGUAGES = [
-    { value: 'English', label: 'English' },
-    { value: 'Spanish', label: 'Spanish' },
-    { value: 'French', label: 'French' },
-    { value: 'German', label: 'German' },
-    { value: 'Arabic', label: 'Arabic' }
+    'English',
+    'Spanish',
+    'French',
+    'German',
+    'Arabic'
 ]
 
 const LENGTHS = [
-    { value: 'short', label: 'Short' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'long', label: 'Long' }
+    'short',
+    'medium',
+    'long'
 ]
 
 const TEMPLATES = [
-    { label: 'Product Launch', sub: 'Announce new products with excitement', icon: 'tabler-rocket' },
-    { label: 'Behind the Scenes', sub: 'Show your brand\'s human side', icon: 'tabler-camera' },
-    { label: 'Educational Tips', sub: 'Share valuable insights', icon: 'tabler-school' },
+    { key: 'launch', icon: 'tabler-rocket' },
+    { key: 'behindScenes', icon: 'tabler-camera' },
+    { key: 'educationalTips', icon: 'tabler-school' },
 ]
 
 interface UnifiedPostGeneratorProps {
@@ -51,6 +56,9 @@ interface UnifiedPostGeneratorProps {
 }
 
 export default function UnifiedPostGenerator({ initialDate }: UnifiedPostGeneratorProps) {
+    const { notify } = useSystemMessages()
+    const t = useTranslations('studio')
+    const tl = useTranslations('common')
     const [loading, setLoading] = useState(false)
     
     // Inputs
@@ -67,7 +75,7 @@ export default function UnifiedPostGenerator({ initialDate }: UnifiedPostGenerat
 
     const handleGenerate = async () => {
         if (!topic) {
-            toast.error('Please enter a topic or focus')
+            notify(SystemMessageCode.VALIDATION_ERROR)
             
 return
         }
@@ -87,10 +95,10 @@ return
             })
 
             setResult(response.data)
-            toast.success('Generated complete post package!')
+            notify(SystemMessageCode.SUCCESS)
         } catch (error) {
             console.error(error)
-            toast.error('Failed to generate post package')
+            notify(SystemMessageCode.GENERIC_ERROR)
         } finally {
             setLoading(false)
         }
@@ -108,7 +116,7 @@ return
                     onClick={() => setResult(null)} 
                     sx={{ mb: 3 }}
                 >
-                    Back to Studio
+                    {t('magic.backToStudio')}
                 </Button>
                 <UnifiedResults data={result} initialDate={initialDate} />
             </Box>
@@ -119,10 +127,10 @@ return
         <Box>
             <Box sx={{ mb: 4, textAlign: 'center' }}>
                 <Typography variant="h3" fontWeight="bold" gutterBottom>
-                    Create Complete Posts Instantly
+                    {t('magic.heroTitle')}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                    One AI brain. One prompt. Caption + Hashtags + Content Ideas in seconds.
+                    {t('magic.heroSubtitle')}
                 </Typography>
             </Box>
 
@@ -142,7 +150,7 @@ return
                                 }}>
                                     <i className="tabler-sparkles" style={{ fontSize: 24 }} />
                                 </Box>
-                                <Typography variant="h6" fontWeight="bold">What do you want to create?</Typography>
+                                <Typography variant="h6" fontWeight="bold">{t('magic.question')}</Typography>
                             </Box>
 
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -150,9 +158,9 @@ return
                                 <PlatformSelector value={platform} onChange={setPlatform} />
 
                                 <Box>
-                                    <Typography variant="body2" fontWeight="bold" mb={1} color="text.secondary">Topic or Main Idea</Typography>
+                                    <Typography variant="body2" fontWeight="bold" mb={1} color="text.secondary">{t('magic.topicLabel')}</Typography>
                                     <TextField
-                                        placeholder="e.g., A post announcing our new summer collection... include keywords like summer, sale, fashion"
+                                        placeholder={t('magic.topicPlaceholder')}
                                         multiline
                                         rows={3}
                                         value={topic}
@@ -170,9 +178,9 @@ return
 
                                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3 }}>
                                     <Box>
-                                        <Typography variant="body2" fontWeight="bold" mb={1} color="text.secondary">Target Audience</Typography>
+                                        <Typography variant="body2" fontWeight="bold" mb={1} color="text.secondary">{t('magic.audienceLabel')}</Typography>
                                         <TextField
-                                            placeholder="e.g. Young professionals..."
+                                            placeholder={t('magic.audiencePlaceholder')}
                                             value={audience}
                                             onChange={(e) => setAudience(e.target.value)}
                                             fullWidth
@@ -181,7 +189,7 @@ return
                                         />
                                     </Box>
                                     <Box>
-                                        <Typography variant="body2" fontWeight="bold" mb={1} color="text.secondary">Goal</Typography>
+                                        <Typography variant="body2" fontWeight="bold" mb={1} color="text.secondary">{t('magic.goalLabel')}</Typography>
                                         <TextField
                                             select
                                             value={goal}
@@ -191,7 +199,7 @@ return
                                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                                         >
                                             {GOALS.map(g => (
-                                                <MenuItem key={g.value} value={g.value}>{g.label}</MenuItem>
+                                                <MenuItem key={g} value={g}>{t(`magic.goals.${g}`)}</MenuItem>
                                             ))}
                                         </TextField>
                                     </Box>
@@ -201,7 +209,7 @@ return
 
                                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3 }}>
                                     <Box>
-                                        <Typography variant="body2" fontWeight="bold" mb={1} color="text.secondary">Language</Typography>
+                                        <Typography variant="body2" fontWeight="bold" mb={1} color="text.secondary">{t('magic.languageLabel')}</Typography>
                                         <TextField
                                             select
                                             value={language}
@@ -211,12 +219,12 @@ return
                                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                                         >
                                             {LANGUAGES.map(l => (
-                                                <MenuItem key={l.value} value={l.value}>{l.label}</MenuItem>
+                                                <MenuItem key={l} value={l}>{tl(`language.${l.toLowerCase()}`)}</MenuItem>
                                             ))}
                                         </TextField>
                                     </Box>
                                     <Box>
-                                        <Typography variant="body2" fontWeight="bold" mb={1} color="text.secondary">Caption Length</Typography>
+                                        <Typography variant="body2" fontWeight="bold" mb={1} color="text.secondary">{t('magic.lengthLabel')}</Typography>
                                         <TextField
                                             select
                                             value={length}
@@ -226,7 +234,7 @@ return
                                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                                         >
                                             {LENGTHS.map(l => (
-                                                <MenuItem key={l.value} value={l.value}>{l.label}</MenuItem>
+                                                <MenuItem key={l} value={l}>{t(`magic.lengths.${l}`)}</MenuItem>
                                             ))}
                                         </TextField>
                                     </Box>
@@ -253,7 +261,7 @@ return
                                     }}
                                     startIcon={loading ? <i className="tabler-loader-2 tabler-spin" /> : <i className="tabler-wand" />}
                                 >
-                                    {loading ? 'Generating Magic...' : 'Generate Complete Post'}
+                                    {loading ? t('magic.loading') : t('magic.submitButton')}
                                 </Button>
                             </Box>
                         </CardContent>
@@ -293,23 +301,23 @@ return
                                 <i className="tabler-brain" style={{ fontSize: 56, color: 'white' }} />
                             </Box>
 
-                            <Typography variant="h5" fontWeight="bold" gutterBottom>Your AI Content Brain</Typography>
+                            <Typography variant="h5" fontWeight="bold" gutterBottom>{t('magic.aiBrain')}</Typography>
                             <Typography variant="body2" color="text.secondary" sx={{ mb: 4, maxWidth: 300, mx: 'auto' }}>
-                                Powered by advanced AI that understands your brand voice, audience, and platform best practices.
+                                {t('magic.aiBrainDesc')}
                             </Typography>
 
                             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
                                 <Box>
-                                    <Typography variant="h6" fontWeight="bold">3-in-1</Typography>
-                                    <Typography variant="caption" color="text.secondary">OUTPUTS</Typography>
+                                    <Typography variant="h6" fontWeight="bold">{t('magic.outputCount')}</Typography>
+                                    <Typography variant="caption" color="text.secondary">{t('magic.outputs')}</Typography>
                                 </Box>
                                 <Box>
-                                    <Typography variant="h6" fontWeight="bold">10s</Typography>
-                                    <Typography variant="caption" color="text.secondary">GENERATION</Typography>
+                                    <Typography variant="h6" fontWeight="bold">{t('magic.generationTime')}</Typography>
+                                    <Typography variant="caption" color="text.secondary">{t('magic.generation')}</Typography>
                                 </Box>
                                 <Box>
-                                    <Typography variant="h6" fontWeight="bold">98%</Typography>
-                                    <Typography variant="caption" color="text.secondary">ACCURACY</Typography>
+                                    <Typography variant="h6" fontWeight="bold">{t('magic.accuracyRate')}</Typography>
+                                    <Typography variant="caption" color="text.secondary">{t('magic.accuracy')}</Typography>
                                 </Box>
                             </Box>
                         </Card>
@@ -319,21 +327,21 @@ return
                             <Box sx={{ mb: 2 }}>
                                 <i className="tabler-rocket" style={{ fontSize: 48, color: '#90A4AE', opacity: 0.5 }} />
                             </Box>
-                            <Typography variant="h6" fontWeight="bold" gutterBottom>Ready to Create Magic?</Typography>
+                            <Typography variant="h6" fontWeight="bold" gutterBottom>{t('magic.readyTitle')}</Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Fill in the form and hit generate to get your complete post package.
+                                {t('magic.readyDesc')}
                             </Typography>
                         </Card>
 
                         {/* 3. Quick Start Templates */}
                         <Card variant="outlined" sx={{ borderRadius: 3, bgcolor: 'background.paper' }}>
                             <CardContent sx={{ p: 3 }}>
-                                <Typography variant="subtitle1" fontWeight="bold" mb={2}>Quick Start Templates</Typography>
+                                <Typography variant="subtitle1" fontWeight="bold" mb={2}>{t('magic.quickStart')}</Typography>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                     {TEMPLATES.map((tpl, i) => (
                                         <Box 
                                             key={i} 
-                                            onClick={() => handleUseTemplate(tpl.label)}
+                                            onClick={() => handleUseTemplate(t(`magic.templates.${tpl.key}.title`))}
                                             sx={{ 
                                                 display: 'flex', 
                                                 alignItems: 'center', 
@@ -352,10 +360,10 @@ return
                                                 <i className={tpl.icon} style={{ fontSize: 20 }} />
                                             </Box>
                                             <Box sx={{ flexGrow: 1 }}>
-                                                <Typography variant="body2" fontWeight="bold">{tpl.label}</Typography>
-                                                <Typography variant="caption" color="text.secondary">{tpl.sub}</Typography>
+                                                <Typography variant="body2" fontWeight="bold">{t(`magic.templates.${tpl.key}.title`)}</Typography>
+                                                <Typography variant="caption" color="text.secondary">{t(`magic.templates.${tpl.key}.subtitle`)}</Typography>
                                             </Box>
-                                            <Button size="small" variant="outlined" sx={{ minWidth: 0, px: 2 }}>Use</Button>
+                                            <Button size="small" variant="outlined" sx={{ minWidth: 0, px: 2 }}>{t('magic.use')}</Button>
                                         </Box>
                                     ))}
                                 </Box>

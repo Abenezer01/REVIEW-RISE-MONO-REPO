@@ -15,6 +15,8 @@ import Paper from '@mui/material/Paper'
 import { useTheme, alpha } from '@mui/material/styles'
 import Fade from '@mui/material/Fade'
 
+import { useTranslation } from '@/hooks/useTranslation'
+
 import CustomChip from '@core/components/mui/Chip'
 
 interface SocialPostDetailModalProps {
@@ -25,6 +27,7 @@ interface SocialPostDetailModalProps {
 
 const SocialPostDetailModal = ({ open, onClose, job }: SocialPostDetailModalProps) => {
   const theme = useTheme()
+  const t = useTranslation('dashboard')
 
   if (!job) return null
 
@@ -97,16 +100,16 @@ const SocialPostDetailModal = ({ open, onClose, job }: SocialPostDetailModalProp
                 </Avatar>
                 <Box>
                     <Typography variant='h5' fontWeight={700} sx={{ letterSpacing: -0.5 }}>
-                        Social Post Details
+                        {t('jobs.social.socialDetail.title')}
                     </Typography>
                     <Typography component="div" variant='body2' color='text.secondary' sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        Job ID: <Chip label={job.id} size='small' variant='outlined' sx={{ height: 20, fontFamily: 'monospace', fontSize: '0.75rem', borderRadius: 1 }} />
+                        {t('jobs.social.socialDetail.jobId')}: <Chip label={job.id} size='small' variant='outlined' sx={{ height: 20, fontFamily: 'monospace', fontSize: '0.75rem', borderRadius: 1 }} />
                     </Typography>
                 </Box>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <CustomChip
-                    label={job.status}
+                    label={t(`common.status.${job.status}`)}
                     color={getStatusColor(job.status)}
                     variant='tonal'
                     size='medium'
@@ -132,7 +135,7 @@ const SocialPostDetailModal = ({ open, onClose, job }: SocialPostDetailModalProp
                 borderRight: { md: `1px solid ${theme.palette.divider}` }
             }}>
                 <Typography variant='overline' color='text.secondary' fontWeight={700} sx={{ mb: 3, letterSpacing: 1 }}>
-                    Mobile Preview
+                    {t('jobs.social.socialDetail.mobilePreview')}
                 </Typography>
 
                 {/* Mobile Device Frame */}
@@ -223,10 +226,10 @@ const SocialPostDetailModal = ({ open, onClose, job }: SocialPostDetailModalProp
                                 <Box component="span" fontWeight={600} sx={{ mr: 1 }}>
                                     {job.business?.name || 'user'}
                                 </Box>
-                                {payload.content || 'No text content'}
+                                {payload.content || t('jobs.social.socialDetail.noContent')}
                             </Typography>
                             <Typography variant='caption' color='text.secondary' sx={{ mt: 1, display: 'block', fontSize: '0.65rem' }}>
-                                {payload.scheduledTime ? new Date(payload.scheduledTime).toLocaleString() : 'Just now'}
+                                {payload.scheduledTime ? new Date(payload.scheduledTime).toLocaleString() : t('jobs.social.socialDetail.justNow')}
                             </Typography>
                          </Box>
                      </Box>
@@ -236,7 +239,7 @@ const SocialPostDetailModal = ({ open, onClose, job }: SocialPostDetailModalProp
             {/* Right Column: Detailed Metadata */}
             <Grid size={{ xs: 12, md: 7 }} sx={{ p: 5 }}>
                 <Typography variant='overline' color='text.secondary' fontWeight={700} sx={{ mb: 3, display: 'block', letterSpacing: 1 }}>
-                    Job Information
+                    {t('jobs.social.socialDetail.jobInfo')}
                 </Typography>
 
                 <Grid container spacing={3}>
@@ -252,16 +255,16 @@ const SocialPostDetailModal = ({ open, onClose, job }: SocialPostDetailModalProp
                                 <i className={`tabler-${job.status === 'completed' ? 'check' : job.status === 'failed' ? 'alert-triangle' : 'clock'}`} style={{ fontSize: '1.5rem' }} />
                             </Box>
                             <Box sx={{ flex: 1 }}>
-                                <Typography variant='subtitle2' color='text.secondary'>Current Status</Typography>
-                                <Typography variant='h6' sx={{ textTransform: 'capitalize' }}>{job.status}</Typography>
+                                <Typography variant='subtitle2' color='text.secondary'>{t('jobs.social.socialDetail.currentStatus')}</Typography>
+                                <Typography variant='h6' sx={{ textTransform: 'capitalize' }}>{t(`common.status.${job.status}`)}</Typography>
                             </Box>
                             {job.status === 'failed' && (
                                 <Box sx={{ flex: 2, bgcolor: alpha(theme.palette.error.main, 0.05), p: 1.5, borderRadius: 1, border: `1px dashed ${theme.palette.error.main}` }}>
                                     <Typography variant='caption' color='error.main' fontWeight={600} display='block'>
-                                        Error Message
+                                        {t('jobs.social.socialDetail.errorMessage')}
                                     </Typography>
                                     <Typography variant='body2' color='error.main'>
-                                        {job.error?.message || 'Unknown error occurred'}
+                                        {job.error?.message || t('jobs.social.socialDetail.unknownError')}
                                     </Typography>
                                 </Box>
                             )}
@@ -272,8 +275,8 @@ const SocialPostDetailModal = ({ open, onClose, job }: SocialPostDetailModalProp
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <InfoCard 
                             icon='tabler-calendar-event'
-                            title='Scheduled For'
-                            value={payload.scheduledTime ? new Date(payload.scheduledTime).toLocaleString() : 'Not scheduled'}
+                            title={t('jobs.social.columns.scheduledFor')}
+                            value={payload.scheduledTime ? new Date(payload.scheduledTime).toLocaleString() : t('common.status.scheduled')}
                             color='primary'
                         />
                     </Grid>
@@ -282,10 +285,9 @@ const SocialPostDetailModal = ({ open, onClose, job }: SocialPostDetailModalProp
                     <Grid size={{ xs: 12, sm: 6 }}>
                          <InfoCard 
                             icon={`tabler-brand-${platform.toLowerCase()}`}
-                            title='Target Platform'
-                            value={platform}
+                            title={t('jobs.social.socialDetail.targetPlatform')}
+                            value={t(`common.channel.${platform.toLowerCase()}`)}
                             color='info'
-                            isCapitalized
                         />
                     </Grid>
 
@@ -294,20 +296,20 @@ const SocialPostDetailModal = ({ open, onClose, job }: SocialPostDetailModalProp
                          <Paper variant='outlined' sx={{ p: 3, borderRadius: 2 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                                 <i className='tabler-building-store' />
-                                <Typography variant='subtitle1' fontWeight={600}>Account Details</Typography>
+                                <Typography variant='subtitle1' fontWeight={600}>{t('jobs.social.socialDetail.accountDetails')}</Typography>
                             </Box>
                             <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                                 <Box>
-                                    <Typography variant='caption' color='text.secondary'>Account Name</Typography>
+                                    <Typography variant='caption' color='text.secondary'>{t('jobs.social.socialDetail.accountName')}</Typography>
                                     <Typography variant='body1' fontWeight={500}>{job.business?.name || 'N/A'}</Typography>
                                 </Box>
                                 <Box>
-                                    <Typography variant='caption' color='text.secondary'>Location</Typography>
+                                    <Typography variant='caption' color='text.secondary'>{t('jobs.social.columns.status')}</Typography>
                                     <Typography variant='body1' fontWeight={500}>{job.location?.name || 'N/A'}</Typography>
                                 </Box>
                                 <Box>
-                                    <Typography variant='caption' color='text.secondary'>Post Type</Typography>
-                                    <Chip label={payload.type || 'organic'} size='small' variant='tonal' color='secondary' sx={{ ml: 1, textTransform: 'capitalize' }} />
+                                    <Typography variant='caption' color='text.secondary'>{t('jobs.social.socialDetail.postType')}</Typography>
+                                    <Chip label={t(`jobs.social.types.${payload.type || 'organic'}`)} size='small' variant='tonal' color='secondary' sx={{ ml: 1, textTransform: 'capitalize' }} />
                                 </Box>
                             </Box>
                          </Paper>
@@ -319,7 +321,7 @@ const SocialPostDetailModal = ({ open, onClose, job }: SocialPostDetailModalProp
 
       <DialogActions sx={{ p: 3, borderTop: `1px solid ${theme.palette.divider}`, bgcolor: 'background.paper' }}>
         <Button onClick={onClose} variant='contained' color='secondary' sx={{ borderRadius: 2, px: 4 }}>
-            Close Detail
+            {t('jobs.social.socialDetail.closeDetail')}
         </Button>
       </DialogActions>
     </Dialog>

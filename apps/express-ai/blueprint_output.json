@@ -1,0 +1,127 @@
+Generating Blueprint for: Apex Plumbing
+Falling back to mock generation due to error.
+{
+  "clusters": [
+    {
+      "intent": "Service",
+      "theme": "Emergency Leak Repair - Core",
+      "funnelStage": "MOF",
+      "keywords": [
+        {
+          "term": "emergency leak repair Austin, TX",
+          "matchType": "Phrase"
+        },
+        {
+          "term": "best emergency leak repair Austin, TX",
+          "matchType": "Phrase"
+        }
+      ]
+    },
+    {
+      "intent": "Problem",
+      "theme": "Pain Points",
+      "funnelStage": "TOF",
+      "keywords": [
+        {
+          "term": "fix Burst pipe",
+          "matchType": "Broad"
+        },
+        {
+          "term": "fix Flooded kitchen",
+          "matchType": "Broad"
+        }
+      ]
+    }
+  ],
+  "adGroups": [
+    {
+      "name": "Emergency Leak Repair - Core",
+      "keywords": {
+        "intent": "Service",
+        "theme": "Emergency Leak Repair - Core",
+        "funnelStage": "MOF",
+        "keywords": [
+          {
+            "term": "emergency leak repair Austin, TX",
+            "matchType": "Phrase"
+          },
+          {
+            "term": "best emergency leak repair Austin, TX",
+            "matchType": "Phrase"
+          }
+        ]
+      },
+      "assets": {
+        "headlines": [
+          "Emergency Leak Repair",
+          "Best Emergency Leak Repair",
+          "Emergency Leak Repair in Austi",
+          "Call Now",
+          "Free Initial Consult"
+        ],
+        "descriptions": [
+          "Top rated Emergency Leak Repair serving Austin, TX. Call us today for a free quote.",
+          "Professional, reliable, and affordable services. Satisfaction guaranteed."
+        ]
+      }
+    },
+    {
+      "name": "Pain Points",
+      "keywords": {
+        "intent": "Problem",
+        "theme": "Pain Points",
+        "funnelStage": "TOF",
+        "keywords": [
+          {
+            "term": "fix Burst pipe",
+            "matchType": "Broad"
+          },
+          {
+            "term": "fix Flooded kitchen",
+            "matchType": "Broad"
+          }
+        ]
+      },
+      "assets": {
+        "headlines": [
+          "Emergency Leak Repair",
+          "Best Emergency Leak Repair",
+          "Emergency Leak Repair in Austi",
+          "Call Now",
+          "Free Initial Consult"
+        ],
+        "descriptions": [
+          "Top rated Emergency Leak Repair serving Austin, TX. Call us today for a free quote.",
+          "Professional, reliable, and affordable services. Satisfaction guaranteed."
+        ]
+      }
+    }
+  ],
+  "negatives": [
+    {
+      "category": "General",
+      "keywords": [
+        "free",
+        "cheap",
+        "diy",
+        "job"
+      ]
+    }
+  ],
+  "landingPageAnalysis": {
+    "url": "https://apexplumbing.com/emergency",
+    "isValid": true,
+    "score": 85,
+    "mobileOptimized": true,
+    "trustSignalsDetected": [
+      "SSL",
+      "Phone Number"
+    ],
+    "missingElements": []
+  },
+  "performanceAssumptions": {
+    "expectedCTR": "3-5%",
+    "expectedCPC": "$2.50-$4.00",
+    "conversionDifficulty": 5
+  }
+}

@@ -1,0 +1,27 @@
+
+> @platform/campaign-engine@0.1.0 test C:\Users\pc\Documents\Projects\Review Rise\REVIEW-RISE-MONO-REPO\REVIEW-RISE-MONO-REPO\packages\@platform\campaign-engine
+> jest "test/engine/channel-selector.test.ts"
+
+FAIL test/engine/channel-selector.test.ts
+  ● Test suite failed to run
+
+    [96mtest/engine/channel-selector.test.ts[0m:[93m9[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'string' is not assignable to type 'VerticalType'.
+
+    [7m9[0m     vertical,
+    [7m [0m [91m    ~~~~~~~~[0m
+
+      [96msrc/schema/campaign-plan.ts[0m:[93m17[0m:[93m5[0m
+        [7m17[0m     vertical: z.enum([
+        [7m  [0m [96m    ~~~~~~~~~~~~~~~~~~[0m
+        [7m18[0m         'Local Service', 'E-commerce', 'SaaS', 'Restaurant', 'Healthcare'
+        [7m  [0m [96m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+        [7m19[0m     ] as [VerticalType, ...VerticalType[]]),
+        [7m  [0m [96m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+        The expected type comes from property 'vertical' which is declared here on type '{ vertical: VerticalType; objective: "Leads" | "Awareness" | "Sales" | "Local Visits"; budget: number; currency: string; brandName?: string | undefined; }'
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        3.522 s
+Ran all test suites matching /test\\engine\\channel-selector.test.ts/i.
+ ELIFECYCLE  Test failed. See above for more details.

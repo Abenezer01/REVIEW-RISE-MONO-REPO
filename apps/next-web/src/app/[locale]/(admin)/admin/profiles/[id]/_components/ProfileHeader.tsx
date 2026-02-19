@@ -18,7 +18,7 @@ import {
   CheckCircle as ConfirmIcon,
   History as HistoryIcon,
 } from '@mui/icons-material';
-import { formatDynamicDate } from '@platform/utils';
+import { useTranslations, useFormatter } from 'next-intl';
 
 import type { BrandProfile } from '@/services/brand-profile.service';
 
@@ -43,6 +43,8 @@ export default function ProfileHeader({
   onReExtract,
   onDelete,
 }: ProfileHeaderProps) {
+  const tc = useTranslations('common');
+  const format = useFormatter();
   const theme = useTheme();
 
   return (
@@ -131,7 +133,7 @@ export default function ProfileHeader({
             )}
             <Typography variant="caption" sx={{ color: 'text.disabled', display: 'flex', alignItems: 'center', fontWeight: 600 }}>
               <HistoryIcon sx={{ mr: 0.75, fontSize: 16 }} />
-              Last updated {formatDynamicDate(profile.updatedAt, 'MMM DD, YYYY HH:mm')}
+              {tc('form.success-updated')} {format.dateTime(new Date(profile.updatedAt), { month: 'short', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
             </Typography>
           </Stack>
         </Box>
@@ -150,7 +152,7 @@ export default function ProfileHeader({
                 boxShadow: (theme) => `0 8px 16px ${alpha(theme.palette.primary.main, 0.25)}`
               }}
             >
-              Confirm
+              {tc('common.confirm')}
             </Button>
           )}
           <Button
@@ -167,9 +169,9 @@ export default function ProfileHeader({
               '&:hover': { borderColor: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.02) }
             }}
           >
-            Re-extract
+            {t('list.actions.reExtract')}
           </Button>
-          <Tooltip title="Delete Profile">
+          <Tooltip title={tc('common.delete')}>
             <IconButton
               color="error"
               onClick={onDelete}

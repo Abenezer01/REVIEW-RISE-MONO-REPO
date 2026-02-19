@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unresolved */
 'use client'
 
 import React from 'react'
@@ -11,6 +10,7 @@ import Tooltip from '@mui/material/Tooltip'
 import InfoOutlined from '@mui/icons-material/InfoOutlined'
 
 import MetricCard from '@/components/shared/analytics/MetricCard'
+import { useTranslations } from 'next-intl'
 
 // Icons
 const VisibilityIcon = () => (
@@ -46,13 +46,15 @@ interface AIVisibilityOverviewProps {
 }
 
 const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) => {
+  const t = useTranslations('dashboard')
+
   if (!metrics) return null
 
   const getSentimentLabel = (score: number) => {
-    if (score >= 60) return 'Positive'
-    if (score <= 40) return 'Negative'
+    if (score >= 60) return t('reviews.positive')
+    if (score <= 40) return t('reviews.negative')
 
-    return 'Neutral'
+    return t('reviews.neutral')
   }
 
   const getSentimentColor = (score: number): 'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info' => {
@@ -83,8 +85,8 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
         <MetricCard
           title={
             <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
-              Visibility Score
-              <Tooltip title="Overall presence of your brand across major AI models (ChatGPT, Gemini, etc.) based on mention frequency." arrow>
+              {t('aiVisibility.overview.visibilityScore')}
+              <Tooltip title={t('aiVisibility.overview.visibilityTooltip')} arrow>
                 <InfoOutlined sx={{ ml: 1, fontSize: '1rem', color: 'text.secondary', cursor: 'help' }} />
               </Tooltip>
             </Box>
@@ -94,15 +96,15 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
           color="primary"
           footer={
             <Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={metrics.visibilityScore}
-                  color="primary"
-                  sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
-                />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
-                  AI brand presence
-                </p>
+              <LinearProgress
+                variant="determinate"
+                value={metrics.visibilityScore}
+                color="primary"
+                sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
+              />
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
+                {t('aiVisibility.overview.visibilityFooter')}
+              </p>
             </Box>
           }
         />
@@ -112,8 +114,8 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
         <MetricCard
           title={
             <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
-              Sentiment
-              <Tooltip title="The emotional tone of AI-generated responses about your brand, ranging from negative to positive." arrow>
+              {t('aiVisibility.overview.sentiment')}
+              <Tooltip title={t('aiVisibility.overview.sentimentTooltip')} arrow>
                 <InfoOutlined sx={{ ml: 1, fontSize: '1rem', color: 'text.secondary', cursor: 'help' }} />
               </Tooltip>
             </Box>
@@ -122,17 +124,17 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
           icon={<HeartIcon />}
           color={getSentimentColor(metrics.sentimentScore)}
           footer={
-             <Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={metrics.sentimentScore}
-                  color={getSentimentColor(metrics.sentimentScore) as any}
-                  sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
-                />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
-                  AI brand perception
-                </p>
-             </Box>
+            <Box>
+              <LinearProgress
+                variant="determinate"
+                value={metrics.sentimentScore}
+                color={getSentimentColor(metrics.sentimentScore) as any}
+                sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
+              />
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
+                {t('aiVisibility.overview.sentimentFooter')}
+              </p>
+            </Box>
           }
         />
       </Grid>
@@ -141,8 +143,8 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
         <MetricCard
           title={
             <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
-              Share of Voice
-              <Tooltip title="Your brand's percentage of mentions compared to the total industry/context mentions in AI answers." arrow>
+              {t('aiVisibility.overview.shareOfVoice')}
+              <Tooltip title={t('aiVisibility.overview.shareOfVoiceTooltip')} arrow>
                 <InfoOutlined sx={{ ml: 1, fontSize: '1rem', color: 'text.secondary', cursor: 'help' }} />
               </Tooltip>
             </Box>
@@ -151,17 +153,17 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
           icon={<VoiceIcon />}
           color="info"
           footer={
-             <Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={metrics.shareOfVoice}
-                  color="info"
-                  sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
-                />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
-                  Proportion of mentions
-                </p>
-             </Box>
+            <Box>
+              <LinearProgress
+                variant="determinate"
+                value={metrics.shareOfVoice}
+                color="info"
+                sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
+              />
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
+                {t('aiVisibility.overview.shareOfVoiceFooter')}
+              </p>
+            </Box>
           }
         />
       </Grid>
@@ -170,8 +172,8 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
         <MetricCard
           title={
             <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
-              Authority
-              <Tooltip title="The quality and trustworthiness of the sources that AI models use to verify information about your brand." arrow>
+              {t('aiVisibility.overview.authority')}
+              <Tooltip title={t('aiVisibility.overview.authorityTooltip')} arrow>
                 <InfoOutlined sx={{ ml: 1, fontSize: '1rem', color: 'text.secondary', cursor: 'help' }} />
               </Tooltip>
             </Box>
@@ -180,17 +182,17 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
           icon={<AwardIcon />}
           color="secondary"
           footer={
-             <Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={metrics.citationAuthority}
-                  color="secondary"
-                  sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
-                />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
-                  Source trustworthiness
-                </p>
-             </Box>
+            <Box>
+              <LinearProgress
+                variant="determinate"
+                value={metrics.citationAuthority}
+                color="secondary"
+                sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
+              />
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
+                {t('aiVisibility.overview.authorityFooter')}
+              </p>
+            </Box>
           }
         />
       </Grid>
@@ -199,8 +201,8 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
         <MetricCard
           title={
             <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
-              Readiness
-              <Tooltip title="Technical accessibility for AI crawlers (robots.txt, SEO, public access)." arrow>
+              {t('aiVisibility.overview.readiness')}
+              <Tooltip title={t('aiVisibility.overview.readinessTooltip')} arrow>
                 <InfoOutlined sx={{ ml: 1, fontSize: '1rem', color: 'text.secondary', cursor: 'help' }} />
               </Tooltip>
             </Box>
@@ -209,17 +211,17 @@ const AIVisibilityOverview: React.FC<AIVisibilityOverviewProps> = ({ metrics }) 
           icon={<TechnicalIcon />}
           color="success"
           footer={
-             <Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={metrics.technicalReadiness}
-                  color="success"
-                  sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
-                />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
-                  AI crawler accessibility
-                </p>
-             </Box>
+            <Box>
+              <LinearProgress
+                variant="determinate"
+                value={metrics.technicalReadiness}
+                color="success"
+                sx={{ height: 6, borderRadius: 3, mb: 1, bgcolor: 'action.hover' }}
+              />
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'gray' }}>
+                {t('aiVisibility.overview.readinessFooter')}
+              </p>
+            </Box>
           }
         />
       </Grid>

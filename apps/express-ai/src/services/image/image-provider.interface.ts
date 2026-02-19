@@ -9,6 +9,7 @@ export interface ImageGenerationResult {
     urls: string[];
     prompt: string;
     settings: ImageGenerationOptions;
+    data?: any; // Allow flexibility for now if providers return more structure
 }
 
 export interface ImageGeneratorProvider {

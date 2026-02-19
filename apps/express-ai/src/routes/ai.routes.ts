@@ -10,9 +10,11 @@ import {
     GenerateVisibilityPlanRequestSchema,
     AnalyzeReviewRequestSchema,
     createSuccessResponse,
-    createErrorResponse
+    createErrorResponse,
+    SystemMessageCode
 } from '@platform/contracts';
 import { llmService } from '../services/llm.service';
+import { generateConcepts, generateCreativeImage, saveConcept, getLibrary } from '../controllers/creative-engine.controller';
 
 const router = Router();
 
@@ -20,10 +22,10 @@ router.post('/classify-competitor', validateRequest(ClassifyCompetitorRequestSch
     try {
         const { domain, title, snippet, businessContext } = req.body;
         const result = await competitorClassifier.classify(domain, title || '', snippet || '', businessContext);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Competitor classified', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('API Error:', error);
-        res.status(500).json(createErrorResponse('Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse('Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
@@ -31,10 +33,10 @@ router.post('/analyze-competitor', validateRequest(AnalyzeCompetitorRequestSchem
     try {
         const { domain, headline, uvp, serviceList, businessContext } = req.body;
         const result = await competitorClassifier.analyze(domain, headline, uvp, serviceList || [], businessContext);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Competitor analyzed', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('API Error:', error);
-        res.status(500).json(createErrorResponse('Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse('Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
@@ -42,20 +44,20 @@ router.post('/generate-report', validateRequest(GenerateReportRequestSchema), as
     try {
         const { competitors, businessType } = req.body;
         const result = await competitorClassifier.generateOpportunitiesReport(competitors, businessType);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Report generated', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('API Error:', error);
-        res.status(500).json(createErrorResponse('Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse('Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
 router.get('/provider-status', async (req, res) => {
     try {
         const info = competitorClassifier.getProviderInfo();
-        res.json(createSuccessResponse(info));
+        res.json(createSuccessResponse(info, 'Provider status fetched', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('API Error:', error);
-        res.status(500).json(createErrorResponse('Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse('Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
@@ -69,10 +71,10 @@ router.post('/generate-review-replies', validateRequest(GenerateReviewRepliesReq
     try {
         const { reviewId, options } = req.body;
         const result = await replyGenerator.generateReplyVariations(reviewId, options);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Replies generated', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('Review Reply Generation Error:', error);
-        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
@@ -80,10 +82,10 @@ router.post('/generate-recommendations', validateRequest(GenerateRecommendations
     try {
         const { category, context } = req.body;
         const result = await brandStrategist.generateRecommendations(category, context);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Recommendations generated', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('Recommendation Generation Error:', error);
-        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
@@ -91,10 +93,10 @@ router.post('/generate-visibility-plan', validateRequest(GenerateVisibilityPlanR
     try {
         const { context } = req.body;
         const result = await brandStrategist.generateVisibilityPlan(context);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Visibility plan generated', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('Visibility Plan Generation Error:', error);
-        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 
@@ -150,10 +152,116 @@ router.post('/reviews/analyze', validateRequest(AnalyzeReviewRequestSchema), asy
     try {
         const { content, rating } = req.body;
         const result = await reviewSentimentService.analyzeReview(content || '', rating);
-        res.json(createSuccessResponse(result));
+        res.json(createSuccessResponse(result, 'Review analyzed', 200, {}, SystemMessageCode.SUCCESS));
     } catch (error: any) {
         console.error('Review Analysis Error:', error);
-        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', 'INTERNAL_SERVER_ERROR', 500));
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
+    }
+});
+
+// Creative Engine Routes
+router.post('/creative-engine/concepts', generateConcepts);
+router.post('/creative-engine/image', generateCreativeImage);
+router.post('/creative-engine/save', saveConcept);
+router.get('/creative-engine/library', getLibrary);
+
+router.post('/extract-offer', async (req, res) => {
+    try {
+        const { html, businessContext } = req.body;
+        if (!html) {
+            return res.status(400).json({ error: 'Missing html content' });
+        }
+
+        const prompt = `
+        You are a conversion optimization expert. Analyze the following website HTML and extract any current promotional offers, discounts, or incentives (e.g., "$50 off", "Buy 1 Get 1 Free", "Free Consultation", "Join for $1").
+        
+        Business Context: ${businessContext || 'Local Business'}
+        
+        HTML Content:
+        ${html.substring(0, 15000)} // Truncate to avoid token limits
+        
+        Rules:
+        1. Identify the most prominent offer.
+        2. Describe it in a concise (1-2 sentences), high-converting way suitable for an ad campaign.
+        3. If no specific offer is found, summarize the core value proposition of the service.
+        4. Return ONLY the extracted text. No JSON, no preamble.
+        `;
+
+        const extractedOffer = await llmService.generateText(prompt, { temperature: 0.3 });
+        res.json({ extractedOffer: extractedOffer.trim() });
+    } catch (error: any) {
+        console.error('Offer Extraction Error:', error);
+        res.status(500).json({ error: error.message || 'Internal Server Error' });
+    }
+});
+
+router.post('/recommend-goal', async (req, res) => {
+    try {
+        const { offer, industry, businessContext } = req.body;
+        if (!offer) {
+            return res.status(400).json({ error: 'Missing offer content' });
+        }
+
+        const prompt = `
+        You are a digital marketing strategist. Based on the following offer and industry, recommend the most appropriate campaign goal from the list: [traffic, leads, sales, awareness].
+        
+        Industry: ${industry || 'Not specified'}
+        Offer: ${offer}
+        Business Context: ${businessContext || 'Local Business'}
+        
+        Rules:
+        1. Choose exactly one from: [traffic, leads, sales, awareness].
+        2. 'sales' is for direct purchases.
+        3. 'leads' is for service-based businesses or complex products requiring contact.
+        4. 'traffic' is for educational content or getting people to a physical store/detailed page.
+        5. 'awareness' is for new brands or reaching the widest audience possible.
+        
+        Return ONLY the chosen goal word.
+        `;
+
+        const recommendedGoal = await llmService.generateText(prompt, { temperature: 0.1 });
+        const cleanGoal = recommendedGoal.trim().toLowerCase();
+
+        // Validate output
+        const validGoals = ['traffic', 'leads', 'sales', 'awareness'];
+        res.json({ recommendedGoal: validGoals.includes(cleanGoal) ? cleanGoal : 'leads' });
+    } catch (error: any) {
+        console.error('Goal Recommendation Error:', error);
+        res.status(500).json({ error: error.message || 'Internal Server Error' });
+    }
+});
+
+import { campaignNarrativeService } from '../services/campaign-narrative.service';
+import { channelAllocationService } from '../services/channel-allocation.service';
+import { troubleshootingAdvisorService } from '../services/troubleshooting-advisor.service';
+
+router.post('/generate-channel-allocation', async (req, res) => {
+    try {
+        const result = await channelAllocationService.generate(req.body);
+        res.json(createSuccessResponse(result, 'Channel allocation generated', 200, {}, SystemMessageCode.SUCCESS));
+    } catch (error: any) {
+        console.error('Channel Allocation Error:', error);
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
+    }
+});
+
+router.post('/generate-campaign-narrative', async (req, res) => {
+    try {
+        const result = await campaignNarrativeService.generate(req.body);
+        res.json(createSuccessResponse(result, 'Campaign narrative generated', 200, {}, SystemMessageCode.SUCCESS));
+    } catch (error: any) {
+        console.error('Narrative Generation Error:', error);
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
+    }
+});
+
+router.post('/generate-troubleshooting-advice', async (req, res) => {
+    try {
+        const result = await troubleshootingAdvisorService.generate(req.body);
+        res.json(createSuccessResponse(result, 'Troubleshooting advice generated', 200, {}, SystemMessageCode.SUCCESS));
+    } catch (error: any) {
+        console.error('Troubleshooting Advice Error:', error);
+        res.status(500).json(createErrorResponse(error.message || 'Internal Server Error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500));
     }
 });
 

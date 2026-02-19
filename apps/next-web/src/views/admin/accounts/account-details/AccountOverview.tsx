@@ -51,7 +51,7 @@ const AccountOverview = ({ data }: { data: any }) => {
                       size='small'
                       variant='tonal'
                       color={sub.status === 'active' ? 'success' : 'error'}
-                      label={sub.status}
+                      label={t(`common.status.${sub.status}`)}
                     />
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>

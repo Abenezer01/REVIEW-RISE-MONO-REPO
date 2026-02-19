@@ -17,6 +17,7 @@ import {
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   type AiVisibilityValidationResults,
 } from './AIVisibilityValidationTypes';
@@ -37,9 +38,8 @@ const ValidationItem: React.FC<{ isValid: boolean; text: string; message?: strin
   </ListItem>
 );
 
-// ... (icons remain the same)
-
 const AIVisibilityValidationResults: React.FC<AIVisibilityValidationResultsProps> = ({ results }) => {
+  const t = useTranslation('dashboard');
   const { urlAccessibility, robotsTxt, seoPractices } = results;
 
   const checks = [
@@ -68,15 +68,15 @@ const AIVisibilityValidationResults: React.FC<AIVisibilityValidationResultsProps
       }}
     >
       <CardHeader
-        title="Technical Readiness Analysis"
-        subheader="Checking how well AI crawlers can access and interpret your site"
+        title={t('aiVisibility.validation.title')}
+        subheader={t('aiVisibility.validation.subtitle')}
         titleTypographyProps={{ variant: 'h6', fontWeight: 600 }}
         action={
           <Box sx={{ textAlign: 'right', mr: 2 }}>
             <Typography variant="h4" color={score > 80 ? 'success.main' : score > 50 ? 'warning.main' : 'error.main'} fontWeight="bold">
               {score}%
             </Typography>
-            <Typography variant="caption" color="text.secondary">Ready for AI</Typography>
+            <Typography variant="caption" color="text.secondary">{t('aiVisibility.validation.readyForAI')}</Typography>
           </Box>
         }
       />
@@ -90,43 +90,43 @@ const AIVisibilityValidationResults: React.FC<AIVisibilityValidationResultsProps
         {score < 100 && (
           <Alert severity={score > 70 ? 'info' : 'warning'} sx={{ mb: 3 }}>
             {score === 100
-              ? "Your site is perfectly optimized for AI discovery!"
-              : "Some technical issues might be preventing AI models from fully indexing your brand."}
+              ? t('aiVisibility.validation.perfectOptimized')
+              : t('aiVisibility.validation.technicalIssues')}
           </Alert>
         )}
 
         <Grid container spacing={4}>
           <Grid size={{ xs: 12, md: 4 }}>
             <Typography variant="subtitle2" color="primary" sx={{ mb: 1, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-              Accessibility
+              {t('aiVisibility.validation.accessibility')}
             </Typography>
             <List dense disablePadding>
-              <ValidationItem isValid={urlAccessibility.isPubliclyAccessible} text="Public Access" />
-              <ValidationItem isValid={urlAccessibility.noLoginWall} text="No Login Wall" />
-              <ValidationItem isValid={urlAccessibility.noIpRestriction} text="No IP Blocks" />
-              <ValidationItem isValid={urlAccessibility.noAggressiveBotBlocking} text="Bot Friendly" />
+              <ValidationItem isValid={urlAccessibility.isPubliclyAccessible} text={t('aiVisibility.validation.checks.publicAccess')} />
+              <ValidationItem isValid={urlAccessibility.noLoginWall} text={t('aiVisibility.validation.checks.noLoginWall')} />
+              <ValidationItem isValid={urlAccessibility.noIpRestriction} text={t('aiVisibility.validation.checks.noIpBlocks')} />
+              <ValidationItem isValid={urlAccessibility.noAggressiveBotBlocking} text={t('aiVisibility.validation.checks.botFriendly')} />
             </List>
           </Grid>
 
           <Grid size={{ xs: 12, md: 4 }}>
             <Typography variant="subtitle2" color="primary" sx={{ mb: 1, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-              Bot Permissions
+              {t('aiVisibility.validation.botPermissions')}
             </Typography>
             <List dense disablePadding>
-              <ValidationItem isValid={robotsTxt.allowsAIBots} text="robots.txt (AI Bots)" />
-              <ValidationItem isValid={true} text="Crawl Rate Optimized" />
+              <ValidationItem isValid={robotsTxt.allowsAIBots} text={t('aiVisibility.validation.checks.robotsTxt')} />
+              <ValidationItem isValid={true} text={t('aiVisibility.validation.checks.crawlRate')} />
             </List>
           </Grid>
 
           <Grid size={{ xs: 12, md: 4 }}>
             <Typography variant="subtitle2" color="primary" sx={{ mb: 1, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-              SEO Foundations
+              {t('aiVisibility.validation.seoFoundations')}
             </Typography>
             <List dense disablePadding>
-              <ValidationItem isValid={seoPractices.properHtml} text="Valid HTML5" />
-              <ValidationItem isValid={seoPractices.semanticTags} text="Semantic Schema" />
-              <ValidationItem isValid={seoPractices.sitemapXml} text="Sitemap.xml" />
-              <ValidationItem isValid={seoPractices.cleanUrls} text="Clean URL Structure" />
+              <ValidationItem isValid={seoPractices.properHtml} text={t('aiVisibility.validation.checks.validHtml')} />
+              <ValidationItem isValid={seoPractices.semanticTags} text={t('aiVisibility.validation.checks.semanticSchema')} />
+              <ValidationItem isValid={seoPractices.sitemapXml} text={t('aiVisibility.validation.checks.sitemap')} />
+              <ValidationItem isValid={seoPractices.cleanUrls} text={t('aiVisibility.validation.checks.cleanUrls')} />
             </List>
           </Grid>
         </Grid>

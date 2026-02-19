@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { createSuccessResponse, createErrorResponse, ErrorCode } from '@platform/contracts';
+import { createSuccessResponse, createErrorResponse, SystemMessageCode } from '@platform/contracts';
 import * as ScheduledPostService from '../services/scheduled-posts.service';
 
 const scheduledPostSchema = z.object({
@@ -48,10 +48,10 @@ export const list = async (req: Request, res: Response) => {
     const locationId = req.query.locationId as string;
     const posts = await ScheduledPostService.listPosts(businessId, locationId);
     const formattedPosts = posts.map(formatPostResponse);
-    const response = createSuccessResponse(formattedPosts, 'Scheduled posts fetched', 200, { requestId: req.id });
+    const response = createSuccessResponse(formattedPosts, 'Scheduled posts fetched', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
     res.status(response.statusCode).json(response);
   } catch (e: any) {
-    const response = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+    const response = createErrorResponse(e.message, SystemMessageCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
     res.status(response.statusCode).json(response);
   }
 };
@@ -62,13 +62,13 @@ export const get = async (req: Request, res: Response) => {
     const postId = req.params.postId;
     const post = await ScheduledPostService.getPost(postId, businessId);
     if (!post) {
-      const errorResponse = createErrorResponse('Post not found', ErrorCode.NOT_FOUND, 404, undefined, req.id);
+      const errorResponse = createErrorResponse('Post not found', SystemMessageCode.POST_NOT_FOUND, 404, undefined, req.id);
       return res.status(errorResponse.statusCode).json(errorResponse);
     }
-    const response = createSuccessResponse(formatPostResponse(post), 'Scheduled post fetched', 200, { requestId: req.id });
+    const response = createSuccessResponse(formatPostResponse(post), 'Scheduled post fetched', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
     res.status(response.statusCode).json(response);
   } catch (e: any) {
-    const response = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+    const response = createErrorResponse(e.message, SystemMessageCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
     res.status(response.statusCode).json(response);
   }
 };
@@ -78,15 +78,15 @@ export const create = async (req: Request, res: Response) => {
     const businessId = req.params.id;
     const validation = scheduledPostSchema.safeParse(req.body);
     if (!validation.success) {
-      const errorResponse = createErrorResponse('Invalid inputs', ErrorCode.VALIDATION_ERROR, 400, undefined, req.id);
+      const errorResponse = createErrorResponse('Invalid inputs', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
       return res.status(errorResponse.statusCode).json(errorResponse);
     }
 
     const result = await ScheduledPostService.createPost(businessId, validation.data);
-    const response = createSuccessResponse(formatPostResponse(result), 'Scheduled post created', 201, { requestId: req.id });
+    const response = createSuccessResponse(formatPostResponse(result), 'Scheduled post created', 201, { requestId: req.id }, SystemMessageCode.POST_CREATED);
     res.status(response.statusCode).json(response);
   } catch (e: any) {
-    const response = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+    const response = createErrorResponse(e.message, SystemMessageCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
     res.status(response.statusCode).json(response);
   }
 };
@@ -98,15 +98,15 @@ export const update = async (req: Request, res: Response) => {
     const validation = scheduledPostSchema.partial().safeParse(req.body);
 
     if (!validation.success) {
-      const errorResponse = createErrorResponse('Invalid inputs', ErrorCode.VALIDATION_ERROR, 400, undefined, req.id);
+      const errorResponse = createErrorResponse('Invalid inputs', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
       return res.status(errorResponse.statusCode).json(errorResponse);
     }
 
     const result = await ScheduledPostService.updatePost(postId, businessId, validation.data);
-    const response = createSuccessResponse(formatPostResponse(result), 'Scheduled post updated', 200, { requestId: req.id });
+    const response = createSuccessResponse(formatPostResponse(result), 'Scheduled post updated', 200, { requestId: req.id }, SystemMessageCode.POST_UPDATED);
     res.status(response.statusCode).json(response);
   } catch (e: any) {
-    const response = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+    const response = createErrorResponse(e.message, SystemMessageCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
     res.status(response.statusCode).json(response);
   }
 };
@@ -116,10 +116,10 @@ export const remove = async (req: Request, res: Response) => {
     const businessId = req.params.id;
     const postId = req.params.postId;
     await ScheduledPostService.deletePost(postId, businessId);
-    const response = createSuccessResponse(null, 'Scheduled post deleted', 200, { requestId: req.id });
+    const response = createSuccessResponse(null, 'Scheduled post deleted', 200, { requestId: req.id }, SystemMessageCode.POST_DELETED);
     res.status(response.statusCode).json(response);
   } catch (e: any) {
-    const response = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+    const response = createErrorResponse(e.message, SystemMessageCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
     res.status(response.statusCode).json(response);
   }
 };
@@ -131,10 +131,10 @@ export const duplicate = async (req: Request, res: Response) => {
     const { scheduledAt, status } = req.body;
 
     const result = await ScheduledPostService.duplicatePost(postId, businessId, { scheduledAt, status });
-    const response = createSuccessResponse(formatPostResponse(result), 'Scheduled post duplicated', 201, { requestId: req.id });
+    const response = createSuccessResponse(formatPostResponse(result), 'Scheduled post duplicated', 201, { requestId: req.id }, SystemMessageCode.POST_DUPLICATED);
     res.status(response.statusCode).json(response);
   } catch (e: any) {
-    const response = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+    const response = createErrorResponse(e.message, SystemMessageCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
     res.status(response.statusCode).json(response);
   }
 };
@@ -157,10 +157,10 @@ export const getLogs = async (req: Request, res: Response) => {
       scheduledPost: formatPostResponse(log.scheduledPost),
     }));
 
-    const response = createSuccessResponse(formattedLogs, 'Publishing logs fetched', 200, { requestId: req.id });
+    const response = createSuccessResponse(formattedLogs, 'Publishing logs fetched', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
     res.status(response.statusCode).json(response);
   } catch (e: any) {
-    const response = createErrorResponse(e.message, ErrorCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+    const response = createErrorResponse(e.message, SystemMessageCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
     res.status(response.statusCode).json(response);
   }
 };

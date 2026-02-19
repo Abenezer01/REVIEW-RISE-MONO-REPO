@@ -6,7 +6,7 @@ import React, { useState } from 'react'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 
-import { toast } from 'react-toastify'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import { SERVICES } from '@/configs/services'
 import apiClient from '@/lib/apiClient'
@@ -16,6 +16,7 @@ import HashtagResults from './hashtags/HashtagResults'
 import HashtagSidebar from './hashtags/HashtagSidebar'
 
 export default function HashtagGenerator() {
+    const { notify } = useSystemMessages()
     const [loading, setLoading] = useState(false)
     
     // Input State
@@ -28,7 +29,10 @@ export default function HashtagGenerator() {
 
     const handleGenerate = async () => {
         if (!niche && !description) {
-            toast.error('Please enter at least a niche or description')
+            notify({
+                messageCode: 'studio.hashtagInputError' as any,
+                severity: 'ERROR'
+            })
             
 return
         }
@@ -46,10 +50,16 @@ return
             const data = response.data
 
             setResults(data)
-            toast.success('Hashtags generated!')
+            notify({
+                messageCode: 'studio.hashtagsGenerated' as any,
+                severity: 'SUCCESS'
+            })
         } catch (error) {
             console.error(error)
-            toast.error('Failed to generate hashtags')
+            notify({
+                messageCode: 'studio.generateError' as any,
+                severity: 'ERROR'
+            })
         } finally {
             setLoading(false)
         }
@@ -60,7 +70,10 @@ return
         const allTags = [...results.core, ...results.niche, ...results.local].join(' ')
 
         navigator.clipboard.writeText(allTags)
-        toast.success('All hashtags copied')
+        notify({
+            messageCode: 'COPIED_TO_CLIPBOARD' as any,
+            severity: 'SUCCESS'
+        })
     }
 
     return (

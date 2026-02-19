@@ -88,20 +88,28 @@ Return valid JSON with this structure:
 
     PLAN: {
     GENERATE_30DAY: (topic: string, businessType: string, context?: any) => {
-            const brandDNA = context?.brandDNA || {};
-            const audience = brandDNA.audience || 'General Public';
-            const voice = brandDNA.voice || 'Professional and engaging';
-            const mission = brandDNA.mission || '';
+        const brandDNA = context?.brandDNA || {};
+        const audience = brandDNA.audience || 'General Public';
+        const voice = brandDNA.voice || 'Professional and engaging';
+        const mission = brandDNA.mission || '';
+        const seasonalEvents = context?.seasonalEvents || [];
 
-            return `You are a world-class social media strategist. Create a high-converting 30-day social media content calendar for a ${businessType} focusing on the theme: "${topic}".
+        let seasonalContext = '';
+         if (seasonalEvents.length > 0) {
+             seasonalContext = `\nCRITICAL SEASONAL EVENTS (MANDATORY):\n${seasonalEvents.map((e: any) => `- Day ${e.day}: ${e.name} - ${e.description || 'No description'}`).join('\n')}\n`;
+         }
+
+         return `You are a world-class social media strategist. Create a high-converting 30-day social media content calendar for a ${businessType} focusing on the theme: "${topic}".
         
         Brand Context:
         - Target Audience: ${audience}
         - Brand Voice/Tone: ${voice}
         ${mission ? `- Brand Mission: ${mission}` : ''}
-        
+        ${seasonalContext}
         Strategic Guidelines:
-        - Mix content types (Educational, Entertaining, Inspirational, Promotional).
+        - MANDATORY REQUIREMENT: For EVERY day listed in the "CRITICAL SEASONAL EVENTS" section above, you MUST create a post that is 100% focused on that specific event. For example, if March 8 is International Women's Day, Day 8 MUST be about International Women's Day.
+        - For seasonal posts, set the "seasonalHook" field to the name of the event (e.g., "International Women's Day").
+        - Mix content types for other days (Educational, Entertaining, Inspirational, Promotional).
         - Ensure a logical flow that builds trust and authority over the 30 days.
         - Each post should feel authentic to the brand voice.
         - Use hooks that stop the scroll for the specific target audience.
@@ -113,6 +121,7 @@ Return valid JSON with this structure:
         - "platform": (e.g., "Instagram", "Facebook", "LinkedIn", "X")
         - "contentIdea": (A detailed description of the post concept)
         - "suggestedCopy": (A draft of the actual caption or script including emojis and relevant hooks)
+        - "seasonalHook": (If this is a seasonal event post, include the event name here, otherwise leave null)
         `;
     },
     },

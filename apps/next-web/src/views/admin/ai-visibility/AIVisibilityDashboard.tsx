@@ -6,6 +6,7 @@ import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Alert from '@mui/material/Alert'
 
+import { useTranslation } from '@/hooks/useTranslation'
 import apiClient from '@/lib/apiClient'
 import BrandInputSection from './BrandInputSection'
 import AIVisibilityOverview, { type BrandVisibilityMetrics } from './AIVisibilityOverview'
@@ -16,6 +17,7 @@ import AIVisibilityValidationResults from './AIVisibilityValidationResults'
 import { type AiVisibilityValidationResults } from './AIVisibilityValidationTypes'
 
 const AIVisibilityDashboard = () => {
+  const t = useTranslation('dashboard')
   const [loading, setLoading] = useState(false)
   const [analyzed, setAnalyzed] = useState(false)
   const [validationResults, setValidationResults] = useState<AiVisibilityValidationResults | null>(null)
@@ -30,10 +32,10 @@ const AIVisibilityDashboard = () => {
     setAnalyzed(false)
     setValidationResults(null) // Clear previous validation results
     setErrorMessage(null) // Clear previous errors
-    setLoadingMessage('Starting analysis...') // Initial loading message
+    setLoadingMessage(t('aiVisibility.dashboard.starting')) // Initial loading message
 
     try {
-      setLoadingMessage('Validating URL accessibility and robots.txt...')
+      setLoadingMessage(t('aiVisibility.dashboard.validating'))
 
       // Call real validation API using apiClient (auto-unwraps data field)
       const validationData = await apiClient.post<AiVisibilityValidationResults>('/api/ai-visibility/validate', { url })
@@ -43,28 +45,28 @@ const AIVisibilityDashboard = () => {
 
       // If validation fails, stop here and show specific error messages
       if (!validationData.urlAccessibility.isPubliclyAccessible) {
-        setErrorMessage('URL is not publicly accessible. Please ensure it is live and not behind a login or IP restriction.')
+        setErrorMessage(t('aiVisibility.dashboard.errorAccessibility'))
         setLoading(false)
 
 return
       }
 
       if (!validationData.robotsTxt.allowsAIBots) {
-        setErrorMessage('robots.txt disallows AI bots. Please update your robots.txt to allow crawlers.')
+        setErrorMessage(t('aiVisibility.dashboard.errorRobots'))
         setLoading(false)
 
 return
       }
 
       if (!validationData.seoPractices.properHtml) {
-        setErrorMessage('Basic SEO practices not met (e.g., no proper HTML structure). Please ensure your page has valid HTML.')
+        setErrorMessage(t('aiVisibility.dashboard.errorSeo'))
         setLoading(false)
 
 return
       }
 
       // If validation passes, proceed with AI analysis
-      setLoadingMessage('Analyzing AI visibility and generating insights...')
+      setLoadingMessage(t('aiVisibility.dashboard.analyzing'))
 
       const analysisData = await apiClient.post<any>('/api/ai-visibility/analyze', { url })
         .then(res => res.data)
@@ -98,7 +100,7 @@ return
 
     } catch (error: any) {
         console.error('Error analyzing brand:', error)
-        const message = error.response?.data?.message || error.message || 'An unexpected error occurred'
+        const message = error.response?.data?.message || error.message || t('aiVisibility.dashboard.unexpectedError')
 
         setErrorMessage(message)
     } finally {
@@ -132,7 +134,7 @@ return
             {!analyzed && !validationResults && !errorMessage && (
               <Grid size={{ xs: 12 }}>
                 <Alert severity="info" sx={{ mb: 4 }}>
-                  Enter a URL above to analyze its AI visibility and get optimization tips.
+                  {t('aiVisibility.dashboard.initialInfo')}
                 </Alert>
               </Grid>
             )}
@@ -145,7 +147,7 @@ return
               <>
                 <Grid size={{ xs: 12 }}>
                   <Alert severity="success" sx={{ mb: 2 }}>
-                    {metrics ? `Analysis complete! Your brand achieved a visibility score of ${metrics.visibilityScore}%.` : 'Analysis complete!'}
+                    {metrics ? t('aiVisibility.dashboard.analysisCompleteScore', { score: metrics.visibilityScore }) : t('aiVisibility.dashboard.analysisComplete')}
                   </Alert>
                 </Grid>
 

@@ -15,6 +15,9 @@
     "profiles": "Profiles"
   },
   "common": {
+    "new": "New",
+    "popular": "Popular",
+    "copyright": "© {year}, all rights reserved",
     "apply": "Apply",
     "save": "Save",
     "cancel": "Cancel",
@@ -23,6 +26,8 @@
     "add": "Add",
     "create": "Create",
     "search": "Search",
+    "tags": "Tags",
+    "status": "Status",
     "filter": "Filter",
     "export": "Export",
     "import": "Import",
@@ -38,17 +43,43 @@
     "no": "No",
     "back": "Back",
     "next": "Next",
+    "refresh": "Refresh",
     "previous": "Previous",
     "finish": "Finish",
     "retry": "Retry",
+    "generating": "Generating...",
+    "loadMore": "Load More",
+    "showLess": "Show less",
+    "moreCount": "+{count} more",
+    "clickToFilter": "Click to filter",
+    "comingSoon": "Coming soon feature.",
     "no-items": "No items found",
+    "no-data": "No Data Found",
+    "no-data-description": "There is no data available to display.",
     "items-selected": "items selected",
     "exportFormat": "Export Format",
     "exportCurrentPageOnly": "Export only current page's records",
     "selectFields": "Select Fields",
     "search-placeholder": "Search...",
+    "copy": "Copy",
+    "bookmark": "Bookmark",
+    "share": "Share",
+    "all": "All",
+    "days": "Days",
     "found": "Found",
-    "confirmDelete": "Are you sure you want to delete this item?"
+    "id": "ID",
+    "confirmDelete": "Are you sure you want to delete this item?",
+    "currencySymbol": "$",
+    "distanceUnit": "km",
+    "of": "of",
+    "none": "None",
+    "discard": "Discard",
+    "view": "View"
+  },
+  "list": {
+    "actions": {
+      "reExtract": "Re-extract"
+    }
   },
   "form": {
     "success-created": "created successfully",
@@ -59,14 +90,70 @@
     "type-min-chars": "Type at least {minChars} characters",
     "no-results": "No results found"
   },
+  "status": {
+    "aiPowered": "AI-Powered",
+    "completed": "Completed",
+    "failed": "Failed",
+    "pending": "Pending",
+    "processing": "Processing",
+    "scheduled": "Scheduled",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info",
+    "active": "Active",
+    "inactive": "Inactive",
+    "archived": "Archived",
+    "replied": "Replied",
+    "approved": "Approved",
+    "pending_approval": "Pending Approval",
+    "skipped": "Skipped",
+    "none": "Not Replied",
+    "unanalyzed": "Unanalyzed",
+    "unknown": "Unknown"
+  },
+  "channel": {
+    "google": "Google",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "twitter": "Twitter",
+    "linkedin": "LinkedIn",
+    "yelp": "Yelp",
+    "tripadvisor": "TripAdvisor",
+    "all": "All Channels"
+  },
+  "actions": "Actions",
+  "layout": {
+    "table": "Table View",
+    "grid": "Grid View",
+    "list": "List View",
+    "masonry": "Masonry View"
+  },
   "dialog": {
     "confirm-edit-title": "Confirm Edit",
     "confirm-edit-message": "Are you sure you want to edit this item?"
+  },
+  "notFound": {
+    "title": "Page Not Found ⚠️",
+    "message": "we couldn't find the page you are looking for.",
+    "backHome": "Back To Home"
   },
   "language": {
     "select": "Select Language",
     "english": "English",
     "arabic": "Arabic"
+  },
+  "userDropdown": {
+    "myProfile": "My Profile",
+    "settings": "Settings"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "newReview": "New Review Received",
+    "systemAlert": "System Alert",
+    "mockReview": "You received a {rating}-star review from {name}.",
+    "mockSeoReport": "Your daily SEO report is ready to view.",
+    "viewAll": "View All Notifications"
   },
   "seoAnalyzer": {
     "hero": {
@@ -131,6 +218,42 @@
     "cta": {
       "title": "Ready to Improve Your SEO?",
       "button": "Analyze Your Website Now"
+    },
+    "results": {
+      "analyzing": "Analyzing {url}...",
+      "checking": "Checking meta tags, performance, security, and content quality...",
+      "healthScore": "Overall Health Score",
+      "noTitle": "No Title Detected",
+      "aiInsights": "AI Strategic Insights",
+      "noInsights": "No strategic insights available at this time.",
+      "auditDetails": "Audit Details",
+      "noIssues": "Great job! No critical issues found.",
+      "recommendation": "Recommendation:"
+    }
+  },
+  "dates": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This Week",
+    "older": "Older",
+    "atTime": "{date}, {time}"
+  },
+  "save": "Save",
+  "cancel": "Cancel",
+  "all": "All",
+  "create": "Create",
+  "update": "Update",
+  "new": "New",
+  "popular": "Popular",
+  "not-available": "N/A",
+  "view": "View",
+  "locations": {
+    "form": {
+      "active": "Active",
+      "archived": "Archived",
+      "name": "Location Name",
+      "address": "Address",
+      "status": "Status"
     }
   }
 }

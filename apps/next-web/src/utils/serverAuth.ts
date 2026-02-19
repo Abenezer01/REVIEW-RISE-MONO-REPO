@@ -88,7 +88,9 @@ export const getServerUser = async (): Promise<User | null> => {
           return {
             id: u.id,
             email: u.email,
-            role: u.role,
+            role: u.role || claims?.role,
+            roles: u.roles || (u.role ? [u.role] : (claims?.roles || (claims?.role ? [claims.role] : []))),
+            permissions: u.permissions || claims?.permissions || [],
             firstName,
             lastName,
             avatar,

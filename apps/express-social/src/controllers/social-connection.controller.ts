@@ -5,6 +5,8 @@ import {
     createErrorResponse,
     ErrorCode
 } from '@platform/contracts';
+import { facebookService } from '../services/facebook.service';
+import { linkedInService } from '../services/linkedin.service';
 
 export class SocialConnectionController {
     /**
@@ -160,8 +162,7 @@ export class SocialConnectionController {
                 case 'facebook':
                 case 'instagram': {
                     // For Facebook/Instagram, use the user token (refreshToken) to get new page token
-                    const { facebookService } = await import('../services/facebook.service');
-                    
+
                     if (!connection.pageId || !connection.refreshToken) {
                         return res.status(400).json(createErrorResponse(
                             'Missing required data for Facebook refresh',
@@ -182,8 +183,6 @@ export class SocialConnectionController {
                 }
 
                 case 'linkedin': {
-                    const { linkedInService } = await import('../services/linkedin.service');
-                    
                     if (!connection.refreshToken) {
                         return res.status(400).json(createErrorResponse(
                             'No refresh token available for LinkedIn. Please reconnect.',
@@ -237,7 +236,7 @@ export class SocialConnectionController {
 
         } catch (error: any) {
             console.error('Error refreshing connection:', error);
-            
+
             // Update status to error
             if (req.params.id) {
                 await socialConnectionRepository.updateStatus(

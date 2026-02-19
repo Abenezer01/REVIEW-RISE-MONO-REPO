@@ -54,15 +54,15 @@ export default function StudioDashboard() {
                         <Box sx={{ mt: 4, display: 'flex', gap: 3, flexWrap: 'wrap' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.1)', px: 2, py: 1, borderRadius: 2 }}>
                                 <i className="tabler-wand" style={{ color: '#69F0AE' }} />
-                                <Typography variant="body2" fontWeight="bold" color="inherit">8 AI Tools</Typography>
+                                <Typography variant="body2" fontWeight="bold" color="inherit">{t('dashboard.aiToolsCount')}</Typography>
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.1)', px: 2, py: 1, borderRadius: 2 }}>
                                 <i className="tabler-devices" style={{ color: '#69F0AE' }} />
-                                <Typography variant="body2" fontWeight="bold" color="inherit">Multi-Platform</Typography>
+                                <Typography variant="body2" fontWeight="bold" color="inherit">{t('dashboard.multiPlatform')}</Typography>
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.1)', px: 2, py: 1, borderRadius: 2 }}>
                                 <i className="tabler-bolt" style={{ color: '#69F0AE' }} />
-                                <Typography variant="body2" fontWeight="bold" color="inherit">Instant Results</Typography>
+                                <Typography variant="body2" fontWeight="bold" color="inherit">{t('dashboard.instantResults')}</Typography>
                             </Box>
                         </Box>
                     </Box>
@@ -124,8 +124,8 @@ export default function StudioDashboard() {
                             icon={<i className="tabler-sparkles" style={{ fontSize: 24 }} />}
                             color="#E65100"
                             stats={[
-                                { label: 'Outputs', value: '4-in-1' },
-                                { label: 'Speed', value: '10s' }
+                                { label: t('magic.outputs'), value: '4-in-1' },
+                                { label: t('magic.generation'), value: '10s' }
                             ]}
                             isNew
                             onClick={() => router.push('/admin/studio/smart-create')}
@@ -138,8 +138,8 @@ export default function StudioDashboard() {
                             icon={<i className="tabler-wand" style={{ fontSize: 24 }} />}
                             color="#9C27B0"
                             stats={[
-                                { label: 'Variations', value: '3-5' },
-                                { label: 'Generated', value: '1,247' }
+                                { label: t('captions.variations'), value: '3-5' },
+                                { label: t('captions.generatedLabel', { count: '' }).replace('()', '').trim(), value: '1,247' }
                             ]}
                             isPopular
                             onClick={() => router.push('/admin/studio/captions')}
@@ -152,8 +152,8 @@ export default function StudioDashboard() {
                             icon={<i className="tabler-hash" style={{ fontSize: 24 }} />}
                             color="#2196F3"
                             stats={[
-                                { label: 'Hashtags', value: '20-30' },
-                                { label: 'Generated', value: '892' }
+                                { label: t('hashtags.title'), value: '20-30' },
+                                { label: t('captions.generatedLabel', { count: '' }).replace('()', '').trim(), value: '892' }
                             ]}
                             onClick={() => router.push('/admin/studio/hashtags')}
                         />
@@ -165,8 +165,8 @@ export default function StudioDashboard() {
                             icon={<i className="tabler-bulb" style={{ fontSize: 24 }} />}
                             color="#4CAF50"
                             stats={[
-                                { label: 'Ideas', value: '10+' },
-                                { label: 'Generated', value: '634' }
+                                { label: t('ideas.title'), value: '10+' },
+                                { label: t('captions.generatedLabel', { count: '' }).replace('()', '').trim(), value: '634' }
                             ]}
                             onClick={() => router.push('/admin/studio/ideas')}
                         />
@@ -178,8 +178,8 @@ export default function StudioDashboard() {
                             icon={<i className="tabler-calendar" style={{ fontSize: 24 }} />}
                             color="#FF9800"
                             stats={[
-                                { label: 'Days', value: '30' },
-                                { label: 'Generated', value: '156' }
+                                { label: t('planner.day'), value: '30' },
+                                { label: t('captions.generatedLabel', { count: '' }).replace('()', '').trim(), value: '156' }
                             ]}
                             onClick={() => router.push('/admin/studio/planner')}
                         />
@@ -191,8 +191,8 @@ export default function StudioDashboard() {
                             icon={<i className="tabler-photo" style={{ fontSize: 24 }} />}
                             color="#E91E63"
                             stats={[
-                                { label: 'Variations', value: '3' },
-                                { label: 'Generated', value: '423' }
+                                { label: t('captions.variations'), value: '3' },
+                                { label: t('captions.generatedLabel', { count: '' }).replace('()', '').trim(), value: '423' }
                             ]}
                             onClick={() => router.push('/admin/studio/images')}
                         />
@@ -204,8 +204,8 @@ export default function StudioDashboard() {
                             icon={<i className="tabler-slideshow" style={{ fontSize: 24 }} />}
                             color="#00BCD4"
                             stats={[
-                                { label: 'Slides', value: '5-8' },
-                                { label: 'Generated', value: '289' }
+                                { label: t('carousels.slideCountLabel'), value: '5-8' },
+                                { label: t('captions.generatedLabel', { count: '' }).replace('()', '').trim(), value: '289' }
                             ]}
                             onClick={() => router.push('/admin/studio/carousels')}
                         />
@@ -217,8 +217,8 @@ export default function StudioDashboard() {
                             icon={<i className="tabler-movie" style={{ fontSize: 24 }} />}
                             color="#F44336"
                             stats={[
-                                { label: 'Types', value: '3' },
-                                { label: 'Generated', value: '112' }
+                                { label: t('scripts.styleLabel'), value: '3' },
+                                { label: t('captions.generatedLabel', { count: '' }).replace('()', '').trim(), value: '112' }
                             ]}
                             onClick={() => router.push('/admin/studio/scripts')}
                         />

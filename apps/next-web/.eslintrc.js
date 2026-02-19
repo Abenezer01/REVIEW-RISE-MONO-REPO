@@ -59,33 +59,33 @@ module.exports = {
         count: 1
       }
     ],
-    'import/order': [
+    'no-restricted-imports': [
       'error',
       {
-        groups: ['builtin', 'external', ['internal', 'parent', 'sibling', 'index'], ['object', 'unknown']],
-        pathGroups: [
+        paths: [
           {
-            pattern: 'react',
-            group: 'external',
-            position: 'before'
+            name: 'react-hot-toast',
+            message: 'Please use SystemMessageProvider and notify() from @platform/shared-ui instead.'
           },
           {
-            pattern: 'next/**',
-            group: 'external',
-            position: 'before'
-          },
-          {
-            pattern: '~/**',
-            group: 'external',
-            position: 'before'
-          },
-          {
-            pattern: '@/**',
-            group: 'internal'
+            name: 'react-toastify',
+            message: 'Please use SystemMessageProvider and notify() from @platform/shared-ui instead.'
           }
-        ],
-        pathGroupsExcludedImportTypes: ['react', 'type'],
-        'newlines-between': 'always-and-inside-groups'
+        ]
+      }
+    ],
+    'import/order': 'off',
+    'react/jsx-no-literals': [
+      'error',
+      {
+        noStrings: true,
+        ignoreProps: true,
+        allowedStrings: [
+          '%', '✓', '•', 'N/A', '|', '™', '—', ':', '(', ')', '/', '+', '-', '*', '#', '.', ',', ' ', '!',
+          '"', "'", '&quot;', '&ldquo;', '&rdquo;', '&lsquo;', '&rsquo;', '&hellip;', '&apos;',
+          '@', '⋮', '↑', '↓', '📅', '⬇️', '💡', '×', '●', 'X:', '| Y:', 'v', '.0', '100%', 's', 'Aa', '94/100', '...', 'Loading...',
+          '$', '/10', '~', '→', '←', '·'
+        ]
       }
     ]
   },
@@ -110,6 +110,15 @@ module.exports = {
       rules: {
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/no-var-requires': 'off'
+      }
+    },
+    {
+      files: [
+        'src/shared/components/SystemMessageProvider.tsx',
+        'src/libs/styles/AppReactToastify.tsx'
+      ],
+      rules: {
+        'no-restricted-imports': 'off'
       }
     }
   ]

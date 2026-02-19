@@ -5,6 +5,7 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import { useTheme, alpha } from '@mui/material/styles'
+import { useTranslations } from 'next-intl'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import TrendingDownIcon from '@mui/icons-material/TrendingDown'
 
@@ -26,6 +27,7 @@ const ReviewMetricCard = ({
   color = 'primary'
 }: ReviewMetricCardProps) => {
   const theme = useTheme()
+  const t = useTranslations('dashboard.brandRise.overview')
   const colorValue = theme.palette[color].main
   const bgColor = alpha(colorValue, 0.1)
 
@@ -74,10 +76,10 @@ const ReviewMetricCard = ({
               color={change >= 0 ? 'success.main' : 'error.main'}
               fontWeight={500}
             >
-              {Math.abs(change)}%
+              {Math.abs(change)}{'%'}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              from last period
+              {t('fromLastPeriod')}
             </Typography>
           </Box>
         )}

@@ -42,6 +42,9 @@ export { ReportRepository, reportRepository } from './report.repository';
 export { CompetitorReviewRepository, competitorReviewRepository } from './competitor-review.repository';
 export { ScheduledPostRepository, scheduledPostRepository } from './scheduled-post.repository';
 export { PublishingJobRepository, publishingJobRepository } from './publishing-job.repository';
+export { AdriseSessionRepository, adriseSessionRepository } from './adrise-session.repository';
+export { AdriseSessionVersionRepository, adriseSessionVersionRepository } from './adrise-session-version.repository';
+export { AdriseOutputRepository, adriseOutputRepository } from './adrise-output.repository';
 
 // Import repositories for the convenience object
 import { userRepository } from './user.repository';
@@ -73,6 +76,9 @@ import { reportRepository } from './report.repository';
 import { competitorReviewRepository } from './competitor-review.repository';
 import { scheduledPostRepository } from './scheduled-post.repository';
 import { publishingJobRepository } from './publishing-job.repository';
+import { adriseSessionRepository } from './adrise-session.repository';
+import { adriseSessionVersionRepository } from './adrise-session-version.repository';
+import { adriseOutputRepository } from './adrise-output.repository';
 
 // Re-export all repositories as a single object for convenience
 export const repositories = {
@@ -105,4 +111,7 @@ export const repositories = {
     competitorReview: competitorReviewRepository,
     scheduledPost: scheduledPostRepository,
     publishingJob: publishingJobRepository,
+    adriseSession: adriseSessionRepository,
+    adriseSessionVersion: adriseSessionVersionRepository,
+    adriseOutput: adriseOutputRepository,
 } as const;

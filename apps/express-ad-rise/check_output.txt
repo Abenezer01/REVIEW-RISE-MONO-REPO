@@ -1,0 +1,2 @@
+src/controllers/analytics.controller.ts(14,21): error TS2554: Expected 2-3 arguments, but got 1.
+src/controllers/analytics.controller.ts(29,21): error TS2322: Type 'Record<any, unknown>' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.

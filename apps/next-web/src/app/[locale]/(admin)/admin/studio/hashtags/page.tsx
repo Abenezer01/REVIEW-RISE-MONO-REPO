@@ -21,7 +21,7 @@ export default function HashtagsPage() {
                     onClick={() => router.push('/admin/studio')} 
                     sx={{ mb: 2 }}
                 >
-                    Back to Studio
+                    {t('page.backToStudio')}
                 </Button>
                 
                 <Box>

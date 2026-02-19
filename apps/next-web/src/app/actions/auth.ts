@@ -5,6 +5,8 @@ import { cookies, headers } from 'next/headers'
 
 import { z } from 'zod'
 
+import { SystemMessageCode } from '@platform/contracts'
+
 import { backendClient } from '@/utils/backendClient'
 import { ROLES } from '@/configs/roles'
 import menuData, { type MenuItem } from '@/configs/menu'
@@ -20,6 +22,7 @@ type LoginResponse = {
   success: boolean
   user?: User
   message?: string
+  messageCode?: SystemMessageCode
   errors?: Record<string, string[]>
 }
 
@@ -37,6 +40,7 @@ export async function loginAction(prevState: LoginResponse | null, formData: For
     return {
       success: false,
       message: 'Validation failed',
+      messageCode: SystemMessageCode.VALIDATION_ERROR,
       errors: validationResult.error.flatten().fieldErrors
     }
   }
@@ -81,7 +85,8 @@ export async function loginAction(prevState: LoginResponse | null, formData: For
       if (!allowedRoles.includes(userRole)) {
         return {
           success: false,
-          message: 'Invalid user role - please contact administrator'
+          message: 'Invalid user role - please contact administrator',
+          messageCode: SystemMessageCode.FORBIDDEN
         }
       }
 
@@ -95,7 +100,8 @@ export async function loginAction(prevState: LoginResponse | null, formData: For
       if (userRole === ROLES.OWNER && !hasAccess) {
         return {
           success: false,
-          message: 'Access Denied: Your account does not have required menu permissions'
+          message: 'Access Denied: Your account does not have required menu permissions',
+          messageCode: SystemMessageCode.FORBIDDEN
         }
       }
     }
@@ -133,6 +139,8 @@ export async function loginAction(prevState: LoginResponse | null, formData: For
         firstName: nameParts[0] || '',
         lastName: nameParts.slice(1).join(' ') || '',
         role: data.user.role,
+        roles: data.user.roles || (data.user.role ? [data.user.role] : []),
+        permissions: data.user.permissions || [],
         avatar: data.user.image,
         username: data.user.email
       }
@@ -152,13 +160,15 @@ export async function loginAction(prevState: LoginResponse | null, formData: For
 
     return {
       success: true,
-      user
+      user,
+      messageCode: SystemMessageCode.AUTH_LOGIN_SUCCESS
     }
 
   } catch (error: any) {
     return {
       success: false,
-      message: error.message || 'Login failed'
+      message: error.message || 'Login failed',
+      messageCode: SystemMessageCode.AUTH_LOGIN_FAILED
     }
   }
 }

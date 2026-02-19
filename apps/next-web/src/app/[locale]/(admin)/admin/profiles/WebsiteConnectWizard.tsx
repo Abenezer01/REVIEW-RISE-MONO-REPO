@@ -44,6 +44,7 @@ interface WebsiteConnectWizardProps {
 
 const WebsiteConnectWizard = ({ onSuccess }: WebsiteConnectWizardProps = {}) => {
   const t = useTranslations('BrandProfiles');
+  const tc = useTranslations('common');
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
   const [websiteUrl, setWebsiteUrl] = useState('');
@@ -182,7 +183,7 @@ const WebsiteConnectWizard = ({ onSuccess }: WebsiteConnectWizardProps = {}) => 
               {t('wizard.step1.title')}
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-              Enter the website URL to automatically extract brand identity assets.
+              {t('description')}
             </Typography>
             
             <Stack spacing={3}>
@@ -287,7 +288,7 @@ const WebsiteConnectWizard = ({ onSuccess }: WebsiteConnectWizardProps = {}) => 
                 </Paper>
 
                 <Box>
-                  <Typography variant="overline" fontWeight="800" color="text.secondary" gutterBottom display="block">Colors</Typography>
+                  <Typography variant="overline" fontWeight="800" color="text.secondary" gutterBottom display="block">{t('identity.colorsTitle')}</Typography>
                   <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                     {brandProfile.currentExtractedData?.colors?.map((c: any, i: number) => (
                       <Tooltip key={i} title={c.hexCode}>
@@ -298,12 +299,12 @@ const WebsiteConnectWizard = ({ onSuccess }: WebsiteConnectWizardProps = {}) => 
                         }} />
                       </Tooltip>
                     ))}
-                    {(!brandProfile.currentExtractedData?.colors || brandProfile.currentExtractedData?.colors.length === 0) && <Typography variant="body2">No colors found</Typography>}
+                    {(!brandProfile.currentExtractedData?.colors || brandProfile.currentExtractedData?.colors.length === 0) && <Typography variant="body2">{t('identity.noColors')}</Typography>}
                   </Stack>
                 </Box>
 
                 <Box>
-                  <Typography variant="overline" fontWeight="800" color="text.secondary" gutterBottom display="block">Visual Assets</Typography>
+                  <Typography variant="overline" fontWeight="800" color="text.secondary" gutterBottom display="block">{t('identity.assetsTitle')}</Typography>
                   <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
                     {brandProfile.currentExtractedData?.assets?.map((a: any, i: number) => (
                       <Paper key={i} variant="outlined" sx={{ p: 1.5, borderRadius: 2, textAlign: 'center', minWidth: 100 }}>
@@ -314,7 +315,7 @@ const WebsiteConnectWizard = ({ onSuccess }: WebsiteConnectWizardProps = {}) => 
                         <Chip label={a.type} size="small" variant="outlined" sx={{ fontWeight: 700, fontSize: '0.65rem', textTransform: 'uppercase' }} />
                       </Paper>
                     ))}
-                    {(!brandProfile.currentExtractedData?.assets || brandProfile.currentExtractedData?.assets.length === 0) && <Typography variant="body2">No assets found</Typography>}
+                    {(!brandProfile.currentExtractedData?.assets || brandProfile.currentExtractedData?.assets.length === 0) && <Typography variant="body2">{t('identity.noAssets')}</Typography>}
                   </Stack>
                 </Box>
 
@@ -336,7 +337,7 @@ const WebsiteConnectWizard = ({ onSuccess }: WebsiteConnectWizardProps = {}) => 
                     fullWidth
                     sx={{ borderRadius: 3, py: 1.5, fontWeight: 800 }}
                   >
-                    Start Over
+                    {tc('common.retry')}
                   </Button>
                 </Stack>
               </Stack>

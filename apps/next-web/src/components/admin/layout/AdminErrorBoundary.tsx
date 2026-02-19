@@ -5,12 +5,18 @@ import React from 'react'
 
 import { Alert, AlertTitle } from '@mui/material'
 
+import { useTranslation } from '@/hooks/useTranslation'
+
 type Props = {
   children: React.ReactNode
 }
 
-class AdminErrorBoundaryImpl extends React.Component<Props, { hasError: boolean; error?: any }> {
-  constructor(props: Props) {
+interface ImplProps extends Props {
+  t: any
+}
+
+class AdminErrorBoundaryImpl extends React.Component<ImplProps, { hasError: boolean; error?: any }> {
+  constructor(props: ImplProps) {
     super(props)
     this.state = { hasError: false, error: undefined }
   }
@@ -30,8 +36,8 @@ class AdminErrorBoundaryImpl extends React.Component<Props, { hasError: boolean;
     if (this.state.hasError) {
       return (
         <Alert severity='error' role='alert'>
-          <AlertTitle>Something went wrong</AlertTitle>
-          Please retry or contact support.
+          <AlertTitle>{this.props.t('common.error')}</AlertTitle>
+          {this.props.t('form.error-update')}
         </Alert>
       )
     }
@@ -40,6 +46,10 @@ class AdminErrorBoundaryImpl extends React.Component<Props, { hasError: boolean;
   }
 }
 
-const AdminErrorBoundary = (props: Props) => <AdminErrorBoundaryImpl {...props} />
+const AdminErrorBoundary = (props: Props) => {
+  const t = useTranslation('common')
+
+  return <AdminErrorBoundaryImpl {...props} t={t} />
+}
 
 export default AdminErrorBoundary

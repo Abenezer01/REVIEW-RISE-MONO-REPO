@@ -3,6 +3,8 @@
 
 import { useCallback, useEffect, useState, useMemo } from 'react';
 
+import { useTranslations } from 'next-intl';
+
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
@@ -22,11 +24,16 @@ interface PublishingLogsTableProps {
   onViewPost: (postId: string) => void;
 }
 
+const isUuid = (value: string | null | undefined): value is string =>
+  Boolean(value && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
+
 const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [key: string]: any }) => {
   return <i className={icon} style={{ fontSize }} {...rest} />;
 };
 
 const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingLogsTableProps) => {
+  const t = useTranslations('social.publishingLogs');
+  const tc = useTranslations('common');
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const [logs, setLogs] = useState<PublishingLog[]>([]);
@@ -39,6 +46,8 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
     endDate: '',
   });
 
+  const normalizedLocationId = isUuid(locationId) ? locationId : undefined;
+
   const fetchLogs = useCallback(async () => {
     if (!businessId) return;
 
@@ -50,7 +59,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
         status: filters.status === 'ALL' ? undefined : filters.status,
         startDate: filters.startDate || undefined,
         endDate: filters.endDate || undefined,
-        locationId: locationId || undefined,
+        locationId: normalizedLocationId,
       });
 
       setLogs(data);
@@ -59,30 +68,36 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
     } finally {
       setLoading(false);
     }
-  }, [businessId, locationId, filters]);
+  }, [businessId, normalizedLocationId, filters]);
 
   useEffect(() => {
     fetchLogs();
   }, [fetchLogs]);
 
-  const getStatusChip = (status: string) => {
+  const getStatusChip = useCallback((status: string) => {
     switch (status) {
       case 'completed':
       case 'published':
-        return <Chip label="Published" color="success" size="small" variant="tonal" />;
+        return <Chip label={t('published')} color="success" size="small" variant="tonal" />;
       case 'failed':
-        return <Chip label="Failed" color="error" size="small" variant="tonal" />;
+        return <Chip label={t('failed')} color="error" size="small" variant="tonal" />;
       case 'processing':
-        return <Chip label="Processing" color="info" size="small" variant="tonal" />;
+        return <Chip label={t('processing')} color="info" size="small" variant="tonal" />;
       case 'pending':
-        return <Chip label="Pending" color="warning" size="small" variant="tonal" />;
+        return <Chip label={t('pending')} color="warning" size="small" variant="tonal" />;
       default:
         return <Chip label={status} size="small" variant="tonal" />;
     }
-  };
+  }, [t]);
 
-  const getPlatformIcon = (platform: string) => {
-    switch (platform.toUpperCase()) {
+  const getPlatformIcon = useCallback((platform: string) => {
+    if (!platform) return <Icon icon="tabler-world" fontSize={20} />;
+
+    const normalized = platform.toUpperCase().replace(/\s+/g, '_');
+
+    switch (normalized) {
+      case 'ALL_PLATFORMS':
+        return <Icon icon="tabler-world" fontSize={20} />;
       case 'INSTAGRAM':
         return <Icon icon="tabler-brand-instagram" fontSize={20} style={{ color: '#E4405F' }} />;
       case 'FACEBOOK':
@@ -90,37 +105,65 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
       case 'LINKEDIN':
         return <Icon icon="tabler-brand-linkedin" fontSize={20} style={{ color: '#0A66C2' }} />;
       case 'TWITTER':
+      case 'X':
         return <Icon icon="tabler-brand-x" fontSize={20} />;
       case 'GOOGLE_BUSINESS':
         return <Icon icon="tabler-brand-google" fontSize={20} style={{ color: '#4285F4' }} />;
       default:
         return <Icon icon="tabler-world" fontSize={20} />;
     }
-  };
+  }, []);
 
   const columns: GridColDef[] = useMemo(() => [
     {
       field: 'updatedAt',
-      headerName: 'Time',
+      headerName: t('time'),
       flex: 1,
       minWidth: 160,
       renderCell: (params) => {
         const date = new Date(params.row.updatedAt);
+        const isDark = theme.palette.mode === 'dark';
 
-        const options: Intl.DateTimeFormatOptions = { 
-          month: 'short', 
-          day: 'numeric', 
-          year: 'numeric', 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        };
-
-        return date.toLocaleDateString(undefined, options);
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, py: 2 }}>
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 42,
+              height: 42,
+              borderRadius: '12px',
+              bgcolor: isDark ? alpha(theme.palette.primary.main, 0.15) : alpha(theme.palette.primary.main, 0.08),
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+              color: 'primary.main',
+              flexShrink: 0
+            }}>
+              <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.6rem', lineHeight: 1, mb: 0.5 }}>
+                {date.toLocaleDateString(undefined, { month: 'short' }).toUpperCase()}
+              </Typography>
+              <Typography variant="body2" sx={{ fontWeight: 900, fontSize: '0.9rem', lineHeight: 1 }}>
+                {date.getDate()}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.2 }}>
+                {date.toLocaleDateString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, opacity: 0.8 }}>
+                {new Intl.RelativeTimeFormat('en', { numeric: 'auto' }).format(
+                  Math.ceil((date.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)), 
+                  'day'
+                )}
+              </Typography>
+            </Box>
+          </Box>
+        );
       },
     },
     {
       field: 'platform',
-      headerName: 'Platform',
+      headerName: t('platform'),
       flex: 1,
       minWidth: 150,
       renderCell: (params) => (
@@ -134,7 +177,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
     },
     {
       field: 'content',
-      headerName: 'Post Content',
+      headerName: t('postContent'),
       flex: 2,
       minWidth: 250,
       renderCell: (params) => (
@@ -145,14 +188,14 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
     },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: t('status'),
       flex: 1,
       minWidth: 130,
       renderCell: (params) => getStatusChip(params.row.status),
     },
     {
       field: 'details',
-      headerName: 'Details/Errors',
+      headerName: t('detailsErrors'),
       flex: 1.5,
       minWidth: 200,
       renderCell: (params) => {
@@ -178,32 +221,32 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
         }
        
         if (log.status === 'completed') {
-          return <Typography variant="caption" color="success.main">Published successfully</Typography>;
+          return <Typography variant="caption" color="success.main">{t('publishedSuccessfully')}</Typography>;
         }
         
         return (
           <Typography variant="caption" color="text.secondary">
-            {log.attemptCount > 0 ? `Attempt ${log.attemptCount}` : 'Waiting to start'}
+            {log.attemptCount > 0 ? t('attempt', { count: log.attemptCount }) : t('waitingToStart')}
           </Typography>
         );
       },
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('actions'),
       sortable: false,
       align: 'right',
       headerAlign: 'right',
       width: 100,
       renderCell: (params) => (
-        <Tooltip title="View Original Post">
+        <Tooltip title={t('viewOriginalPost')}>
           <IconButton size="small" onClick={() => onViewPost(params.row.scheduledPostId)}>
             <Icon icon="tabler-eye" fontSize={20} />
           </IconButton>
         </Tooltip>
       ),
     },
-  ], [onViewPost]);
+  ], [onViewPost, t, getStatusChip, getPlatformIcon, theme.palette.mode, theme.palette.primary.main]);
 
   return (
     <Box>
@@ -221,7 +264,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
           id="log-platform-filter"
           select
           size="small"
-          label="Platform"
+          label={t('platform')}
           value={filters.platform}
           onChange={(e) => setFilters({ ...filters, platform: e.target.value })}
           sx={{ 
@@ -240,37 +283,37 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
           <MenuItem value="ALL">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Icon icon="tabler-world" fontSize={18} />
-              <Typography variant="body2" fontWeight="600">All Platforms</Typography>
+              <Typography variant="body2" fontWeight="600">{t('allPlatforms')}</Typography>
             </Box>
           </MenuItem>
           <MenuItem value="INSTAGRAM">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Icon icon="tabler-brand-instagram" fontSize={18} style={{ color: '#E4405F' }} />
-              <Typography variant="body2" fontWeight="600">Instagram</Typography>
+              <Typography variant="body2" fontWeight="600">{tc('channel.instagram')}</Typography>
             </Box>
           </MenuItem>
           <MenuItem value="FACEBOOK">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Icon icon="tabler-brand-facebook" fontSize={18} style={{ color: '#1877F2' }} />
-              <Typography variant="body2" fontWeight="600">Facebook</Typography>
+              <Typography variant="body2" fontWeight="600">{tc('channel.facebook')}</Typography>
             </Box>
           </MenuItem>
           <MenuItem value="LINKEDIN">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Icon icon="tabler-brand-linkedin" fontSize={18} style={{ color: '#0A66C2' }} />
-              <Typography variant="body2" fontWeight="600">LinkedIn</Typography>
+              <Typography variant="body2" fontWeight="600">{tc('channel.linkedin')}</Typography>
             </Box>
           </MenuItem>
           <MenuItem value="TWITTER">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Icon icon="tabler-brand-x" fontSize={18} />
-              <Typography variant="body2" fontWeight="600">Twitter (X)</Typography>
+              <Typography variant="body2" fontWeight="600">{t('twitterX')}</Typography>
             </Box>
           </MenuItem>
           <MenuItem value="GOOGLE_BUSINESS">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Icon icon="tabler-brand-google" fontSize={18} style={{ color: '#4285F4' }} />
-              <Typography variant="body2" fontWeight="600">Google Business</Typography>
+              <Typography variant="body2" fontWeight="600">{t('googleBusiness')}</Typography>
             </Box>
           </MenuItem>
         </TextField>
@@ -279,7 +322,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
           id="log-status-filter"
           select
           size="small"
-          label="Status"
+          label={t('status')}
           value={filters.status}
           onChange={(e) => setFilters({ ...filters, status: e.target.value })}
           sx={{ 
@@ -295,18 +338,18 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
             '& .MuiInputLabel-root': { fontWeight: 600 }
           }}
         >
-          <MenuItem value="ALL">All Statuses</MenuItem>
-          <MenuItem value="completed">Published</MenuItem>
-          <MenuItem value="failed">Failed</MenuItem>
-          <MenuItem value="processing">Processing</MenuItem>
-          <MenuItem value="pending">Pending</MenuItem>
+          <MenuItem value="ALL">{t('allStatuses')}</MenuItem>
+          <MenuItem value="completed">{t('published')}</MenuItem>
+          <MenuItem value="failed">{t('failed')}</MenuItem>
+          <MenuItem value="processing">{t('processing')}</MenuItem>
+          <MenuItem value="pending">{t('pending')}</MenuItem>
         </TextField>
 
         <TextField
           id="log-start-date"
           type="date"
           size="small"
-          label="Start Date"
+          label={t('startDate')}
           value={filters.startDate}
           onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
           slotProps={{ inputLabel: { shrink: true } }}
@@ -328,7 +371,7 @@ const PublishingLogsTable = ({ businessId, locationId, onViewPost }: PublishingL
           id="log-end-date"
           type="date"
           size="small"
-          label="End Date"
+          label={t('endDate')}
           value={filters.endDate}
           onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
           slotProps={{ inputLabel: { shrink: true } }}

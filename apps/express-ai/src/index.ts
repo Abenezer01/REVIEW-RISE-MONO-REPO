@@ -8,12 +8,20 @@ import { requestIdMiddleware, errorHandler } from '@platform/middleware';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 3002;
 
 app.use(cors());
 app.use(requestIdMiddleware);
 app.use(morgan('dev'));
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ limit: '2mb', extended: true }));
+
+// Debug Middleware
+app.use((req, res, next) => {
+    console.log(`[Express AI] ${req.method} ${req.path}`);
+    console.log('[Express AI] Headers:', JSON.stringify(req.headers));
+    next();
+});
 
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', service: 'express-ai' });
@@ -21,9 +29,14 @@ app.get('/health', (req, res) => {
 
 import aiRoutes from './routes/ai.routes';
 import contentStudioRoutes from './routes/content-studio.routes';
+import blueprintRoutes from './routes/blueprint.routes';
+
+// import analyticsRoutes from './routes/analytics.routes';
 
 app.use('/api/v1', aiRoutes);
 app.use('/api/v1/studio', contentStudioRoutes);
+app.use('/api/v1/blueprint', blueprintRoutes);
+// app.use('/api/v1/analytics', analyticsRoutes);
 
 app.get('/', (req, res) => {
     const response = createSuccessResponse(null, 'Express AI Service is running', 200, { requestId: req.id });

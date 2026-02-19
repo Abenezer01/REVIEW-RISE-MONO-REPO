@@ -1,0 +1,925 @@
+
+> @apps/express-ai@0.1.0 test
+> jest src/services/__tests__/blueprint-verification.test.ts
+
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151002: [0mUsing hybrid module kind (Node16/18/Next) is only supported in "isolatedModules: true". Please set "isolatedModules: true" in your tsconfig.json. To disable this message, you can set "diagnostics.ignoreCodes" to include 151002 in your ts-jest config. See more at https://kulshekhar.github.io/ts-jest/docs/getting-started/options/diagnostics
+  console.log
+    Verified Output: {
+      "strategySummary": {
+        "goal": "Drive Leads for Apex Plumbing",
+        "totalBudget": 2000,
+        "vertical": "Local Service",
+        "bidStrategy": "Maximize Conversions"
+      },
+      "budgetModeling": {
+        "clickCapacity": 160,
+        "budgetTier": "Medium",
+        "recommendedCampaignCount": 2
+      },
+      "campaigns": [
+        {
+          "name": "Apex Plumbing - Brand Protection",
+          "objective": "Brand Awareness",
+          "budgetRecommendation": "15%",
+          "adGroups": [
+            {
+              "name": "Apex Plumbing - Brand",
+              "keywords": {
+                "intent": "Brand",
+                "theme": "Apex Plumbing - Brand",
+                "funnelStage": "BOF",
+                "keywords": [
+                  {
+                    "term": "Apex Plumbing"
+                  },
+                  {
+                    "term": "Apex Plumbing reviews"
+                  },
+                  {
+                    "term": "Apex Plumbing login"
+                  }
+                ]
+              },
+              "assets": {
+                "headlines": [
+                  "Apex Plumbing",
+                  "Local Service Experts",
+                  "Emergency Leak Repair",
+                  "Best Pipe Repair",
+                  "Best Leak Detection",
+                  "Best Drain Cleaning",
+                  "Serving Austin, TX",
+                  "Austin, TX Local Service",
+                  "Trusted & Verified",
+                  "5-Star Rated",
+                  "Satisfaction Guaranteed",
+                  "Call Now",
+                  "Book Online",
+                  "Get a Free Quote",
+                  "Open 24/7"
+                ],
+                "descriptions": [
+                  "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+                  "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+                  "Same Day Service Available. Don't wait, get the quality service you deserve."
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Emergency Leak Repair - General Service",
+          "objective": "Leads",
+          "budgetRecommendation": "85%",
+          "adGroups": [
+            {
+              "name": "Pipe Repair - Service",
+              "keywords": {
+                "intent": "Service",
+                "theme": "Pipe Repair - Service",
+                "funnelStage": "MOF",
+                "keywords": [
+                  {
+                    "term": "Pipe Repair"
+                  },
+                  {
+                    "term": "Pipe Repair service"
+                  },
+                  {
+                    "term": "Pipe Repair company"
+                  },
+                  {
+                    "term": "best Pipe Repair"
+                  },
+                  {
+                    "term": "Pipe Repair in Austin, TX"
+                  },
+                  {
+                    "term": "Pipe Repair Austin, TX"
+                  },
+                  {
+                    "term": "Austin, TX Pipe Repair"
+                  }
+                ]
+              },
+              "assets": {
+                "headlines": [
+                  "Apex Plumbing",
+                  "Local Service Experts",
+                  "Emergency Leak Repair",
+                  "Best Pipe Repair",
+                  "Best Leak Detection",
+                  "Best Drain Cleaning",
+                  "Serving Austin, TX",
+                  "Austin, TX Local Service",
+                  "Trusted & Verified",
+                  "5-Star Rated",
+                  "Satisfaction Guaranteed",
+                  "Call Now",
+                  "Book Online",
+                  "Get a Free Quote",
+                  "Open 24/7"
+                ],
+                "descriptions": [
+                  "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+                  "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+                  "Same Day Service Available. Don't wait, get the quality service you deserve."
+                ]
+              }
+            },
+            {
+              "name": "Leak Detection - Service",
+              "keywords": {
+                "intent": "Service",
+                "theme": "Leak Detection - Service",
+                "funnelStage": "MOF",
+                "keywords": [
+                  {
+                    "term": "Leak Detection"
+                  },
+                  {
+                    "term": "Leak Detection service"
+                  },
+                  {
+                    "term": "Leak Detection company"
+                  },
+                  {
+                    "term": "best Leak Detection"
+                  },
+                  {
+                    "term": "Leak Detection in Austin, TX"
+                  },
+                  {
+                    "term": "Leak Detection Austin, TX"
+                  },
+                  {
+                    "term": "Austin, TX Leak Detection"
+                  }
+                ]
+              },
+              "assets": {
+                "headlines": [
+                  "Apex Plumbing",
+                  "Local Service Experts",
+                  "Emergency Leak Repair",
+                  "Best Pipe Repair",
+                  "Best Leak Detection",
+                  "Best Drain Cleaning",
+                  "Serving Austin, TX",
+                  "Austin, TX Local Service",
+                  "Trusted & Verified",
+                  "5-Star Rated",
+                  "Satisfaction Guaranteed",
+                  "Call Now",
+                  "Book Online",
+                  "Get a Free Quote",
+                  "Open 24/7"
+                ],
+                "descriptions": [
+                  "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+                  "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+                  "Same Day Service Available. Don't wait, get the quality service you deserve."
+                ]
+              }
+            },
+            {
+              "name": "Drain Cleaning - Service",
+              "keywords": {
+                "intent": "Service",
+                "theme": "Drain Cleaning - Service",
+                "funnelStage": "MOF",
+                "keywords": [
+                  {
+                    "term": "Drain Cleaning"
+                  },
+                  {
+                    "term": "Drain Cleaning service"
+                  },
+                  {
+                    "term": "Drain Cleaning company"
+                  },
+                  {
+                    "term": "best Drain Cleaning"
+                  },
+                  {
+                    "term": "Drain Cleaning in Austin, TX"
+                  },
+                  {
+                    "term": "Drain Cleaning Austin, TX"
+                  },
+                  {
+                    "term": "Austin, TX Drain Cleaning"
+                  }
+                ]
+              },
+              "assets": {
+                "headlines": [
+                  "Apex Plumbing",
+                  "Local Service Experts",
+                  "Emergency Leak Repair",
+                  "Best Pipe Repair",
+                  "Best Leak Detection",
+                  "Best Drain Cleaning",
+                  "Serving Austin, TX",
+                  "Austin, TX Local Service",
+                  "Trusted & Verified",
+                  "5-Star Rated",
+                  "Satisfaction Guaranteed",
+                  "Call Now",
+                  "Book Online",
+                  "Get a Free Quote",
+                  "Open 24/7"
+                ],
+                "descriptions": [
+                  "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+                  "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+                  "Same Day Service Available. Don't wait, get the quality service you deserve."
+                ]
+              }
+            },
+            {
+              "name": "Burst pipe flooding house - Problem",
+              "keywords": {
+                "intent": "Problem",
+                "theme": "Burst pipe flooding house - Problem",
+                "funnelStage": "TOF",
+                "keywords": [
+                  {
+                    "term": "how to fix Burst pipe flooding house"
+                  },
+                  {
+                    "term": "why is Burst pipe flooding house"
+                  },
+                  {
+                    "term": "Burst pipe flooding house solutions"
+                  }
+                ]
+              },
+              "assets": {
+                "headlines": [
+                  "Apex Plumbing",
+                  "Local Service Experts",
+                  "Emergency Leak Repair",
+                  "Best Pipe Repair",
+                  "Best Leak Detection",
+                  "Best Drain Cleaning",
+                  "Serving Austin, TX",
+                  "Austin, TX Local Service",
+                  "Trusted & Verified",
+                  "5-Star Rated",
+                  "Satisfaction Guaranteed",
+                  "Call Now",
+                  "Book Online",
+                  "Get a Free Quote",
+                  "Open 24/7"
+                ],
+                "descriptions": [
+                  "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+                  "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+                  "Same Day Service Available. Don't wait, get the quality service you deserve."
+                ]
+              }
+            },
+            {
+              "name": "High water bill - Problem",
+              "keywords": {
+                "intent": "Problem",
+                "theme": "High water bill - Problem",
+                "funnelStage": "TOF",
+                "keywords": [
+                  {
+                    "term": "how to fix High water bill"
+                  },
+                  {
+                    "term": "why is High water bill"
+                  },
+                  {
+                    "term": "High water bill solutions"
+                  }
+                ]
+              },
+              "assets": {
+                "headlines": [
+                  "Apex Plumbing",
+                  "Local Service Experts",
+                  "Emergency Leak Repair",
+                  "Best Pipe Repair",
+                  "Best Leak Detection",
+                  "Best Drain Cleaning",
+                  "Serving Austin, TX",
+                  "Austin, TX Local Service",
+                  "Trusted & Verified",
+                  "5-Star Rated",
+                  "Satisfaction Guaranteed",
+                  "Call Now",
+                  "Book Online",
+                  "Get a Free Quote",
+                  "Open 24/7"
+                ],
+                "descriptions": [
+                  "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+                  "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+                  "Same Day Service Available. Don't wait, get the quality service you deserve."
+                ]
+              }
+            },
+            {
+              "name": "Emergency / Near Me",
+              "keywords": {
+                "intent": "Emergency",
+                "theme": "Emergency / Near Me",
+                "funnelStage": "BOF",
+                "keywords": [
+                  {
+                    "term": "emergency Pipe Repair"
+                  },
+                  {
+                    "term": "24/7 Pipe Repair"
+                  },
+                  {
+                    "term": "Pipe Repair near me"
+                  },
+                  {
+                    "term": "emergency Pipe Repair Austin, TX"
+                  }
+                ]
+              },
+              "assets": {
+                "headlines": [
+                  "Apex Plumbing",
+                  "Local Service Experts",
+                  "Emergency Leak Repair",
+                  "Best Pipe Repair",
+                  "Best Leak Detection",
+                  "Best Drain Cleaning",
+                  "Serving Austin, TX",
+                  "Austin, TX Local Service",
+                  "Trusted & Verified",
+                  "5-Star Rated",
+                  "Satisfaction Guaranteed",
+                  "Call Now",
+                  "Book Online",
+                  "Get a Free Quote",
+                  "Open 24/7"
+                ],
+                "descriptions": [
+                  "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+                  "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+                  "Same Day Service Available. Don't wait, get the quality service you deserve."
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "clusters": [
+        {
+          "intent": "Service",
+          "theme": "Pipe Repair - Service",
+          "funnelStage": "MOF",
+          "keywords": [
+            {
+              "term": "Pipe Repair"
+            },
+            {
+              "term": "Pipe Repair service"
+            },
+            {
+              "term": "Pipe Repair company"
+            },
+            {
+              "term": "best Pipe Repair"
+            },
+            {
+              "term": "Pipe Repair in Austin, TX"
+            },
+            {
+              "term": "Pipe Repair Austin, TX"
+            },
+            {
+              "term": "Austin, TX Pipe Repair"
+            }
+          ]
+        },
+        {
+          "intent": "Service",
+          "theme": "Leak Detection - Service",
+          "funnelStage": "MOF",
+          "keywords": [
+            {
+              "term": "Leak Detection"
+            },
+            {
+              "term": "Leak Detection service"
+            },
+            {
+              "term": "Leak Detection company"
+            },
+            {
+              "term": "best Leak Detection"
+            },
+            {
+              "term": "Leak Detection in Austin, TX"
+            },
+            {
+              "term": "Leak Detection Austin, TX"
+            },
+            {
+              "term": "Austin, TX Leak Detection"
+            }
+          ]
+        },
+        {
+          "intent": "Service",
+          "theme": "Drain Cleaning - Service",
+          "funnelStage": "MOF",
+          "keywords": [
+            {
+              "term": "Drain Cleaning"
+            },
+            {
+              "term": "Drain Cleaning service"
+            },
+            {
+              "term": "Drain Cleaning company"
+            },
+            {
+              "term": "best Drain Cleaning"
+            },
+            {
+              "term": "Drain Cleaning in Austin, TX"
+            },
+            {
+              "term": "Drain Cleaning Austin, TX"
+            },
+            {
+              "term": "Austin, TX Drain Cleaning"
+            }
+          ]
+        },
+        {
+          "intent": "Brand",
+          "theme": "Apex Plumbing - Brand",
+          "funnelStage": "BOF",
+          "keywords": [
+            {
+              "term": "Apex Plumbing"
+            },
+            {
+              "term": "Apex Plumbing reviews"
+            },
+            {
+              "term": "Apex Plumbing login"
+            }
+          ]
+        },
+        {
+          "intent": "Problem",
+          "theme": "Burst pipe flooding house - Problem",
+          "funnelStage": "TOF",
+          "keywords": [
+            {
+              "term": "how to fix Burst pipe flooding house"
+            },
+            {
+              "term": "why is Burst pipe flooding house"
+            },
+            {
+              "term": "Burst pipe flooding house solutions"
+            }
+          ]
+        },
+        {
+          "intent": "Problem",
+          "theme": "High water bill - Problem",
+          "funnelStage": "TOF",
+          "keywords": [
+            {
+              "term": "how to fix High water bill"
+            },
+            {
+              "term": "why is High water bill"
+            },
+            {
+              "term": "High water bill solutions"
+            }
+          ]
+        },
+        {
+          "intent": "Emergency",
+          "theme": "Emergency / Near Me",
+          "funnelStage": "BOF",
+          "keywords": [
+            {
+              "term": "emergency Pipe Repair"
+            },
+            {
+              "term": "24/7 Pipe Repair"
+            },
+            {
+              "term": "Pipe Repair near me"
+            },
+            {
+              "term": "emergency Pipe Repair Austin, TX"
+            }
+          ]
+        }
+      ],
+      "adGroups": [
+        {
+          "name": "Pipe Repair - Service",
+          "keywords": {
+            "intent": "Service",
+            "theme": "Pipe Repair - Service",
+            "funnelStage": "MOF",
+            "keywords": [
+              {
+                "term": "Pipe Repair"
+              },
+              {
+                "term": "Pipe Repair service"
+              },
+              {
+                "term": "Pipe Repair company"
+              },
+              {
+                "term": "best Pipe Repair"
+              },
+              {
+                "term": "Pipe Repair in Austin, TX"
+              },
+              {
+                "term": "Pipe Repair Austin, TX"
+              },
+              {
+                "term": "Austin, TX Pipe Repair"
+              }
+            ]
+          },
+          "assets": {
+            "headlines": [
+              "Apex Plumbing",
+              "Local Service Experts",
+              "Emergency Leak Repair",
+              "Best Pipe Repair",
+              "Best Leak Detection",
+              "Best Drain Cleaning",
+              "Serving Austin, TX",
+              "Austin, TX Local Service",
+              "Trusted & Verified",
+              "5-Star Rated",
+              "Satisfaction Guaranteed",
+              "Call Now",
+              "Book Online",
+              "Get a Free Quote",
+              "Open 24/7"
+            ],
+            "descriptions": [
+              "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+              "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+              "Same Day Service Available. Don't wait, get the quality service you deserve."
+            ]
+          }
+        },
+        {
+          "name": "Leak Detection - Service",
+          "keywords": {
+            "intent": "Service",
+            "theme": "Leak Detection - Service",
+            "funnelStage": "MOF",
+            "keywords": [
+              {
+                "term": "Leak Detection"
+              },
+              {
+                "term": "Leak Detection service"
+              },
+              {
+                "term": "Leak Detection company"
+              },
+              {
+                "term": "best Leak Detection"
+              },
+              {
+                "term": "Leak Detection in Austin, TX"
+              },
+              {
+                "term": "Leak Detection Austin, TX"
+              },
+              {
+                "term": "Austin, TX Leak Detection"
+              }
+            ]
+          },
+          "assets": {
+            "headlines": [
+              "Apex Plumbing",
+              "Local Service Experts",
+              "Emergency Leak Repair",
+              "Best Pipe Repair",
+              "Best Leak Detection",
+              "Best Drain Cleaning",
+              "Serving Austin, TX",
+              "Austin, TX Local Service",
+              "Trusted & Verified",
+              "5-Star Rated",
+              "Satisfaction Guaranteed",
+              "Call Now",
+              "Book Online",
+              "Get a Free Quote",
+              "Open 24/7"
+            ],
+            "descriptions": [
+              "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+              "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+              "Same Day Service Available. Don't wait, get the quality service you deserve."
+            ]
+          }
+        },
+        {
+          "name": "Drain Cleaning - Service",
+          "keywords": {
+            "intent": "Service",
+            "theme": "Drain Cleaning - Service",
+            "funnelStage": "MOF",
+            "keywords": [
+              {
+                "term": "Drain Cleaning"
+              },
+              {
+                "term": "Drain Cleaning service"
+              },
+              {
+                "term": "Drain Cleaning company"
+              },
+              {
+                "term": "best Drain Cleaning"
+              },
+              {
+                "term": "Drain Cleaning in Austin, TX"
+              },
+              {
+                "term": "Drain Cleaning Austin, TX"
+              },
+              {
+                "term": "Austin, TX Drain Cleaning"
+              }
+            ]
+          },
+          "assets": {
+            "headlines": [
+              "Apex Plumbing",
+              "Local Service Experts",
+              "Emergency Leak Repair",
+              "Best Pipe Repair",
+              "Best Leak Detection",
+              "Best Drain Cleaning",
+              "Serving Austin, TX",
+              "Austin, TX Local Service",
+              "Trusted & Verified",
+              "5-Star Rated",
+              "Satisfaction Guaranteed",
+              "Call Now",
+              "Book Online",
+              "Get a Free Quote",
+              "Open 24/7"
+            ],
+            "descriptions": [
+              "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+              "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+              "Same Day Service Available. Don't wait, get the quality service you deserve."
+            ]
+          }
+        },
+        {
+          "name": "Apex Plumbing - Brand",
+          "keywords": {
+            "intent": "Brand",
+            "theme": "Apex Plumbing - Brand",
+            "funnelStage": "BOF",
+            "keywords": [
+              {
+                "term": "Apex Plumbing"
+              },
+              {
+                "term": "Apex Plumbing reviews"
+              },
+              {
+                "term": "Apex Plumbing login"
+              }
+            ]
+          },
+          "assets": {
+            "headlines": [
+              "Apex Plumbing",
+              "Local Service Experts",
+              "Emergency Leak Repair",
+              "Best Pipe Repair",
+              "Best Leak Detection",
+              "Best Drain Cleaning",
+              "Serving Austin, TX",
+              "Austin, TX Local Service",
+              "Trusted & Verified",
+              "5-Star Rated",
+              "Satisfaction Guaranteed",
+              "Call Now",
+              "Book Online",
+              "Get a Free Quote",
+              "Open 24/7"
+            ],
+            "descriptions": [
+              "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+              "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+              "Same Day Service Available. Don't wait, get the quality service you deserve."
+            ]
+          }
+        },
+        {
+          "name": "Burst pipe flooding house - Problem",
+          "keywords": {
+            "intent": "Problem",
+            "theme": "Burst pipe flooding house - Problem",
+            "funnelStage": "TOF",
+            "keywords": [
+              {
+                "term": "how to fix Burst pipe flooding house"
+              },
+              {
+                "term": "why is Burst pipe flooding house"
+              },
+              {
+                "term": "Burst pipe flooding house solutions"
+              }
+            ]
+          },
+          "assets": {
+            "headlines": [
+              "Apex Plumbing",
+              "Local Service Experts",
+              "Emergency Leak Repair",
+              "Best Pipe Repair",
+              "Best Leak Detection",
+              "Best Drain Cleaning",
+              "Serving Austin, TX",
+              "Austin, TX Local Service",
+              "Trusted & Verified",
+              "5-Star Rated",
+              "Satisfaction Guaranteed",
+              "Call Now",
+              "Book Online",
+              "Get a Free Quote",
+              "Open 24/7"
+            ],
+            "descriptions": [
+              "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+              "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+              "Same Day Service Available. Don't wait, get the quality service you deserve."
+            ]
+          }
+        },
+        {
+          "name": "High water bill - Problem",
+          "keywords": {
+            "intent": "Problem",
+            "theme": "High water bill - Problem",
+            "funnelStage": "TOF",
+            "keywords": [
+              {
+                "term": "how to fix High water bill"
+              },
+              {
+                "term": "why is High water bill"
+              },
+              {
+                "term": "High water bill solutions"
+              }
+            ]
+          },
+          "assets": {
+            "headlines": [
+              "Apex Plumbing",
+              "Local Service Experts",
+              "Emergency Leak Repair",
+              "Best Pipe Repair",
+              "Best Leak Detection",
+              "Best Drain Cleaning",
+              "Serving Austin, TX",
+              "Austin, TX Local Service",
+              "Trusted & Verified",
+              "5-Star Rated",
+              "Satisfaction Guaranteed",
+              "Call Now",
+              "Book Online",
+              "Get a Free Quote",
+              "Open 24/7"
+            ],
+            "descriptions": [
+              "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+              "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+              "Same Day Service Available. Don't wait, get the quality service you deserve."
+            ]
+          }
+        },
+        {
+          "name": "Emergency / Near Me",
+          "keywords": {
+            "intent": "Emergency",
+            "theme": "Emergency / Near Me",
+            "funnelStage": "BOF",
+            "keywords": [
+              {
+                "term": "emergency Pipe Repair"
+              },
+              {
+                "term": "24/7 Pipe Repair"
+              },
+              {
+                "term": "Pipe Repair near me"
+              },
+              {
+                "term": "emergency Pipe Repair Austin, TX"
+              }
+            ]
+          },
+          "assets": {
+            "headlines": [
+              "Apex Plumbing",
+              "Local Service Experts",
+              "Emergency Leak Repair",
+              "Best Pipe Repair",
+              "Best Leak Detection",
+              "Best Drain Cleaning",
+              "Serving Austin, TX",
+              "Austin, TX Local Service",
+              "Trusted & Verified",
+              "5-Star Rated",
+              "Satisfaction Guaranteed",
+              "Call Now",
+              "Book Online",
+              "Get a Free Quote",
+              "Open 24/7"
+            ],
+            "descriptions": [
+              "Top Rated Local Service in Austin, TX. Emergency Leak Repair. Call Us Today!",
+              "Licensed & Insured. 100% Satisfaction Guarantee. Book your appointment online now.",
+              "Same Day Service Available. Don't wait, get the quality service you deserve."
+            ]
+          }
+        }
+      ],
+      "negatives": [
+        {
+          "category": "Global",
+          "keywords": [
+            "free",
+            "cheap",
+            "torrent",
+            "crack",
+            "hack",
+            "jobs",
+            "hiring",
+            "career",
+            "salary",
+            "resume",
+            "training",
+            "course",
+            "learn to",
+            "diy",
+            "how to make",
+            "youtube",
+            "video",
+            "pics",
+            "images",
+            "job",
+            "national",
+            "usa",
+            "worldwide"
+          ]
+        }
+      ],
+      "landingPageAnalysis": {
+        "url": "https://apexplumbing.com/emergency",
+        "isValid": false,
+        "score": 5.666666666666667,
+        "mobileOptimized": true,
+        "trustSignalsDetected": [],
+        "missingElements": []
+      },
+      "performanceAssumptions": {
+        "expectedCTR": "4-6%",
+        "expectedCPC": "$10.00 - $15.00",
+        "conversionDifficulty": 5
+      }
+    }
+
+      at Object.<anonymous> (src/services/__tests__/blueprint-verification.test.ts:85:17)
+
+PASS src/services/__tests__/blueprint-verification.test.ts
+  Blueprint Strategy Verification
+    √ should generate a Strategy-Driven Blueprint with all required fields (26 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        5.241 s, estimated 6 s
+Ran all test suites matching /src\\services\\__tests__\\blueprint-verification.test.ts/i.

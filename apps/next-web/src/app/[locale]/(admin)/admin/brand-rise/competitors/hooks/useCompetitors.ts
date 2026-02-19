@@ -1,8 +1,6 @@
 import { useState } from 'react';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useTranslations } from 'next-intl';
-import toast from 'react-hot-toast';
 
 import { useBusinessId } from '@/hooks/useBusinessId';
 import { useLocationFilter } from '@/hooks/useLocationFilter';
@@ -11,7 +9,6 @@ import { BrandService } from '@/services/brand.service';
 import type { Competitor } from '@/components/brand-rise/competitors/CompetitorCard';
 
 export const useCompetitors = () => {
-  const t = useTranslations('dashboard');
   const { businessId } = useBusinessId();
   const { locationId } = useLocationFilter();
   const queryClient = useQueryClient();
@@ -53,12 +50,10 @@ export const useCompetitors = () => {
 return res.data;
     },
     onSuccess: () => {
-      toast.success(t('brandRise.competitors.toast.discoverySuccess') || 'Discovery started!');
       queryClient.invalidateQueries({ queryKey: ['competitors', businessId] });
       setTimeout(() => setDiscoveryStatus('idle'), 2000);
     },
-    onError: (error: any) => {
-        toast.error(error.response?.data?.message || t('brandRise.competitors.toast.discoveryError') || 'Discovery failed');
+    onError: () => {
         setDiscoveryStatus('idle');
     }
   });
@@ -74,7 +69,6 @@ return apiClient.patch(`/brands/${businessId}/competitors/${competitor.id}`, {
         });
     },
     onSuccess: () => {
-        toast.success(t('brandRise.competitors.toast.addedSuccess') || 'Competitor added');
         queryClient.invalidateQueries({ queryKey: ['competitors', businessId] });
     }
   });
@@ -87,7 +81,6 @@ return apiClient.patch(`/brands/${businessId}/competitors/${competitor.id}`, {
 return apiClient.delete(`/brands/${businessId}/competitors/${id}`);
     },
     onSuccess: () => {
-        toast.success(t('brandRise.competitors.toast.removedSuccess') || 'Competitor removed');
         queryClient.invalidateQueries({ queryKey: ['competitors', businessId] });
     }
   });
@@ -102,12 +95,10 @@ return apiClient.delete(`/brands/${businessId}/competitors/${id}`);
 return res.data;
     },
     onSuccess: (data, id) => {
-       toast.success(t('brandRise.competitors.toast.analysisStarted') || 'Analysis started');
        queryClient.invalidateQueries({ queryKey: ['competitors', businessId] });
        setAnalyzingIds(prev => prev.filter(pid => pid !== id));
     },
     onError: (err, id) => {
-       toast.error(t('brandRise.competitors.toast.analysisFailed') || 'Analysis failed');
        setAnalyzingIds(prev => prev.filter(pid => pid !== id));
     }
   });

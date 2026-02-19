@@ -20,14 +20,18 @@ import {
 } from '@mui/material'
 import { Store as StoreIcon, InfoOutlined as InfoIcon, SmartToy as RobotIcon } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
-import toast from 'react-hot-toast'
+
+import { SystemMessageCode } from '@platform/contracts'
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 import AutoReplySettings from '@/views/admin/reviews/components/AutoReplySettings'
 import { getCurrentAccount } from '@/app/actions/account'
 import { getBrandProfileByBusinessId, updateAutoReplySettings } from '@/app/actions/brand-profile'
 
 const AutoReplySettingsPage = () => {
-  const tDashboard = useTranslations('dashboard')
+  const { notify } = useSystemMessages()
+  const t = useTranslations('dashboard')
   const [businesses, setBusinesses] = useState<any[]>([])
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('')
   const [brandProfile, setBrandProfile] = useState<any>(null)
@@ -59,14 +63,14 @@ const AutoReplySettingsPage = () => {
         }
       } catch (error: any) {
         console.error('Failed to fetch initial data:', error)
-        toast.error(error.message || 'Failed to load businesses')
+        notify(SystemMessageCode.GENERIC_ERROR)
       } finally {
         setLoading(false)
       }
     }
 
     fetchInitialData()
-  }, [])
+  }, [notify])
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -82,7 +86,7 @@ const AutoReplySettingsPage = () => {
         } else {
           setBrandProfile(null)
 
-          toast.error(result.error || 'Brand profile not found for this business')
+          notify(SystemMessageCode.BRAND_PROFILE_NOT_FOUND)
         }
       } catch (error) {
         console.error('Failed to fetch brand profile:', error)
@@ -93,26 +97,25 @@ const AutoReplySettingsPage = () => {
     }
 
     fetchProfile()
-  }, [selectedBusinessId])
+  }, [selectedBusinessId, notify])
 
   const handleUpdateSettings = async (data: any) => {
     if (!selectedBusinessId || isUpdating) return
 
     setIsUpdating(true)
-    const toastId = toast.loading('Updating settings...')
 
     try {
       const result = await updateAutoReplySettings(selectedBusinessId, data.autoReplySettings)
 
       if (result.success) {
         setBrandProfile(result.data)
-        toast.success('Auto-reply settings updated', { id: toastId })
+        notify(SystemMessageCode.SAVE_SUCCESS)
       } else {
         throw new Error(result.error)
       }
     } catch (error: any) {
       console.error('Update failed:', error)
-      toast.error(error.message || 'Failed to update auto-reply settings', { id: toastId })
+      notify(SystemMessageCode.SAVE_FAILED)
     } finally {
       setIsUpdating(false)
     }
@@ -143,10 +146,10 @@ const AutoReplySettingsPage = () => {
           </Avatar>
           <Box>
             <Typography variant='h3'>
-              {tDashboard('auto-reply')}
+              {t('auto-reply')}
             </Typography>
             <Typography variant='body1' color="text.secondary">
-              Configure AI-powered automated responses for your business reviews.
+              {t('autoReply.description')}
             </Typography>
           </Box>
         </Stack>
@@ -181,8 +184,8 @@ const AutoReplySettingsPage = () => {
               <StoreIcon />
             </Avatar>
             <Box>
-              <Typography variant="subtitle1" fontWeight="800">Active Business Context</Typography>
-              <Typography variant="body2" color="text.secondary">Select the business you want to configure</Typography>
+              <Typography variant="subtitle1" fontWeight="800">{t('accounts.userDialog.fields.business')}</Typography>
+              <Typography variant="body2" color="text.secondary">{t('accounts.userDialog.fields.rolePlaceholder')}</Typography>
             </Box>
           </Stack>
           
@@ -234,9 +237,9 @@ const AutoReplySettingsPage = () => {
                   <InfoIcon fontSize="large" />
                 </Avatar>
                 <Box>
-                  <Typography variant="h6" fontWeight="600">No Brand Profile Found</Typography>
+                  <Typography variant="h6" fontWeight="600">{t('locations.detail.notFound')}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 400 }}>
-                    The selected business does not have an active brand profile. Please set up a brand profile first to enable auto-reply features.
+                    {t('locations.detail.saveFirst')}
                   </Typography>
                 </Box>
               </Stack>

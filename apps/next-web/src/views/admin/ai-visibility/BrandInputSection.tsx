@@ -36,9 +36,12 @@ import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 
+import { useTranslation } from '@/hooks/useTranslation'
+
 // ... (icons remain the same)
 
 const BrandInputSection: React.FC<BrandInputSectionProps> = ({ onAnalyze, loading }) => {
+  const t = useTranslation('dashboard')
   const [url, setUrl] = useState('')
 
   const examples = [
@@ -63,8 +66,8 @@ const BrandInputSection: React.FC<BrandInputSectionProps> = ({ onAnalyze, loadin
   return (
     <Card>
       <CardHeader
-        title="AI Brand Visibility Analysis"
-        subheader="Enter your brand's website URL to analyze its presence across major AI platforms like ChatGPT, Gemini, and Claude."
+        title={t('aiVisibility.input.title')}
+        subheader={t('aiVisibility.input.subtitle')}
       />
       <Divider />
       <CardContent>
@@ -73,11 +76,11 @@ const BrandInputSection: React.FC<BrandInputSectionProps> = ({ onAnalyze, loadin
             <Grid size={{ xs: 12, md: 9 }}>
               <TextField
                 fullWidth
-                label="Brand Website URL"
-                placeholder="e.g., https://yourbrand.com"
+                label={t('aiVisibility.input.label')}
+                placeholder={t('aiVisibility.input.placeholder')}
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                helperText="Enter the full URL including https://"
+                helperText={t('aiVisibility.input.helper')}
                 slotProps={{
                     input: {
                         startAdornment: (
@@ -89,7 +92,7 @@ const BrandInputSection: React.FC<BrandInputSectionProps> = ({ onAnalyze, loadin
                 }}
               />
               <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                <Typography variant="caption" color="text.secondary">Try an example:</Typography>
+                <Typography variant="caption" color="text.secondary">{t('aiVisibility.input.tryExample')}</Typography>
                 {examples.map((example) => (
                   <Chip
                     key={example}
@@ -111,7 +114,7 @@ const BrandInputSection: React.FC<BrandInputSectionProps> = ({ onAnalyze, loadin
                 startIcon={!loading && <SearchIcon />}
                 sx={{ height: '56px' }} // Match TextField height
               >
-                {loading ? 'Analyzing...' : 'Analyze'}
+                {loading ? t('aiVisibility.input.analyzing') : t('aiVisibility.input.analyze')}
               </Button>
             </Grid>
           </Grid>

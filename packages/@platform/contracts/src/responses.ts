@@ -1,3 +1,5 @@
+import { SystemMessageCode } from './system-messages';
+
 // ============================================================================
 // Response Types
 // ============================================================================
@@ -11,7 +13,8 @@ export interface ApiResponse<T = any> {
    * HTTP Status code for quick reference in client logic
    */
   statusCode: number;
-  message?: string;
+  message?: string; // Human readable message (deprecated in favor of messageCode)
+  messageCode?: SystemMessageCode; // Machine readable system message code
   data?: T;
   error?: ApiError;
   meta: ApiMeta;
@@ -33,7 +36,7 @@ export interface PaginatedResponse<T = any> extends ApiResponse<T[]> {
  * API error details
  */
 export interface ApiError {
-  code: string; // Machine readable error code e.g. 'VALIDATION_ERROR'
+  code: SystemMessageCode | string; // Machine readable error code
   message: string; // Human readable message
   details?: unknown; // Stack trace or validation errors (dev only usually)
   field?: string; // Field name for validation errors
@@ -78,11 +81,13 @@ export const createSuccessResponse = <T>(
   data: T,
   message: string = 'Success',
   statusCode: number = 200,
-  meta: Partial<ApiMeta> = {}
+  meta: Partial<ApiMeta> = {},
+  messageCode: SystemMessageCode = SystemMessageCode.SUCCESS
 ): ApiResponse<T> => ({
   success: true,
   statusCode,
   message,
+  messageCode,
   data,
   meta: {
     timestamp: new Date().toISOString(),
@@ -99,11 +104,13 @@ export const createPaginatedResponse = <T>(
   pagination: { page: number; limit: number; total: number },
   message: string = 'Success',
   statusCode: number = 200,
-  meta: Partial<ApiMeta> = {}
+  meta: Partial<ApiMeta> = {},
+  messageCode: SystemMessageCode = SystemMessageCode.SUCCESS
 ): PaginatedResponse<T> => ({
   success: true,
   statusCode,
   message,
+  messageCode,
   data,
   meta: {
     timestamp: new Date().toISOString(),
@@ -121,13 +128,16 @@ export const createPaginatedResponse = <T>(
  */
 export const createErrorResponse = (
   message: string,
-  code: string = ErrorCode.INTERNAL_SERVER_ERROR,
+  code: SystemMessageCode | string = SystemMessageCode.INTERNAL_SERVER_ERROR,
   statusCode: number = 500,
   details?: unknown,
   requestId: string = 'unknown-request-id'
 ): ApiResponse<null> => ({
   success: false,
   statusCode,
+  messageCode: typeof code === 'string' && Object.values(SystemMessageCode).includes(code as any)
+    ? (code as SystemMessageCode)
+    : (code as any),
   data: undefined,
   error: {
     code,
@@ -150,9 +160,10 @@ export const createValidationErrorResponse = (
   success: false,
   statusCode: 400,
   message: 'Validation failed',
+  messageCode: SystemMessageCode.VALIDATION_ERROR,
   data: undefined,
   error: {
-    code: ErrorCode.VALIDATION_ERROR,
+    code: SystemMessageCode.VALIDATION_ERROR,
     message: 'Validation failed',
     details: errors
   },

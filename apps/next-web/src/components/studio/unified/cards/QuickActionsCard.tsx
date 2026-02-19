@@ -2,22 +2,26 @@ import React from 'react'
 
 import { Card, CardContent, Typography, Button, Box } from '@mui/material'
 
+import { useTranslation } from '@/hooks/useTranslation'
+
 interface QuickActionsCardProps {
     onInstantPost: () => void
     onOpenSchedule: () => void
 }
 
 export default function QuickActionsCard({ onInstantPost, onOpenSchedule }: QuickActionsCardProps) {
+    const t = useTranslation('studio')
+
     return (
         <React.Fragment>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom sx={{ mt: 2 }}>Quick Actions</Typography>
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom sx={{ mt: 2 }}>{t('magic.quickActionsTitle')}</Typography>
             <Card variant="outlined" sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
                 <CardContent sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
                     {[
-                        { label: 'Post Instantly', icon: 'tabler-send', action: onInstantPost },
-                        { label: 'Schedule to Instagram', icon: 'tabler-calendar', action: onOpenSchedule },
-                        { label: 'Download as PDF', icon: 'tabler-download', action: () => {} },
-                        { label: 'Share with Team', icon: 'tabler-share', action: () => {} }
+                        { label: t('magic.postInstantly'), icon: 'tabler-send', action: onInstantPost },
+                        { label: t('magic.scheduleToSocial'), icon: 'tabler-calendar', action: onOpenSchedule },
+                        { label: t('magic.downloadPdf'), icon: 'tabler-download', action: () => {} },
+                        { label: t('magic.shareWithTeam'), icon: 'tabler-share', action: () => {} }
                     ].map((action, i) => (
                         <Button 
                             key={i}

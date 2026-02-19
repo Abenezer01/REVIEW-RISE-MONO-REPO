@@ -36,9 +36,16 @@ export const generateMonthlyPlan = async (businessId: string, options: {
   try {
     const aiContext = {
       brandDNA: business?.dna || {},
-      seasonalEvents: events.map(e => ({ name: e.name, date: e.date, description: e.description })),
+      seasonalEvents: events.map(e => ({ 
+        name: e.name, 
+        date: e.date.toISOString(), // Ensure date is stringified correctly for JSON
+        description: e.description,
+        day: e.date.getDate() // Use local date day
+      })),
       requestedPlatforms: options.platforms
     };
+
+    console.log('Sending AI Context with Seasonal Events:', JSON.stringify(aiContext.seasonalEvents, null, 2));
 
     const aiResponse = await axios.post(`${AI_SERVICE_URL}/api/v1/studio/plan`, {
       topic: `${monthNames[month - 1]} ${year} ${industry} Content Strategy`,
@@ -55,14 +62,33 @@ export const generateMonthlyPlan = async (businessId: string, options: {
       const interval = frequency === 'high' ? 1 : frequency === 'medium' ? 2 : 3;
       const requestedPlatforms = options.platforms || ['Instagram', 'Facebook'];
 
-      const filteredDays = planData.days.filter((d: any) => d.day % interval === 0).map((d: any) => {
+      const filteredDays = planData.days.filter((d: any) => {
+        // Always include days that have a seasonal hook/event name in the topic or hook field
+        if (d.seasonalHook) return true;
+        
+        // Check if any event name from our database is mentioned in the topic or copy
+        const isSeasonalEvent = events.some(e => 
+          (d.topic && d.topic.toLowerCase().includes(e.name.toLowerCase())) || 
+          (d.suggestedCopy && d.suggestedCopy.toLowerCase().includes(e.name.toLowerCase()))
+        );
+        if (isSeasonalEvent) return true;
+
+        // Otherwise filter by frequency interval
+        return d.day % interval === 0;
+      }).map((d: any) => {
         // Normalize platform(s) to array
         let dayPlatforms: string[] = [];
 
         if (d.platform && typeof d.platform === 'string') {
-          dayPlatforms = [d.platform];
+          dayPlatforms = d.platform.includes(',') ? d.platform.split(',').map((p: string) => p.trim()) : [d.platform];
         } else if (d.platforms && Array.isArray(d.platforms) && d.platforms.length > 0) {
-          dayPlatforms = d.platforms;
+          // Flatten any comma-separated strings within the array
+          dayPlatforms = d.platforms.reduce((acc: string[], curr: string) => {
+            if (typeof curr === 'string' && curr.includes(',')) {
+              return [...acc, ...curr.split(',').map(p => p.trim())];
+            }
+            return [...acc, curr];
+          }, []);
         } else {
           // If AI didn't specify, default to the first requested platform or all
           dayPlatforms = requestedPlatforms.length > 0 ? [requestedPlatforms[0]] : ['Instagram'];
@@ -107,6 +133,8 @@ export const getPlan = async (businessId: string, month: number, year: number) =
   });
 };
 
+const ALL_SUPPORTED_PLATFORMS = ['INSTAGRAM', 'FACEBOOK', 'LINKEDIN', 'TWITTER', 'GOOGLE_BUSINESS'];
+
 export const convertPlanToDrafts = async (planId: string, locationId?: string) => {
   const plan = await (prisma as any).monthlyPlannerPlan.findUnique({
     where: { id: planId }
@@ -120,11 +148,41 @@ export const convertPlanToDrafts = async (planId: string, locationId?: string) =
   for (const day of days) {
     const scheduledAt = new Date(plan.year, plan.month - 1, day.day, 10, 0); // Default to 10 AM
 
+    const platforms = (day.platforms || []).reduce((acc: string[], curr: string) => {
+      // Handle "All Platforms" string
+      if (typeof curr === 'string' && (curr.toUpperCase() === 'ALL PLATFORMS' || curr.toUpperCase() === 'ALL_PLATFORMS')) {
+        return [...acc, ...ALL_SUPPORTED_PLATFORMS];
+      }
+
+      if (typeof curr === 'string' && curr.includes(',')) {
+        const split = curr.split(',').map(p => p.trim());
+
+        return [...acc, ...split.reduce((pAcc: string[], p) => {
+          if (p.toUpperCase() === 'ALL PLATFORMS' || p.toUpperCase() === 'ALL_PLATFORMS') {
+            return [...pAcc, ...ALL_SUPPORTED_PLATFORMS];
+          }
+
+          const normalized = p.toUpperCase().replace(/\s+/g, '_');
+          const finalPlatform = normalized === 'X' ? 'TWITTER' : normalized;
+
+          return [...pAcc, finalPlatform];
+        }, [])];
+      }
+
+      const normalized = curr.toUpperCase().replace(/\s+/g, '_');
+      const finalPlatform = normalized === 'X' ? 'TWITTER' : normalized;
+
+      return [...acc, finalPlatform];
+    }, []);
+
+    // Remove duplicates
+    const uniquePlatforms = Array.from(new Set(platforms)) as string[];
+
     const post = await prisma.scheduledPost.create({
       data: {
         businessId: plan.businessId,
         locationId,
-        platforms: day.platforms,
+        platforms: uniquePlatforms,
         content: JSON.stringify({
           text: day.suggestedCopy || day.contentIdea,
           contentType: day.contentType,

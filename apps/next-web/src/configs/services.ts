@@ -108,8 +108,8 @@ export const SERVICES_CONFIG = {
                 return `${getClientBaseUrl()}/api/admin`;
             }
 
-
-            return 'http://localhost:3012';
+            // Use proxy in dev as well to handle cookies/auth correctly
+            return '/api/admin';
         }
     }
 };

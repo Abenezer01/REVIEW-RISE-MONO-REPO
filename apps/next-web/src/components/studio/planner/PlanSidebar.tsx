@@ -4,12 +4,16 @@ import React from 'react'
 
 import { Box, Typography, Card, CardContent, Button, Divider } from '@mui/material'
 
+import { useTranslation } from '@/hooks/useTranslation'
+
 interface PlanSidebarProps {
     totalPosts: number
     platformCounts: Record<string, number>
 }
 
 export default function PlanSidebar({ totalPosts, platformCounts }: PlanSidebarProps) {
+    const t = useTranslation('studio')
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             
@@ -18,32 +22,28 @@ export default function PlanSidebar({ totalPosts, platformCounts }: PlanSidebarP
                 <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
                         <i className="tabler-bulb" style={{ color: '#FFB300', fontSize: 24 }} />
-                        <Typography variant="subtitle1" fontWeight="bold" color="text.primary">AI Suggestions</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold" color="text.primary">{t('planner.sidebar.aiSuggestions')}</Typography>
                     </Box>
 
                     <Box sx={{ mb: 3 }}>
-                        <Typography variant="body2" sx={{ mb: 1, lineHeight: 1.6 }}>
-                            Post engagement is <strong>3x higher</strong> on Tuesday-Thursday between 2-4 PM. Consider rescheduling weekend posts.
-                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 1, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: t.raw('planner.sidebar.engagementTip') }} />
                         <Button 
                             endIcon={<i className="tabler-arrow-right" />} 
                             sx={{ color: '#FFB300', fontWeight: 'bold', textTransform: 'none', p: 0, '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' } }}
                         >
-                            Apply Changes
+                            {t('planner.sidebar.applyChanges')}
                         </Button>
                     </Box>
 
                     <Divider sx={{ my: 2, borderColor: '#FFC10720' }} />
 
                     <Box>
-                        <Typography variant="body2" sx={{ mb: 1, lineHeight: 1.6 }}>
-                            Video content performs <strong>45% better</strong> than images. Add 2 more video posts this month.
-                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 1, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: t.raw('planner.sidebar.videoTip') }} />
                          <Button 
                             endIcon={<i className="tabler-arrow-right" />} 
                             sx={{ color: '#FFB300', fontWeight: 'bold', textTransform: 'none', p: 0, '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' } }}
                         >
-                            Generate Videos
+                            {t('planner.sidebar.generateVideos')}
                         </Button>
                     </Box>
                 </CardContent>
@@ -52,10 +52,10 @@ export default function PlanSidebar({ totalPosts, platformCounts }: PlanSidebarP
             {/* Plan Overview Stats */}
             <Card variant="outlined" sx={{ borderRadius: 2 }}>
                 <CardContent>
-                    <Typography variant="subtitle1" fontWeight="bold" mb={3}>Plan Overview</Typography>
+                    <Typography variant="subtitle1" fontWeight="bold" mb={3}>{t('planner.sidebar.planOverview')}</Typography>
                     
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-                        <Typography color="text.secondary">Total Posts</Typography>
+                        <Typography color="text.secondary">{t('planner.sidebar.totalPosts')}</Typography>
                         <Typography fontWeight="bold">{totalPosts}</Typography>
                     </Box>
 

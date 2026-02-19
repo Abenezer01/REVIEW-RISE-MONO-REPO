@@ -27,8 +27,18 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
     label: 'BrandingRise',
     href: '/admin/brand-rise/overview',
     icon: 'tabler-chart-dots'
+  },
+  {
+    label: 'Ad Rise',
+    icon: 'tabler-rocket',
+    children: [
+      {
+        label: 'Blueprint Generator',
+        href: '/admin/ad-rise/blueprint',
+        icon: 'tabler-wand'
+      }
+    ]
   }
-
 ]
 
 export default verticalMenuData

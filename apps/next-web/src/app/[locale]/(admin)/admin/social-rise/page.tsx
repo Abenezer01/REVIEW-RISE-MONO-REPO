@@ -3,6 +3,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -25,6 +27,9 @@ import ContentCalendar from './ContentCalendar';
 import PostEditorDialog from './PostEditorDialog';
 import PublishingLogsTable from './PublishingLogsTable';
 
+const isUuid = (value: string | null | undefined): value is string =>
+  Boolean(value && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
+
 const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [key: string]: any }) => {
     return <i className={icon} style={{ fontSize }} {...rest} />
 }
@@ -32,9 +37,18 @@ const Icon = ({ icon, fontSize, ...rest }: { icon: string; fontSize?: number; [k
 const ContentPage = () => {
     const theme = useTheme();
     const t = useTranslations('dashboard');
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+    const tc = useTranslations('common');
     const { businessId } = useBusinessId();
     const { locationId } = useLocationFilter();
     const { user } = useAuth();
+    const normalizedLocationId = isUuid(locationId) ? locationId : undefined;
+
+    const tabFromUrl = searchParams.get('tab');
+    const [activeTab, setActiveTab] = useState(tabFromUrl || 'calendar');
+
     const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
     const [filteredPosts, setFilteredPosts] = useState<ScheduledPost[]>([]);
     const [selectedPost, setSelectedPost] = useState<ScheduledPost | null>(null);
@@ -42,7 +56,22 @@ const ContentPage = () => {
 
     const [platformFilter, setPlatformFilter] = useState<string>('ALL');
     const [openAddDialog, setOpenAddDialog] = useState(false);
-    const [activeTab, setActiveTab] = useState('calendar');
+
+    useEffect(() => {
+        if (tabFromUrl && tabFromUrl !== activeTab) {
+            setActiveTab(tabFromUrl);
+        }
+    }, [tabFromUrl, activeTab]);
+
+    const handleTabChange = (_: any, newValue: string) => {
+        setActiveTab(newValue);
+
+        const params = new URLSearchParams(searchParams.toString());
+
+        params.set('tab', newValue);
+
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
     const canAdd = user?.role === 'ADMIN' || user?.role === 'MANAGER';
     const isDark = theme.palette.mode === 'dark';
@@ -51,30 +80,62 @@ const ContentPage = () => {
         if (!businessId) return;
 
         try {
-            const postsData = await BrandService.listScheduledPosts(businessId);
+            const postsData = await BrandService.listScheduledPosts(businessId, normalizedLocationId);
 
-            // If locationId is present, filter posts by locationId
-            const filteredByLocation = locationId 
-                ? postsData.filter(p => p.locationId === locationId)
+            // Keep a defensive filter in case mixed legacy data is returned.
+            const filteredByLocation = normalizedLocationId
+                ? postsData.filter(p => p.locationId === normalizedLocationId)
                 : postsData;
 
             setScheduledPosts(filteredByLocation);
         } catch (error) {
             console.error('Failed to fetch scheduled posts', error);
         }
-    }, [businessId, locationId]);
+    }, [businessId, normalizedLocationId]);
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
     useEffect(() => {
-        if (platformFilter === 'ALL') {
-            setFilteredPosts(scheduledPosts);
-        } else {
-            setFilteredPosts(scheduledPosts.filter(post => post.platforms.includes(platformFilter)));
-        }
-    }, [platformFilter, scheduledPosts]);
+    if (platformFilter === 'ALL') {
+      setFilteredPosts(scheduledPosts);
+    } else {
+      setFilteredPosts(scheduledPosts.filter(post => {
+        const ALL_SUPPORTED_PLATFORMS = ['INSTAGRAM', 'FACEBOOK', 'LINKEDIN', 'TWITTER', 'GOOGLE_BUSINESS'];
+
+        const normalizedPlatforms = (post.platforms || []).reduce((acc: string[], curr: string) => {
+          if (typeof curr === 'string' && (curr.toUpperCase() === 'ALL PLATFORMS' || curr.toUpperCase() === 'ALL_PLATFORMS')) {
+            return [...acc, ...ALL_SUPPORTED_PLATFORMS];
+          }
+
+          if (typeof curr === 'string' && curr.includes(',')) {
+            const split = curr.split(',').map(p => p.trim());
+
+            return [...acc, ...split.reduce((pAcc: string[], p) => {
+              if (p.toUpperCase() === 'ALL PLATFORMS' || p.toUpperCase() === 'ALL_PLATFORMS') {
+                return [...pAcc, ...ALL_SUPPORTED_PLATFORMS];
+              }
+
+              const normalized = p.toUpperCase().replace(/\s+/g, '_');
+              const finalPlatform = normalized === 'X' ? 'TWITTER' : normalized;
+
+              return [...pAcc, finalPlatform];
+            }, [])];
+          }
+
+          const normalized = curr.toUpperCase().replace(/\s+/g, '_');
+          const finalPlatform = normalized === 'X' ? 'TWITTER' : normalized;
+
+          return [...acc, finalPlatform];
+        }, []);
+
+        const uniquePlatforms = Array.from(new Set(normalizedPlatforms));
+
+        return uniquePlatforms.includes(platformFilter);
+      }));
+    }
+  }, [platformFilter, scheduledPosts]);
 
     const handleSavePost = async (data: Partial<ScheduledPost>) => {
         if (!businessId) return;
@@ -86,15 +147,15 @@ const ContentPage = () => {
                 // Include locationId if present when creating new post
                 const postData = {
                     ...data,
-                    locationId: locationId || undefined
+                    locationId: normalizedLocationId
                 };
 
                 await BrandService.createScheduledPost(businessId, postData);
             }
 
             fetchData();
-        } catch (error) {
-            console.error('Failed to save post', error);
+        } catch (error: any) {
+            console.error('Failed to save post', error?.response?.data || error);
         }
     };
 
@@ -182,14 +243,14 @@ const ContentPage = () => {
                             <Icon icon="tabler-calendar-stats" fontSize={24} />
                         </Box>
                         <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: '1px' }}>
-                            SOCIAL MEDIA STUDIO
+                            {t('navigation.ai-studio').toUpperCase()}
                         </Typography>
                     </Box>
                     <Typography variant="h2" fontWeight="800" sx={{ mb: 1.5, letterSpacing: '-1.5px', lineHeight: 1.1 }}>
-                        {t('brandRise.content.title', { defaultValue: 'Content Strategy' })}
+                        {t('brandRise.content.title')}
                     </Typography>
                     <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 400, opacity: 0.7, maxWidth: 600, lineHeight: 1.5 }}>
-                        Architect your brand&apos;s digital presence. Schedule, analyze, and scale your content across all social channels from one unified command center.
+                        {t('aiVisibility.pageSubtitle')}
                     </Typography>
                 </Box>
 
@@ -220,7 +281,7 @@ const ContentPage = () => {
                                 setOpenAddDialog(true);
                             }}
                         >
-                            {t('brandRise.content.add', { defaultValue: 'Create New Post' })}
+                            {t('brandRise.content.add')}
                         </Button>
                     )}
                 </Box>
@@ -246,7 +307,7 @@ const ContentPage = () => {
                 }}>
                     <Tabs 
                         value={activeTab} 
-                        onChange={(_, newValue) => setActiveTab(newValue)} 
+                        onChange={handleTabChange} 
                         aria-label="content management tabs"
                         sx={{
                             minHeight: 'auto',
@@ -282,11 +343,11 @@ const ContentPage = () => {
                         }}
                     >
                         <Tab 
-                            label={t('brandRise.content.calendar', { defaultValue: 'Calendar View' })} 
+                            label={t('brandRise.content.calendar')}
                             value="calendar" 
                         />
                         <Tab 
-                            label={t('brandRise.content.logs', { defaultValue: 'Publishing Logs' })} 
+                            label={t('brandRise.content.logs')}
                             value="logs" 
                         />
                     </Tabs>
@@ -329,37 +390,37 @@ const ContentPage = () => {
                                 <MenuItem value="ALL">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                                         <Icon icon="tabler-world" fontSize={18} />
-                                        <Typography variant="body2" fontWeight="600">All Channels</Typography>
+                                        <Typography variant="body2" fontWeight="600">{tc('channel.all')}</Typography>
                                     </Box>
                                 </MenuItem>
                                 <MenuItem value="INSTAGRAM">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                                         <Icon icon="tabler-brand-instagram" fontSize={18} style={{ color: '#E4405F' }} />
-                                        <Typography variant="body2" fontWeight="600">Instagram</Typography>
+                                        <Typography variant="body2" fontWeight="600">{tc('channel.instagram')}</Typography>
                                     </Box>
                                 </MenuItem>
                                 <MenuItem value="FACEBOOK">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                                         <Icon icon="tabler-brand-facebook" fontSize={18} style={{ color: '#1877F2' }} />
-                                        <Typography variant="body2" fontWeight="600">Facebook</Typography>
+                                        <Typography variant="body2" fontWeight="600">{tc('channel.facebook')}</Typography>
                                     </Box>
                                 </MenuItem>
                                 <MenuItem value="LINKEDIN">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                                         <Icon icon="tabler-brand-linkedin" fontSize={18} style={{ color: '#0A66C2' }} />
-                                        <Typography variant="body2" fontWeight="600">LinkedIn</Typography>
+                                        <Typography variant="body2" fontWeight="600">{tc('channel.linkedin')}</Typography>
                                     </Box>
                                 </MenuItem>
                                 <MenuItem value="TWITTER">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                                         <Icon icon="tabler-brand-x" fontSize={18} />
-                                        <Typography variant="body2" fontWeight="600">Twitter (X)</Typography>
+                                        <Typography variant="body2" fontWeight="600">{tc('channel.twitter')}</Typography>
                                     </Box>
                                 </MenuItem>
                                 <MenuItem value="GOOGLE_BUSINESS">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                                         <Icon icon="tabler-brand-google" fontSize={18} style={{ color: '#4285F4' }} />
-                                        <Typography variant="body2" fontWeight="600">Google Business</Typography>
+                                        <Typography variant="body2" fontWeight="600">{tc('channel.google')}</Typography>
                                     </Box>
                                 </MenuItem>
                             </TextField>

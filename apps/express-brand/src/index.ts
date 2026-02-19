@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import { createSuccessResponse } from '@platform/contracts';
+import { createSuccessResponse, SystemMessageCode } from '@platform/contracts';
 import { requestIdMiddleware, errorHandler } from '@platform/middleware';
 
 dotenv.config();
@@ -20,17 +20,21 @@ app.get('/health', (req, res) => {
 });
 
 import v1Routes from './routes/v1';
+import uploadRoutes from './routes/v1/upload.routes';
+import path from 'path';
 import { publishingWorker } from './services/publishing-worker.service';
 
 app.use('/api/v1', v1Routes);
+app.use('/api/v1/uploads', uploadRoutes);
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.get('/', (req, res) => {
-    const response = createSuccessResponse(null, 'Express Brand Service is running', 200, { requestId: req.id });
+    const response = createSuccessResponse(null, 'Express Brand Service is running', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
     res.status(response.statusCode).json(response);
 });
 
 app.get('/health', (req, res) => {
-    const response = createSuccessResponse({ service: 'express-brand' }, 'Service is healthy', 200, { requestId: req.id });
+    const response = createSuccessResponse({ service: 'express-brand' }, 'Service is healthy', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
     res.status(response.statusCode).json(response);
 });
 

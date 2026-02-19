@@ -5,8 +5,10 @@ import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import { CircularProgress, Box, Typography, Alert } from '@mui/material';
+import { useTranslations } from 'next-intl';
 
 const SocialCallbackPage = () => {
+    const t = useTranslations('social');
     const searchParams = useSearchParams();
 
     useEffect(() => {
@@ -43,10 +45,10 @@ const SocialCallbackPage = () => {
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="100vh" p={4}>
             <CircularProgress size={60} thickness={4} />
             <Typography variant="h6" sx={{ mt: 3 }}>
-                Finalizing connection...
+                {t('callback.finalizing')}
             </Typography>
             <Alert severity="info" sx={{ mt: 2, maxWidth: 500 }}>
-                This page handles OAuth callbacks. The connection process is managed via popup windows.
+                {t('callback.info')}
             </Alert>
         </Box>
     );

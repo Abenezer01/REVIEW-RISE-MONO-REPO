@@ -1,36 +1,40 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 export default function Features() {
+  const t = useTranslations('landing.features');
+
   const features = [
     {
       icon: '⚡',
-      title: 'Instant Analysis',
-      description: 'Get comprehensive SEO insights in seconds, not hours.'
+      title: t('items.instant.title'),
+      description: t('items.instant.description')
     },
     {
       icon: '🎯',
-      title: 'Actionable Insights',
-      description: 'Receive clear, prioritized recommendations you can implement immediately.'
+      title: t('items.actionable.title'),
+      description: t('items.actionable.description')
     },
     {
       icon: '🤖',
-      title: 'AI-Powered',
-      description: 'Leverage advanced AI to uncover opportunities your competitors miss.'
+      title: t('items.ai.title'),
+      description: t('items.ai.description')
     },
     {
       icon: '📊',
-      title: 'Detailed Reports',
-      description: 'Access in-depth analysis of meta tags, performance, and content quality.'
+      title: t('items.detailed.title'),
+      description: t('items.detailed.description')
     },
     {
       icon: '🔒',
-      title: 'Secure & Private',
-      description: 'Your data is never stored or shared. Complete privacy guaranteed.'
+      title: t('items.secure.title'),
+      description: t('items.secure.description')
     },
     {
       icon: '💯',
-      title: 'Always Free',
-      description: 'No hidden fees, no credit card required. Professional SEO analysis for everyone.'
+      title: t('items.free.title'),
+      description: t('items.free.description')
     }
   ];
 
@@ -38,9 +42,9 @@ export default function Features() {
     <section id="features" className="features">
       <div className="container">
         <div className="header">
-          <h2 className="title">Everything you need</h2>
+          <h2 className="title">{t('title')}</h2>
           <p className="subtitle">
-            Professional SEO analysis tools at your fingertips
+            {t('subtitle')}
           </p>
         </div>
 

@@ -1,7 +1,7 @@
-import React from 'react'
+import { Box, Card, CardContent, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 
-import { Box, Card, CardContent, Typography, Chip, Stack, IconButton, Tooltip } from '@mui/material'
-import { toast } from 'react-toastify'
+import { useTranslations } from 'next-intl'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 interface HashtagsCardProps {
     hashtags: {
@@ -14,16 +14,22 @@ interface HashtagsCardProps {
 }
 
 export default function HashtagsCard({ hashtags, onUseHashtags }: HashtagsCardProps) {
+    const t = useTranslations('studio')
+    const { notify } = useSystemMessages()
+
     const getAllHashtags = () => {
         const { highVolume = [], niche = [], branded = [] } = hashtags
 
-        
-return [...highVolume, ...niche, ...branded].join(' ')
+
+        return [...highVolume, ...niche, ...branded].join(' ')
     }
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text)
-        toast.success('Copied to clipboard')
+        notify({
+            messageCode: 'common.copied' as any,
+            severity: 'SUCCESS'
+        })
     }
 
     return (
@@ -34,10 +40,10 @@ return [...highVolume, ...niche, ...branded].join(' ')
                         <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: '#E3F2FD', color: '#2196F3' }}>
                             <i className="tabler-hash" style={{ fontSize: 20 }} />
                         </Box>
-                        <Typography variant="h6" fontWeight="bold">Hashtags (30)</Typography>
+                        <Typography variant="h6" fontWeight="bold">{t('hashtags.titleWithCount', { count: 30 })}</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Tooltip title="Use All Hashtags">
+                        <Tooltip title={t('hashtags.useAll')}>
                             <IconButton 
                                 size="small" 
                                 color="primary"
@@ -46,7 +52,7 @@ return [...highVolume, ...niche, ...branded].join(' ')
                                 <i className="tabler-plus" />
                             </IconButton>
                         </Tooltip>
-                        <Tooltip title="Copy All">
+                        <Tooltip title={t('hashtags.copyAll')}>
                             <IconButton size="small" onClick={() => copyToClipboard(getAllHashtags())}>
                                 <i className="tabler-copy" />
                             </IconButton>
@@ -64,14 +70,14 @@ return [...highVolume, ...niche, ...branded].join(' ')
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.5 }}>
                     <Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
-                            <Typography variant="caption" color="text.secondary">High-Volume Hashtags</Typography>
+                            <Typography variant="caption" color="text.secondary">{t('hashtags.highVolumeTitle')}</Typography>
                             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                    <Tooltip title="Add to Preview">
+                                    <Tooltip title={t('hashtags.addToPreview')}>
                                     <IconButton size="small" onClick={() => onUseHashtags(hashtags.highVolume || [])} color="primary">
                                         <i className="tabler-circle-plus" style={{ fontSize: 18 }} />
                                     </IconButton>
                                 </Tooltip>
-                                <Chip label="HIGH REACH" size="small" color="success" sx={{ height: 20, fontSize: '0.65rem' }} />
+                                <Chip label={t('hashtags.highReach')} size="small" color="success" sx={{ height: 20, fontSize: '0.65rem' }} />
                             </Box>
                         </Box>
                         <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.9, fontSize: '0.875rem' }}>
@@ -80,14 +86,14 @@ return [...highVolume, ...niche, ...branded].join(' ')
                     </Box>
                     <Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                            <Typography variant="caption" color="text.secondary">Niche Hashtags</Typography>
+                            <Typography variant="caption" color="text.secondary">{t('hashtags.nicheTitle')}</Typography>
                                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                    <Tooltip title="Add to Preview">
+                                    <Tooltip title={t('hashtags.addToPreview')}>
                                     <IconButton size="small" onClick={() => onUseHashtags(hashtags.niche || [])} color="primary">
                                         <i className="tabler-circle-plus" style={{ fontSize: 18 }} />
                                     </IconButton>
                                 </Tooltip>
-                                <Chip label="TARGETED" size="small" color="info" sx={{ height: 20, fontSize: '0.65rem' }} />
+                                <Chip label={t('hashtags.targeted')} size="small" color="info" sx={{ height: 20, fontSize: '0.65rem' }} />
                             </Box>
                         </Box>
                         <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.9, fontSize: '0.875rem' }}>
@@ -96,14 +102,14 @@ return [...highVolume, ...niche, ...branded].join(' ')
                     </Box>
                     <Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                            <Typography variant="caption" color="text.secondary">Branded Hashtags</Typography>
+                            <Typography variant="caption" color="text.secondary">{t('hashtags.brandedTitle')}</Typography>
                                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                    <Tooltip title="Add to Preview">
+                                    <Tooltip title={t('hashtags.addToPreview')}>
                                     <IconButton size="small" onClick={() => onUseHashtags(hashtags.branded || [])} color="primary">
                                         <i className="tabler-circle-plus" style={{ fontSize: 18 }} />
                                     </IconButton>
                                 </Tooltip>
-                                <Chip label="BRAND" size="small" color="primary" sx={{ height: 20, fontSize: '0.65rem' }} />
+                                <Chip label={t('hashtags.brand')} size="small" color="primary" sx={{ height: 20, fontSize: '0.65rem' }} />
                             </Box>
                         </Box>
                         <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.9, fontSize: '0.875rem' }}>

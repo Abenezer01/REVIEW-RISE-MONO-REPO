@@ -15,6 +15,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import TokenRefresher from '@/components/TokenRefresher'
 import { getServerUser } from '@/utils/serverAuth'
 import ReactQueryProvider from '@/components/ReactQueryProvider'
+import { SystemMessageProvider } from '@/shared/components/SystemMessageProvider'
 
 type Props = ChildrenType & {
   direction: Direction
@@ -36,13 +37,15 @@ const Providers = async (props: Props) => {
     <AuthProvider user={user}>
       <ReactQueryProvider>
         <TokenRefresher />
-        <VerticalNavProvider>
-          <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
-            <ThemeProvider direction={direction} systemMode={systemMode}>
-              {children}
-            </ThemeProvider>
-          </SettingsProvider>
-        </VerticalNavProvider>
+        <SystemMessageProvider>
+          <VerticalNavProvider>
+            <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
+              <ThemeProvider direction={direction} systemMode={systemMode}>
+                {children}
+              </ThemeProvider>
+            </SettingsProvider>
+          </VerticalNavProvider>
+        </SystemMessageProvider>
       </ReactQueryProvider>
     </AuthProvider>
   )

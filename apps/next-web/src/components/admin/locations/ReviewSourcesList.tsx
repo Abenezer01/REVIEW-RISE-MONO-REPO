@@ -20,6 +20,7 @@ interface ReviewSource {
 
 const ReviewSourcesList = ({ locationId }: { locationId: string }) => {
     const t = useTranslation('dashboard');
+    const tc = useTranslation('common');
     const [sources, setSources] = useState<ReviewSource[]>([]);
 
     const fetchSources = useCallback(async () => {
@@ -79,7 +80,7 @@ const ReviewSourcesList = ({ locationId }: { locationId: string }) => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                              {/* Use icon if available or just text */}
                             <Typography variant="h6">
-                                Google {t('accounts.channels.googleSubtitle')}
+                                {tc('channel.google')} {t('accounts.channels.googleSubtitle')}
                             </Typography>
                         </div>
                        

@@ -1,21 +1,25 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 export default function HowItWorks() {
+  const t = useTranslations('landing.howItWorks');
+
   const steps = [
     {
       number: '01',
-      title: 'Enter Your URL',
-      description: 'Simply paste your website URL into the analyzer'
+      title: t('steps.step1.title'),
+      description: t('steps.step1.description')
     },
     {
       number: '02',
-      title: 'AI Analysis',
-      description: 'Our AI scans your site for SEO opportunities'
+      title: t('steps.step2.title'),
+      description: t('steps.step2.description')
     },
     {
       number: '03',
-      title: 'Get Results',
-      description: 'Receive actionable insights and recommendations'
+      title: t('steps.step3.title'),
+      description: t('steps.step3.description')
     }
   ];
 
@@ -23,9 +27,9 @@ export default function HowItWorks() {
     <section id="how-it-works" className="how-it-works">
       <div className="container">
         <div className="header">
-          <h2 className="title">How it works</h2>
+          <h2 className="title">{t('title')}</h2>
           <p className="subtitle">
-            Three simple steps to better SEO
+            {t('subtitle')}
           </p>
         </div>
 

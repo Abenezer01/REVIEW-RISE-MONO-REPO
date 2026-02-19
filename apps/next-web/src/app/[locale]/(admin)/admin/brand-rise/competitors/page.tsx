@@ -8,7 +8,11 @@ import {
   Button
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
-import { toast } from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
+
+import { SystemMessageCode } from '@platform/contracts';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 
 import { DiscoveryInput } from '@/components/brand-rise/competitors/DiscoveryInput';
 import { CompetitorList } from '@/components/brand-rise/competitors/CompetitorList';
@@ -16,6 +20,9 @@ import { CompetitorList } from '@/components/brand-rise/competitors/CompetitorLi
 import { useCompetitors } from './hooks/useCompetitors';
 
 export default function CompetitorsPage() {
+  const t = useTranslations('dashboard');
+  const { notify } = useSystemMessages();
+
   const { 
     competitors, 
     isListLoading, 
@@ -57,10 +64,10 @@ export default function CompetitorsPage() {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      toast.success('Competitor list exported successfully');
+      notify(SystemMessageCode.DOWNLOAD_SUCCESS);
     } catch (error) {
       console.error('Export failed:', error);
-      toast.error('Failed to export competitor list');
+      notify(SystemMessageCode.DOWNLOAD_FAILED);
     }
   };
 
@@ -83,7 +90,7 @@ export default function CompetitorsPage() {
                 }
             }}
         >
-            Export List
+            {t('brandRise.competitors.exportList')}
         </Button>
       </Box>
 

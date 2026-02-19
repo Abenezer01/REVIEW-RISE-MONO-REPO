@@ -4,6 +4,7 @@ import React from 'react'
 
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import { useTranslations } from 'next-intl'
 
 const COLOR_SCHEMES = [
     { value: 'orange', color: '#FF8C42' },
@@ -19,10 +20,12 @@ interface ColorSchemePickerProps {
 }
 
 export default function ColorSchemePicker({ selected, onChange }: ColorSchemePickerProps) {
+    const t = useTranslations('studio.carousels')
+
     return (
         <Box>
             <Typography variant="body2" fontWeight="bold" mb={1.5}>
-                Color Scheme
+                {t('adjustColors')}
             </Typography>
             <Box sx={{ display: 'flex', gap: 1.5 }}>
                 {COLOR_SCHEMES.map((scheme) => (

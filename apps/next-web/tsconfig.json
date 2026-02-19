@@ -64,6 +64,9 @@
       ],
       "@platform/shared-ui/*": [
         "../../packages/@platform/shared-ui/src/*"
+      ],
+      "@platform/campaign-engine": [
+        "../../packages/@platform/campaign-engine/src/index.ts"
       ]
     }
   },

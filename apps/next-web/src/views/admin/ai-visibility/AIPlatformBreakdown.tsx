@@ -16,6 +16,8 @@ import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import Avatar from '@mui/material/Avatar'
 
+import { useTranslation } from '@/hooks/useTranslation'
+
 export interface PlatformData {
   platform: 'ChatGPT' | 'Gemini' | 'Claude' | 'Perplexity' | 'Bing Copilot'
   rank: number | 'Not Found' // Rank in list or "Not Found"
@@ -29,6 +31,8 @@ interface AIPlatformBreakdownProps {
 }
 
 const AIPlatformBreakdown: React.FC<AIPlatformBreakdownProps> = ({ data }) => {
+  const t = useTranslation('dashboard')
+
   const getSentimentColor = (sentiment: string): 'success' | 'default' | 'error' | 'warning' => {
     switch (sentiment) {
       case 'Positive': return 'success'
@@ -57,18 +61,18 @@ const AIPlatformBreakdown: React.FC<AIPlatformBreakdownProps> = ({ data }) => {
   return (
     <Card>
       <CardHeader
-        title="Performance by AI Platform"
-        subheader="How different Large Language Models (LLMs) perceive your brand"
+        title={t('aiVisibility.platformBreakdown.title')}
+        subheader={t('aiVisibility.platformBreakdown.subheader')}
       />
       <CardContent>
         <TableContainer>
           <Table sx={{ minWidth: 650 }} aria-label="ai platform table">
             <TableHead>
               <TableRow>
-                <TableCell>Platform</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Sentiment</TableCell>
-                <TableCell align="right">Sources Cited</TableCell>
+                <TableCell>{t('aiVisibility.platformBreakdown.columns.platform')}</TableCell>
+                <TableCell>{t('aiVisibility.platformBreakdown.columns.status')}</TableCell>
+                <TableCell>{t('aiVisibility.platformBreakdown.columns.sentiment')}</TableCell>
+                <TableCell align="right">{t('aiVisibility.platformBreakdown.columns.sourcesCited')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -87,15 +91,15 @@ const AIPlatformBreakdown: React.FC<AIPlatformBreakdownProps> = ({ data }) => {
                   </TableCell>
                   <TableCell>
                     {row.mentioned ? (
-                         <Chip label="Mentioned" color="success" size="small" variant="tonal" />
+                         <Chip label={t('aiVisibility.platformBreakdown.status.mentioned')} color="success" size="small" variant="tonal" />
                     ) : (
-                         <Chip label="Not Found" color="error" size="small" variant="tonal" />
+                         <Chip label={t('aiVisibility.platformBreakdown.status.notFound')} color="error" size="small" variant="tonal" />
                     )}
                   </TableCell>
                   <TableCell>
                     {row.mentioned && (
                          <Chip
-                            label={row.sentiment}
+                            label={t(`reviews.${row.sentiment.toLowerCase()}`)}
                             color={getSentimentColor(row.sentiment)}
                             size="small"
                             variant="outlined"

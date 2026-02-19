@@ -1,0 +1,148 @@
+
+> @apps/express-ai@0.1.0 test
+> jest src/services/__tests__/blueprint-verification.test.ts
+
+  console.error
+    === BLUEPRINT ENGINE V4 ERROR ===
+
+    [0m [90m 100 |[39m
+     [90m 101 |[39m     } [36mcatch[39m (error[33m:[39m any) {
+    [31m[1m>[22m[39m[90m 102 |[39m       console[33m.[39merror([32m'=== BLUEPRINT ENGINE V4 ERROR ==='[39m)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 103 |[39m       console[33m.[39merror([32m'Error message:'[39m[33m,[39m error[33m.[39mmessage)[33m;[39m
+     [90m 104 |[39m       console[33m.[39merror([32m'Error stack:'[39m[33m,[39m error[33m.[39mstack)[33m;[39m
+     [90m 105 |[39m       console[33m.[39merror([32m'Input:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(input[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m[0m
+
+      at BlueprintService.generate (src/services/blueprint.service.ts:102:15)
+      at Object.<anonymous> (src/services/__tests__/blueprint-verification.test.ts:96:64)
+
+  console.error
+    Error message: Cannot read properties of undefined (reading 'includes')
+
+    [0m [90m 101 |[39m     } [36mcatch[39m (error[33m:[39m any) {
+     [90m 102 |[39m       console[33m.[39merror([32m'=== BLUEPRINT ENGINE V4 ERROR ==='[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 103 |[39m       console[33m.[39merror([32m'Error message:'[39m[33m,[39m error[33m.[39mmessage)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 104 |[39m       console[33m.[39merror([32m'Error stack:'[39m[33m,[39m error[33m.[39mstack)[33m;[39m
+     [90m 105 |[39m       console[33m.[39merror([32m'Input:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(input[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 106 |[39m       console[33m.[39merror([32m'================================'[39m)[33m;[39m[0m
+
+      at BlueprintService.generate (src/services/blueprint.service.ts:103:15)
+      at Object.<anonymous> (src/services/__tests__/blueprint-verification.test.ts:96:64)
+
+  console.error
+    Error stack: TypeError: Cannot read properties of undefined (reading 'includes')
+        at C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\apps\express-ai\src\services\blueprint.service.ts:55:46
+        at Array.find (<anonymous>)
+        at C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\apps\express-ai\src\services\blueprint.service.ts:55:28
+        at Array.map (<anonymous>)
+        at BlueprintService.generate (C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\apps\express-ai\src\services\blueprint.service.ts:53:59)
+        at Object.<anonymous> (C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\apps\express-ai\src\services\__tests__\blueprint-verification.test.ts:96:64)
+        at Promise.then.completed (C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-circus@29.7.0_babel-plugin-macros@3.1.0\node_modules\jest-circus\build\utils.js:298:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-circus@29.7.0_babel-plugin-macros@3.1.0\node_modules\jest-circus\build\utils.js:231:10)
+        at _callCircusTest (C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-circus@29.7.0_babel-plugin-macros@3.1.0\node_modules\jest-circus\build\run.js:316:40)
+        at _runTest (C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-circus@29.7.0_babel-plugin-macros@3.1.0\node_modules\jest-circus\build\run.js:252:3)
+        at _runTestsForDescribeBlock (C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-circus@29.7.0_babel-plugin-macros@3.1.0\node_modules\jest-circus\build\run.js:126:9)
+        at _runTestsForDescribeBlock (C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-circus@29.7.0_babel-plugin-macros@3.1.0\node_modules\jest-circus\build\run.js:121:9)
+        at run (C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-circus@29.7.0_babel-plugin-macros@3.1.0\node_modules\jest-circus\build\run.js:71:3)
+        at runAndTransformResultsToJestFormat (C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-circus@29.7.0_babel-plugin-macros@3.1.0\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
+        at jestAdapter (C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-circus@29.7.0_babel-plugin-macros@3.1.0\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
+        at runTestInternal (C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-runner@29.7.0\node_modules\jest-runner\build\runTest.js:367:16)
+        at runTest (C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\node_modules\.pnpm\jest-runner@29.7.0\node_modules\jest-runner\build\runTest.js:444:34)
+
+    [0m [90m 102 |[39m       console[33m.[39merror([32m'=== BLUEPRINT ENGINE V4 ERROR ==='[39m)[33m;[39m
+     [90m 103 |[39m       console[33m.[39merror([32m'Error message:'[39m[33m,[39m error[33m.[39mmessage)[33m;[39m
+    [31m[1m>[22m[39m[90m 104 |[39m       console[33m.[39merror([32m'Error stack:'[39m[33m,[39m error[33m.[39mstack)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 105 |[39m       console[33m.[39merror([32m'Input:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(input[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 106 |[39m       console[33m.[39merror([32m'================================'[39m)[33m;[39m
+     [90m 107 |[39m[0m
+
+      at BlueprintService.generate (src/services/blueprint.service.ts:104:15)
+      at Object.<anonymous> (src/services/__tests__/blueprint-verification.test.ts:96:64)
+
+  console.error
+    Input: {
+      "businessName": "Apex Plumbing",
+      "offer": "Emergency Leak Repair",
+      "services": [
+        "Pipe Repair",
+        "Leak Detection",
+        "Drain Cleaning"
+      ],
+      "vertical": "Local Service",
+      "geo": "Austin, TX",
+      "budget": 2000,
+      "objective": "Leads",
+      "painPoints": [
+        "Burst pipe flooding house",
+        "High water bill"
+      ],
+      "landingPageUrl": "https://apexplumbing.com/emergency",
+      "expectedAvgCpc": 5,
+      "conversionTrackingEnabled": true
+    }
+
+    [0m [90m 103 |[39m       console[33m.[39merror([32m'Error message:'[39m[33m,[39m error[33m.[39mmessage)[33m;[39m
+     [90m 104 |[39m       console[33m.[39merror([32m'Error stack:'[39m[33m,[39m error[33m.[39mstack)[33m;[39m
+    [31m[1m>[22m[39m[90m 105 |[39m       console[33m.[39merror([32m'Input:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(input[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 106 |[39m       console[33m.[39merror([32m'================================'[39m)[33m;[39m
+     [90m 107 |[39m
+     [90m 108 |[39m       console[33m.[39mlog([32m'Falling back to mock generation due to error.'[39m)[33m;[39m[0m
+
+      at BlueprintService.generate (src/services/blueprint.service.ts:105:15)
+      at Object.<anonymous> (src/services/__tests__/blueprint-verification.test.ts:96:64)
+
+  console.error
+    ================================
+
+    [0m [90m 104 |[39m       console[33m.[39merror([32m'Error stack:'[39m[33m,[39m error[33m.[39mstack)[33m;[39m
+     [90m 105 |[39m       console[33m.[39merror([32m'Input:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(input[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+    [31m[1m>[22m[39m[90m 106 |[39m       console[33m.[39merror([32m'================================'[39m)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 107 |[39m
+     [90m 108 |[39m       console[33m.[39mlog([32m'Falling back to mock generation due to error.'[39m)[33m;[39m
+     [90m 109 |[39m       [36mreturn[39m [36mthis[39m[33m.[39mgenerateMock(input)[33m;[39m[0m
+
+      at BlueprintService.generate (src/services/blueprint.service.ts:106:15)
+      at Object.<anonymous> (src/services/__tests__/blueprint-verification.test.ts:96:64)
+
+  console.log
+    Falling back to mock generation due to error.
+
+      at BlueprintService.generate (src/services/blueprint.service.ts:108:15)
+
+FAIL src/services/__tests__/blueprint-verification.test.ts
+  Blueprint Strategy Verification
+    × should generate a Strategy-Driven Blueprint with all required fields (64 ms)
+
+  ● Blueprint Strategy Verification › should generate a Strategy-Driven Blueprint with all required fields
+
+    expect(received).toBeDefined()
+
+    Received: undefined
+
+    [0m [90m  97 |[39m
+     [90m  98 |[39m         [90m// --- 1. Strategy Layer Validation ---[39m
+    [31m[1m>[22m[39m[90m  99 |[39m         expect(result[33m.[39mstrategySummary)[33m.[39mtoBeDefined()[33m;[39m
+     [90m     |[39m                                        [31m[1m^[22m[39m
+     [90m 100 |[39m         expect(result[33m.[39mstrategySummary[33m?[39m[33m.[39mgoal)[33m.[39mtoContain([32m'Drive Leads'[39m)[33m;[39m
+     [90m 101 |[39m         expect(result[33m.[39mstrategySummary[33m?[39m[33m.[39mtotalBudget)[33m.[39mtoBe([35m2000[39m)[33m;[39m
+     [90m 102 |[39m         expect(result[33m.[39mstrategySummary[33m?[39m[33m.[39mbidStrategy)[33m.[39mtoBe([32m'Maximize Conversions'[39m)[33m;[39m [90m// Leads + Tracking = Max Conv[39m[0m
+
+      at Object.<anonymous> (src/services/__tests__/blueprint-verification.test.ts:99:40)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 total
+Snapshots:   0 total
+Time:        3.997 s, estimated 8 s
+Ran all test suites matching /src\\services\\__tests__\\blueprint-verification.test.ts/i.
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\apps\express-ai
+npm error workspace @apps/express-ai@0.1.0
+npm error location C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\apps\express-ai
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c jest src/services/__tests__/blueprint-verification.test.ts

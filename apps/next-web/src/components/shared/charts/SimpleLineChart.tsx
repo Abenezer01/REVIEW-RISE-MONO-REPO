@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import { useTheme } from '@mui/material/styles';
+import { useTranslations } from 'next-intl';
 
 // --- Bezier Curve Smoothing Logic ---
 const smoothing = 0.2;
@@ -85,6 +86,7 @@ const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
   strokeWidth = 3
 }) => {
   const theme = useTheme();
+  const tc = useTranslations('common');
 
   // Normalize data and calculate paths
   const maxValue = useMemo(() => {
@@ -129,11 +131,11 @@ const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
   }, [data, series, maxValue, curve]);
 
   if (loading) {
-    return <Paper sx={{ height, p: 3, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</Paper>;
+    return <Paper sx={{ height, p: 3, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{tc('common.loading')}</Paper>;
   }
 
   if (data.length === 0) {
-    return <Paper sx={{ height, p: 3, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>No data</Paper>;
+    return <Paper sx={{ height, p: 3, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{tc('common.no-data')}</Paper>;
   }
 
   return (
@@ -204,7 +206,7 @@ const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
                   strokeWidth="2"
                   vectorEffect="non-scaling-stroke"
                 >
-                  <title>{`${s.label}: ${typeof val === 'number' ? val.toFixed(1) : val} (${item[xKey] ? new Date(item[xKey]).toLocaleDateString() : ''})`}</title>
+                  <title>{s.label}: {typeof val === 'number' ? val.toFixed(1) : val} ({item[xKey] ? new Date(item[xKey]).toLocaleDateString() : ''})</title>
                 </circle>
               );
             })

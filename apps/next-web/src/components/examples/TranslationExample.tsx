@@ -14,19 +14,19 @@ export default function TranslationExample() {
 
     return (
         <div>
-            <h1>{t('app.name')}</h1>
-            <p>{t('app.description')}</p>
+            <h1>{t('common.app.name')}</h1>
+            <p>{t('common.app.description')}</p>
 
             <nav>
-                <a href="#">{t('navigation.home')}</a>
-                <a href="#">{t('navigation.dashboard')}</a>
-                <a href="#">{t('navigation.reviews')}</a>
+                <a href="#">{t('common.navigation.home')}</a>
+                <a href="#">{t('common.navigation.dashboard')}</a>
+                <a href="#">{t('common.navigation.reviews')}</a>
             </nav>
 
             <LocaleSwitcher />
 
-            <button>{t('common.save')}</button>
-            <button>{t('common.cancel')}</button>
+            <button>{t('common.common.save')}</button>
+            <button>{t('common.common.cancel')}</button>
         </div>
     )
 }

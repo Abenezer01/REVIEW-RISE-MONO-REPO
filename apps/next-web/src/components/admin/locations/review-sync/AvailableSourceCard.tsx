@@ -2,6 +2,7 @@
 import { Box, Button, Card, CardContent, Typography } from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import StarIcon from '@mui/icons-material/Star';
+import { useTranslations } from 'next-intl';
 
 interface AvailableSourceCardProps {
     platform: 'facebook' | 'trustpilot' | 'yelp';
@@ -10,6 +11,8 @@ interface AvailableSourceCardProps {
 }
 
 const AvailableSourceCard = ({ platform, onConnect, disabled }: AvailableSourceCardProps) => {
+    const t = useTranslations('locations.ReviewSources');
+    const tc = useTranslations('common');
     const isFacebook = platform === 'facebook';
     const isTrustpilot = platform === 'trustpilot';
     const isYelp = platform === 'yelp';
@@ -22,18 +25,18 @@ const AvailableSourceCard = ({ platform, onConnect, disabled }: AvailableSourceC
     if (isFacebook) {
         Icon = FacebookIcon;
         iconColor = 'primary';
-        name = 'Facebook Reviews';
-        description = 'Sync reviews from Facebook Business Pages';
+        name = t('facebook');
+        description = t('facebookDesc');
     } else if (isTrustpilot) {
         Icon = StarIcon;
         iconColor = 'success';
-        name = 'Trustpilot';
-        description = 'Import reviews from Trustpilot';
+        name = t('trustpilot');
+        description = t('trustpilotDesc');
     } else if (isYelp) {
         Icon = StarIcon;
         iconColor = 'error';
-        name = 'Yelp Business';
-        description = 'Sync reviews from Yelp';
+        name = t('yelp');
+        description = t('yelpDesc');
     }
 
     return (
@@ -53,9 +56,9 @@ const AvailableSourceCard = ({ platform, onConnect, disabled }: AvailableSourceC
                     color={disabled ? "inherit" : "warning"} 
                     disabled={disabled} 
                     onClick={onConnect}
-                    startIcon={disabled ? <Typography variant="caption">Coming Soon</Typography> : undefined}
+                    startIcon={disabled ? <Typography variant="caption">{tc('common.comingSoon')}</Typography> : undefined}
                 >
-                    Connect
+                    {t('connect')}
                 </Button>
             </CardContent>
         </Card>

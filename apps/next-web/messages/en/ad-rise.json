@@ -1,0 +1,512 @@
+{
+  "creativeEngine": {
+    "title": "Creative Prompt Engine",
+    "subtitle": "AI-Powered Concept & Image Generator",
+    "backToEditor": "← Back to Editor",
+    "generatedConcepts": "Generated Concepts",
+    "generatedConceptsSubtitle": "Here are your AI-generated creative angles.",
+    "startNewCampaign": "Start New Campaign",
+    "tabs": {
+      "generator": "Generator",
+      "library": "Creative Library"
+    },
+    "form": {
+      "campaignDetails": "Campaign Details",
+      "step1": "Step 1",
+      "step2": "Step 2",
+      "offerLabel": "Offer / Product",
+      "offerSubtitle": "What are you promoting?",
+      "offerPlaceholder": "e.g. Premium Eco-Friendly Cleaning Products",
+      "audienceLabel": "Audience Pain Points",
+      "audienceSubtitle": "What problems does your audience face?",
+      "audiencePlaceholder": "e.g. Harsh chemicals harming family health, environmental concerns...",
+      "brandToneTitle": "Brand Tone Profile",
+      "generateButton": "Generate Creative Concepts",
+      "generating": "Generating..."
+    },
+    "tone": {
+      "title": "Brand Tone Profile",
+      "selectTone": "Select Tone",
+      "preferredWords": "Preferred Words (comma separated)",
+      "preferredWordsPlaceholder": "e.g. eco-friendly, natural, safe",
+      "bannedPhrases": "Banned Phrases (comma separated)",
+      "bannedPhrasesPlaceholder": "e.g. cheap, toxic",
+      "options": {
+        "Friendly": {
+          "label": "Friendly",
+          "description": "Warm, approachable, conversational"
+        },
+        "Professional": {
+          "label": "Professional",
+          "description": "Formal, authoritative, expert"
+        },
+        "Luxury": {
+          "label": "Luxury",
+          "description": "Premium, sophisticated, exclusive"
+        },
+        "Urgent": {
+          "label": "Urgent",
+          "description": "Time-sensitive, action-driven"
+        }
+      }
+    },
+    "results": {
+      "visualIdea": "Visual Idea:",
+      "viewGeneratedImage": "View Generated Image",
+      "aiImageGeneration": "AI Image Generation",
+      "prompt": "Prompt:",
+      "viewPrompts": "View Prompts & Image",
+      "hidePrompts": "Hide Prompts",
+      "copy": "Copy",
+      "copied": "Copied",
+      "generateArt": "Generate Art (DALL-E)",
+      "generating": "Generating..."
+    },
+    "summary": {
+      "title": "What You'll Get",
+      "concepts": "Creative Concepts",
+      "conceptsCount": "3-6",
+      "formats": "Format Variations",
+      "formatsCount": "3",
+      "templates": "Prompt Templates",
+      "templatesCount": "9-18"
+    },
+    "settings": {
+      "aiImageTitle": "AI Image Generation",
+      "enableAiImages": "Enable AI Images",
+      "enableAiImagesDesc": "Generate images with OpenAI DALL-E"
+    },
+    "features": {
+      "title": "Concept Features",
+      "item1": "Headline angles tied to pain points",
+      "item2": "Visual ideas for each concept",
+      "item3": "Primary text variations",
+      "item4": "Optimized CTAs per concept",
+      "item5": "Format-specific prompts (Feed, Stories, Reels)",
+      "item6": "Save to creative library"
+    },
+    "library": {
+      "comingSoon": "Creative Library Coming Soon",
+      "description": "Save your best concepts and reuse them later. This feature is currently under development.",
+      "browse": "Browse Library",
+      "fetchError": "Failed to fetch creative library",
+      "retry": "Retry",
+      "emptyTitle": "Your Library is Empty",
+      "emptyDescription": "Generate and save creative concepts to see them here.",
+      "refresh": "Refresh",
+      "reuse": "Reuse Concept"
+    }
+  },
+  "blueprint": {
+    "title": "Google Search Blueprint",
+    "subtitle": "AI-Powered Campaign Generator",
+    "header": {
+      "history": "History",
+      "myBlueprints": "My Blueprints",
+      "account": "Account"
+    },
+    "icons": {
+      "wizard": "📊",
+      "preview": "📋",
+      "localService": "🔧",
+      "ecommerce": "🛒",
+      "saas": "💻",
+      "healthcare": "✓",
+      "lightning": "⚡",
+      "memo": "📝",
+      "caret": "▼",
+      "key": "🔑",
+      "block": "🚫",
+      "target": "🎯",
+      "lightbulb": "💡",
+      "currency": "$",
+      "rocket": "🚀",
+      "stop": "🛑",
+      "fire": "🔥"
+    },
+    "steps": {
+      "campaignDetails": "Campaign Details",
+      "generate": "Generate Blueprint",
+      "review": "Review & Export",
+      "details": "Campaign Details",
+      "results": "Blueprint Results"
+    },
+    "form": {
+      "businessInfo": "Business Information",
+      "required": "Required",
+      "businessName": "Business Name",
+      "businessNamePlaceholder": "e.g., Austin Plumbing Pros",
+      "offerService": "Offer / Services",
+      "offerServicePlaceholder": "Premium Plumbing Services - Emergency & Repairs",
+      "offerServiceHelp": "What products or services are you promoting?",
+      "servicesOffered": "Services Offered",
+      "servicesHelp": "Add the main services you provide (e.g., Plumbing, Water Heater Repair)",
+      "enterService": "Enter a service",
+      "add": "Add",
+      "specialOffer": "Special Offer or Promotion",
+      "specialOfferHelp": "What makes your offer compelling? (e.g., \"10% Off First Service\")",
+      "specialOfferPlaceholder": "e.g., Free Consultation, 10% Off",
+      "monthlyBudget": "Monthly Budget ($)",
+      "campaignObjective": "Campaign Objective",
+      "industryVertical": "Industry Vertical",
+      "targetingKeywords": "Targeting & Keywords",
+      "geoTargeting": "Geographic Targeting",
+      "geoTargetingTitle": "Geographic Location",
+      "geoTargetingPlaceholder": "Los Angeles, CA",
+      "geoTargetingHelp": "Enter cities, states, or regions you serve",
+      "geoTargetingInputHelp": "Enter your primary target location (e.g., \"Austin, TX\" or \"United States\")",
+      "painPoints": "Customer Pain Points",
+      "painPointsPlaceholder": "Emergency plumbing issues, leaking pipes, burst pipes, clogged drains, water heater failures, sewer backups, 24/7 urgent repairs needed",
+      "painPointsHelp": "What problems do your customers face? (helps generate problem-focused keywords)",
+      "addPainPoint": "Add Pain Point",
+      "landingPage": "Landing Page",
+      "landingPageUrl": "Landing Page URL",
+      "landingPagePlaceholder": "https://premiumplumbing.com/emergency-services",
+      "landingPageHelp": "Where will your ads direct traffic?",
+      "validate": "Validate",
+      "verticals": {
+        "localService": "Local Service",
+        "ecommerce": "E-commerce",
+        "saas": "SaaS",
+        "healthcare": "Healthcare",
+        "realEstate": "Real Estate",
+        "legal": "Legal",
+        "restaurant": "Restaurant",
+        "other": "Other"
+      },
+      "objectives": {
+        "Leads": "Leads",
+        "Sales": "Sales",
+        "Awareness": "Awareness",
+        "Local Visits": "Local Visits"
+      }
+    },
+    "generate": {
+      "loadingTitle": "Generating your Campaign Blueprint...",
+      "loadingText": "Analyzing keywords, competitors, and creating ads.",
+      "readyTitle": "Ready to Generate",
+      "readyText": "Click \"Generate Complete Blueprint\" to create your custom Google Ads campaign structure with keywords, ad copy, and optimization recommendations.",
+      "service": "Service:",
+      "vertical": "Vertical:",
+      "locations": "Locations:",
+      "location": "Location:",
+      "businessName": "Business Name:",
+      "offer": "Offer:",
+      "budget": "Budget:",
+      "objective": "Objective:",
+      "painPoints": "Pain Points:",
+      "button": "Generate Complete Blueprint",
+      "continue": "Continue"
+    },
+    "preview": {
+      "title": "Blueprint Preview",
+      "keywordClusters": "Keyword Clusters",
+      "adGroups": "Ad Groups",
+      "rsaHeadlines": "RSA Headlines",
+      "descriptions": "Descriptions",
+      "negativeKeywords": "Negative Keywords",
+      "whatYouGet": "💡 What You'll Get",
+      "benefits": {
+        "intentBased": "Intent-based keyword clusters",
+        "matchType": "Match type recommendations",
+        "negativeKeywords": "Negative keyword suggestions",
+        "compliantCopy": "Google Ads compliant RSA copy",
+        "landingPageTips": "Landing page optimization tips",
+        "exportable": "Exportable JSON format"
+      },
+      "quickStart": "Quick Start Templates",
+      "quickStartHelp": "Get started faster with pre-filled industry examples",
+      "clickTemplateHelp": "💡 Click any template to auto-fill the form",
+      "templates": {
+        "emergency": "Emergency Services",
+        "emergencyDesc": "24/7 urgent service keywords",
+        "local": "Local Service Pro",
+        "localDesc": "Geo-targeted campaigns",
+        "competitor": "Competitor Targeting",
+        "competitorDesc": "Capture competitor traffic",
+        "tipTitle": "Tip:",
+        "tipText": "Templates are just starting points - you can modify all fields after selecting one"
+      },
+      "use": "Use",
+      "useArrow": "Use →",
+      "services": "services"
+    },
+    "results": {
+      "successTitle": "Your Google Ads Blueprint is Ready",
+      "successText": "Review your campaign structure, keywords, and ad copy below",
+      "strategyTitle": "Strategic Approach",
+      "campaignGoal": "Campaign Goal",
+      "bidStrategy": "Bid Strategy",
+      "vertical": "Vertical Focus",
+      "totalBudget": "Monthly Budget",
+      "budgetTier": "Tier: {tier}",
+      "clickCapacity": "Est. Monthly Clicks",
+      "clickCapacitySub": "Based on market CPC",
+      "assumedCpc": "Assumed CPC",
+      "campaignCount": "Campaign Structure",
+      "campaignCountSub": "Recommended Campaigns",
+      "campaignStructureTitle": "Campaign Structure",
+      "noBlueprint": "No blueprint generated yet.",
+      "exportCsv": "Export CSV",
+      "exportGoogleAds": "Export to Google Ads",
+      "support": "Need help implementing this blueprint? Contact our support team.",
+      "print": "Print Blueprint",
+      "pdf": "Download PDF",
+      "common": {
+        "copied": "copied to clipboard!"
+      },
+      "keywords": {
+        "title": "Keyword Clusters by Intent",
+        "subtitle": "{clusters} clusters • {keywords} keywords total",
+        "badge": "keywords"
+      },
+      "adGroups": {
+        "title": "RSA Assets (Responsive Search Ads)",
+        "subtitle": "{count} ad group(s) with optimized headlines and descriptions",
+        "keywordsCount": "{count} keywords",
+        "headlines": "Headlines ({count})",
+        "descriptions": "Descriptions ({count})",
+        "copyAll": "Copy All",
+        "copyLabel": "Copy",
+        "copied": "{label} copied to clipboard!",
+        "objective": "Objective",
+        "included": "{count} Ad Groups Included",
+        "summary": "Ad Groups Summary:",
+        "more": "more",
+        "budgetLabel": "Budget",
+        "monthlyLabel": "mo",
+        "leadsLabel": "leads",
+        "cpaLabel": "CPA",
+        "lowVolume": "Low volume",
+        "allHeadlines": "All headlines",
+        "allDescriptions": "All descriptions",
+        "headlinePrefix": "Headline",
+        "descriptionPrefix": "Description",
+        "estimatedConversions": "Est. Conversions",
+        "estimatedCpa": "Est. CPA",
+        "learningPhase": "Learning Phase",
+        "status": "Status"
+      },
+      "negatives": {
+        "title": "Negative Keywords",
+        "subtitle": "{count} keyword(s) to prevent wasted ad spend",
+        "copyAll": "Copy All",
+        "copy": "Copy",
+        "tipTitle": "Tip:",
+        "tipText": "Add these negative keywords to your campaign to prevent your ads from showing for irrelevant searches and save your budget for qualified traffic."
+      },
+      "landingPage": {
+        "title": "Landing Page Analysis",
+        "matchQuality": "Overall Match Quality",
+        "score": {
+          "excellent": "Excellent! Your landing page is well-optimized for this campaign.",
+          "good": "Good, but there's room for improvement.",
+          "fair": "Consider optimizing your landing page for better ad performance."
+        },
+        "checklist": "Page Checklist",
+        "mobileOptimized": "Mobile Optimized",
+        "trustSignals": "Detected Trust Signals ({count})",
+        "missingElements": "Recommended Trust Elements ({count})",
+        "metrics": {
+          "qualityScore": "Google Ads Quality Score",
+          "qualityScoreHelp": "Predicted based on relevance, CTR, and experience logic.",
+          "conversionReadiness": "Conversion Readiness",
+          "conversionFriction": "Conversion Friction",
+          "strategicRecommendations": "Strategic Recommendations",
+          "trustAuthority": "Trust & Authority",
+          "optimizationGaps": "Optimization Gaps"
+        }
+      }
+    },
+    "common": {
+      "back": "Back",
+      "passed": "Passed",
+      "failed": "Failed",
+      "disclaimer": {
+        "title": "Important Notice",
+        "message": "This blueprint is guidance only. Results may vary based on your industry, competition, and budget. Always review all recommendations against platform advertising policies before implementation.",
+        "show": "Show Guidance Disclaimer"
+      }
+    },
+    "meta": {
+      "title": "Meta Ads Blueprint Generator",
+      "subtitle": "AI-powered campaign planning for Facebook & Instagram",
+      "steps": {
+        "businessInfo": "Business Information",
+        "geoTargeting": "Geographic Targeting",
+        "results": "Your Blueprint"
+      },
+      "stages": {
+        "TOF": "Top of Funnel (Awareness)",
+        "MOF": "Middle of Funnel (Consideration)",
+        "BOF": "Bottom of Funnel (Conversion)"
+      },
+      "quickTemplates": {
+        "title": "Quick Start Templates",
+        "subtitle": "Get started faster with pre-filled industry examples",
+        "tip": "Tip:",
+        "tipText": "Templates are just starting points - you can modify all fields after selecting one"
+      },
+      "form": {
+        "businessName": "Business Name (Optional)",
+        "businessNamePlaceholder": "e.g., Joe's Plumbing",
+        "offerOrService": "What do you offer?",
+        "offerOrServicePlaceholder": "e.g., Emergency plumbing services",
+        "vertical": "Business Vertical",
+        "verticals": {
+          "localService": "Local Service",
+          "ecommerce": "E-commerce",
+          "saas": "SaaS",
+          "healthcare": "Healthcare",
+          "realEstate": "Real Estate",
+          "legal": "Legal",
+          "restaurant": "Restaurant",
+          "other": "Other"
+        },
+        "geoCenter": "Target Location",
+        "geoCenterPlaceholder": "e.g., San Francisco, CA",
+        "radius": "Radius",
+        "radiusUnit": {
+          "miles": "Miles",
+          "km": "Kilometers"
+        },
+        "painPoints": "Customer Pain Points (Optional)",
+        "painPointsPlaceholder": "e.g., Burst pipes, clogged drains",
+        "landingPageUrl": "Landing Page URL (Optional)",
+        "landingPageUrlPlaceholder": "https://example.com",
+        "addPainPoint": "Add Pain Point",
+        "templates": {
+          "plumbing": "Plumbing Service",
+          "law": "Law Firm",
+          "dentist": "Dental Practice",
+          "restaurant": "Restaurant",
+          "saas": "SaaS Product",
+          "ecommerce": "E-commerce Store",
+          "roofing": "Roofing Service"
+        },
+        "algorithmsOverTargeting": "Algorithms over Targeting",
+        "consolidateModeDesc": "In Consolidate Mode ($100/mo), we skip specific interest clusters to give Meta's AI maximum freedom. Specific interest targeting starts at the",
+        "standardTier": "Standard Tier ($600+/mo)",
+        "objectives": {
+          "Leads": "Leads & Form Fills",
+          "Sales": "Sales & Conversions",
+          "Awareness": "Awareness & Reach"
+        }
+      },
+      "buttons": {
+        "next": "Next",
+        "back": "Back",
+        "generate": "Generate Blueprint",
+        "exportAll": "Export All",
+        "startOver": "Start Over"
+      },
+      "results": {
+        "title": "Your Meta Ads Blueprint is Ready",
+        "sections": {
+          "audiences": "Audience Sets",
+          "interests": "Interest Clusters",
+          "adCopy": "Ad Copy Variations",
+          "placements": "Placement Recommendations",
+          "estDailySpend": "Est. Daily Spend: ${amount}",
+          "budgetStrategy": "Strategy: {strategy}",
+          "aiAnalysis": "AI Analysis",
+          "agencyReadiness": "Agency Readiness",
+          "potentialOptimizations": "Potential Optimizations",
+          "keyTakeaways": "Key Takeaways"
+        },
+        "priorities": {
+          "high": "High Priority",
+          "medium": "Consider",
+          "low": "Nice to Have"
+        },
+        "benefits": {
+          "coreAudiences": "Core audience definitions",
+          "interestClusters": "Interest cluster recommendations",
+          "optimizedCopy": "Optimized copy variations",
+          "placementStrategy": "Placement strategy guide",
+          "exportReady": "Export-ready JSON format",
+          "combinedAudiences": "{prospecting} + {retargeting}"
+        },
+        "audiences": {
+          "prospecting": "Prospecting (Cold Traffic)",
+          "retargeting": "Retargeting (Warm Traffic)",
+          "estimatedReach": "Estimated Reach",
+          "demographics": "Demographics",
+          "age": "Age",
+          "gender": "Gender",
+          "languages": "Languages",
+          "geoLocations": "Geo Locations",
+          "geoTarget": "Geo Target",
+          "interests": "Interests",
+          "interestCluster": "Interest Cluster:",
+          "excludes": "Excludes:",
+          "algorithmLed": "Algorithm-Led Targeting",
+          "algorithmLedDesc": "— No interest restrictions. Meta finds the buyers.",
+          "customAudiences": "Custom Audiences",
+          "lookalikeSources": "Lookalike Sources",
+          "geo": "Geographic Targeting",
+          "retargetingSource": "Retargeting Source",
+          "size": "Est. Size",
+          "predictedValue": "Predicted Value",
+          "days": "Days",
+          "minAudience": "Min audience:",
+          "pausesIfBelow": "(pauses if below)",
+          "estAudienceSize": "Est. Audience Size",
+          "prospectingCampaign": "Prospecting Campaign —",
+          "retargetingCampaign": "Retargeting Campaign — ABO (Always)",
+          "retargetingLocked": "Retargeting Locked — Requires $1,500+/mo",
+          "retargetingLockedDesc": "At your current budget, retargeting would cause audience burnout before generating enough signal. Increase budget to unlock full-funnel structure."
+        },
+        "interests": {
+          "primary": "Primary",
+          "secondary": "Secondary",
+          "exclusions": "Exclusions",
+          "includedInterests": "Included Interests",
+          "interestsCount": "{count} interests",
+          "more": "+{count} more",
+          "intentScore": "Intent Score: {score}/10"
+        },
+        "adCopy": {
+          "variation": "Variation",
+          "primaryText": "Primary Text",
+          "headline": "Headline",
+          "description": "Description",
+          "for": "for",
+          "ctas": "Call-to-Actions",
+          "callToAction": "Call to Action",
+          "tone": "Tone",
+          "compliant": "Meta Ads Compliant",
+          "characterLimits": "Character Limits Guide",
+          "copyToClipboard": "Copy to Clipboard",
+          "copyAll": "Copy All",
+          "copied": "Copied!",
+          "chars": "{count} / {limit} chars",
+          "guide": {
+            "primaryText": "Main ad copy for Feed placements.",
+            "headline": "Bold text above description.",
+            "description": "Short supporting text.",
+            "optimized": "Optimized for Primary Text (125c), Headlines (40c), and Descriptions (25c)."
+          },
+          "charsLimit": "{count} chars"
+        },
+        "placements": {
+          "platform": "Platform",
+          "format": "Format",
+          "objective": "Objective",
+          "why": "Why",
+          "highImpact": "High Impact",
+          "recommended": "Recommended",
+          "objectives": {
+            "Awareness": "Awareness",
+            "Traffic": "Traffic",
+            "Conversion": "Conversion"
+          },
+          "strategyLabel": "Strategy:",
+          "strategyText": "Selected placements to maximize {goal} for this audience stage."
+        }
+      },
+      "loading": "Generating your Meta Ads Blueprint...",
+      "error": "Failed to generate blueprint. Please try again."
+    }
+  }
+}

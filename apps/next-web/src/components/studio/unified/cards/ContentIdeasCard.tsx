@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Box, Card, CardContent, Typography, IconButton, Tooltip } from '@mui/material'
+import { useTranslations } from 'next-intl'
 
 interface ContentIdeasCardProps {
     contentIdeas: Array<{
@@ -12,6 +13,8 @@ interface ContentIdeasCardProps {
 }
 
 export default function ContentIdeasCard({ contentIdeas, onUseIdea }: ContentIdeasCardProps) {
+    const t = useTranslations('studio')
+
     return (
         <Card variant="outlined" sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
             <CardContent sx={{ p: 3.5 }}>
@@ -20,7 +23,7 @@ export default function ContentIdeasCard({ contentIdeas, onUseIdea }: ContentIde
                         <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: '#FFF8E1', color: '#FFC107' }}>
                             <i className="tabler-bulb" style={{ fontSize: 20 }} />
                         </Box>
-                        <Typography variant="h6" fontWeight="bold">Content Ideas</Typography>
+                    <Typography variant="h6" fontWeight="bold">{t('ideas.title')}</Typography>
                     </Box>
                     <IconButton size="small">
                             <i className="tabler-plus" />
@@ -45,7 +48,7 @@ export default function ContentIdeasCard({ contentIdeas, onUseIdea }: ContentIde
                                     {idea.description}
                                 </Typography>
                             </Box>
-                            <Tooltip title="Use this Idea">
+                            <Tooltip title={t('ideas.useThisIdea')}>
                                 <IconButton 
                                     size="small"
                                     onClick={() => onUseIdea(idea.title, idea.description)}

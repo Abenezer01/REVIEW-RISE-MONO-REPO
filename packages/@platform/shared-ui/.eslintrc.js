@@ -1,17 +1,11 @@
 module.exports = {
     extends: [
-        'next/core-web-vitals',
         'plugin:@typescript-eslint/recommended',
         'plugin:import/recommended',
         'prettier'
     ],
     ignorePatterns: ['dist/**', 'node_modules/**'],
     rules: {
-        'jsx-a11y/alt-text': 'off',
-        'react/display-name': 'off',
-        'react/no-children-prop': 'off',
-        '@next/next/no-img-element': 'off',
-        '@next/next/no-page-custom-font': 'off',
         '@typescript-eslint/consistent-type-imports': 'error',
         '@typescript-eslint/ban-ts-comment': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
@@ -71,6 +65,21 @@ module.exports = {
                 count: 1
             }
         ],
+        'no-restricted-imports': [
+            'error',
+            {
+                paths: [
+                    {
+                        name: 'react-hot-toast',
+                        message: 'Please use SystemMessageProvider and notify() from @platform/shared-ui instead.'
+                    },
+                    {
+                        name: 'react-toastify',
+                        message: 'Please use SystemMessageProvider and notify() from @platform/shared-ui instead.'
+                    }
+                ]
+            }
+        ],
         'import/order': [
             'error',
             {
@@ -120,6 +129,12 @@ module.exports = {
             rules: {
                 '@typescript-eslint/explicit-module-boundary-types': 'off',
                 '@typescript-eslint/no-var-requires': 'off'
+            }
+        },
+        {
+            files: ['src/components/feedback/Toast.tsx'],
+            rules: {
+                'no-restricted-imports': 'off'
             }
         }
     ]

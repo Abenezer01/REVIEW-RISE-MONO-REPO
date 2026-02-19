@@ -9,6 +9,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
+import { useTranslations } from 'next-intl'
 
 // Styled Component
 const SearchContainer = styled(Box)(({ theme }) => ({
@@ -26,6 +27,7 @@ const SearchContainer = styled(Box)(({ theme }) => ({
 }))
 
 const GlobalSearch = () => {
+  const t = useTranslations('common.common')
   const [searchValue, setSearchValue] = useState('')
 
   return (
@@ -35,7 +37,7 @@ const GlobalSearch = () => {
         size='small'
         value={searchValue}
         onChange={e => setSearchValue(e.target.value)}
-        placeholder='Search...'
+        placeholder={t('search-placeholder')}
         id='global-search-input'
         sx={{
           '& .MuiOutlinedInput-root': {

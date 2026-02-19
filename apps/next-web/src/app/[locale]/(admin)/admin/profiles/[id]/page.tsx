@@ -25,7 +25,10 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { useTranslations } from 'next-intl';
-import toast from 'react-hot-toast';
+
+import { SystemMessageCode } from '@platform/contracts';
+
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider';
 
 import { BrandProfileService } from '@/services/brand-profile.service';
 import type { BrandProfile } from '@/services/brand-profile.service';
@@ -48,6 +51,7 @@ interface PageProps {
 }
 
 export default function BrandProfileDetailsPage({ params }: PageProps) {
+  const { notify } = useSystemMessages();
   const { id, locale } = use(params);
   const router = useRouter();
   const theme = useTheme();
@@ -76,11 +80,11 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
       const updated = await BrandProfileService.updateBrandProfile(id, data);
 
       setProfile(updated);
-      toast.success('Brand profile updated');
+      notify(SystemMessageCode.BRAND_PROFILE_UPDATED);
       fetchLogs(); // Refresh history
     } catch (error) {
       console.error('Update failed:', error);
-      toast.error('Failed to update brand profile');
+      notify(SystemMessageCode.GENERIC_ERROR);
       throw error;
     } finally {
       setIsUpdating(false);
@@ -98,11 +102,11 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
       return data;
     } catch (err) {
       console.log(err)
-      if (!silent) toast.error('Failed to load brand profile');
+      if (!silent) notify(SystemMessageCode.GENERIC_ERROR);
     } finally {
       if (!silent) setIsLoading(false);
     }
-  }, [id]);
+  }, [id, notify]);
 
   const fetchLogs = useCallback(async () => {
     setIsLoadingLogs(true);
@@ -135,7 +139,7 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
 
         if (updatedProfile && updatedProfile.status !== 'extracting' && updatedProfile.status !== 'pending') {
           clearInterval(intervalId);
-          toast.success(`Extraction ${updatedProfile.status}`);
+          notify(SystemMessageCode.SUCCESS);
         }
       }, 3000); // Poll every 3 seconds
     }
@@ -143,7 +147,7 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [profile?.status, id, fetchProfile]);
+  }, [profile?.status, id, fetchProfile, notify]);
 
   const handleReExtract = async () => {
     if (!profile) return;
@@ -151,11 +155,11 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
 
     try {
       await BrandProfileService.reExtractBrandProfile(id);
-      toast.success('Re-extraction started');
+      notify(SystemMessageCode.SUCCESS);
       fetchProfile(true); // Refresh to show extracting status
     } catch (err) {
       console.log(err)
-      toast.error('Failed to start re-extraction');
+      notify(SystemMessageCode.GENERIC_ERROR);
     } finally {
       setIsReExtracting(false);
     }
@@ -166,11 +170,11 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
 
     try {
       await BrandProfileService.confirmExtraction(id);
-      toast.success('Extraction confirmed');
+      notify(SystemMessageCode.SUCCESS);
       fetchProfile(); // Full refresh to show updated relations
       fetchLogs(); // Refresh history
     } catch (err) {
-      toast.error('Failed to confirm extraction');
+      notify(SystemMessageCode.GENERIC_ERROR);
     } finally {
       setIsConfirming(false);
     }
@@ -181,17 +185,17 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
 
     try {
       await BrandProfileService.deleteBrandProfile(id);
-      toast.success('Brand profile deleted');
+      notify(SystemMessageCode.BRAND_PROFILE_DELETED);
       router.push(`/${locale}/admin/profiles`);
     } catch (err) {
-      toast.error('Failed to delete brand profile');
+      notify(SystemMessageCode.GENERIC_ERROR);
       setIsDeleting(false);
     }
   };
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success('Copied to clipboard');
+    notify(SystemMessageCode.COPIED_TO_CLIPBOARD);
   };
 
   const handleCopyAllColors = () => {
@@ -199,7 +203,7 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
     const allColors = profile.colors.map(c => `${c.type}: ${c.hexCode}`).join('\n');
 
     navigator.clipboard.writeText(allColors);
-    toast.success('All colors copied to clipboard');
+    notify(SystemMessageCode.COPIED_TO_CLIPBOARD);
   };
 
   if (isLoading) {
@@ -213,9 +217,9 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
   if (!profile) {
     return (
       <Box sx={{ p: 4 }}>
-        <Typography variant="h5" color="error">Profile not found</Typography>
+        <Typography variant="h5" color="error">{t('detail.notFound')}</Typography>
         <Button startIcon={<ArrowBackIcon />} onClick={() => router.back()} sx={{ mt: 2 }}>
-          Back to List
+          {t('detail.backToList')}
         </Button>
       </Box>
     );
@@ -299,15 +303,15 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
         onClose={() => !isDeleting && setDeleteDialogOpen(false)}
         PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
       >
-        <DialogTitle sx={{ fontWeight: 800 }}>Delete Brand Profile</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 800 }}>{t('detail.deleteTitle')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this brand profile? This action will permanently remove all extracted data and assets. This cannot be undone.
+            {t('detail.deleteConfirm')}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
           <Button onClick={() => setDeleteDialogOpen(false)} disabled={isDeleting} sx={{ borderRadius: 2 }}>
-            Cancel
+            {t('detail.cancel') || 'Cancel'}
           </Button>
           <Button
             onClick={handleDelete}
@@ -318,7 +322,7 @@ export default function BrandProfileDetailsPage({ params }: PageProps) {
             startIcon={isDeleting ? <CircularProgress size={20} color="inherit" /> : <DeleteIcon />}
             sx={{ borderRadius: 2, px: 3 }}
           >
-            {isDeleting ? 'Deleting...' : 'Delete Permanently'}
+            {isDeleting ? t('detail.deleting') : t('detail.deletePermanently')}
           </Button>
         </DialogActions>
       </Dialog>

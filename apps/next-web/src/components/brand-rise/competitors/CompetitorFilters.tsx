@@ -2,10 +2,12 @@
 
 import { Box, Button, Stack } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
+import { useTranslations } from 'next-intl';
 
 
 
 export const CompetitorFilters = () => {
+  const tc = useTranslations('common');
   const theme = useTheme();
 
   return (
@@ -27,7 +29,7 @@ export const CompetitorFilters = () => {
           }
         }}
       >
-        All
+        {tc('common.all')}
       </Button>
 
       {/* Filter Boxes */}

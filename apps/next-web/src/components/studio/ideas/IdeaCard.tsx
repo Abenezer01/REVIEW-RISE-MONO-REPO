@@ -10,6 +10,7 @@ import Chip from '@mui/material/Chip'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
+import { useTranslations } from 'next-intl'
 
 interface IdeaCardProps {
     idea: {
@@ -27,6 +28,9 @@ interface IdeaCardProps {
 }
 
 export default function IdeaCard({ idea, onUse, onBookmark, onCopy }: IdeaCardProps) {
+    const t = useTranslations('studio')
+    const tc = useTranslations('common')
+
     const getEngagementColor = (level?: string) => {
         switch (level) {
             case 'high': return 'success'
@@ -38,9 +42,9 @@ export default function IdeaCard({ idea, onUse, onBookmark, onCopy }: IdeaCardPr
 
     const getEngagementLabel = (level?: string) => {
         switch (level) {
-            case 'high': return 'High Engagement'
-            case 'medium': return 'Medium Engagement'
-            case 'low': return 'Low Engagement'
+            case 'high': return t('ideas.highEngagement')
+            case 'medium': return t('ideas.mediumEngagement')
+            case 'low': return t('ideas.lowEngagement')
             default: return ''
         }
     }
@@ -69,14 +73,14 @@ export default function IdeaCard({ idea, onUse, onBookmark, onCopy }: IdeaCardPr
                     </Box>
                     <Box sx={{ display: 'flex', gap: 0.5, ml: 2 }}>
                         {onBookmark && (
-                            <Tooltip title="Bookmark">
+                            <Tooltip title={tc('common.bookmark')}>
                                 <IconButton size="small" onClick={onBookmark}>
                                     <i className="tabler-bookmark" style={{ fontSize: 18 }} />
                                 </IconButton>
                             </Tooltip>
                         )}
                         {onCopy && (
-                            <Tooltip title="Copy">
+                            <Tooltip title={tc('common.copy')}>
                                 <IconButton size="small" onClick={onCopy}>
                                     <i className="tabler-copy" style={{ fontSize: 18 }} />
                                 </IconButton>
@@ -130,7 +134,7 @@ export default function IdeaCard({ idea, onUse, onBookmark, onCopy }: IdeaCardPr
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                 <i className="tabler-clock" style={{ fontSize: 16, opacity: 0.6 }} />
                                 <Typography variant="caption" color="text.secondary">
-                                    {idea.readingTime} min read
+                                    {idea.readingTime} {t('ideas.minRead')}
                                 </Typography>
                             </Box>
                         )}
@@ -146,7 +150,7 @@ export default function IdeaCard({ idea, onUse, onBookmark, onCopy }: IdeaCardPr
                             '&:hover': { bgcolor: 'secondary.dark' }
                         }}
                     >
-                        Use This Idea
+                        {t('ideas.useThisIdea')}
                     </Button>
                 </Box>
             </CardContent>

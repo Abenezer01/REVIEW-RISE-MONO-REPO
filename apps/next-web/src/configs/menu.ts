@@ -64,8 +64,14 @@ const menuData: MenuItem[] = [
     allowedRoles: [ROLES.ADMIN],
     children: [
       {
+        title: 'navigation.social-overview',
+        href: '/admin/social-rise/overview',
+        icon: 'tabler-chart-pie',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
         title: 'navigation.social-content',
-        href: '/admin/social-rise',
+        href: '/admin/social-rise?tab=calendar',
         icon: 'tabler-calendar',
         allowedRoles: [ROLES.ADMIN]
       },
@@ -124,7 +130,45 @@ const menuData: MenuItem[] = [
     title: 'navigation.ad-rise',
     href: '/admin/ad-rise',
     icon: 'tabler-badge-ad',
-    allowedRoles: [ROLES.ADMIN]
+    allowedRoles: [ROLES.ADMIN, ROLES.VIEW],
+    children: [
+      {
+        title: 'navigation.platform-overview',
+        href: '/admin/ad-rise',
+        icon: 'tabler-dashboard',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.ad-rise-configuration',
+        href: '/admin/ad-rise/configuration',
+        icon: 'tabler-settings',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.google-blueprint',
+        href: '/admin/ad-rise/blueprint',
+        icon: 'tabler-brand-google',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.meta-blueprint',
+        href: '/admin/ad-rise/meta-blueprint',
+        icon: 'tabler-brand-meta',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.creative-engine',
+        href: '/admin/ad-rise/creative-engine',
+        icon: 'tabler-bulb',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.simulator',
+        href: '/admin/ad-rise/simulator',
+        icon: 'tabler-device-gamepad',
+        allowedRoles: [ROLES.ADMIN]
+      }
+    ]
   },
   {
     title: 'navigation.brand-rise',
