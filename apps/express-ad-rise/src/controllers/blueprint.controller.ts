@@ -77,7 +77,8 @@ export class BlueprintController {
                 landingPageUrl: input.landingPageUrl || '',
                 objective: input.objective,
                 budget: input.budget,
-                currency: 'USD'
+                currency: 'USD',
+                conversionTrackingEnabled: true
             });
 
             const response = createSuccessResponse(result, 'Meta Blueprint generated successfully', 200, { requestId: req.id });

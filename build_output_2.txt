@@ -1,0 +1,8 @@
+
+> @apps/express-ad-rise@0.1.0 build C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\apps\express-ad-rise
+> tsc
+
+src/controllers/blueprint.controller.ts(77,17): error TS2353: Object literal may only specify known properties, and 'landingPageUrl' does not exist in type '{ vertical: VerticalType; objective: "Leads" | "Sales" | "Awareness" | "Local Visits"; budget: number; currency: string; businessName: string; services: string[]; offer: string; ... 6 more ...; keywordsPerAdGroup?: number | undefined; }'.
+C:\Users\REAB\Documents\Projects\ReviewRise\REVIEW-MONO-REPO\REVIEW-RISE-MONO-REPO\apps\express-ad-rise:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @apps/express-ad-rise@0.1.0 build: `tsc`
+Exit status 2
