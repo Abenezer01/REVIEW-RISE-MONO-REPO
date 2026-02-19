@@ -41,7 +41,7 @@ export class CreativeEngineService {
                     console.warn(`Concept ${concept.id} failed Google validation:`, googleValidation.errors);
                 }
                 if (!metaValidation.isValid) {
-                    // @ts-expect-error - Meta validation currently always returns isValid: true, but if it changes
+                    // Meta validation currently always returns isValid: true, but if it changes
                     console.warn(`Concept ${concept.id} failed Meta validation:`, (metaValidation as any).errors);
                 }
                 if (!safetyValidation.isValid) {

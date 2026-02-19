@@ -43,7 +43,7 @@ export class BlueprintService {
       // --- AI ENHANCEMENT LAYER ---
       // Polishes the deterministic plan with LLM creativity
       try {
-        const { blueprintAiEnhancer } = await import('./blueprint/ai-enhancer');
+        const { blueprintAiEnhancer } = await import('./blueprint/ai-enhancer.js');
         v4Plan = await blueprintAiEnhancer.enhance(v4Plan, engineInput);
       } catch (enhancementError) {
         console.warn('AI Enhancement skipped due to error:', enhancementError);
