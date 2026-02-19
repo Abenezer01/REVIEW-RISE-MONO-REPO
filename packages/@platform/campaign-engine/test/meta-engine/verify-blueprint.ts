@@ -20,9 +20,11 @@ console.log('Generating Blueprint for:', mockInput.businessName);
 const blueprint = metaBlueprintEngine.generateBlueprint(mockInput);
 console.log(JSON.stringify(blueprint, null, 2));
 
-if (blueprint.structure.prospecting.audiences.length > 0 && blueprint.structure.retargeting.audiences.length > 0) {
-    console.log('SUCCESS: Blueprint generated with Prospecting and Retargeting.');
+if (blueprint.structure.prospecting.adSets.length > 0) {
+    console.log('SUCCESS: Blueprint generated with Prospecting ad sets.');
+    console.log('Tier:', blueprint.recommendations.budgetTier);
+    console.log('Warnings:', blueprint.recommendations.warnings);
 } else {
-    console.error('FAILURE: Missing audiences.');
+    console.error('FAILURE: Missing ad sets.');
     process.exit(1);
 }

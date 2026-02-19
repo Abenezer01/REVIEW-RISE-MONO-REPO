@@ -36,6 +36,7 @@ import { DisclaimerPanel } from '../creative-engine/DisclaimerPanel'
 import type { MetaBlueprintInput, MetaBlueprintOutput } from '@platform/contracts'
 
 import AdCopyVariations from './AdCopyVariations'
+import AIInsightsPanel from './AIInsightsPanel'
 import AudienceResults from './AudienceResults'
 import InterestClusters from './InterestClusters'
 import PlacementRecommendations from './PlacementRecommendations'
@@ -93,7 +94,9 @@ export default function MetaBlueprintWizard() {
             unit: 'miles'
         },
         painPoints: [],
-        landingPageUrl: ''
+        landingPageUrl: '',
+        budget: 1500, // Default to Full Funnel/Standard threshold
+        objective: 'Leads'
     })
 
     const [painPointInput, setPainPointInput] = useState('')
@@ -271,10 +274,19 @@ export default function MetaBlueprintWizard() {
                                         {input.offerOrService} • {input.geoTargeting.center} • {input.geoTargeting.radius} {t(`meta.form.radiusUnit.${input.geoTargeting.unit}`)}
                                     </Typography>
                                     {output.recommendations && (
-                                        <Box sx={{ mt: 1, display: 'flex', gap: 2 }}>
-                                            <Chip label={t('meta.results.sections.estDailySpend', { amount: output.recommendations.dailySpend })} color="primary" variant="outlined" size="small" />
-                                            <Chip label={t('meta.results.sections.budgetStrategy', { strategy: output.recommendations.budgetStrategy })} color="secondary" variant="outlined" size="small" />
-                                        </Box>
+                                        <Stack direction="column" spacing={1} sx={{ mt: 1 }}>
+                                            <Box sx={{ display: 'flex', gap: 2 }}>
+                                                <Chip label={t('meta.results.sections.estDailySpend', { amount: output.recommendations.dailySpend.toFixed(2) })} color="primary" variant="outlined" size="small" />
+                                                <Chip label={output.recommendations.budgetTier ?? output.recommendations.budgetStrategy} color="secondary" variant="outlined" size="small" />
+                                            </Box>
+                                            {/* Learning Phase Estimate Display */}
+                                            {output.recommendations.learningPhaseEstimate && (
+                                                <Typography variant="caption" color={output.recommendations.learningPhaseEstimate.includes('Healthy') ? 'success.main' : 'warning.main'} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                    <AutoAwesomeIcon fontSize="inherit" />
+                                                    {output.recommendations.learningPhaseEstimate}
+                                                </Typography>
+                                            )}
+                                        </Stack>
                                     )}
                                 </Box>
                                 <Box sx={{ display: 'flex', gap: 1 }}>
@@ -288,6 +300,36 @@ export default function MetaBlueprintWizard() {
                             </Box>
                         </Grid>
 
+                        {/* Budget Tier Banner */}
+                        <Grid size={{ xs: 12 }}>
+                            {output.recommendations?.budgetTier && (() => {
+                                const tier = output.recommendations.budgetTier
+                                const tierConfig = {
+                                    CONSOLIDATE: { color: 'warning', label: '⚡ CONSOLIDATE MODE', desc: '1 Campaign · 1 Ad Set · Broad Targeting · No Retargeting. Signal density over fragmentation at this budget.' },
+                                    STANDARD: { color: 'info', label: '📊 STANDARD MODE', desc: '1 Prospecting Campaign · 2 Ad Sets (Intent + Broad) · No Retargeting. Increase to $1,500+/mo to unlock full funnel.' },
+                                    FULL_FUNNEL: { color: 'success', label: '🚀 FULL FUNNEL MODE', desc: 'Prospecting (CBO) + Retargeting (ABO). Full senior media buyer structure active.' },
+                                } as const
+                                const config = tierConfig[tier]
+                                return (
+                                    <Box sx={{ p: 2.5, borderRadius: 2, border: 1, borderColor: `${config.color}.main`, bgcolor: `${config.color}.50` }}>
+                                        <Typography variant="subtitle2" fontWeight="bold" color={`${config.color}.dark`}>
+                                            {config.label}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">{config.desc}</Typography>
+                                        {output.recommendations.warnings && output.recommendations.warnings.length > 0 && (
+                                            <Box sx={{ mt: 1.5 }}>
+                                                {output.recommendations.warnings.map((w, i) => (
+                                                    <Typography key={i} variant="caption" color="warning.dark" display="block" sx={{ mt: 0.5 }}>
+                                                        {w}
+                                                    </Typography>
+                                                ))}
+                                            </Box>
+                                        )}
+                                    </Box>
+                                )
+                            })()}
+                        </Grid>
+
                         <Grid size={{ xs: 12 }}>
                             {/* Section: Audiences */}
                             <Box sx={{ mb: 5 }}>
@@ -296,8 +338,8 @@ export default function MetaBlueprintWizard() {
                                     {t('meta.results.sections.audiences')}
                                 </Typography>
                                 <AudienceResults
-                                    prospecting={output.structure?.prospecting?.audiences || []}
-                                    retargeting={output.structure?.retargeting?.audiences || []}
+                                    prospecting={output.structure.prospecting}
+                                    retargeting={output.structure.retargeting}
                                 />
                             </Box>
 
@@ -307,12 +349,29 @@ export default function MetaBlueprintWizard() {
                                     <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: 'primary.main', color: 'white', display: 'flex' }}><CheckCircleIcon /></Box>
                                     {t('meta.results.sections.interests')}
                                 </Typography>
-                                <InterestClusters
-                                    data={(output.structure?.prospecting?.audiences || [])
-                                        .flatMap(a => a.interests || [])
-                                        .filter((v, i, a) => a.findIndex(t => t.theme === v.theme) === i) // Unique by theme
-                                    }
-                                />
+                                {output.recommendations.budgetTier === 'CONSOLIDATE' ? (
+                                    <Paper sx={{ p: 3, bgcolor: 'background.default', border: '1px dashed', borderColor: 'divider', borderRadius: 2 }}>
+                                        <Stack direction="row" spacing={2} alignItems="center">
+                                            <Box sx={{ p: 1, bgcolor: 'warning.light', color: 'warning.dark', borderRadius: 1 }}>
+                                                <AutoAwesomeIcon />
+                                            </Box>
+                                            <Box>
+                                                <Typography variant="subtitle1" fontWeight="bold">Algorithms over Targeting</Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    In Consolidate Mode ($100/mo), we skip specific interest clusters to give Meta's AI maximum freedom.
+                                                    Specific interest targeting starts at the <strong>Standard Tier ($600+/mo)</strong>.
+                                                </Typography>
+                                            </Box>
+                                        </Stack>
+                                    </Paper>
+                                ) : (
+                                    <InterestClusters
+                                        data={(output.structure?.prospecting?.adSets || [])
+                                            .flatMap(a => a.audience.interests || [])
+                                            .filter((v, i, a) => a.findIndex(t => t.theme === v.theme) === i)
+                                        }
+                                    />
+                                )}
                             </Box>
 
                             {/* Section: Placements */}
@@ -334,11 +393,56 @@ export default function MetaBlueprintWizard() {
                                 </Typography>
                                 <AdCopyVariations
                                     data={[
-                                        ...(output.structure?.prospecting?.adSets || []).flatMap(adSet => adSet.creatives.map(c => ({ creative: c, audienceName: adSet.audience.name, stage: adSet.audience.funnelStage }))),
-                                        ...(output.structure?.retargeting?.adSets || []).flatMap(adSet => adSet.creatives.map(c => ({ creative: c, audienceName: adSet.audience.name, stage: adSet.audience.funnelStage })))
+                                        ...(output.structure?.prospecting?.adSets || []).flatMap(adSet =>
+                                            adSet.creatives.flatMap(c => {
+                                                // Explode text variations into separate viewable items
+                                                const variationsCount = Math.max(c.primaryText.length, c.headlines.length, c.descriptions?.length || 0);
+                                                return Array.from({ length: variationsCount }).map((_, i) => ({
+                                                    creative: {
+                                                        ...c,
+                                                        // Create a synthetic creative with just the i-th option as the first element
+                                                        primaryText: [c.primaryText[i] || c.primaryText[0]],
+                                                        headlines: [c.headlines[i] || c.headlines[0]],
+                                                        descriptions: [c.descriptions?.[i] || c.descriptions?.[0] || '']
+                                                    },
+                                                    audienceName: adSet.audience.name,
+                                                    stage: adSet.audience.funnelStage
+                                                }));
+                                            })
+                                        ),
+                                        ...(output.structure?.retargeting?.adSets || []).flatMap(adSet =>
+                                            adSet.creatives.flatMap(c => {
+                                                const variationsCount = Math.max(c.primaryText.length, c.headlines.length, c.descriptions?.length || 0);
+                                                return Array.from({ length: variationsCount }).map((_, i) => ({
+                                                    creative: {
+                                                        ...c,
+                                                        primaryText: [c.primaryText[i] || c.primaryText[0]],
+                                                        headlines: [c.headlines[i] || c.headlines[0]],
+                                                        descriptions: [c.descriptions?.[i] || c.descriptions?.[0] || '']
+                                                    },
+                                                    audienceName: adSet.audience.name,
+                                                    stage: adSet.audience.funnelStage
+                                                }));
+                                            })
+                                        )
                                     ]}
                                 />
                             </Box>
+
+                            {/* Section: AI Insights */}
+                            {output.aiInsights && (
+                                <Box sx={{ mb: 5 }}>
+                                    <Paper variant="outlined" sx={{
+                                        p: 3,
+                                        borderRadius: 2,
+                                        background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.04)} 0%, ${alpha(theme.palette.secondary?.main || theme.palette.primary.dark, 0.04)} 100%)`,
+                                        borderColor: 'primary.main',
+                                        borderStyle: 'dashed'
+                                    }}>
+                                        <AIInsightsPanel insights={output.aiInsights} />
+                                    </Paper>
+                                </Box>
+                            )}
                         </Grid>
                     </Grid>
                 ) : (
@@ -367,8 +471,39 @@ export default function MetaBlueprintWizard() {
                                                     onChange={(e) => setInput({ ...input, offerOrService: e.target.value })}
                                                     fullWidth
                                                     variant="outlined"
-                                                    sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
+                                                    sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' }, mb: 3 }}
                                                 />
+
+                                                <Stack direction="row" spacing={2}>
+                                                    <Box sx={{ flex: 1 }}>
+                                                        <Typography variant="body2" fontWeight="bold" sx={{ mb: 1 }}>{t('meta.form.budget') || 'Monthly Budget'}</Typography>
+                                                        <TextField
+                                                            type="number"
+                                                            value={input.budget}
+                                                            onChange={(e) => setInput({ ...input, budget: Number(e.target.value) })}
+                                                            fullWidth
+                                                            InputProps={{
+                                                                startAdornment: <Typography color="text.secondary" sx={{ mr: 1 }}>$</Typography>
+                                                            }}
+                                                            sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
+                                                        />
+                                                    </Box>
+                                                    <Box sx={{ flex: 1 }}>
+                                                        <Typography variant="body2" fontWeight="bold" sx={{ mb: 1 }}>{t('meta.form.objective') || 'Campaign Objective'}</Typography>
+                                                        <TextField
+                                                            select
+                                                            value={input.objective}
+                                                            onChange={(e) => setInput({ ...input, objective: e.target.value })}
+                                                            fullWidth
+                                                            SelectProps={{ native: true }}
+                                                            sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'background.default' } }}
+                                                        >
+                                                            <option value="Leads">Leads & Form Fills</option>
+                                                            <option value="Sales">Sales & Conversions</option>
+                                                            <option value="Awareness">Awareness & Reach</option>
+                                                        </TextField>
+                                                    </Box>
+                                                </Stack>
                                             </Box>
 
                                             <Box>

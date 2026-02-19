@@ -30,6 +30,7 @@ export const CampaignInputSchema = z.object({
     services: z.array(z.string()).min(1),
     offer: z.string().min(5),
     painPoints: z.array(z.string()).optional(),
+    landingPageUrl: z.string().url().optional(),
     geo: z.string().min(2), // e.g. "Austin, TX" or "United States"
 
     // Advanced Configuration (New in v4)

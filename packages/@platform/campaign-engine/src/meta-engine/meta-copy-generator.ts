@@ -6,6 +6,8 @@ export class MetaCopyGenerator {
 
     public generateCreative(input: CampaignInput, funnelStage: 'TOF' | 'MOF' | 'BOF'): MetaCreative {
         return {
+            name: `${funnelStage} - Legacy Creative`,
+            assetType: 'IMAGE' as const,
             primaryText: this.generatePrimaryText(input, funnelStage),
             headlines: this.generateHeadlines(input, funnelStage),
             descriptions: this.generateDescriptions(input, funnelStage),

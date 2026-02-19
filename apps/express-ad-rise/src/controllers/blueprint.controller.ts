@@ -56,7 +56,9 @@ export class BlueprintController {
                     unit: z.enum(['miles', 'km'])
                 }),
                 painPoints: z.array(z.string()),
-                landingPageUrl: z.union([z.string().url(), z.literal('')]).optional()
+                landingPageUrl: z.union([z.string().url(), z.literal('')]).optional(),
+                budget: z.number().optional().default(1500),
+                objective: z.enum(['Leads', 'Sales', 'Awareness']).optional().default('Leads')
             });
 
             const input = schema.parse(req.body);
@@ -73,8 +75,8 @@ export class BlueprintController {
                 geo: input.geoTargeting.center,
                 painPoints: input.painPoints || [],
                 landingPageUrl: input.landingPageUrl || '',
-                objective: 'Leads', // Fixed default for now
-                budget: 100, // Fixed default
+                objective: input.objective,
+                budget: input.budget,
                 currency: 'USD'
             });
 

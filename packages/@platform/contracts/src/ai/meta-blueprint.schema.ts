@@ -3,14 +3,14 @@ export interface MetaBlueprintInput {
     offerOrService: string;
     vertical: 'Local Service' | 'E-commerce' | 'SaaS' | 'Healthcare' | 'Other';
     geoTargeting: {
-        center: string; // "San Francisco, CA" or zip
-        radius: number; // in miles
+        center: string;
+        radius: number;
         unit: 'miles' | 'km';
     };
     painPoints: string[];
     landingPageUrl?: string;
-    budget?: number; // Added budget input
-    objective?: string; // Added objective input
+    budget?: number;
+    objective?: string;
 }
 
 export interface MetaGeoTargeting {
@@ -30,31 +30,35 @@ export interface MetaInterestCluster {
 }
 
 export interface MetaAudience {
-    type: 'Core' | 'Lookalike' | 'Custom' | 'Retargeting';
+    type: 'Core' | 'Broad' | 'Lookalike' | 'Retargeting' | 'Custom';
     name: string;
     funnelStage: 'TOF' | 'MOF' | 'BOF';
     geo?: MetaGeoTargeting;
     interests?: MetaInterestCluster[];
-    lookalike?: {
-        source: string;
-        percentage: number;
-    };
     retargeting?: {
         source: 'Website' | 'Instagram' | 'Facebook' | 'Video';
         windowDays: number;
         engagementType?: 'PageView' | 'AddToCart' | 'Purchase' | 'Engaged Shopper';
+        minAudienceSize?: number;
     };
     priorityScore?: number;
     audienceSizeEstimate?: number;
-    predictedValue?: number;
+    exclusions?: string[];
 }
 
 export interface MetaCreative {
-    primaryText: string[];
-    headlines: string[];
-    descriptions?: string[];
+    name?: string;
+    assetType: 'IMAGE' | 'VIDEO' | 'CAROUSEL';
+    primaryText: string[];   // Max 125 chars each
+    headlines: string[];     // Max 40 chars each
+    descriptions?: string[]; // Max 30 chars each
     callToAction: string;
     placementAssetCustomization?: Record<string, string>;
+    videoConcept?: {
+        sceneDescription: string;
+        hook: string;
+        callToAction: string;
+    };
 }
 
 export interface MetaAdSet {
@@ -66,12 +70,42 @@ export interface MetaAdSet {
         strategy: 'LowestCost' | 'CostCap';
     };
     placements: string[];
+    placementStrategy?: string;    // e.g. "Advantage+ Placements"
+    placementRationale?: string;   // Why this strategy was chosen
+    placementNotes?: string[];     // Actionable notes for the media buyer
     audience: MetaAudience;
     creatives: MetaCreative[];
     learningPhaseInfo?: {
         minDailyBudget: number;
         estimatedWeeklyEvents: number;
+        status?: 'Healthy' | 'Learning Limited' | 'Risk' | 'Pending';
     };
+    frequencyControl?: {
+        cap: number;
+        period: 'Day' | 'Week' | 'Lifetime';
+    };
+}
+
+export interface MetaCampaign {
+    name: string;
+    objective: 'OUTCOME_LEADS' | 'OUTCOME_SALES' | 'OUTCOME_AWARENESS';
+    buyingType: 'AUCTION';
+    budgetOptimization: 'CBO' | 'ABO';
+    totalBudget: number;
+    adSets: MetaAdSet[];
+}
+
+export type MetaBudgetTier = 'CONSOLIDATE' | 'STANDARD' | 'FULL_FUNNEL';
+
+export interface MetaBlueprintAIInsights {
+    optimizations: {
+        title: string;
+        detail: string;
+        priority: 'high' | 'medium' | 'low';
+    }[];
+    takeaways: string[];
+    overallScore?: number;   // 0-100 agency readiness score
+    scoreSummary?: string;
 }
 
 export interface MetaBlueprintOutput {
@@ -79,18 +113,15 @@ export interface MetaBlueprintOutput {
     objective: string;
     totalBudget: number;
     structure: {
-        prospecting: {
-            audiences: MetaAudience[];
-            adSets: MetaAdSet[];
-        };
-        retargeting: {
-            audiences: MetaAudience[];
-            adSets: MetaAdSet[];
-        };
+        prospecting: MetaCampaign;
+        retargeting: MetaCampaign;
     };
     recommendations: {
         budgetStrategy: string;
         dailySpend: number;
         learningPhaseEstimate: string;
+        warnings?: string[];
+        budgetTier?: MetaBudgetTier;
     };
+    aiInsights?: MetaBlueprintAIInsights;
 }

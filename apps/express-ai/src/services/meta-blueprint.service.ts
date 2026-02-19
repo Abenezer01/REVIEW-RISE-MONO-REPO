@@ -1,196 +1,128 @@
 import {
     MetaBlueprintInput,
     MetaBlueprintOutput,
-    MetaAudienceSet,
-    MetaInterestCluster,
-    MetaCopyVariation,
-    PlacementRecommendation
+    MetaBlueprintAIInsights,
 } from '@platform/contracts';
+import { MetaBlueprintEngine } from '@platform/campaign-engine';
+import { llmService } from './llm.service';
 
 export class MetaBlueprintService {
+
+    private engine = new MetaBlueprintEngine();
+
+    /**
+     * Generates a full Meta Blueprint:
+     * 1. Runs the deterministic engine for structure/audiences/copy/placements
+     * 2. Passes the result to the LLM to generate contextual AI insights
+     * 3. Returns both merged into a single response
+     */
     async generate(input: MetaBlueprintInput): Promise<MetaBlueprintOutput> {
-        const audiences = this.generateAudiences(input);
-        const interestClusters = this.generateInterestClusters(input);
-        const copyVariations = this.generateCopyVariations(input);
-        const placements = this.generatePlacements(input);
+        // --- Step 1: Deterministic Engine ---
+        const blueprint = this.engine.generateBlueprint({
+            businessName: input.businessName || 'Your Business',
+            services: [input.offerOrService],
+            offer: input.offerOrService,
+            vertical: (input.vertical === 'Other' ? 'Local Service' : input.vertical) as any,
+            geo: input.geoTargeting.center,
+            painPoints: input.painPoints || [],
+            landingPageUrl: input.landingPageUrl || '',
+            objective: (input.objective || 'Leads') as any,
+            budget: input.budget || 1500,
+            currency: 'USD',
+        } as any);
 
-        return {
-            audiences,
-            interestClusters,
-            copyVariations,
-            placements
-        };
-    }
-
-    private generateAudiences(input: MetaBlueprintInput): MetaAudienceSet[] {
-        const { geoTargeting } = input;
-
-        const prospecting: MetaAudienceSet = {
-            type: 'Prospecting',
-            name: `${input.vertical} Prospecting - ${geoTargeting.center}`,
-            demographics: {
-                ageRange: '25-55',
-                gender: 'All',
-                homeowners: input.vertical === 'Local Service',
-                languages: ['English']
-            },
-            geoLocations: [geoTargeting.center],
-            interests: ['Home & Living', 'Busy Professionals', 'Family & Parenting'],
-            estimatedReach: '150K - 200K',
-        };
-
-        const retargeting: MetaAudienceSet = {
-            type: 'Retargeting',
-            name: 'Warm Audiences - 30D',
-            demographics: {
-                ageRange: '30-55',
-                gender: 'All',
-                languages: ['English']
-            },
-            geoLocations: [geoTargeting.center],
-            customAudiences: [
-                'Website Visitors (30 days)',
-                'Facebook/Instagram engagers (90 days)'
-            ],
-            lookalikeSources: [
-                'Past Customers, active within 2+ years',
-                'Facebook/Instagram, active within 2+ years'
-            ],
-            estimatedReach: '5K - 10K',
-        };
-
-        return [prospecting, retargeting];
-    }
-
-    private generateInterestClusters(input: MetaBlueprintInput): MetaInterestCluster[] {
-        const clusters: MetaInterestCluster[] = [];
-
-        if (input.vertical === 'Local Service') {
-            clusters.push({
-                name: 'Home & Living',
-                theme: 'Home Improvement',
-                type: 'Primary',
-                interests: ['Home improvement', 'Interior design', 'Home organization', '+5 more'],
-                exclusions: ['Budget cleaning']
-            });
-            clusters.push({
-                name: 'Busy Professionals',
-                theme: 'Real Estate / Movers',
-                type: 'Secondary',
-                interests: ['Work-life balance', 'Time management', 'Productivity', '+4 more'],
-                exclusions: ['DIY cleaning', 'Job seeking']
-            });
-            clusters.push({
-                name: 'Family & Parenting',
-                theme: 'Competitors & Brands',
-                type: 'Secondary',
-                interests: ['Parenting', 'Busy activities', 'Child care', '+7 more'],
-                exclusions: []
-            });
-        } else if (input.vertical === 'E-commerce') {
-            clusters.push({
-                name: 'Shopping Behavior',
-                theme: 'Shopping Behavior',
-                type: 'Primary',
-                interests: ['Online shopping', 'Engaged shoppers', 'Luxury goods'],
-                exclusions: []
-            });
-            clusters.push({
-                name: 'Competitors & Brands',
-                theme: 'Likely Customers',
-                type: 'Secondary',
-                interests: ['Big Brands', 'Competitor A', 'Competitor B'],
-                exclusions: []
-            });
-            clusters.push({
-                name: 'Lifestyle & Hobbies',
-                theme: 'Audience Persona',
-                type: 'Secondary',
-                interests: ['Fashion', 'Gadgets', 'Trending Items'],
-                exclusions: ['Bargain hunters']
-            });
-        } else {
-            clusters.push({
-                name: 'Industry Interests',
-                theme: 'Industry Interests',
-                type: 'Primary',
-                interests: [input.offerOrService, 'Business', 'Entrepreneurship'],
-                exclusions: []
-            });
-            clusters.push({
-                name: 'Professional Development',
-                theme: 'Growth Mindset',
-                type: 'Secondary',
-                interests: ['Professional training', 'Workshops', 'Networking'],
-                exclusions: []
-            });
-            clusters.push({
-                name: 'Small Business Decision Makers',
-                theme: 'B2B Targeting',
-                type: 'Secondary',
-                interests: ['Small business owners', 'Admin admins', 'Management'],
-                exclusions: []
-            });
+        // --- Step 2: AI Insights Layer ---
+        let aiInsights: MetaBlueprintAIInsights | undefined;
+        try {
+            aiInsights = await this.generateAIInsights(input, blueprint);
+        } catch (e) {
+            console.error('[MetaBlueprintService] AI insights generation failed, returning without insights:', e);
         }
 
-        return clusters;
+        // --- Step 3: Merge and return ---
+        return {
+            ...blueprint,
+            aiInsights,
+        };
     }
 
-    private generateCopyVariations(input: MetaBlueprintInput): MetaCopyVariation[] {
-        // Safe lengths: Primary ~125, Headline ~40, Desc ~25
-        const variations: MetaCopyVariation[] = [
-            {
-                id: '1',
-                tone: 'Professional / Trust',
-                primaryText: `Looking for top-rated ${input.offerOrService} in ${input.geoTargeting.center}? We provide professional, reliable service you can count on. Book today!`,
-                headline: `Best ${input.offerOrService} in ${input.geoTargeting.center}`,
-                description: 'Licensed & Insured.',
-                ctas: ['Book Now', 'Learn More']
-            },
-            {
-                id: '2',
-                tone: 'Benefit-Focused',
-                primaryText: `Don't let ${input.painPoints[0] || 'problems'} stress you out. Our expert team handles ${input.offerOrService} quickly and efficiently. Get a free quote now.`,
-                headline: 'Fast & Affordable Service',
-                description: 'Free Quotes Available.',
-                ctas: ['Get Quote']
-            },
-            {
-                id: '3',
-                tone: 'Social Proof',
-                primaryText: `Join hundreds of happy neighbors in ${input.geoTargeting.center} who trust us for their ${input.offerOrService} needs. 5-star rated and ready to help!`,
-                headline: 'Rated 5 Stars Locally',
-                description: 'See our reviews.',
-                ctas: ['Contact Us']
-            }
-        ];
-        return variations;
-    }
+    /**
+     * Uses the LLM to analyze the deterministic blueprint and return
+     * actionable optimization notes and strategic takeaways.
+     */
+    private async generateAIInsights(
+        input: MetaBlueprintInput,
+        blueprint: MetaBlueprintOutput
+    ): Promise<MetaBlueprintAIInsights> {
+        const tier = blueprint.recommendations.budgetTier || 'UNKNOWN';
+        const dailySpend = blueprint.recommendations.dailySpend || 0;
+        const prospectingAdSets = blueprint.structure.prospecting.adSets.length;
+        const retargetingAdSets = blueprint.structure.retargeting.adSets.length;
+        const warnings = blueprint.recommendations.warnings || [];
 
-    private generatePlacements(_input: MetaBlueprintInput): PlacementRecommendation[] {
-        return [
-            {
-                platform: 'Facebook',
-                format: 'Feed',
-                objective: 'Awareness',
-                rationale: 'Core for detailed storytelling and information.',
-                recommended: true
-            },
-            {
-                platform: 'Instagram',
-                format: 'Stories',
-                objective: 'Conversion',
-                rationale: 'High intent, immersive full-screen experience.',
-                recommended: true
-            },
-            {
-                platform: 'Instagram',
-                format: 'Reels',
-                objective: 'Awareness',
-                rationale: 'Excellent for reaching new audiences via algorithm.',
-                recommended: true
-            }
-        ];
+        const summaryContext = `
+Business: ${input.businessName || 'Unknown'} | Vertical: ${input.vertical}
+Service: ${input.offerOrService}
+Location: ${input.geoTargeting.center} (${input.geoTargeting.radius} ${input.geoTargeting.unit})
+Monthly Budget: $${input.budget || 1500} | Daily: $${dailySpend.toFixed(2)}
+Campaign Objective: ${input.objective || 'Leads'}
+Budget Tier: ${tier}
+Structure:
+  - Prospecting: ${prospectingAdSets} ad set(s), $${blueprint.structure.prospecting.totalBudget.toFixed(0)}/mo
+  - Retargeting: ${retargetingAdSets > 0 ? `${retargetingAdSets} ad set(s), $${blueprint.structure.retargeting.totalBudget.toFixed(0)}/mo` : 'Locked (budget too low)'}
+Learning Phase: ${blueprint.recommendations.learningPhaseEstimate}
+Existing Warnings: ${warnings.length > 0 ? warnings.join(' | ') : 'None'}
+Pain Points Targeted: ${(input.painPoints || []).join(', ') || 'Not specified'}
+`;
+
+        const prompt = `
+You are a Senior Meta Ads Media Buyer and Strategist reviewing a client's campaign blueprint before launch.
+
+Blueprint Summary:
+${summaryContext}
+
+Your task: Provide a concise, expert-level review of this blueprint. Be specific, actionable, and direct. Think like an agency strategist reviewing this before a client call.
+
+Return a JSON object with exactly this shape:
+{
+  "optimizations": [
+    {
+      "title": "Short optimization title (max 8 words)",
+      "detail": "Specific, actionable recommendation (1-2 sentences max). Reference actual numbers from the blueprint where relevant.",
+      "priority": "high" | "medium" | "low"
+    }
+  ],
+  "takeaways": [
+    "1-sentence strategic observation about this blueprint (3-5 items)"
+  ],
+  "overallScore": <number 0-100 representing agency-readiness of this blueprint>,
+  "scoreSummary": "One sentence summary of the score rationale."
+}
+
+Rules:
+- Max 4 optimizations, prioritize the most impactful ones
+- Max 5 takeaways  
+- Score 90+ means ready to launch, 70-89 needs minor tweaks, below 70 needs work
+- Be specific to THIS blueprint — no generic advice
+- Do NOT repeat information already stated in warnings
+- If retargeting is locked, note when it unlocks and what to do until then
+`;
+
+        const result = await llmService.generateJSON<MetaBlueprintAIInsights>(prompt, { temperature: 0.4 });
+
+        // Validate and sanitize the response
+        return {
+            optimizations: (result.optimizations || []).slice(0, 4).map(o => ({
+                title: o.title || 'Optimization',
+                detail: o.detail || '',
+                priority: (['high', 'medium', 'low'].includes(o.priority) ? o.priority : 'medium') as 'high' | 'medium' | 'low'
+            })),
+            takeaways: (result.takeaways || []).slice(0, 5),
+            overallScore: typeof result.overallScore === 'number'
+                ? Math.min(100, Math.max(0, result.overallScore))
+                : undefined,
+            scoreSummary: result.scoreSummary,
+        };
     }
 }
 

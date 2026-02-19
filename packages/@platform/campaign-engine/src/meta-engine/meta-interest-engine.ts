@@ -1,69 +1,78 @@
 import { MetaInterestCluster } from '../schema/meta-plan';
 import { VERTICAL_PROFILES, VerticalType } from '../config/vertical-profiles';
 
+/**
+ * Generates STRICTLY SEPARATED interest clusters.
+ *
+ * Senior Media Buyer Rule: Internal competition kills delivery.
+ * Each cluster must be mutually exclusive via explicit exclusions.
+ *
+ * 3-Cluster Structure:
+ *   Cluster A — Intent:       Homeowners + Recently Moved (high-intent behavioral)
+ *   Cluster B — Topic:        Service/Renovation Interests (topic-based)
+ *   Cluster C — Broad:        No interests, 25mi radius, let Meta optimize
+ */
 export class MetaInterestEngine {
 
-    /**
-     * Generates a set of Interest Clusters for a given vertical.
-     * Strategies:
-     * 1. Core Vertical Interests (High Intent)
-     * 2. Broad Related Interests (Discovery)
-     * 3. Behavioral / Demographic (Qualifiers)
-     * 4. Competitor Proxies (if available/applicable)
-     */
     public generateClusters(vertical: VerticalType, baseAudienceSize: number): MetaInterestCluster[] {
-        const clusters: MetaInterestCluster[] = [];
         const profile = VERTICAL_PROFILES[vertical] || VERTICAL_PROFILES['Other' as VerticalType];
 
-        // Safety check for missing profile data
+        // Fallback: if no profile data, return pure broad only
         if (!profile.metaInterests || !profile.metaInterests.core) {
             return [{
-                theme: 'Broad Targeting',
-                interests: ['Small Business', 'Entrepreneurship'], // Safe fallback
-                audienceSizeEstimate: baseAudienceSize
+                theme: 'Broad — No Interests',
+                interests: [],
+                audienceSizeEstimate: baseAudienceSize,
+                predictedIntentScore: 3
             }];
         }
 
-        // 1. Core Cluster
+        const intentInterests = profile.metaInterests.core;
+        const topicInterests = profile.metaInterests.behaviors || [];
+
+        const clusters: MetaInterestCluster[] = [];
+
+        // ─────────────────────────────────────────────────────────────
+        // Cluster A — Intent
+        // Who: People actively searching for or engaging with this service
+        // Excludes: Topic interests (to prevent overlap with Cluster B)
+        // ─────────────────────────────────────────────────────────────
         clusters.push({
-            theme: `${vertical} Core`,
-            interests: profile.metaInterests.core,
-            exclusions: ['Competitors'],
-            audienceSizeEstimate: Math.round(baseAudienceSize * 0.45),
+            theme: 'Intent — Homeowners & High-Intent',
+            interests: intentInterests,
+            exclusions: topicInterests,   // Strict: exclude Cluster B's interests
+            audienceSizeEstimate: Math.round(baseAudienceSize * 0.25),
             predictedIntentScore: 9
         });
 
-        // 2. Broad Cluster
-        if (profile.metaInterests.broad && profile.metaInterests.broad.length > 0) {
+        // ─────────────────────────────────────────────────────────────
+        // Cluster B — Topic / Renovation Interests
+        // Who: People interested in home improvement, renovation, etc.
+        // Excludes: Intent interests (to prevent overlap with Cluster A)
+        // ─────────────────────────────────────────────────────────────
+        if (topicInterests.length > 0) {
             clusters.push({
-                theme: 'Broad / Related Topics',
-                interests: profile.metaInterests.broad,
-                audienceSizeEstimate: Math.round(baseAudienceSize * 0.65),
-                predictedIntentScore: 5
+                theme: 'Topic — Renovation & Service Interests',
+                interests: topicInterests,
+                exclusions: intentInterests,  // Strict: exclude Cluster A's interests
+                audienceSizeEstimate: Math.round(baseAudienceSize * 0.40),
+                predictedIntentScore: 6
             });
         }
 
-        // 3. Behavioral Cluster
-        if (profile.metaInterests.behaviors && profile.metaInterests.behaviors.length > 0) {
-            clusters.push({
-                theme: 'High Interaction Behaviors',
-                interests: profile.metaInterests.behaviors,
-                audienceSizeEstimate: Math.round(baseAudienceSize * 0.35),
-                predictedIntentScore: 7
-            });
-        }
-
-        // 4. Combined 'Super' Cluster (Core + Behavior) if we have both
-        if (profile.metaInterests.core.length > 0 && profile.metaInterests.behaviors.length > 0) {
-            clusters.push({
-                theme: 'Core + Behavioral Layer',
-                interests: [...profile.metaInterests.core, ...profile.metaInterests.behaviors],
-                audienceSizeEstimate: Math.round(baseAudienceSize * 0.25), // Narrower because we might intersect in ad manager, but here we list them. 
-                // Note: Meta treats lists as OR usually. Stacked interests is different. 
-                // For now, we assume this is a standard OR list to see which signals work better.
-                predictedIntentScore: 8
-            });
-        }
+        // ─────────────────────────────────────────────────────────────
+        // Cluster C — Broad
+        // Who: No interest targeting — let Meta's algorithm find buyers
+        // Excludes: ALL interests from A and B (pure broad signal)
+        // Senior note: This is often the best performer with strong creative
+        // ─────────────────────────────────────────────────────────────
+        clusters.push({
+            theme: 'Broad — No Interests (Algorithm-Led)',
+            interests: [],  // Empty = pure broad
+            exclusions: [...intentInterests, ...topicInterests],
+            audienceSizeEstimate: Math.round(baseAudienceSize * 0.80),
+            predictedIntentScore: 4
+        });
 
         return clusters;
     }

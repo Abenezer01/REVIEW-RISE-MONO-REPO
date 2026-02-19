@@ -85,6 +85,8 @@ export class MetaRetargetingEngine {
 
         if (context === 'Abandoned Cart') {
             return {
+                name: 'Retargeting - Abandoned Cart',
+                assetType: 'IMAGE' as const,
                 primaryText: [
                     `Did you forget something? Your ${input.services[0]} is waiting! Complete your order now before it sells out.`,
                     `Come back and get ${offer}. We saved your cart for you!`,
@@ -101,6 +103,8 @@ export class MetaRetargetingEngine {
 
         // General Retargeting (Website Visitors) - Testimonials & Urgency
         return {
+            name: 'Retargeting - General',
+            assetType: 'IMAGE' as const,
             primaryText: [
                 `Still thinking about it? See why ${input.geo} locals rate ${business} 5 stars. ⭐⭐⭐⭐⭐`,
                 `Ready to move forward? Claim your ${offer} today. Spots are filling up fast!`,

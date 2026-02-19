@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@platform/campaign-engine": "workspace:*",
     "@platform/contracts": "workspace:*",
     "@platform/db": "workspace:*",
     "@platform/middleware": "workspace:*",
