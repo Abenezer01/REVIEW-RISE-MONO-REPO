@@ -34,8 +34,8 @@ describe('Blueprint Engine V4 Integration', () => {
 
         const serviceCluster = plan.keywordClusters?.find(c => c.intentType === 'Service');
         expect(serviceCluster).toBeDefined();
-        expect(serviceCluster?.keywords).toContain('Plumbing');
-        expect(serviceCluster?.keywords.some(k => k.includes('Austin'))).toBe(true);
+        expect(serviceCluster?.keywords).toContain('plumbing');
+        expect(serviceCluster?.keywords.some(k => k.includes('austin'))).toBe(true);
     });
 
     it('should generate negative keywords', async () => {
