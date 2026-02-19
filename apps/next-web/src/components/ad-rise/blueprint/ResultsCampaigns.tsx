@@ -3,7 +3,6 @@
 import React from 'react';
 import {
     Box,
-    Card,
     Chip,
     Stack,
     Typography,
@@ -76,7 +75,7 @@ export default function ResultsCampaigns({ campaigns }: Props) {
                                 </Stack>
                                 <Chip
                                     icon={<Percent style={{ fontSize: 16 }} />}
-                                    label={`${campaign.budgetRecommendation} Budget`}
+                                    label={`${campaign.budgetRecommendation} ${t('results.totalBudget')}`}
                                     size="small"
                                     color="secondary"
                                     variant="outlined"
@@ -87,7 +86,7 @@ export default function ResultsCampaigns({ campaigns }: Props) {
                             <Grid container spacing={2} alignItems="center">
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                                        Objective
+                                        {t('results.adGroups.objective')}
                                     </Typography>
                                     <Typography variant="body2" fontWeight="500">
                                         {campaign.objective}
@@ -97,7 +96,7 @@ export default function ResultsCampaigns({ campaigns }: Props) {
                                     <Stack direction="row" alignItems="center" spacing={1}>
                                         <GroupWork fontSize="small" color="action" />
                                         <Typography variant="body2">
-                                            {campaign.adGroups?.length || 0} Ad Groups Included
+                                            {t('results.adGroups.included', { count: campaign.adGroups?.length || 0 })}
                                         </Typography>
                                     </Stack>
                                 </Grid>
@@ -108,14 +107,14 @@ export default function ResultsCampaigns({ campaigns }: Props) {
                                 <Box sx={{ mt: 2 }}>
                                     <Divider sx={{ mb: 1, borderStyle: 'dashed' }} />
                                     <Typography variant="caption" color="text.secondary">
-                                        Ad Groups Summary:
+                                        {t('results.adGroups.summary')}
                                     </Typography>
                                     <Stack direction="row" flexWrap="wrap" gap={1} mt={1}>
                                         {campaign.adGroups.slice(0, 5).map((ag, i) => (
                                             <Chip key={i} label={ag.name} size="small" />
                                         ))}
                                         {campaign.adGroups.length > 5 && (
-                                            <Chip label={`+${campaign.adGroups.length - 5} more`} size="small" variant="outlined" />
+                                            <Chip label={`+${campaign.adGroups.length - 5} ${t('results.adGroups.more')}`} size="small" variant="outlined" />
                                         )}
                                     </Stack>
                                 </Box>

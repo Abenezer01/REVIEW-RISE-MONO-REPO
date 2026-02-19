@@ -88,7 +88,13 @@
     "library": {
       "comingSoon": "المكتبة الإبداعية قريباً",
       "description": "احفظ أفضل مفاهيمك وأعد استخدامها لاحقاً. هذه الميزة قيد التطوير حالياً.",
-      "browse": "تصفح المكتبة"
+      "browse": "تصفح المكتبة",
+      "fetchError": "فشل جلب المكتبة الإبداعية",
+      "retry": "إعادة المحاولة",
+      "emptyTitle": "مكتبتك فارغة",
+      "emptyDescription": "قم بتوليد وحفظ مفاهيم إبداعية لتراها هنا.",
+      "refresh": "تحديث",
+      "reuse": "إعادة استخدام المفهوم"
     }
   },
   "blueprint": {
@@ -110,25 +116,44 @@
       "memo": "📝",
       "caret": "▼",
       "key": "🔑",
-      "block": "🚫"
+      "block": "🚫",
+      "target": "🎯",
+      "lightbulb": "💡",
+      "rocket": "🚀",
+      "stop": "🛑",
+      "fire": "🔥"
     },
     "steps": {
       "campaignDetails": "تفاصيل الحملة",
       "generate": "إنشاء المخطط",
-      "review": "المراجعة والتصدير"
+      "review": "المراجعة والتصدير",
+      "details": "تفاصيل الحملة",
+      "results": "نتائج المخطط"
     },
     "form": {
       "businessInfo": "معلومات العمل",
       "required": "مطلوب",
+      "businessName": "اسم العمل",
+      "businessNamePlaceholder": "مثال: محترفو السباكة في أوستن",
       "offerService": "العرض / الخدمات",
       "offerServicePlaceholder": "خدمات سباكة متميزة - طوارئ وإصلاحات",
       "offerServiceHelp": "ما هي المنتجات أو الخدمات التي تروج لها؟",
+      "servicesOffered": "الخدمات المقدمة",
+      "servicesHelp": "أضف الخدمات الرئيسية التي تقدمها (مثال: السباكة، إصلاح سخانات المياه)",
+      "enterService": "أدخل خدمة",
+      "add": "إضافة",
+      "specialOffer": "عرض خاص أو ترويج",
+      "specialOfferHelp": "ما الذي يجعل عرضك جذاباً؟ (مثال: \"خصم 10% على أول خدمة\")",
+      "specialOfferPlaceholder": "مثال: استشارة مجانية، خصم 10%",
+      "monthlyBudget": "الميزانية الشهرية ($)",
+      "campaignObjective": "هدف الحملة",
       "industryVertical": "قطاع العمل",
       "targetingKeywords": "الاستهداف والكلمات الرئيسية",
       "geoTargeting": "الاستهداف الجغرافي",
+      "geoTargetingTitle": "الموقع الجغرافي",
       "geoTargetingPlaceholder": "دبي، الإمارات العربية المتحدة",
       "geoTargetingHelp": "أدخل المدن أو المناطق التي تخدمها",
-      "add": "إضافة",
+      "geoTargetingInputHelp": "أدخل موقعك المستهدف الرئيسي (مثال: \"دبي، الإمارات\" أو \"السعودية\")",
       "painPoints": "نقاط ألم العملاء",
       "painPointsPlaceholder": "مشاكل السباكة الطارئة، تسرب المواسير، انفجار المواسير، انسداد المصارف...",
       "painPointsHelp": "ما هي المشاكل التي يواجهها عملاؤك؟ (يساعد في إنشاء كلمات رئيسية تركز على المشكلة)",
@@ -143,7 +168,16 @@
         "ecommerce": "تجارة إلكترونية",
         "saas": "برمجيات كخدمة",
         "healthcare": "رعاية صحية",
+        "realEstate": "عقارات",
+        "legal": "قانوني",
+        "restaurant": "مطعم",
         "other": "أخرى"
+      },
+      "objectives": {
+        "Leads": "عملاء محتملون",
+        "Sales": "مبيعات",
+        "Awareness": "وعي",
+        "Local Visits": "زيارات محلية"
       }
     },
     "generate": {
@@ -154,6 +188,11 @@
       "service": "الخدمة:",
       "vertical": "القطاع:",
       "locations": "المواقع:",
+      "location": "الموقع:",
+      "businessName": "اسم العمل:",
+      "offer": "العرض:",
+      "budget": "الميزانية:",
+      "objective": "الهدف:",
       "painPoints": "نقاط الألم:",
       "button": "إنشاء مخطط كامل",
       "continue": "استمرار"
@@ -175,19 +214,37 @@
         "exportable": "تنسيق JSON قابل للتصدير"
       },
       "quickStart": "قوالب البدء السريع",
+      "quickStartHelp": "ابدأ بشكل أسرع مع أمثلة صناعية معبأة مسبقاً",
+      "clickTemplateHelp": "💡 انقر على أي قالب لملء النموذج تلقائياً",
       "templates": {
         "emergency": "خدمات الطوارئ",
         "emergencyDesc": "كلمات رئيسية للخدمات العاجلة 24/7",
         "local": "محترف خدمات محلية",
         "localDesc": "حملات مستهدفة جغرافياً",
         "competitor": "استهداف المنافسين",
-        "competitorDesc": "جذب زيارات المنافسين"
+        "competitorDesc": "جذب زيارات المنافسين",
+        "tipTitle": "نصيحة:",
+        "tipText": "القوالب هي مجرد نقاط بداية - يمكنك تعديل جميع الحقول بعد اختيار واحد منها"
       },
-      "use": "استخدام"
+      "use": "استخدام",
+      "useArrow": "استخدام ←",
+      "services": "خدمات"
     },
     "results": {
       "successTitle": "مخطط إعلانات جوجل الخاص بك جاهز",
       "successText": "راجع هيكل حملتك والكلمات الرئيسية ونصوص الإعلانات أدناه",
+      "strategyTitle": "النهج الاستراتيجي",
+      "campaignGoal": "هدف الحملة",
+      "bidStrategy": "استراتيجية المزايدة",
+      "vertical": "التركيز القطاعي",
+      "totalBudget": "الميزانية الشهرية",
+      "budgetTier": "المستوى: {tier}",
+      "clickCapacity": "النقرات الشهرية المقدرة",
+      "clickCapacitySub": "بناءً على سعر النقرة في السوق",
+      "assumedCpc": "سعر النقرة المفترض",
+      "campaignCount": "هيكل الحملة",
+      "campaignCountSub": "الحملات الموصى بها",
+      "campaignStructureTitle": "هيكل الحملة",
       "noBlueprint": "لم يتم إنشاء مخطط بعد.",
       "exportCsv": "تصدير CSV",
       "exportGoogleAds": "تصدير إلى إعلانات جوجل",
@@ -209,14 +266,33 @@
         "headlines": "العناوين ({count})",
         "descriptions": "الأوصاف ({count})",
         "copyAll": "نسخ الكل",
-        "copyLabel": "نسخ"
+        "copyLabel": "نسخ",
+        "copied": "تم نسخ {label} إلى الحافظة!",
+        "objective": "الهدف",
+        "included": "تم تضمين {count} مجموعات إعلانية",
+        "summary": "ملخص المجموعات الإعلانية:",
+        "more": "أخرى",
+        "budgetLabel": "الميزانية",
+        "monthlyLabel": "شهرياً",
+        "leadsLabel": "عملاء محتملون",
+        "cpaLabel": "تكلفة الاكتساب",
+        "lowVolume": "حجم منخفض",
+        "allHeadlines": "جميع العناوين",
+        "allDescriptions": "جميع الأوصاف",
+        "headlinePrefix": "عنوان",
+        "descriptionPrefix": "وصف",
+        "estimatedConversions": "تحويلات مقدرة",
+        "estimatedCpa": "تكلفة اكتساب مقدرة",
+        "learningPhase": "مرحلة التعلم",
+        "status": "الحالة"
       },
       "negatives": {
         "title": "الكلمات الرئيسية السلبية",
         "subtitle": "{count} كلمة رئيسية لمنع إهدار الإنفاق الإعلاني",
         "copyAll": "نسخ الكل",
         "copy": "نسخ",
-        "tip": "نصيحة: أضف هذه الكلمات الرئيسية السلبية إلى حملتك لمنع ظهور إعلاناتك لعمليات بحث غير ذات صلة وتوفير ميزانيتك للزيارات المؤهلة."
+        "tipTitle": "نصيحة:",
+        "tipText": "أضف هذه الكلمات الرئيسية السلبية إلى حملتك لمنع ظهور إعلاناتك لعمليات بحث غير ذات صلة وتوفير ميزانيتك للزيارات المؤهلة."
       },
       "landingPage": {
         "title": "تحليل الصفحة المقصودة",
@@ -229,13 +305,27 @@
         "checklist": "قائمة فحص الصفحة",
         "mobileOptimized": "محسنة للجوال",
         "trustSignals": "إشارات الثقة المكتشفة ({count})",
-        "missingElements": "عناصر الثقة الموصى بها ({count})"
+        "missingElements": "عناصر الثقة الموصى بها ({count})",
+        "metrics": {
+          "qualityScore": "درجة جودة إعلانات جوجل",
+          "qualityScoreHelp": "متوقع بناءً على الملاءمة، نسبة النقر إلى الظهور، ومنطق الخبرة.",
+          "conversionReadiness": "جاهزية التحويل",
+          "conversionFriction": "احتكاك التحويل",
+          "strategicRecommendations": "توصيات استراتيجية",
+          "trustAuthority": "الثقة والسلطة",
+          "optimizationGaps": "فجوات التحسين"
+        }
       }
     },
     "common": {
       "back": "رجوع",
       "passed": "نجح",
-      "failed": "فشل"
+      "failed": "فشل",
+      "disclaimer": {
+        "title": "تنبيه هام",
+        "message": "هذا المخطط هو للإرشاد فقط. قد تختلف النتائج بناءً على قطاع عملك والمنافسة والميزانية. راجع دائماً جميع التوصيات مقابل سياسات الإعلان الخاصة بالمنصة قبل التنفيذ.",
+        "show": "عرض إخلاء مسؤولية الإرشاد"
+      }
     },
     "meta": {
       "title": "مولد خطة إعلانات ميتا",
@@ -244,6 +334,17 @@
         "businessInfo": "معلومات العمل",
         "geoTargeting": "الاستهداف الجغرافي",
         "results": "خطتك"
+      },
+      "stages": {
+        "TOF": "أعلى القمع (الوعي)",
+        "MOF": "منتصف القمع (الاعتبار)",
+        "BOF": "أسفل القمع (التحويل)"
+      },
+      "quickTemplates": {
+        "title": "قوالب البدء السريع",
+        "subtitle": "ابدأ بشكل أسرع مع أمثلة صناعية معبأة مسبقاً",
+        "tip": "نصيحة:",
+        "tipText": "القوالب هي مجرد نقاط بداية - يمكنك تعديل جميع الحقول بعد اختيار واحد منها"
       },
       "form": {
         "businessName": "اسم العمل (اختياري)",
@@ -256,6 +357,9 @@
           "ecommerce": "تجارة إلكترونية",
           "saas": "برمجيات كخدمة",
           "healthcare": "رعاية صحية",
+          "realEstate": "عقارات",
+          "legal": "قانوني",
+          "restaurant": "مطعم",
           "other": "أخرى"
         },
         "geoCenter": "الموقع المستهدف",
@@ -268,7 +372,25 @@
         "painPoints": "نقاط ألم العملاء (اختياري)",
         "painPointsPlaceholder": "مثال: أنابيب منفجرة، مصارف مسدودة",
         "landingPageUrl": "رابط الصفحة المقصودة (اختياري)",
-        "landingPageUrlPlaceholder": "https://example.com"
+        "landingPageUrlPlaceholder": "https://example.com",
+        "addPainPoint": "إضافة نقطة ألم",
+        "templates": {
+          "plumbing": "خدمة سباكة",
+          "law": "مكتب محاماة",
+          "dentist": "عيادة أسنان",
+          "restaurant": "مطعم",
+          "saas": "منتج برمجيات",
+          "ecommerce": "متجر إلكتروني",
+          "roofing": "خدمة تسقيف"
+        },
+        "algorithmsOverTargeting": "الخوارزميات فوق الاستهداف",
+        "consolidateModeDesc": "في وضع الدمج (100 دولار شهرياً)، نتخطى مجموعات اهتمامات معينة لمنح ذكاء ميتا الاصطناعي أقصى قدر من الحرية. يبدأ استهداف اهتمامات معينة في",
+        "standardTier": "المستوى القياسي (600+ دولار شهرياً)",
+        "objectives": {
+          "Leads": "العملاء المحتملون ونماذج البيانات",
+          "Sales": "المبيعات والتحويلات",
+          "Awareness": "الوعي والوصول"
+        }
       },
       "buttons": {
         "next": "التالي",
@@ -283,14 +405,26 @@
           "audiences": "مجموعات الجمهور",
           "interests": "مجموعات الاهتمامات",
           "adCopy": "نسخ الإعلانات",
-          "placements": "توصيات المواضع"
+          "placements": "توصيات المواضع",
+          "estDailySpend": "الإنفاق اليومي المقدر: {amount}$",
+          "budgetStrategy": "الاستراتيجية: {strategy}",
+          "aiAnalysis": "تحليل الذكاء الاصطناعي",
+          "agencyReadiness": "جاهزية الوكالة",
+          "potentialOptimizations": "تحسينات محتملة",
+          "keyTakeaways": "أهم الملاحظات"
+        },
+        "priorities": {
+          "high": "أولوية عالية",
+          "medium": "للنظر",
+          "low": "من الجيد توفره"
         },
         "benefits": {
           "coreAudiences": "تعريفات الجمهور الأساسية",
           "interestClusters": "توصيات مجموعات الاهتمامات",
           "optimizedCopy": "تنويعات نصوص إعلانية محسنة",
           "placementStrategy": "دليل استراتيجية الموضع",
-          "exportReady": "تنسيق JSON جاهز للتصدير"
+          "exportReady": "تنسيق JSON جاهز للتصدير",
+          "combinedAudiences": "{prospecting} + {retargeting}"
         },
         "audiences": {
           "prospecting": "التنقيب (حركة باردة)",
@@ -301,9 +435,26 @@
           "gender": "الجنس",
           "languages": "اللغات",
           "geoLocations": "المواقع الجغرافية",
+          "geoTarget": "الاستهداف الجغرافي",
           "interests": "الاهتمامات",
+          "interestCluster": "مجموعة الاهتمامات:",
+          "excludes": "يستثني:",
+          "algorithmLed": "استهداف تقوده الخوارزمية",
+          "algorithmLedDesc": "— لا توجد قيود على الاهتمامات. ميتا يجد المشترين.",
           "customAudiences": "الجماهير المخصصة",
-          "lookalikeSources": "مصادر الجماهير المشابهة"
+          "lookalikeSources": "مصادر الجماهير المشابهة",
+          "geo": "الاستهداف الجغرافي",
+          "retargetingSource": "مصدر إعادة الاستهداف",
+          "size": "الحجم المقدر",
+          "predictedValue": "القيمة المتوقعة",
+          "days": "أيام",
+          "minAudience": "الحد الأدنى للجمهور:",
+          "pausesIfBelow": "(يتوقف إذا كان أقل)",
+          "estAudienceSize": "حجم الجمهور المقدر",
+          "prospectingCampaign": "حملة التنقيب —",
+          "retargetingCampaign": "حملة إعادة الاستهداف — ABO (دائماً)",
+          "retargetingLocked": "إعادة الاستهداف مقفلة — تتطلب 1,500+ دولار شهرياً",
+          "retargetingLockedDesc": "بميزانيتك الحالية، ستؤدي إعادة الاستهداف إلى إرهاق الجمهور قبل توليد إشارة كافية. زد الميزانية لفتح هيكل القمع الكامل."
         },
         "interests": {
           "primary": "أساسي",
@@ -311,14 +462,17 @@
           "exclusions": "الاستثناءات",
           "includedInterests": "الاهتمامات المتضمنة",
           "interestsCount": "{count} اهتمامات",
-          "more": "+{count} أخرى"
+          "more": "+{count} أخرى",
+          "intentScore": "درجة النية: {score}/10"
         },
         "adCopy": {
           "variation": "نسخة",
           "primaryText": "النص الأساسي",
           "headline": "العنوان",
           "description": "الوصف",
+          "for": "لـ",
           "ctas": "دعوات اتخاذ إجراء",
+          "callToAction": "دعوة لاتخاذ إجراء",
           "tone": "النبرة",
           "compliant": "متوافق مع إعلانات ميتا",
           "characterLimits": "دليل حدود الأحرف",
@@ -345,7 +499,9 @@
             "Awareness": "الوعي",
             "Traffic": "حركة المرور",
             "Conversion": "التحويل"
-          }
+          },
+          "strategyLabel": "الاستراتيجية:",
+          "strategyText": "المواضع المختارة لتعظيم {goal} لمرحلة الجمهور هذه."
         }
       },
       "loading": "جاري إنشاء خطة إعلانات ميتا الخاصة بك...",
