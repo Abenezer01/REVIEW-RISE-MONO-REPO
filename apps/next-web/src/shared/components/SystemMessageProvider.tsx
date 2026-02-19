@@ -90,6 +90,11 @@ export const SystemMessageProvider: React.FC<{ children: React.ReactNode }> = ({
       finalOptions = options;
     }
 
+    // Suppress noisy generic success toasts like "Operation successful".
+    if (code === 'SUCCESS' || code === 'GENERIC_SUCCESS') {
+      return;
+    }
+
     const severity = finalOptions.severity || DefaultSeverityMap[code as SystemMessageCode] || SystemMessageSeverity.INFO;
     const variant = finalOptions.variant || 'TOAST';
     const message = getMessage(code as any, finalOptions.params);

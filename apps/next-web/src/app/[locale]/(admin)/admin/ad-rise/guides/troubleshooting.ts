@@ -54,10 +54,10 @@ export const TROUBLESHOOTING_FLOWS: TroubleshootingNode[] = [
         issue: 'Low Impressions',
         suggestion: 'Broaden your horizon or increase visibility.',
         steps: [
-            'Increase your Daily Budget.',
-            'Change Keyword Match types from Exact to Phrase or Broad.',
-            'Check if your targeting location is too small.',
-            'Increase your Max CPC bid (Google) or Bid Cap (Meta).',
+            'Broaden targeting: expand geo, audience size, or age constraints if currently too narrow.',
+            'Broaden keywords: move some terms from Exact to Phrase/Broad where relevant.',
+            'Raise bids: increase Max CPC (Google) or Bid Cap (Meta) to improve auction competitiveness.',
+            'Increase daily budget if campaigns are budget-limited and stopping delivery early.',
         ],
     },
     {
@@ -65,10 +65,11 @@ export const TROUBLESHOOTING_FLOWS: TroubleshootingNode[] = [
         issue: 'High CPC / Cost Per Result',
         suggestion: 'Focus on efficiency and quality.',
         steps: [
-            'Improve Ad Relevance (headlines must match keywords).',
-            'Add Negative Keywords (Google) to filter out high-cost, low-intent traffic.',
+            'Tighten intent: pause broad low-intent terms/audiences and focus on high-intent segments.',
+            'Add negative keywords (Google) to block expensive irrelevant traffic.',
+            'Improve Quality Score proxies: better ad-to-keyword relevance, stronger CTR signals, faster and more relevant landing page experience.',
             'Test a new Creative/Image on Meta to resolve "Creative Fatigue".',
-            'Check Landing Page load speed and mobile experience.',
+            'Check landing page speed and mobile UX to reduce bounce and improve post-click quality.',
         ],
     },
     {

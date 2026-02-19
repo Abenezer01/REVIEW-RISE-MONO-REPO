@@ -6,7 +6,6 @@ import type { ReactNode } from 'react'
 import { redirect } from 'next/navigation'
 
 import { getServerUser } from '@/utils/serverAuth'
-import { ROLES } from '@/configs/roles'
 
 type Props = {
   children: ReactNode
@@ -14,9 +13,8 @@ type Props = {
 }
 
 /**
- * Admin section layout with server-side route protection.
- * Guards all `/[locale]/admin/*` pages by verifying the authenticated user's role.
- * Non-admin users are redirected to the localized dashboard with a `forbidden` flag.
+ * Admin section layout with server-side auth protection.
+ * Route-level role authorization is handled by middleware/menu rules.
  */
 const AdminSectionLayout = async (props: Props) => {
   const { children, params } = props
@@ -24,9 +22,9 @@ const AdminSectionLayout = async (props: Props) => {
 
   const user = await getServerUser()
 
-  // Enforce admin-only access
-  if (!user || user.role !== ROLES.ADMIN) {
-    redirect(`/${locale}/dashboard?error=forbidden`)
+  // Require authentication; middleware handles per-route role authorization.
+  if (!user) {
+    redirect(`/${locale}/login?returnUrl=/admin`)
   }
 
   return <>{children}</>

@@ -9,11 +9,11 @@ export const usePermissions = () => {
   const { businessId, loading: businessLoading } = useBusinessId();
   const { user: globalUser } = useAuth();
 
-  // Fetch roles for the current user in this business
+  // Fetch roles for the current user in this business without limit
   const { data: roleData, isLoading: roleLoading } = useApiGet<any>(
     ['user-business-role', businessId || ''],
     `${SERVICES_CONFIG.admin.url}/user-business-roles`,
-    { businessId, limit: 1 },
+    { businessId }, // Removed limit: 1 to get ALL roles
     { enabled: !!businessId }
   );
 
@@ -21,28 +21,60 @@ export const usePermissions = () => {
 
   // 1. Check workspace-specific role from DB
   // Note: apiClient automatically unwraps the response, so roleData is the array of roles
-  const roles = Array.isArray(roleData) ? roleData : (roleData as any)?.data || [];
-  let userRole: WorkspaceRole = (roles?.[0]?.role?.name?.toLowerCase() || 'viewer') as WorkspaceRole;
+  const rolesRaw = Array.isArray(roleData) ? roleData : (roleData as any)?.data || [];
+
+  // Map roles to permission levels (higher is better)
+  const roleLevels: Record<string, number> = {
+    'owner': 4,
+    'admin': 3,
+    'editor': 2,
+    'manager': 2, // Manager = Editor level
+    'viewer': 1
+  };
+
+  let maxLevel = 0;
+  let userRole: WorkspaceRole = 'viewer';
+
+  // Iterate through all roles to find the highest permission
+  if (rolesRaw && rolesRaw.length > 0) {
+    rolesRaw.forEach((r: any) => {
+      const roleName = r.role?.name?.toLowerCase() || 'viewer';
+      const level = roleLevels[roleName] || 1;
+
+      if (level > maxLevel) {
+        maxLevel = level;
+
+        // Map manager to editor for the type system
+        if (roleName === 'manager') {
+          userRole = 'editor';
+        } else if (['owner', 'admin', 'editor', 'viewer'].includes(roleName)) {
+          userRole = roleName as WorkspaceRole;
+        }
+      }
+    });
+  }
 
   // 2. If the user is a Global Admin (from JWT), elevate their permissions to 'admin'
   // even if they don't have a specific role assigned in this business yet.
-  const isGlobalAdmin = 
-    globalUser?.roles?.includes('Admin') || 
+  const isGlobalAdmin =
+    globalUser?.roles?.includes('Admin') ||
     globalUser?.role?.toLowerCase() === 'admin' ||
     globalUser?.role === 'Admin' ||
     globalUser?.permissions?.includes('admin');
 
-  if (isGlobalAdmin && userRole === 'viewer') {
+  if (isGlobalAdmin && maxLevel < 3) {
+    maxLevel = 3;
     userRole = 'admin';
   }
 
-  const isOwner = userRole === 'owner';
-  const isAdmin = userRole === 'admin';
-  const isEditor = userRole === 'editor';
-  const isViewer = userRole === 'viewer';
+  // Use numeric levels for robust permission checks
+  const isOwner = maxLevel >= 4;
+  const isAdmin = maxLevel >= 3;
+  const isEditor = maxLevel >= 2; // Includes 'manager' logic
+  const isViewer = maxLevel >= 1;
 
-  const canEdit = isOwner || isAdmin || isEditor;
-  const canRegenerate = isOwner || isAdmin || isEditor;
+  const canEdit = isEditor;
+  const canRegenerate = isEditor;
   const canView = true;
   const canExport = true;
 
