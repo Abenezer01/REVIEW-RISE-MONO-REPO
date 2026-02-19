@@ -139,7 +139,7 @@ export default function ResultsKeywords({ clusters }: Props) {
                                                 <Chip
                                                     label={cluster.funnelStage}
                                                     size="small"
-                                                    icon={cluster.funnelStage === 'BOF' ? <span>🔥</span> : undefined}
+                                                    icon={cluster.funnelStage === 'BOF' ? <span>{t('icons.fire')}</span> : undefined}
                                                     sx={{
                                                         fontWeight: 500,
                                                         bgcolor: cluster.funnelStage === 'BOF' ? alpha(theme.palette.error.main, 0.1) :

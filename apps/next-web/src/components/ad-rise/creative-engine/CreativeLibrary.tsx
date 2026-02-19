@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Typography, Paper, Button, Grid, CircularProgress, Alert } from '@mui/material';
 import type { CreativeConcept } from '@platform/contracts';
 import { AutoAwesome, Refresh } from '@mui/icons-material';
@@ -19,14 +19,16 @@ export default function CreativeLibrary({ businessId, onReuse }: CreativeLibrary
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchLibrary = async () => {
+    const fetchLibrary = useCallback(async () => {
         if (!businessId) return;
         setLoading(true);
         setError(null);
+
         try {
             const response = await apiClient.get('/api/ai/creative-engine/library', {
                 params: { businessId }
             });
+
             setConcepts(response.data.concepts || []);
         } catch (err) {
             console.error('Failed to fetch library', err);
@@ -34,13 +36,13 @@ export default function CreativeLibrary({ businessId, onReuse }: CreativeLibrary
         } finally {
             setLoading(false);
         }
-    };
+    }, [businessId, t]);
 
     useEffect(() => {
         if (businessId) {
             fetchLibrary();
         }
-    }, [businessId]);
+    }, [businessId, fetchLibrary]);
 
     if (!businessId) {
         return (
@@ -92,11 +94,12 @@ export default function CreativeLibrary({ businessId, onReuse }: CreativeLibrary
             </Box>
             <Grid container spacing={3}>
                 {concepts.map((concept) => (
-                    <Grid item xs={12} md={6} xl={4} key={concept.id}>
+                    <Grid size={{ xs: 12, md: 6, xl: 4 }} key={concept.id}>
                         <ConceptResultCard
                             concept={concept}
                             onGenerateImage={() => { }} // Library likely doesn't regenerate images yet, or reuse logic needed
                             isGeneratingImage={false}
+
                         // No save button in library view
                         />
                         <Box sx={{ mt: 1, textAlign: 'right' }}>

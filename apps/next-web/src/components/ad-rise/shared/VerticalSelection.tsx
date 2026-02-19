@@ -1,8 +1,11 @@
 'use client'
 
+import GavelIcon from '@mui/icons-material/Gavel'
 import HealingIcon from '@mui/icons-material/Healing'
+import HomeIcon from '@mui/icons-material/Home'
 import LanguageIcon from '@mui/icons-material/Language'
 import PublicIcon from '@mui/icons-material/Public'
+import RestaurantIcon from '@mui/icons-material/Restaurant'
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag'
 import StoreIcon from '@mui/icons-material/Store'
 import { alpha, Box, Grid, Paper, Typography, useTheme } from '@mui/material'
@@ -14,6 +17,9 @@ export const VERTICALS = [
     { value: 'E-commerce', icon: <ShoppingBagIcon fontSize="large" /> },
     { value: 'SaaS', icon: <LanguageIcon fontSize="large" /> },
     { value: 'Healthcare', icon: <HealingIcon fontSize="large" /> },
+    { value: 'Real Estate', icon: <HomeIcon fontSize="large" /> },
+    { value: 'Legal', icon: <GavelIcon fontSize="large" /> },
+    { value: 'Restaurant', icon: <RestaurantIcon fontSize="large" /> },
     { value: 'Other', icon: <PublicIcon fontSize="large" /> },
 ] as const
 
@@ -30,9 +36,19 @@ export default function VerticalSelection({ value, onChange, tPrefix = 'meta.for
     const t = useTranslation('blueprint')
 
     const getTranslationKey = (v: string) => {
-        const key = v === 'Local Service' ? 'localService' : v === 'E-commerce' ? 'ecommerce' : v.toLowerCase()
+        const mapping: Record<string, string> = {
+            'Local Service': 'localService',
+            'E-commerce': 'ecommerce',
+            'SaaS': 'saas',
+            'Healthcare': 'healthcare',
+            'Real Estate': 'realEstate',
+            'Legal': 'legal',
+            'Restaurant': 'restaurant',
+            'Other': 'other'
+        }
 
-        return `${tPrefix}.${key}`
+
+return `${tPrefix}.${mapping[v] || v.toLowerCase()}`
     }
 
     return (

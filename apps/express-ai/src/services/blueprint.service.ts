@@ -15,6 +15,12 @@ import { strategyCompiler } from './blueprint/strategy-compiler';
 export class BlueprintService {
   async generate(input: BlueprintInput): Promise<BlueprintOutput> {
     try {
+      // Pre-sanitize URLs for Zod validation
+      let landingPageUrl = input.landingPageUrl;
+      if (landingPageUrl && !landingPageUrl.startsWith('http')) {
+        landingPageUrl = `https://${landingPageUrl}`;
+      }
+
       // Transform BlueprintInput to CampaignInput for v4 engine
       const engineInput: CampaignInput = {
         businessName: input.businessName,
@@ -25,7 +31,7 @@ export class BlueprintService {
         budget: input.budget,
         objective: input.objective as any,
         painPoints: input.painPoints,
-        websiteUrl: input.landingPageUrl,
+        websiteUrl: landingPageUrl,
         currency: input.currency || 'USD',
         expectedAvgCpc: input.expectedAvgCpc,
         conversionTrackingEnabled: input.conversionTrackingEnabled ?? true,
@@ -37,7 +43,7 @@ export class BlueprintService {
       // --- AI ENHANCEMENT LAYER ---
       // Polishes the deterministic plan with LLM creativity
       try {
-        const { blueprintAiEnhancer } = require('./blueprint/ai-enhancer');
+        const { blueprintAiEnhancer } = await import('./blueprint/ai-enhancer');
         v4Plan = await blueprintAiEnhancer.enhance(v4Plan, engineInput);
       } catch (enhancementError) {
         console.warn('AI Enhancement skipped due to error:', enhancementError);
@@ -70,8 +76,9 @@ export class BlueprintService {
       ];
 
       const landingPageAnalysis: LandingPageAnalysis = {
-        url: input.landingPageUrl || '',
+        url: landingPageUrl || '',
         isValid: (v4Plan.landingPageAnalysis?.score || 0) > 50,
+        validationMessage: v4Plan.landingPageAnalysis?.warnings?.join('. '),
         score: v4Plan.landingPageAnalysis?.score || 0,
         mobileOptimized: v4Plan.landingPageAnalysis?.mobileOptimized ?? true,
         trustSignalsDetected: v4Plan.landingPageAnalysis?.trustSignalsDetected || [],

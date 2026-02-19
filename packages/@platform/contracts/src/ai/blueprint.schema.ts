@@ -2,7 +2,7 @@ export interface BlueprintInput {
     businessName: string; // Required
     services: string[]; // Array of services (min 1)
     offer: string; // Distinct offer/promotion (min 5 chars)
-    vertical: 'Local Service' | 'E-commerce' | 'SaaS' | 'Healthcare' | 'Restaurant' | 'Other';
+    vertical: 'Local Service' | 'E-commerce' | 'SaaS' | 'Healthcare' | 'Restaurant' | 'Real Estate' | 'Legal' | 'Other';
     geo: string; // Single location string (e.g., "Austin, TX")
     painPoints?: string[]; // Optional
     landingPageUrl?: string; // Optional (websiteUrl in engine)
@@ -33,6 +33,9 @@ export interface AdGroup {
         percentage: number;
         amount: number;
         estimatedClicks: number;
+        estimatedConversions?: number;
+        estimatedCpa?: number;
+        learningPhaseStatus?: string;
     };
 }
 

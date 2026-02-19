@@ -4,7 +4,7 @@ import type { BlueprintInput } from '@platform/contracts';
 export interface GenerateSectionProps {
     loading: boolean;
     formData: BlueprintInput;
-    t: (key: string) => string;
+    t: any;
 }
 
 export function GenerateSection({ loading, formData, t }: GenerateSectionProps) {
@@ -74,7 +74,7 @@ export function GenerateSection({ loading, formData, t }: GenerateSectionProps) 
                             <br />
                             <strong>{t('generate.location')}</strong> {formData.geo || 'None'}
                             <br />
-                            <strong>{t('generate.budget')}</strong> ${formData.budget}
+                            <strong>{t('generate.budget')}</strong> {t('icons.currency')}{formData.budget}
                             <br />
                             <strong>{t('generate.objective')}</strong> {formData.objective}
                             <br />

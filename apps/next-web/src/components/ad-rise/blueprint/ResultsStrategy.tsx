@@ -21,15 +21,6 @@ export default function ResultsStrategy({ strategy, budget }: Props) {
     const t = useTranslation('blueprint');
     const theme = useTheme();
 
-    const getBudgetColor = (tier: string) => {
-        switch (tier) {
-            case 'High': return 'success';
-            case 'Medium': return 'primary';
-            case 'Low': return 'warning';
-            default: return 'default';
-        }
-    };
-
     const MetricCard = ({ icon: Icon, title, value, subtext, color = 'primary.main' }: any) => (
         <Card sx={{ p: 2, height: '100%', position: 'relative', overflow: 'hidden' }}>
             <Box
@@ -108,7 +99,7 @@ export default function ResultsStrategy({ strategy, budget }: Props) {
                     <MetricCard
                         icon={MonetizationOn}
                         title={t('results.totalBudget')}
-                        value={`$${strategy.totalBudget.toLocaleString()}`}
+                        value={`${t('icons.currency')}${strategy.totalBudget.toLocaleString()}`}
                         subtext={`${t('results.budgetTier')}: ${budget.budgetTier}`}
                         color={theme.palette.success.main}
                     />

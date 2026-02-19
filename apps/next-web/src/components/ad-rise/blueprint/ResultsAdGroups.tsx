@@ -54,13 +54,13 @@ export default function ResultsAdGroups({ adGroups }: Props) {
     const copyAllHeadlines = (headlines: string[]) => {
         const text = headlines.join('\n');
 
-        copyToClipboard(text, 'All headlines');
+        copyToClipboard(text, t('results.adGroups.allHeadlines'));
     };
 
     const copyAllDescriptions = (descriptions: string[]) => {
         const text = descriptions.join('\n');
 
-        copyToClipboard(text, 'All descriptions');
+        copyToClipboard(text, t('results.adGroups.allDescriptions'));
     };
 
     return (
@@ -136,7 +136,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                 {group.budgetAllocation && (
                                                     <>
                                                         <Chip
-                                                            label={`${(group.budgetAllocation.percentage * 100).toFixed(1)}% Budget`}
+                                                            label={`${(group.budgetAllocation.percentage * 100).toFixed(1)}% ${t('results.adGroups.budgetLabel')}`}
                                                             size="small"
                                                             sx={{
                                                                 bgcolor: alpha(theme.palette.success.main, 0.1),
@@ -145,7 +145,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                             }}
                                                         />
                                                         <Chip
-                                                            label={`$${group.budgetAllocation.amount.toFixed(0)}/mo`}
+                                                            label={`${t('icons.currency')}${group.budgetAllocation.amount.toFixed(0)}/${t('results.adGroups.monthlyLabel')}`}
                                                             size="small"
                                                             sx={{
                                                                 bgcolor: alpha(theme.palette.info.main, 0.1),
@@ -156,7 +156,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                         {/* ROI Metrics */}
                                                         {group.budgetAllocation.estimatedConversions !== undefined && (
                                                             <Chip
-                                                                label={`~${group.budgetAllocation.estimatedConversions} leads`}
+                                                                label={`~${group.budgetAllocation.estimatedConversions} ${t('results.adGroups.leadsLabel')}`}
                                                                 size="small"
                                                                 sx={{
                                                                     bgcolor: alpha(theme.palette.warning.main, 0.1),
@@ -167,7 +167,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                         )}
                                                         {group.budgetAllocation.estimatedCpa !== undefined && (
                                                             <Chip
-                                                                label={`$${group.budgetAllocation.estimatedCpa.toFixed(0)} CPA`}
+                                                                label={`${t('icons.currency')}${group.budgetAllocation.estimatedCpa.toFixed(0)} ${t('results.adGroups.cpaLabel')}`}
                                                                 size="small"
                                                                 variant="outlined"
                                                                 sx={{ borderColor: theme.palette.divider }}
@@ -176,7 +176,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                         {/* Learning Phase Warning */}
                                                         {group.budgetAllocation.learningPhaseStatus === 'Starved' && (
                                                             <Chip
-                                                                label="Low volume"
+                                                                label={t('results.adGroups.lowVolume')}
                                                                 size="small"
                                                                 color="error"
                                                                 variant="outlined"
@@ -253,7 +253,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                                     className="copy-btn"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        copyToClipboard(h, `Headline ${idx + 1}`);
+                                                                        copyToClipboard(h, `${t('results.adGroups.headlinePrefix')} ${idx + 1}`);
                                                                     }}
                                                                     sx={{ opacity: 0, transition: 'opacity 0.2s' }}
                                                                 >
@@ -322,7 +322,7 @@ export default function ResultsAdGroups({ adGroups }: Props) {
                                                                     className="copy-btn"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        copyToClipboard(d, `Description ${idx + 1}`);
+                                                                        copyToClipboard(d, `${t('results.adGroups.descriptionPrefix')} ${idx + 1}`);
                                                                     }}
                                                                     sx={{ opacity: 0, transition: 'opacity 0.2s' }}
                                                                 >

@@ -1,4 +1,4 @@
-export type VerticalType = 'Local Service' | 'E-commerce' | 'SaaS' | 'Restaurant' | 'Healthcare' | 'Other';
+export type VerticalType = 'Local Service' | 'E-commerce' | 'SaaS' | 'Restaurant' | 'Healthcare' | 'Real Estate' | 'Legal' | 'Other';
 
 export interface FunnelSplit {
     awareness: number;
@@ -111,6 +111,40 @@ export const VERTICAL_PROFILES: Record<VerticalType, VerticalProfile> = {
         benchmarks: {
             cvr: { BOF: 0.10, MOF: 0.04, TOF: 0.01 },
             cpa_target: 60.00
+        }
+    },
+    'Real Estate': {
+        name: 'Real Estate',
+        recommendedFunnelSplit: { awareness: 0.3, consideration: 0.4, conversion: 0.3 },
+        conversionType: 'Lead Form / Inquiry',
+        typicalKPIs: ['CPL', 'Lead Quality', 'Viewing Rate'],
+        avgCpc: 8.50,
+        negativeKeywords: ['career', 'salary', 'degree', 'rental help'],
+        metaInterests: {
+            core: ['Real Estate', 'House Hunting', 'First-Time Buyer', 'Property Investment'],
+            broad: ['Zillow', 'Trulia', 'Realtor.com', 'Home improvement'],
+            behaviors: ['Likely to move', 'Recent mortgage inquiry']
+        },
+        benchmarks: {
+            cvr: { BOF: 0.06, MOF: 0.03, TOF: 0.01 },
+            cpa_target: 80.00
+        }
+    },
+    'Legal': {
+        name: 'Legal',
+        recommendedFunnelSplit: { awareness: 0.1, consideration: 0.3, conversion: 0.6 },
+        conversionType: 'Consultation / Call',
+        typicalKPIs: ['CPA', 'Call Volume', 'Case Value'],
+        avgCpc: 25.00,
+        negativeKeywords: ['law school', 'legal aid', 'pro bono', 'salary', 'jobs'],
+        metaInterests: {
+            core: ['Law', 'Legal Services', 'Lawyer', 'Justice'],
+            broad: ['Professional Services', 'Court', 'Government'],
+            behaviors: ['Small Business Owners', 'High Income']
+        },
+        benchmarks: {
+            cvr: { BOF: 0.12, MOF: 0.04, TOF: 0.01 },
+            cpa_target: 150.00
         }
     },
     'Other': {

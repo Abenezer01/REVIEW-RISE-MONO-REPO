@@ -1,5 +1,5 @@
 
-import { CreativeConcept, CreativeConceptInput, BrandToneProfile } from '@platform/contracts';
+import { CreativeConcept, BrandToneProfile } from '@platform/contracts';
 
 export class NavGuardrailsService {
 

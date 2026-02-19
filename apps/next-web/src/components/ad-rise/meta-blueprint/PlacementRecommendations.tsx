@@ -3,6 +3,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import { alpha, Box, Card, CardContent, Chip, Stack, Typography, useTheme } from '@mui/material'
 import type { MetaAdSet } from '@platform/contracts'
+import { useTranslation } from '@/hooks/useTranslation'
 
 interface Props {
     adSets: MetaAdSet[]
@@ -10,6 +11,7 @@ interface Props {
 
 export default function PlacementRecommendations({ adSets }: Props) {
     const theme = useTheme()
+    const t = useTranslation('ad-rise')
 
     const formatPlacementName = (p: string) =>
         p.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
@@ -75,8 +77,12 @@ export default function PlacementRecommendations({ adSets }: Props) {
                             {/* Actionable Notes */}
                             {adSet.placementNotes && adSet.placementNotes.length > 0 && (
                                 <Stack spacing={1}>
+                                    <Typography variant="caption" sx={{ fontWeight: 'bold', mb: 0.5, display: 'block' }}>
+                                        {t('meta.results.placements.strategyLabel')}
+                                    </Typography>
                                     {adSet.placementNotes.map((note, i) => {
                                         const isWarning = note.includes('⚠️') || note.toLowerCase().includes('pause') || note.toLowerCase().includes('cap')
+
                                         return (
                                             <Box key={i} sx={{
                                                 display: 'flex', alignItems: 'flex-start', gap: 1,

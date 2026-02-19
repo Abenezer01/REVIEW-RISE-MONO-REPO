@@ -40,6 +40,10 @@ export class CreativeEngineService {
                 if (!googleValidation.isValid) {
                     console.warn(`Concept ${concept.id} failed Google validation:`, googleValidation.errors);
                 }
+                if (!metaValidation.isValid) {
+                    // @ts-expect-error - Meta validation currently always returns isValid: true, but if it changes
+                    console.warn(`Concept ${concept.id} failed Meta validation:`, (metaValidation as any).errors);
+                }
                 if (!safetyValidation.isValid) {
                     console.warn(`Concept ${concept.id} failed safety validation:`, safetyValidation.errors);
                     // Filter out unsafe concepts? 
