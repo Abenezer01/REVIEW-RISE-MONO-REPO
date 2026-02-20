@@ -28,6 +28,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
             settings: (await import(`../../messages/${locale}/settings.json`)).default,
             admin: (await import(`../../messages/${locale}/admin.json`)).default,
             blueprint: adRiseMessages.blueprint,
+            meta: adRiseMessages.meta,
             simulator: (await import(`../../messages/${locale}/simulator.json`)).default,
             'ad-rise': adRiseMessages
         }
