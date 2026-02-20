@@ -100,6 +100,7 @@
   "blueprint": {
     "title": "Google Search Blueprint",
     "subtitle": "AI-Powered Campaign Generator",
+    "badge": "BETA",
     "header": {
       "history": "History",
       "myBlueprints": "My Blueprints",
@@ -354,6 +355,8 @@
       "offerOrService": "What do you offer?",
       "offerOrServicePlaceholder": "e.g., Emergency plumbing services",
       "vertical": "Business Vertical",
+      "budget": "Monthly Budget",
+      "objective": "Campaign Objective",
       "verticals": {
         "localService": "Local Service",
         "ecommerce": "E-commerce",

@@ -290,7 +290,33 @@ export default function MetaBlueprintWizard() {
                                     )}
                                 </Box>
                                 <Box sx={{ display: 'flex', gap: 1 }}>
-                                    <Button variant="contained" color="primary" startIcon={<SaveAltIcon />}>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        startIcon={<SaveAltIcon />}
+                                        onClick={() => {
+                                            const payload = {
+                                                input,
+                                                output
+                                            };
+
+                                            const blob = new Blob([
+                                                JSON.stringify(payload, null, 2)
+                                            ], { type: 'application/json' });
+
+                                            const url = URL.createObjectURL(blob);
+                                            const link = document.createElement('a');
+
+                                            link.href = url;
+                                            link.download = 'meta-ads-blueprint.json';
+
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+
+                                            URL.revokeObjectURL(url);
+                                        }}
+                                    >
                                         {t('meta.buttons.exportAll')}
                                     </Button>
                                     <Button variant="outlined" color="primary" onClick={() => setActiveStep(0)}>
@@ -419,7 +445,7 @@ export default function MetaBlueprintWizard() {
                                                 const variationsCount = Math.max(c.primaryText.length, c.headlines.length, c.descriptions?.length || 0);
 
 
-return Array.from({ length: variationsCount }).map((_, i) => ({
+                                                return Array.from({ length: variationsCount }).map((_, i) => ({
                                                     creative: {
                                                         ...c,
                                                         primaryText: [c.primaryText[i] || c.primaryText[0]],
@@ -459,7 +485,6 @@ return Array.from({ length: variationsCount }).map((_, i) => ({
                         <Grid size={{ xs: 12, md: 7 }}>
                             {activeStep === 0 && (
                                 <>
-                                    <MetaQuickTemplatesSection onSelectTemplate={applyTemplate} t={t} />
                                     <Card variant="outlined" sx={{ p: 0, bgcolor: 'background.paper', overflow: 'hidden' }}>
                                         <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <Typography variant="h6" fontWeight="bold">
@@ -517,6 +542,8 @@ return Array.from({ length: variationsCount }).map((_, i) => ({
                                                 <VerticalSelection
                                                     value={input.vertical}
                                                     onChange={(v) => setInput({ ...input, vertical: v as any })}
+                                                    tPrefix="meta.form.verticals"
+                                                    namespace="ad-rise"
                                                 />
                                             </Box>
 
@@ -642,6 +669,11 @@ return Array.from({ length: variationsCount }).map((_, i) => ({
                                     <CardContent>
                                         <SidebarStats />
                                         <Checklist />
+                                        {activeStep === 0 && (
+                                            <Box sx={{ mt: 3 }}>
+                                                <MetaQuickTemplatesSection onSelectTemplate={applyTemplate} t={t} />
+                                            </Box>
+                                        )}
                                     </CardContent>
                                 </Card>
                             </Box>

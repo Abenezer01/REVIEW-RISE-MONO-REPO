@@ -354,6 +354,8 @@
       "offerOrService": "ماذا تقدم؟",
       "offerOrServicePlaceholder": "مثال: خدمات السباكة الطارئة",
       "vertical": "قطاع العمل",
+      "budget": "الميزانية الشهرية",
+      "objective": "هدف الحملة",
       "verticals": {
         "localService": "خدمة محلية",
         "ecommerce": "تجارة إلكترونية",

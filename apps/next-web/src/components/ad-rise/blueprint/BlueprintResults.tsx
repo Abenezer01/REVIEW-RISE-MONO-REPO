@@ -31,10 +31,96 @@ export default function BlueprintResults({ results }: Props) {
         );
     }
 
+    const downloadFile = (content: string | Blob, filename: string, type: string) => {
+        const blob = content instanceof Blob ? content : new Blob([content], { type });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        link.href = url;
+        link.download = filename;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+    };
+
+    const toCsv = () => {
+        const rows: string[] = [];
+
+        rows.push([
+            'Campaign Name',
+            'Ad Group Name',
+            'Keyword',
+            'Match Type',
+            'Headline',
+            'Description'
+        ].join(','));
+
+        results.campaigns.forEach((campaign) => {
+            campaign.adGroups.forEach((group) => {
+                group.keywords.forEach((kw) => {
+                    const headline = group.ads[0]?.headlines[0] || '';
+                    const description = group.ads[0]?.descriptions[0] || '';
+
+                    rows.push([
+                        JSON.stringify(campaign.name),
+                        JSON.stringify(group.name),
+                        JSON.stringify(kw.term),
+                        JSON.stringify(kw.matchType),
+                        JSON.stringify(headline),
+                        JSON.stringify(description)
+                    ].join(','));
+                });
+            });
+        });
+
+        return rows.join('\n');
+    };
+
     const handleExport = (format: 'pdf' | 'csv' | 'google-ads') => {
-        // TODO: Implement export functionality
-        console.log(`Exporting as ${format}`);
-        alert(`Export as ${format.toUpperCase()} - Coming soon!`);
+        if (format === 'csv') {
+            const csv = toCsv();
+
+            downloadFile(csv, 'google-blueprint.csv', 'text/csv;charset=utf-8;');
+
+            return;
+        }
+
+        if (format === 'google-ads') {
+            const payload = {
+                summary: results.strategySummary,
+                budget: results.budgetModeling,
+                campaigns: results.campaigns,
+                adGroups: results.adGroups,
+                keywords: results.clusters,
+                negatives: results.negatives
+            };
+
+            downloadFile(
+                JSON.stringify(payload, null, 2),
+                'google-ads-blueprint.json',
+                'application/json'
+            );
+
+            return;
+        }
+
+        const printable = {
+            summary: results.strategySummary,
+            campaigns: results.campaigns,
+            adGroups: results.adGroups,
+            keywords: results.clusters,
+            landingPage: results.landingPageAnalysis,
+            negatives: results.negatives
+        };
+
+        downloadFile(
+            JSON.stringify(printable, null, 2),
+            'google-blueprint-report.json',
+            'application/json'
+        );
     };
 
     return (
