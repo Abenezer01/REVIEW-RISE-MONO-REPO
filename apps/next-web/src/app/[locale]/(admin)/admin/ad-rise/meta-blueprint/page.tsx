@@ -5,7 +5,7 @@ import MetaBlueprintWizard from '@/components/ad-rise/meta-blueprint/MetaBluepri
 
 export default function MetaBlueprintPage() {
     return (
-        <Page title="Meta Ads Blueprint" titleId="blueprint.meta.title">
+        <Page title="Meta Ads Blueprint" titleId="meta.title">
             <MetaBlueprintWizard />
         </Page>
     );
