@@ -15,7 +15,6 @@ import GoogleIcon from '@mui/icons-material/Google';
 
 import apiClient from '@/lib/apiClient';
 
-import ConnectGoogleModal from './ConnectGoogleModal';
 import ConnectionSuccessView from './ConnectionSuccessView';
 import ConnectedSourceCard from './ConnectedSourceCard';
 import AvailableSourceCard from './AvailableSourceCard';
@@ -43,7 +42,6 @@ const ReviewSourcesDashboard = () => {
     const router = useRouter();
     const { id: locationId } = params;
 
-    const [modalOpen, setModalOpen] = useState(false);
     const [view, setView] = useState<'dashboard' | 'success'>('dashboard');
     const [sources, setSources] = useState<ReviewSource[]>([]);
     const [stats, setStats] = useState<ReviewStats | null>(null);
@@ -56,17 +54,41 @@ const ReviewSourcesDashboard = () => {
         severity: 'info'
     });
 
-    // Check for success param on mount
+    // Check for success or pending params on mount
     useEffect(() => {
-        if (searchParams.get('google_connected') === 'true') {
+        const connected = searchParams.get('google_connected');
+        const pending = searchParams.get('pending_google');
+        const error = searchParams.get('google_error');
+
+        if (connected === 'true') {
             setView('success');
             const newParams = new URLSearchParams(searchParams.toString());
 
             newParams.delete('google_connected');
             router.replace(`?${newParams.toString()}`);
             setSnackbar({ open: true, message: t('sourceConnected'), severity: 'success' });
-        } else if (searchParams.get('google_error')) {
-            setSnackbar({ open: true, message: t('failedToConnect'), severity: 'error' });
+        } else if (pending) {
+            const newParams = new URLSearchParams(searchParams.toString());
+
+            newParams.delete('pending_google');
+            router.replace(`?${newParams.toString()}`);
+        } else if (error) {
+            let errorMsg = t('failedToConnect');
+            
+            // Map specific errors to translated messages
+            if (error === 'access_denied') errorMsg = t('errors.accessDenied');
+            else if (error === 'no_accounts') errorMsg = t('errors.noAccounts');
+            else if (error === 'no_locations') errorMsg = t('errors.noLocations');
+            else if (error === 'session_expired') errorMsg = t('errors.sessionExpired');
+            else if (error === 'invalid_callback' || error === 'invalid_state') errorMsg = t('errors.invalidCallback');
+            else if (error === 'server_error') errorMsg = t('errors.serverError');
+
+            setSnackbar({ open: true, message: errorMsg, severity: 'error' });
+            
+            const newParams = new URLSearchParams(searchParams.toString());
+
+            newParams.delete('google_error');
+            router.replace(`?${newParams.toString()}`);
         }
     }, [searchParams, router, t]);
 
@@ -97,22 +119,36 @@ const ReviewSourcesDashboard = () => {
         fetchData();
     }, [fetchData]);
 
-    const handleConnectTrigger = () => {
-        setModalOpen(true);
-    };
+    const [googleConnected, setGoogleConnected] = useState(false);
 
-    const handleConnectGoogle = async () => {
+    const checkGoogleStatus = useCallback(async () => {
+        if (!locationId) return;
+
         try {
-            const res = await apiClient.get<{ url: string }>(`${REVIEWS_API_URL}/auth/google/connect`, {
-                params: { locationId }
-            });
+            const res = await apiClient.get(`/auth/google/status/${locationId}`);
 
-            if (res.data?.url) {
-                window.location.href = res.data.url;
-            }
+            setGoogleConnected(res.data?.data?.connected === true);
         } catch (error) {
-            console.error('Failed to get connect URL', error);
-            setSnackbar({ open: true, message: t('failedToInitiate'), severity: 'error' });
+            console.error('Failed to check google status', error);
+        }
+    }, [locationId]);
+
+    useEffect(() => {
+        checkGoogleStatus();
+    }, [checkGoogleStatus]);
+
+    const handleEnableGoogleSync = async () => {
+        if (!locationId) return;
+
+        try {
+            setLoading(true);
+            await apiClient.post(`${REVIEWS_API_URL}/locations/${locationId}/enable-google-sync`);
+            setSnackbar({ open: true, message: 'Google Review Sync Enabled', severity: 'success' });
+            fetchData();
+        } catch (error) {
+            console.error('Failed to enable sync', error);
+            setSnackbar({ open: true, message: 'Failed to enable Google Sync', severity: 'error' });
+            setLoading(false);
         }
     };
 
@@ -165,11 +201,7 @@ const ReviewSourcesDashboard = () => {
                 </Alert>
             </Snackbar>
 
-            <ConnectGoogleModal
-                open={modalOpen}
-                onClose={() => setModalOpen(false)}
-                onConnect={handleConnectGoogle}
-            />
+
 
             <Dialog
                 open={view === 'success'}
@@ -290,10 +322,22 @@ const ReviewSourcesDashboard = () => {
                                     <Box sx={{ p: 1.5, bgcolor: 'action.hover', borderRadius: 2 }}><GoogleIcon color="info" /></Box>
                                     <Box>
                                         <Typography variant="subtitle1" fontWeight="bold">{t('googleBusiness')}</Typography>
-                                        <Typography variant="caption" color="text.secondary">{t('connectToSyncReviews')}</Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                            {googleConnected 
+                                                ? t('googleConnectedDesc')
+                                                : t('googleNotConnectedDesc')}
+                                        </Typography>
                                     </Box>
                                 </Box>
-                                <Button variant="contained" color="warning" onClick={handleConnectTrigger}>{t('connect')}</Button>
+                                <Button 
+                                    variant="contained" 
+                                    color="primary" 
+                                    onClick={googleConnected ? handleEnableGoogleSync : () => router.push(`/admin/locations/${locationId}?tab=integrations`)}
+
+                                    // Make button say "Enable Sync" or "Go to Integrations"
+                                >
+                                    {googleConnected ? t('enableSync') : t('goToIntegrations')}
+                                </Button>
                             </CardContent>
                         </Card>
                     )}

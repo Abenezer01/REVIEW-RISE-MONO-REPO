@@ -121,7 +121,8 @@
       "lightbulb": "💡",
       "rocket": "🚀",
       "stop": "🛑",
-      "fire": "🔥"
+      "fire": "🔥",
+      "currency": "$"
     },
     "steps": {
       "campaignDetails": "تفاصيل الحملة",
@@ -326,186 +327,188 @@
         "message": "هذا المخطط هو للإرشاد فقط. قد تختلف النتائج بناءً على قطاع عملك والمنافسة والميزانية. راجع دائماً جميع التوصيات مقابل سياسات الإعلان الخاصة بالمنصة قبل التنفيذ.",
         "show": "عرض إخلاء مسؤولية الإرشاد"
       }
-    },
-    "meta": {
-      "title": "مولد خطة إعلانات ميتا",
-      "subtitle": "تخطيط الحملات المدعوم بالذكاء الاصطناعي لفيسبوك وإنستغرام",
-      "steps": {
-        "businessInfo": "معلومات العمل",
-        "geoTargeting": "الاستهداف الجغرافي",
-        "results": "خطتك"
-      },
-      "stages": {
-        "TOF": "أعلى القمع (الوعي)",
-        "MOF": "منتصف القمع (الاعتبار)",
-        "BOF": "أسفل القمع (التحويل)"
-      },
-      "quickTemplates": {
-        "title": "قوالب البدء السريع",
-        "subtitle": "ابدأ بشكل أسرع مع أمثلة صناعية معبأة مسبقاً",
-        "tip": "نصيحة:",
-        "tipText": "القوالب هي مجرد نقاط بداية - يمكنك تعديل جميع الحقول بعد اختيار واحد منها"
-      },
-      "form": {
-        "businessName": "اسم العمل (اختياري)",
-        "businessNamePlaceholder": "مثال: سباكة جو",
-        "offerOrService": "ماذا تقدم؟",
-        "offerOrServicePlaceholder": "مثال: خدمات السباكة الطارئة",
-        "vertical": "قطاع العمل",
-        "verticals": {
-          "localService": "خدمة محلية",
-          "ecommerce": "تجارة إلكترونية",
-          "saas": "برمجيات كخدمة",
-          "healthcare": "رعاية صحية",
-          "realEstate": "عقارات",
-          "legal": "قانوني",
-          "restaurant": "مطعم",
-          "other": "أخرى"
-        },
-        "geoCenter": "الموقع المستهدف",
-        "geoCenterPlaceholder": "مثال: سان فرانسيسكو، كاليفورنيا",
-        "radius": "نطاق الاستهداف",
-        "radiusUnit": {
-          "miles": "أميل",
-          "km": "كيلومتر"
-        },
-        "painPoints": "نقاط ألم العملاء (اختياري)",
-        "painPointsPlaceholder": "مثال: أنابيب منفجرة، مصارف مسدودة",
-        "landingPageUrl": "رابط الصفحة المقصودة (اختياري)",
-        "landingPageUrlPlaceholder": "https://example.com",
-        "addPainPoint": "إضافة نقطة ألم",
-        "templates": {
-          "plumbing": "خدمة سباكة",
-          "law": "مكتب محاماة",
-          "dentist": "عيادة أسنان",
-          "restaurant": "مطعم",
-          "saas": "منتج برمجيات",
-          "ecommerce": "متجر إلكتروني",
-          "roofing": "خدمة تسقيف"
-        },
-        "algorithmsOverTargeting": "الخوارزميات فوق الاستهداف",
-        "consolidateModeDesc": "في وضع الدمج (100 دولار شهرياً)، نتخطى مجموعات اهتمامات معينة لمنح ذكاء ميتا الاصطناعي أقصى قدر من الحرية. يبدأ استهداف اهتمامات معينة في",
-        "standardTier": "المستوى القياسي (600+ دولار شهرياً)",
-        "objectives": {
-          "Leads": "العملاء المحتملون ونماذج البيانات",
-          "Sales": "المبيعات والتحويلات",
-          "Awareness": "الوعي والوصول"
-        }
-      },
-      "buttons": {
-        "next": "التالي",
-        "back": "السابق",
-        "generate": "إنشاء الخطة",
-        "exportAll": "تصدير الكل",
-        "startOver": "البدء من جديد"
-      },
-      "results": {
-        "title": "خطة إعلانات ميتا الخاصة بك جاهزة",
-        "sections": {
-          "audiences": "مجموعات الجمهور",
-          "interests": "مجموعات الاهتمامات",
-          "adCopy": "نسخ الإعلانات",
-          "placements": "توصيات المواضع",
-          "estDailySpend": "الإنفاق اليومي المقدر: {amount}$",
-          "budgetStrategy": "الاستراتيجية: {strategy}",
-          "aiAnalysis": "تحليل الذكاء الاصطناعي",
-          "agencyReadiness": "جاهزية الوكالة",
-          "potentialOptimizations": "تحسينات محتملة",
-          "keyTakeaways": "أهم الملاحظات"
-        },
-        "priorities": {
-          "high": "أولوية عالية",
-          "medium": "للنظر",
-          "low": "من الجيد توفره"
-        },
-        "benefits": {
-          "coreAudiences": "تعريفات الجمهور الأساسية",
-          "interestClusters": "توصيات مجموعات الاهتمامات",
-          "optimizedCopy": "تنويعات نصوص إعلانية محسنة",
-          "placementStrategy": "دليل استراتيجية الموضع",
-          "exportReady": "تنسيق JSON جاهز للتصدير",
-          "combinedAudiences": "{prospecting} + {retargeting}"
-        },
-        "audiences": {
-          "prospecting": "التنقيب (حركة باردة)",
-          "retargeting": "إعادة الاستهداف (حركة دافئة)",
-          "estimatedReach": "الوصول المقدر",
-          "demographics": "الديموغرافيا",
-          "age": "العمر",
-          "gender": "الجنس",
-          "languages": "اللغات",
-          "geoLocations": "المواقع الجغرافية",
-          "geoTarget": "الاستهداف الجغرافي",
-          "interests": "الاهتمامات",
-          "interestCluster": "مجموعة الاهتمامات:",
-          "excludes": "يستثني:",
-          "algorithmLed": "استهداف تقوده الخوارزمية",
-          "algorithmLedDesc": "— لا توجد قيود على الاهتمامات. ميتا يجد المشترين.",
-          "customAudiences": "الجماهير المخصصة",
-          "lookalikeSources": "مصادر الجماهير المشابهة",
-          "geo": "الاستهداف الجغرافي",
-          "retargetingSource": "مصدر إعادة الاستهداف",
-          "size": "الحجم المقدر",
-          "predictedValue": "القيمة المتوقعة",
-          "days": "أيام",
-          "minAudience": "الحد الأدنى للجمهور:",
-          "pausesIfBelow": "(يتوقف إذا كان أقل)",
-          "estAudienceSize": "حجم الجمهور المقدر",
-          "prospectingCampaign": "حملة التنقيب —",
-          "retargetingCampaign": "حملة إعادة الاستهداف — ABO (دائماً)",
-          "retargetingLocked": "إعادة الاستهداف مقفلة — تتطلب 1,500+ دولار شهرياً",
-          "retargetingLockedDesc": "بميزانيتك الحالية، ستؤدي إعادة الاستهداف إلى إرهاق الجمهور قبل توليد إشارة كافية. زد الميزانية لفتح هيكل القمع الكامل."
-        },
-        "interests": {
-          "primary": "أساسي",
-          "secondary": "ثانوي",
-          "exclusions": "الاستثناءات",
-          "includedInterests": "الاهتمامات المتضمنة",
-          "interestsCount": "{count} اهتمامات",
-          "more": "+{count} أخرى",
-          "intentScore": "درجة النية: {score}/10"
-        },
-        "adCopy": {
-          "variation": "نسخة",
-          "primaryText": "النص الأساسي",
-          "headline": "العنوان",
-          "description": "الوصف",
-          "for": "لـ",
-          "ctas": "دعوات اتخاذ إجراء",
-          "callToAction": "دعوة لاتخاذ إجراء",
-          "tone": "النبرة",
-          "compliant": "متوافق مع إعلانات ميتا",
-          "characterLimits": "دليل حدود الأحرف",
-          "copyToClipboard": "نسخ إلى الحافظة",
-          "copyAll": "نسخ الكل",
-          "copied": "تم النسخ!",
-          "chars": "{count} / {limit} حرف",
-          "guide": {
-            "primaryText": "نص الإعلان الرئيسي لخلاصات الأخبار.",
-            "headline": "نص عريض يظهر فوق الوصف.",
-            "description": "نص داعم قصير.",
-            "optimized": "محسن للنص الرئيسي (125 حرفًا)، والعناوين (40 حرفًا)، والأوصاف (25 حرفًا)."
-          },
-          "charsLimit": "{count} حرف"
-        },
-        "placements": {
-          "platform": "المنصة",
-          "format": "التنسيق",
-          "objective": "الهدف",
-          "why": "لماذا",
-          "highImpact": "تأثير عالي",
-          "recommended": "موصى به",
-          "objectives": {
-            "Awareness": "الوعي",
-            "Traffic": "حركة المرور",
-            "Conversion": "التحويل"
-          },
-          "strategyLabel": "الاستراتيجية:",
-          "strategyText": "المواضع المختارة لتعظيم {goal} لمرحلة الجمهور هذه."
-        }
-      },
-      "loading": "جاري إنشاء خطة إعلانات ميتا الخاصة بك...",
-      "error": "فشل في إنشاء الخطة. يرجى المحاولة مرة أخرى."
     }
+  },
+  "meta": {
+    "title": "مولد خطة إعلانات ميتا",
+    "subtitle": "تخطيط الحملات المدعوم بالذكاء الاصطناعي لفيسبوك وإنستغرام",
+    "steps": {
+      "businessInfo": "معلومات العمل",
+      "geoTargeting": "الاستهداف الجغرافي",
+      "results": "خطتك"
+    },
+    "stages": {
+      "TOF": "أعلى القمع (الوعي)",
+      "MOF": "منتصف القمع (الاعتبار)",
+      "BOF": "أسفل القمع (التحويل)"
+    },
+    "quickTemplates": {
+      "title": "قوالب البدء السريع",
+      "subtitle": "ابدأ بشكل أسرع مع أمثلة صناعية معبأة مسبقاً",
+      "tip": "نصيحة:",
+      "tipText": "القوالب هي مجرد نقاط بداية - يمكنك تعديل جميع الحقول بعد اختيار واحد منها"
+    },
+    "form": {
+      "businessName": "اسم العمل (اختياري)",
+      "businessNamePlaceholder": "مثال: سباكة جو",
+      "offerOrService": "ماذا تقدم؟",
+      "offerOrServicePlaceholder": "مثال: خدمات السباكة الطارئة",
+      "vertical": "قطاع العمل",
+      "budget": "الميزانية الشهرية",
+      "objective": "هدف الحملة",
+      "verticals": {
+        "localService": "خدمة محلية",
+        "ecommerce": "تجارة إلكترونية",
+        "saas": "برمجيات كخدمة",
+        "healthcare": "رعاية صحية",
+        "realEstate": "عقارات",
+        "legal": "قانوني",
+        "restaurant": "مطعم",
+        "other": "أخرى"
+      },
+      "geoCenter": "الموقع المستهدف",
+      "geoCenterPlaceholder": "مثال: سان فرانسيسكو، كاليفورنيا",
+      "radius": "نطاق الاستهداف",
+      "radiusUnit": {
+        "miles": "أميل",
+        "km": "كيلومتر"
+      },
+      "painPoints": "نقاط ألم العملاء (اختياري)",
+      "painPointsPlaceholder": "مثال: أنابيب منفجرة، مصارف مسدودة",
+      "landingPageUrl": "رابط الصفحة المقصودة (اختياري)",
+      "landingPageUrlPlaceholder": "https://example.com",
+      "addPainPoint": "إضافة نقطة ألم",
+      "templates": {
+        "plumbing": "خدمة سباكة",
+        "law": "مكتب محاماة",
+        "dentist": "عيادة أسنان",
+        "restaurant": "مطعم",
+        "saas": "منتج برمجيات",
+        "ecommerce": "متجر إلكتروني",
+        "roofing": "خدمة تسقيف"
+      },
+      "algorithmsOverTargeting": "الخوارزميات فوق الاستهداف",
+      "consolidateModeDesc": "في وضع الدمج (100 دولار شهرياً)، نتخطى مجموعات اهتمامات معينة لمنح ذكاء ميتا الاصطناعي أقصى قدر من الحرية. يبدأ استهداف اهتمامات معينة في",
+      "standardTier": "المستوى القياسي (600+ دولار شهرياً)",
+      "objectives": {
+        "Leads": "العملاء المحتملون ونماذج البيانات",
+        "Sales": "المبيعات والتحويلات",
+        "Awareness": "الوعي والوصول"
+      }
+    },
+    "buttons": {
+      "next": "التالي",
+      "back": "السابق",
+      "generate": "إنشاء الخطة",
+      "exportAll": "تصدير الكل",
+      "startOver": "البدء من جديد"
+    },
+    "results": {
+      "title": "خطة إعلانات ميتا الخاصة بك جاهزة",
+      "sections": {
+        "audiences": "مجموعات الجمهور",
+        "interests": "مجموعات الاهتمامات",
+        "adCopy": "نسخ الإعلانات",
+        "placements": "توصيات المواضع",
+        "estDailySpend": "الإنفاق اليومي المقدر: {amount}$",
+        "budgetStrategy": "الاستراتيجية: {strategy}",
+        "aiAnalysis": "تحليل الذكاء الاصطناعي",
+        "agencyReadiness": "جاهزية الوكالة",
+        "potentialOptimizations": "تحسينات محتملة",
+        "keyTakeaways": "أهم الملاحظات"
+      },
+      "priorities": {
+        "high": "أولوية عالية",
+        "medium": "للنظر",
+        "low": "من الجيد توفره"
+      },
+      "benefits": {
+        "coreAudiences": "تعريفات الجمهور الأساسية",
+        "interestClusters": "توصيات مجموعات الاهتمامات",
+        "optimizedCopy": "تنويعات نصوص إعلانية محسنة",
+        "placementStrategy": "دليل استراتيجية الموضع",
+        "exportReady": "تنسيق JSON جاهز للتصدير",
+        "combinedAudiences": "{prospecting} + {retargeting}"
+      },
+      "audiences": {
+        "prospecting": "التنقيب (حركة باردة)",
+        "retargeting": "إعادة الاستهداف (حركة دافئة)",
+        "estimatedReach": "الوصول المقدر",
+        "demographics": "الديموغرافيا",
+        "age": "العمر",
+        "gender": "الجنس",
+        "languages": "اللغات",
+        "geoLocations": "المواقع الجغرافية",
+        "geoTarget": "الاستهداف الجغرافي",
+        "interests": "الاهتمامات",
+        "interestCluster": "مجموعة الاهتمامات:",
+        "excludes": "يستثني:",
+        "algorithmLed": "استهداف تقوده الخوارزمية",
+        "algorithmLedDesc": "— لا توجد قيود على الاهتمامات. ميتا يجد المشترين.",
+        "customAudiences": "الجماهير المخصصة",
+        "lookalikeSources": "مصادر الجماهير المشابهة",
+        "geo": "الاستهداف الجغرافي",
+        "retargetingSource": "مصدر إعادة الاستهداف",
+        "size": "الحجم المقدر",
+        "predictedValue": "القيمة المتوقعة",
+        "days": "أيام",
+        "minAudience": "الحد الأدنى للجمهور:",
+        "pausesIfBelow": "(يتوقف إذا كان أقل)",
+        "estAudienceSize": "حجم الجمهور المقدر",
+        "prospectingCampaign": "حملة التنقيب —",
+        "retargetingCampaign": "حملة إعادة الاستهداف — ABO (دائماً)",
+        "retargetingLocked": "إعادة الاستهداف مقفلة — تتطلب 1,500+ دولار شهرياً",
+        "retargetingLockedDesc": "بميزانيتك الحالية، ستؤدي إعادة الاستهداف إلى إرهاق الجمهور قبل توليد إشارة كافية. زد الميزانية لفتح هيكل القمع الكامل."
+      },
+      "interests": {
+        "primary": "أساسي",
+        "secondary": "ثانوي",
+        "exclusions": "الاستثناءات",
+        "includedInterests": "الاهتمامات المتضمنة",
+        "interestsCount": "{count} اهتمامات",
+        "more": "+{count} أخرى",
+        "intentScore": "درجة النية: {score}/10"
+      },
+      "adCopy": {
+        "variation": "نسخة",
+        "primaryText": "النص الأساسي",
+        "headline": "العنوان",
+        "description": "الوصف",
+        "for": "لـ",
+        "ctas": "دعوات اتخاذ إجراء",
+        "callToAction": "دعوة لاتخاذ إجراء",
+        "tone": "النبرة",
+        "compliant": "متوافق مع إعلانات ميتا",
+        "characterLimits": "دليل حدود الأحرف",
+        "copyToClipboard": "نسخ إلى الحافظة",
+        "copyAll": "نسخ الكل",
+        "copied": "تم النسخ!",
+        "chars": "{count} / {limit} حرف",
+        "guide": {
+          "primaryText": "نص الإعلان الرئيسي لخلاصات الأخبار.",
+          "headline": "نص عريض يظهر فوق الوصف.",
+          "description": "نص داعم قصير.",
+          "optimized": "محسن للنص الرئيسي (125 حرفًا)، والعناوين (40 حرفًا)، والأوصاف (25 حرفًا)."
+        },
+        "charsLimit": "{count} حرف"
+      },
+      "placements": {
+        "platform": "المنصة",
+        "format": "التنسيق",
+        "objective": "الهدف",
+        "why": "لماذا",
+        "highImpact": "تأثير عالي",
+        "recommended": "موصى به",
+        "objectives": {
+          "Awareness": "الوعي",
+          "Traffic": "حركة المرور",
+          "Conversion": "التحويل"
+        },
+        "strategyLabel": "الاستراتيجية:",
+        "strategyText": "المواضع المختارة لتعظيم {goal} لمرحلة الجمهور هذه."
+      }
+    },
+    "loading": "جاري إنشاء خطة إعلانات ميتا الخاصة بك...",
+    "error": "فشل في إنشاء الخطة. يرجى المحاولة مرة أخرى."
   }
 }

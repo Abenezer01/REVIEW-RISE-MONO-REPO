@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { createSuccessResponse, createErrorResponse, SystemMessageCode } from '@platform/contracts';
-import { reviewSourceRepository, reviewRepository } from '@platform/db';
+import { reviewSourceRepository, reviewRepository, platformIntegrationRepository } from '@platform/db';
 import { reviewSyncService } from '../services/review-sync.service';
 
 export const listReviewSources = async (req: Request, res: Response) => {
@@ -99,6 +99,34 @@ export const syncReviews = async (req: Request, res: Response) => {
         res.status(response.statusCode).json(response);
     } catch (error: any) {
         console.error('Sync reviews error:', error);
+        const response = createErrorResponse('Internal server error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        res.status(response.statusCode).json(response);
+    }
+};
+
+export const enableGoogleSync = async (req: Request, res: Response) => {
+    try {
+        const { locationId } = req.params;
+
+        // Verify that a valid Google PlatformIntegration exists
+        const integration = await platformIntegrationRepository.findByLocationIdAndPlatform(locationId, 'google');
+        
+        if (!integration || integration.status !== 'active') {
+            const response = createErrorResponse('No active Google integration found. Please connect your account first.', SystemMessageCode.UNAUTHORIZED, 400, undefined, req.id);
+            return res.status(response.statusCode).json(response);
+        }
+
+        // Upsert a ReviewSource record indicating that Google sync is enabled for this location
+        // Note: The ReviewSource no longer holds tokens; it merely acts as a flag/config
+        await reviewSourceRepository.upsertLocationPlatform(locationId, 'google');
+
+        // Optionally trigger an immediate sync here
+        // await reviewSyncService.syncReviewsForLocation(locationId);
+
+        const response = createSuccessResponse({}, 'Google Review Sync enabled successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
+        res.status(response.statusCode).json(response);
+    } catch (error: any) {
+        console.error('Enable Google sync error:', error);
         const response = createErrorResponse('Internal server error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
         res.status(response.statusCode).json(response);
     }

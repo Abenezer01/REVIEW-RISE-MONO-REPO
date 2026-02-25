@@ -146,8 +146,8 @@ export const SocialConnectionList = ({ businessId, locationId }: SocialConnectio
         };
 
         window.addEventListener('message', handleMessage);
-        
-return () => window.removeEventListener('message', handleMessage);
+
+        return () => window.removeEventListener('message', handleMessage);
     }, [businessId, locationId, t, notify]);
 
     // Handlers
@@ -190,14 +190,14 @@ return () => window.removeEventListener('message', handleMessage);
 
         if (!fbConn) {
             alert(t('alerts.pleaseConnectFbFirst'));
-            
-return;
+
+            return;
         }
 
         if (!fbConn.accessToken) {
             alert(t('alerts.fbMissingToken'));
-            
-return;
+
+            return;
         }
 
         try {

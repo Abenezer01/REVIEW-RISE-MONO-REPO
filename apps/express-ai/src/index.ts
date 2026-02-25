@@ -23,6 +23,10 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', service: 'express-ai' });
+});
+
 import aiRoutes from './routes/ai.routes';
 import contentStudioRoutes from './routes/content-studio.routes';
 import blueprintRoutes from './routes/blueprint.routes';

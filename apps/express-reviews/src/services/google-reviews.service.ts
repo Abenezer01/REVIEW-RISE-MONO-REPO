@@ -5,8 +5,35 @@ import axios from 'axios';
 const SCOPES = [
     'https://www.googleapis.com/auth/business.manage',
     'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile'
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'openid',
 ];
+
+export interface GbpAccount {
+    name: string;          // "accounts/123456"
+    accountName: string;   // Display name
+    type: string;          // "PERSONAL", "LOCATION_GROUP", etc.
+    verificationState?: string;
+}
+
+export interface GbpLocation {
+    name: string;          // "accounts/123456/locations/789"
+    title: string;         // Business display name
+    storeCode?: string;
+    websiteUri?: string;
+    phoneNumbers?: { primaryPhone?: string };
+    storefrontAddress?: {
+        addressLines?: string[];
+        locality?: string;
+        administrativeArea?: string;
+        postalCode?: string;
+        regionCode?: string;
+    };
+    metadata?: {
+        mapsUri?: string;
+        newReviewUri?: string;
+    };
+}
 
 export class GoogleReviewsService {
     private oauth2Client: OAuth2Client;
@@ -15,7 +42,7 @@ export class GoogleReviewsService {
         if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET || !process.env.GOOGLE_REDIRECT_URI) {
             console.error('Google OAuth credentials missing');
         }
-        
+
         this.oauth2Client = new google.auth.OAuth2(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET,
@@ -25,10 +52,10 @@ export class GoogleReviewsService {
 
     getAuthUrl(state: string): string {
         return this.oauth2Client.generateAuthUrl({
-            access_type: 'offline', // Request refresh token
+            access_type: 'offline',
             scope: SCOPES,
-            state: state,
-            prompt: 'consent' // Force consent to ensure refresh token is returned
+            state,
+            prompt: 'consent', // Always force consent to guarantee refresh_token
         });
     }
 
@@ -38,108 +65,120 @@ export class GoogleReviewsService {
     }
 
     async refreshAccessToken(refreshToken: string) {
-        this.oauth2Client.setCredentials({
-            refresh_token: refreshToken
-        });
+        this.oauth2Client.setCredentials({ refresh_token: refreshToken });
         const { credentials } = await this.oauth2Client.refreshAccessToken();
         return credentials;
     }
 
     /**
-     * Fetch all accounts for the authorized user.
-     * Useful to let the user select which account represents this business.
+     * Revoke a Google OAuth token (access or refresh).
+     * Call on disconnect.
      */
-    async listAccounts(accessToken: string) {
+    async revokeToken(token: string): Promise<void> {
         try {
-            const response = await axios.get('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            });
-            return response.data.accounts || [];
+            await axios.post(
+                `https://oauth2.googleapis.com/revoke?token=${encodeURIComponent(token)}`,
+                {},
+                { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+            );
         } catch (error) {
-            console.error('Error listing accounts:', error);
-            throw error;
+            // Non-critical: token may already be expired/revoked
+            console.warn('Token revocation failed (may already be revoked):', error);
         }
     }
 
     /**
-     * Fetch locations for a specific account.
+     * List all GBP accounts for the authenticated user.
      */
-    async listLocations(accessToken: string, accountId: string) {
-        try {
-            // accountId format: "accounts/{accountId}"
-            const response = await axios.get(`https://mybusinessbusinessinformation.googleapis.com/v1/${accountId}/locations`, {
+    async listAccounts(accessToken: string): Promise<GbpAccount[]> {
+        const response = await axios.get(
+            'https://mybusinessaccountmanagement.googleapis.com/v1/accounts',
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        return response.data.accounts || [];
+    }
+
+    /**
+     * List locations for a specific account.
+     * accountId format: "accounts/{accountId}"
+     */
+    async listLocations(accessToken: string, accountId: string): Promise<GbpLocation[]> {
+        const response = await axios.get(
+            `https://mybusinessbusinessinformation.googleapis.com/v1/${accountId}/locations`,
+            {
                 headers: { Authorization: `Bearer ${accessToken}` },
                 params: {
-                    readMask: 'name,title,storeCode,metadata'
-                }
-            });
-            return response.data.locations || [];
-        } catch (error) {
-            console.error('Error listing locations:', error);
-            throw error;
-        }
+                    readMask: 'name,title,storeCode,websiteUri,phoneNumbers,storefrontAddress,metadata',
+                },
+            }
+        );
+        return response.data.locations || [];
     }
 
     /**
-     * Fetch reviews for a specific location.
+     * Fetch all locations across ALL accounts for the authenticated user.
+     * Returns a flat array with an `accountId` attached to each location.
+     */
+    async listAllLocations(
+        accessToken: string,
+        accounts: GbpAccount[]
+    ): Promise<Array<GbpLocation & { accountId: string }>> {
+        const results = await Promise.allSettled(
+            accounts.map(async (account) => {
+                const locs = await this.listLocations(accessToken, account.name);
+                return locs.map((loc) => ({ ...loc, accountId: account.name }));
+            })
+        );
+
+        const locations: Array<GbpLocation & { accountId: string }> = [];
+        for (const result of results) {
+            if (result.status === 'fulfilled') {
+                locations.push(...result.value);
+            }
+        }
+        return locations;
+    }
+
+    /**
+     * Fetch reviews for a specific GBP location.
      * locationName format: "accounts/{accountId}/locations/{locationId}"
      */
     async listReviews(accessToken: string, locationName: string, pageToken?: string) {
-         try {
-            // Note: Reviews are fetched from mybusiness.googleapis.com v4 (legacy) or v1 (new)?
-            // The new API is https://mybusiness.googleapis.com/v4/{name}/reviews
-            // Wait, GBP API v1 has taken over. 
-            // The API is `https://mybusiness.googleapis.com/v4/${locationName}/reviews`
-            // Actually, for reviews, we should check api documentation.
-            // Documentation says: GET https://mybusiness.googleapis.com/v4/{name=accounts/*/locations/*}/reviews
-            
-            const response = await axios.get(`https://mybusiness.googleapis.com/v4/${locationName}/reviews`, {
+        const response = await axios.get(
+            `https://mybusiness.googleapis.com/v4/${locationName}/reviews`,
+            {
                 headers: { Authorization: `Bearer ${accessToken}` },
-                params: {
-                    pageSize: 50,
-                    pageToken: pageToken
-                }
-            });
-            return {
-                reviews: response.data.reviews || [],
-                nextPageToken: response.data.nextPageToken
-            };
-        } catch (error) {
-            console.error('Error listing reviews:', error);
-            throw error; // Handle or rethrow
-        }
+                params: { pageSize: 50, pageToken },
+            }
+        );
+        return {
+            reviews: response.data.reviews || [],
+            nextPageToken: response.data.nextPageToken,
+        };
     }
+
     /**
      * Post or update a reply to a review.
      * reviewName format: "accounts/{accountId}/locations/{locationId}/reviews/{reviewId}"
      */
     async updateReply(accessToken: string, reviewName: string, comment: string) {
-        try {
-            const response = await axios.put(`https://mybusiness.googleapis.com/v4/${reviewName}/reply`, {
-                comment: comment
-            }, {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error updating review reply:', error);
-            throw error;
-        }
+        const response = await axios.put(
+            `https://mybusiness.googleapis.com/v4/${reviewName}/reply`,
+            { comment },
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        return response.data;
     }
 
     /**
      * Delete a reply to a review.
      */
     async deleteReply(accessToken: string, reviewName: string) {
-        try {
-            await axios.delete(`https://mybusiness.googleapis.com/v4/${reviewName}/reply`, {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            });
-            return { success: true };
-        } catch (error) {
-            console.error('Error deleting review reply:', error);
-            throw error;
-        }
+        await axios.delete(
+            `https://mybusiness.googleapis.com/v4/${reviewName}/reply`,
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        return { success: true };
     }
 }
 

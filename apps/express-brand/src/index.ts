@@ -15,6 +15,10 @@ app.use(requestIdMiddleware);
 app.use(morgan('dev'));
 app.use(express.json());
 
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', service: 'express-brand' });
+});
+
 import v1Routes from './routes/v1';
 import uploadRoutes from './routes/v1/upload.routes';
 import path from 'path';

@@ -102,7 +102,36 @@
       "mockTime": "2:00 AM",
       "mockDurationValue": "2 mins"
     },
+    "selector": {
+      "title": "Select Location",
+      "subtitle": "Choose the Google Business Profile location to connect.",
+      "foundLocations": "Found {count} locations",
+      "noAddress": "No address provided",
+      "confirm": "Connect this location",
+      "connecting": "Connecting..."
+    },
+    "errors": {
+      "accessDenied": "Google connection was cancelled.",
+      "noAccounts": "No Google Business Profile accounts found.",
+      "noLocations": "No locations found in your Google account.",
+      "sessionExpired": "Session expired. Please try connecting again.",
+      "serverError": "A server error occurred during connection.",
+      "invalidCallback": "Failed to connect: invalid callback data."
+    },
     "configure": "Configure",
-    "disconnect": "Disconnect"
+    "disconnect": "Disconnect",
+    "connectedPlatforms": "Connected Platforms",
+    "integrationsDesc": "Connect your location to external platforms like Google Business Profile. Once connected, these integrations power features like Review Syncing and GBP Rocket across the platform.",
+    "connected": "Connected",
+    "to": "to",
+    "connectionActiveDesc": "Your connection is active. Features like Review Sync and Auto-Replies can use this connection.",
+    "connectionError": "Connection Error",
+    "lostAccessDesc": "We lost access to your Google account. Please reconnect to restore functionality.",
+    "reconnectGoogle": "Reconnect Google",
+    "connectGoogleDesc": "Connect to Google Business Profile to enable automatic review syncing, AI response generation, and GBP posting.",
+    "googleConnectedDesc": "Google is connected. Click Enable to start syncing reviews.",
+    "googleNotConnectedDesc": "Go to the Integrations tab to connect your Google account.",
+    "enableSync": "Enable Sync",
+    "goToIntegrations": "Go to Integrations"
   }
 }

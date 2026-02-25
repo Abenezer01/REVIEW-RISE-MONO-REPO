@@ -1,9 +1,11 @@
 import { googleReviewsService } from './google-reviews.service';
+import { tokenGuardService } from './token-guard.service';
 import { 
     reviewRepository, 
     reviewSourceRepository, 
     reviewSyncLogRepository, 
-    locationRepository 
+    locationRepository,
+    platformIntegrationRepository 
 } from '@platform/db';
 import { ReviewSource } from '@prisma/client';
 
@@ -13,8 +15,7 @@ export class ReviewSyncService {
         
         const results = [];
         for (const source of sources) {
-            if (source.status !== 'active' || !source.accessToken) continue;
-
+            if (source.status !== 'active') continue;
             if (source.platform === 'google') {
                 results.push(this.syncGoogleReviews(source));
             }
@@ -30,35 +31,27 @@ export class ReviewSyncService {
         const startedAt = new Date();
 
         try {
-            // Refresh token if needed? 
-            // Google tokens expire in 1 hour. We likely need to refresh if close to expiry.
-            // For now, let's assume valid or auto-refresh in wrapper (not implemented yet).
-            // Better: Check expiry and refresh.
+            // Fetch the Google platform integration for this location
+            const integration = await platformIntegrationRepository.findByLocationIdAndPlatform(source.locationId, 'google');
             
-            let accessToken = source.accessToken!;
-            if (source.refreshToken && source.expiresAt && BigInt(new Date().getTime()) > (source.expiresAt - BigInt(300000))) {
-                 console.log("Refreshing token for source:", source.id);
-                 const tokens = await googleReviewsService.refreshAccessToken(source.refreshToken);
-                 accessToken = tokens.access_token!;
-                 // Update DB
-                 await reviewSourceRepository.updateTokens(
-                    source.id, 
-                    tokens.access_token!, 
-                    tokens.refresh_token || undefined, 
-                    tokens.expiry_date || undefined
-                 );
+            if (!integration || integration.status !== 'active') {
+                throw new Error('No active Google PlatformIntegration found for this location. Reconnection required.');
             }
 
-            const metadata = source.metadata as any;
-            if (!metadata?.locationName) {
-                throw new Error('Missing locationName in metadata');
+            // Token guard handles decryption + auto-refresh for PlatformIntegration
+            const accessToken = await tokenGuardService.getValidAccessToken(integration);
+
+            // Use dedicated gbpLocationName field from integration
+            const gbpLocationName = integration.gbpLocationName;
+
+            if (!gbpLocationName) {
+                throw new Error('No GBP locationName found on the PlatformIntegration. User may need to reconnect.');
             }
 
-            // Fetch location to get businessId
             const location = await locationRepository.findById(source.locationId);
             if (!location) throw new Error('Location not found');
 
-            const { reviews } = await googleReviewsService.listReviews(accessToken, metadata.locationName);
+            const { reviews } = await googleReviewsService.listReviews(accessToken, gbpLocationName);
             
             if (reviews && reviews.length > 0) {
                 for (const review of reviews) {
@@ -85,10 +78,9 @@ export class ReviewSyncService {
             console.error('Error syncing Google reviews:', error);
         }
 
-        // Log the sync
         const location = await locationRepository.findById(source.locationId);
         if (location) {
-             await reviewSyncLogRepository.createLog({
+            await reviewSyncLogRepository.createLog({
                 business: { connect: { id: location.businessId } },
                 location: { connect: { id: source.locationId } },
                 platform: source.platform,

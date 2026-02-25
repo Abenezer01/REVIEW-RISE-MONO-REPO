@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Alert, Box, Button, Paper, Stack, Typography, alpha, useTheme } from '@mui/material';
 
-import type { BlueprintOutput } from '@platform/contracts';
+import type { BlueprintOutput, KeywordCluster } from '@platform/contracts';
 
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -16,137 +16,224 @@ import ResultsStrategy from './ResultsStrategy';
 import ResultsCampaigns from './ResultsCampaigns';
 
 interface Props {
-    results: BlueprintOutput | null;
+  results: BlueprintOutput | null;
 }
 
 export default function BlueprintResults({ results }: Props) {
-    const t = useTranslation('blueprint');
-    const theme = useTheme();
+  const t = useTranslation('blueprint');
+  const theme = useTheme();
 
-    if (!results) {
-        return (
-            <Box sx={{ mt: 4 }}>
-                <Alert severity="info">{t('results.noBlueprint')}</Alert>
-            </Box>
-        );
+  if (!results) {
+    return (
+      <Box sx={{ mt: 4 }}>
+        <Alert severity="info">{t('results.noBlueprint')}</Alert>
+      </Box>
+    );
+  }
+
+  const downloadFile = (content: string | Blob, filename: string, type: string) => {
+    const blob = content instanceof Blob ? content : new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = filename;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  };
+
+  const toCsv = () => {
+    const rows: string[] = [];
+
+    rows.push([
+      'Campaign Name',
+      'Ad Group Name',
+      'Keyword',
+      'Match Type',
+      'Headline',
+      'Description'
+    ].join(','));
+
+    results.adGroups.forEach((group) => {
+      const keywords = group.keywords.keywords;
+
+      keywords.forEach((kw: KeywordCluster['keywords'][number]) => {
+        const headline = group.assets.headlines[0] || '';
+        const description = group.assets.descriptions?.[0] || '';
+        const campaignName = results.campaigns?.[0]?.name || group.name;
+
+        rows.push([
+          JSON.stringify(campaignName),
+          JSON.stringify(group.name),
+          JSON.stringify(kw.term),
+          JSON.stringify(kw.matchType),
+          JSON.stringify(headline),
+          JSON.stringify(description)
+        ].join(','));
+      });
+    });
+
+    return rows.join('\n');
+  };
+
+  const handleExport = (format: 'pdf' | 'csv' | 'google-ads') => {
+    if (format === 'csv') {
+      const csv = toCsv();
+
+      downloadFile(csv, 'google-blueprint.csv', 'text/csv;charset=utf-8;');
+
+      return;
     }
 
-    const handleExport = (format: 'pdf' | 'csv' | 'google-ads') => {
-        // TODO: Implement export functionality
-        console.log(`Exporting as ${format}`);
-        alert(`Export as ${format.toUpperCase()} - Coming soon!`);
+    if (format === 'google-ads') {
+      const payload = {
+        summary: results.strategySummary,
+        budget: results.budgetModeling,
+        campaigns: results.campaigns,
+        adGroups: results.adGroups,
+        keywords: results.clusters,
+        negatives: results.negatives
+      };
+
+      downloadFile(
+        JSON.stringify(payload, null, 2),
+        'google-ads-blueprint.json',
+        'application/json'
+      );
+
+      return;
+    }
+
+    const printable = {
+      summary: results.strategySummary,
+      campaigns: results.campaigns,
+      adGroups: results.adGroups,
+      keywords: results.clusters,
+      landingPage: results.landingPageAnalysis,
+      negatives: results.negatives
     };
 
-    return (
-        <Box>
-            {/* Success Banner */}
-            <Paper
-                elevation={0}
-                sx={{
-                    bgcolor: alpha(theme.palette.success.main, 0.1),
-                    border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
-                    borderRadius: 2,
-                    p: 3,
-                    mb: 4
-                }}
-            >
-                <Stack direction="row" alignItems="center" spacing={2}>
-                    <Box
-                        sx={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: '50%',
-                            bgcolor: 'success.main',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'success.contrastText'
-                        }}
-                    >
-                        <Typography variant="h5">✓</Typography>
-                    </Box>
-                    <Box sx={{ flex: 1 }}>
-                        <Typography variant="h5" sx={{ fontWeight: 600, color: 'success.dark' }}>
-                            {t('results.successTitle')}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            {t('results.successText')}
-                        </Typography>
-                    </Box>
-                    <Stack direction="row" spacing={1}>
-                        <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() => handleExport('csv')}
-                        >
-                            {t('results.exportCsv')}
-                        </Button>
-                        <Button
-                            variant="contained"
-                            size="small"
-                            onClick={() => handleExport('google-ads')}
-                        >
-                            {t('results.exportGoogleAds')}
-                        </Button>
-                    </Stack>
-                </Stack>
-            </Paper>
-
-            {/* Results Sections */}
-            <Stack spacing={3}>
-                {/* Strategy & Budget */}
-                {results.strategySummary && results.budgetModeling && (
-                    <ResultsStrategy
-                        strategy={results.strategySummary}
-                        budget={results.budgetModeling}
-                    />
-                )}
-
-                {/* Campaign Structure */}
-                {results.campaigns && results.campaigns.length > 0 && (
-                    <ResultsCampaigns campaigns={results.campaigns} />
-                )}
-
-                {/* Keywords Section */}
-                <ResultsKeywords clusters={results.clusters} />
-
-                {/* Landing Page Analysis */}
-                {results.landingPageAnalysis && (
-                    <ResultsLandingPage analysis={results.landingPageAnalysis} />
-                )}
-
-                {/* Ad Groups Section */}
-                <ResultsAdGroups adGroups={results.adGroups} />
-
-                {/* Negative Keywords Section */}
-                <ResultsNegatives negatives={results.negatives} />
-            </Stack>
-
-            {/* Bottom Actions */}
-            <Paper
-                elevation={0}
-                sx={{
-                    mt: 4,
-                    p: 3,
-                    bgcolor: 'background.paper',
-                    borderRadius: 2,
-                    border: `1px solid ${theme.palette.divider}`
-                }}
-            >
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography variant="body2" color="text.secondary">
-                        {t('results.support')}
-                    </Typography>
-                    <Stack direction="row" spacing={2}>
-                        <Button variant="outlined" onClick={() => window.print()}>
-                            {t('results.print')}
-                        </Button>
-                        <Button variant="contained" onClick={() => handleExport('pdf')}>
-                            {t('results.pdf')}
-                        </Button>
-                    </Stack>
-                </Stack>
-            </Paper>
-        </Box>
+    downloadFile(
+      JSON.stringify(printable, null, 2),
+      'google-blueprint-report.json',
+      'application/json'
     );
+  };
+
+  return (
+    <Box>
+      {/* Success Banner */}
+      <Paper
+        elevation={0}
+        sx={{
+          bgcolor: alpha(theme.palette.success.main, 0.1),
+          border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
+          borderRadius: 2,
+          p: 3,
+          mb: 4
+        }}
+      >
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              bgcolor: 'success.main',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'success.contrastText'
+            }}
+          >
+            <Typography variant="h5">✓</Typography>
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="h5" sx={{ fontWeight: 600, color: 'success.dark' }}>
+              {t('results.successTitle')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {t('results.successText')}
+            </Typography>
+          </Box>
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => handleExport('csv')}
+            >
+              {t('results.exportCsv')}
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => handleExport('google-ads')}
+            >
+              {t('results.exportGoogleAds')}
+            </Button>
+          </Stack>
+        </Stack>
+      </Paper>
+
+      {/* Results Sections */}
+      <Stack spacing={3}>
+        {/* Strategy & Budget */}
+        {results.strategySummary && results.budgetModeling && (
+          <ResultsStrategy
+            strategy={results.strategySummary}
+            budget={results.budgetModeling}
+          />
+        )}
+
+        {/* Campaign Structure */}
+        {results.campaigns && results.campaigns.length > 0 && (
+          <ResultsCampaigns campaigns={results.campaigns} />
+        )}
+
+        {/* Keywords Section */}
+        <ResultsKeywords clusters={results.clusters} />
+
+        {/* Landing Page Analysis */}
+        {results.landingPageAnalysis && (
+          <ResultsLandingPage analysis={results.landingPageAnalysis} />
+        )}
+
+        {/* Ad Groups Section */}
+        <ResultsAdGroups adGroups={results.adGroups} />
+
+        {/* Negative Keywords Section */}
+        <ResultsNegatives negatives={results.negatives} />
+      </Stack>
+
+      {/* Bottom Actions */}
+      <Paper
+        elevation={0}
+        sx={{
+          mt: 4,
+          p: 3,
+          bgcolor: 'background.paper',
+          borderRadius: 2,
+          border: `1px solid ${theme.palette.divider}`
+        }}
+      >
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Typography variant="body2" color="text.secondary">
+            {t('results.support')}
+          </Typography>
+          <Stack direction="row" spacing={2}>
+            <Button variant="outlined" onClick={() => window.print()}>
+              {t('results.print')}
+            </Button>
+            <Button variant="contained" onClick={() => handleExport('pdf')}>
+              {t('results.pdf')}
+            </Button>
+          </Stack>
+        </Stack>
+      </Paper>
+    </Box>
+  );
 }

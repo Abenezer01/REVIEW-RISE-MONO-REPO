@@ -138,6 +138,8 @@ model Location {
   socialConnections   SocialConnection[]
   userBusinessRoles   UserBusinessRole[]
   visibilityMetrics   VisibilityMetric[]
+  pendingGoogleConnections  PendingGoogleConnection[]
+  platformIntegrations PlatformIntegration[]
 
   @@index([businessId])
 }
@@ -715,21 +717,57 @@ model ReviewReply {
 }
 
 model ReviewSource {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  locationId   String   @db.Uuid
-  platform     String
-  accessToken  String?
-  refreshToken String?
-  expiresAt    BigInt?
-  status       String   @default("active")
-  metadata     Json?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  reviews      Review[]
-  location     Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  locationId            String    @db.Uuid
+  platform              String
+  status                String    @default("active") // active, error, disconnected
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  reviews               Review[]
+  location              Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   @@unique([locationId, platform])
   @@index([locationId])
+  @@index([status])
+}
+
+model PlatformIntegration {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  locationId            String    @db.Uuid
+  platform              String
+  accessToken           String?   // AES-256-GCM encrypted (format: iv:authTag:ciphertext)
+  refreshToken          String?   // AES-256-GCM encrypted
+  expiresAt             BigInt?
+  status                String    @default("active") // active, error, disconnected
+  metadata              Json?
+  gbpAccountId          String?   // e.g. "accounts/123456"
+  gbpLocationName       String?   // e.g. "accounts/123456/locations/789"
+  gbpLocationTitle      String?   // e.g. "My Awesome Cafe"
+  connectedAt           DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  location              Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([locationId, platform])
+  @@index([locationId])
+  @@index([status])
+}
+
+model PendingGoogleConnection {
+  id                    String   @id @default(uuid())
+  locationId            String   @db.Uuid
+  nonce                 String   @unique
+  encryptedAccessToken  String
+  encryptedRefreshToken String
+  expiryDate            BigInt
+  accountsJson          Json     // List of GBP accounts [{name, accountName, type}]
+  locationsJson         Json     // List of GBP locations [{name, title, address, ...}]
+  expiresAt             DateTime // Short TTL (~10 minutes)
+  createdAt             DateTime @default(now())
+  location              Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@index([locationId])
+  @@index([expiresAt])
 }
 
 model BrandRecommendation {

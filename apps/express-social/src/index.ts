@@ -15,6 +15,10 @@ app.use(requestIdMiddleware);
 app.use(morgan('dev'));
 app.use(express.json());
 
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', service: 'express-social' });
+});
+
 // Routes
 import socialRoutes from './routes/v1/social.routes';
 import postsRoutes from './routes/v1/posts.routes';

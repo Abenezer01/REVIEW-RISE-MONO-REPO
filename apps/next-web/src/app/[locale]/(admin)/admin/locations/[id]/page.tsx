@@ -36,7 +36,7 @@ import { SERVICES } from '@/configs/services'
 
 import LocationReviews from '@/components/admin/locations/review-sync/LocationReviews'
 import { SocialConnectionList } from '@/components/admin/locations/social/SocialConnectionList'
-
+import IntegrationsDashboard from '@/components/admin/locations/integrations/IntegrationsDashboard'
 
 // Placeholder Components for new tabs
 const LocationOverview = ({ location }: { location: any }) => {
@@ -161,6 +161,7 @@ const LocationDetailsPage = () => {
                         <Tab value='overview' label={t('locations.detail.tabs.overview')} icon={<InfoIcon />} iconPosition='start' />
                         <Tab value='reviews' label={t('locations.detail.tabs.reviews')} icon={<StarIcon />} iconPosition='start' />
                         <Tab value='sources' label={t('locations.detail.tabs.sources')} icon={<LinkIcon />} iconPosition='start' />
+                        <Tab value='integrations' label="Integrations" icon={<LinkIcon />} iconPosition='start' />
                         <Tab value='social' label={t('locations.detail.tabs.social') || 'Social'} icon={<ShareIcon />} iconPosition='start' />
                     </CustomTabList>
 
@@ -173,6 +174,9 @@ const LocationDetailsPage = () => {
                         </TabPanel>
                         <TabPanel value='sources' sx={{ p: 0 }}>
                             <ReviewSourcesDashboard />
+                        </TabPanel>
+                        <TabPanel value='integrations' sx={{ p: 0 }}>
+                            <IntegrationsDashboard />
                         </TabPanel>
                         <TabPanel value='social' sx={{ p: 0 }}>
                             <Box sx={{ mb: 3 }}>

@@ -56,7 +56,7 @@ const AutoReplySettingsPage = () => {
           setBusinesses(uniqueBusinesses)
           
           if (uniqueBusinesses.length > 0) {
-            setSelectedBusinessId(uniqueBusinesses[0].id)
+            setSelectedBusinessId((uniqueBusinesses as any[])[0].id)
           }
         } else if (accountData && 'error' in accountData) {
           throw new Error(accountData.error)

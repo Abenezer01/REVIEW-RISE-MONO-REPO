@@ -13,74 +13,80 @@ import { alpha, Box, Grid, Paper, Typography, useTheme } from '@mui/material'
 import { useTranslation } from '@/hooks/useTranslation'
 
 export const VERTICALS = [
-    { value: 'Local Service', icon: <StoreIcon fontSize="large" /> },
-    { value: 'E-commerce', icon: <ShoppingBagIcon fontSize="large" /> },
-    { value: 'SaaS', icon: <LanguageIcon fontSize="large" /> },
-    { value: 'Healthcare', icon: <HealingIcon fontSize="large" /> },
-    { value: 'Real Estate', icon: <HomeIcon fontSize="large" /> },
-    { value: 'Legal', icon: <GavelIcon fontSize="large" /> },
-    { value: 'Restaurant', icon: <RestaurantIcon fontSize="large" /> },
-    { value: 'Other', icon: <PublicIcon fontSize="large" /> },
+  { value: 'Local Service', icon: <StoreIcon fontSize="large" /> },
+  { value: 'E-commerce', icon: <ShoppingBagIcon fontSize="large" /> },
+  { value: 'SaaS', icon: <LanguageIcon fontSize="large" /> },
+  { value: 'Healthcare', icon: <HealingIcon fontSize="large" /> },
+  { value: 'Real Estate', icon: <HomeIcon fontSize="large" /> },
+  { value: 'Legal', icon: <GavelIcon fontSize="large" /> },
+  { value: 'Restaurant', icon: <RestaurantIcon fontSize="large" /> },
+  { value: 'Other', icon: <PublicIcon fontSize="large" /> },
 ] as const
 
 export type VerticalValue = typeof VERTICALS[number]['value']
 
 interface VerticalSelectionProps {
-    value: VerticalValue
-    onChange: (value: VerticalValue) => void
-    tPrefix?: string // Allows for meta.form.verticals or just form.verticals
+  value: VerticalValue
+  onChange: (value: VerticalValue) => void
+  tPrefix?: string
+  namespace?: string
 }
 
-export default function VerticalSelection({ value, onChange, tPrefix = 'meta.form.verticals' }: VerticalSelectionProps) {
-    const theme = useTheme()
-    const t = useTranslation('blueprint')
+export default function VerticalSelection({
+  value,
+  onChange,
+  tPrefix = 'meta.form.verticals',
+  namespace = 'blueprint',
+}: VerticalSelectionProps) {
+  const theme = useTheme()
+  const t = useTranslation(namespace)
 
-    const getTranslationKey = (v: string) => {
-        const mapping: Record<string, string> = {
-            'Local Service': 'localService',
-            'E-commerce': 'ecommerce',
-            'SaaS': 'saas',
-            'Healthcare': 'healthcare',
-            'Real Estate': 'realEstate',
-            'Legal': 'legal',
-            'Restaurant': 'restaurant',
-            'Other': 'other'
-        }
-
-
-return `${tPrefix}.${mapping[v] || v.toLowerCase()}`
+  const getTranslationKey = (v: string) => {
+    const mapping: Record<string, string> = {
+      'Local Service': 'localService',
+      'E-commerce': 'ecommerce',
+      'SaaS': 'saas',
+      'Healthcare': 'healthcare',
+      'Real Estate': 'realEstate',
+      'Legal': 'legal',
+      'Restaurant': 'restaurant',
+      'Other': 'other'
     }
 
-    return (
-        <Grid container spacing={2}>
-            {VERTICALS.map((v) => (
-                <Grid size={{ xs: 6, sm: 3 }} key={v.value}>
-                    <Paper
-                        elevation={0}
-                        onClick={() => onChange(v.value)}
-                        sx={{
-                            p: 2,
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            border: `2px solid ${value === v.value ? theme.palette.primary.main : theme.palette.divider}`,
-                            borderRadius: 2,
-                            bgcolor: value === v.value ? alpha(theme.palette.primary.main, 0.05) : 'background.paper',
-                            transition: 'all 0.2s ease',
-                            '&:hover': {
-                                borderColor: theme.palette.primary.main,
-                                transform: 'translateY(-2px)'
-                            }
-                        }}
-                    >
-                        <Box sx={{ color: value === v.value ? 'primary.main' : 'text.secondary', mb: 1 }}>
-                            {v.icon}
-                        </Box>
-                        <Typography variant="body2" fontWeight={value === v.value ? 600 : 500}>
-                            {t(getTranslationKey(v.value))}
-                        </Typography>
-                    </Paper>
-                </Grid>
-            ))}
+
+    return `${tPrefix}.${mapping[v] || v.toLowerCase()}`
+  }
+
+  return (
+    <Grid container spacing={2}>
+      {VERTICALS.map((v) => (
+        <Grid size={{ xs: 6, sm: 3 }} key={v.value}>
+          <Paper
+            elevation={0}
+            onClick={() => onChange(v.value)}
+            sx={{
+              p: 2,
+              textAlign: 'center',
+              cursor: 'pointer',
+              border: `2px solid ${value === v.value ? theme.palette.primary.main : theme.palette.divider}`,
+              borderRadius: 2,
+              bgcolor: value === v.value ? alpha(theme.palette.primary.main, 0.05) : 'background.paper',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                borderColor: theme.palette.primary.main,
+                transform: 'translateY(-2px)'
+              }
+            }}
+          >
+            <Box sx={{ color: value === v.value ? 'primary.main' : 'text.secondary', mb: 1 }}>
+              {v.icon}
+            </Box>
+            <Typography variant="body2" fontWeight={value === v.value ? 600 : 500}>
+              {t(getTranslationKey(v.value))}
+            </Typography>
+          </Paper>
         </Grid>
-    )
+      ))}
+    </Grid>
+  )
 }

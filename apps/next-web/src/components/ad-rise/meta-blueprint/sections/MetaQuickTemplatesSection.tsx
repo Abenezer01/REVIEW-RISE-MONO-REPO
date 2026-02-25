@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Paper, Stack, Typography, alpha, useTheme } from '@mui/material';
+import { Box, Button, Paper, Stack, Typography, alpha, useTheme } from '@mui/material';
 import { META_QUICK_TEMPLATES, type MetaQuickTemplate } from '../data/meta-quick-templates';
 
 interface MetaQuickTemplatesSectionProps {
@@ -10,64 +10,65 @@ export function MetaQuickTemplatesSection({ onSelectTemplate, t }: MetaQuickTemp
     const theme = useTheme();
 
     return (
-        <Paper
-            sx={{
-                bgcolor: alpha(theme.palette.primary.main, 0.03),
-                borderRadius: 2,
-                p: 3,
-                mb: 3,
-                border: `1px dashed ${theme.palette.primary.main}`
-            }}
-        >
-            <Stack spacing={2}>
-                <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
-                        {t('meta.quickTemplates.title')}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {t('meta.quickTemplates.subtitle')}
-                    </Typography>
-                </Box>
+        <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                {t('meta.quickTemplates.title')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('meta.quickTemplates.subtitle')}
+            </Typography>
+            <Stack spacing={1.5}>
+                {META_QUICK_TEMPLATES.map((template) => {
+                    const center = template.data.geoTargeting?.center;
+                    const radius = template.data.geoTargeting?.radius;
+                    const unit = template.data.geoTargeting?.unit;
 
-                <Grid container spacing={1.5}>
-                    {META_QUICK_TEMPLATES.map((template) => (
-                        <Grid size={{ xs: 6, sm: 4, md: 3 }} key={template.id}>
-                            <Button
-                                fullWidth
-                                variant="outlined"
-                                onClick={() => onSelectTemplate(template)}
-                                sx={{
-                                    p: 1.5,
-                                    height: '100%',
-                                    flexDirection: 'column',
-                                    gap: 0.5,
-                                    borderColor: theme.palette.divider,
-                                    '&:hover': {
-                                        borderColor: theme.palette.primary.main,
-                                        bgcolor: alpha(theme.palette.primary.main, 0.05)
-                                    }
-                                }}
-                            >
-                                <Typography variant="h5">{template.icon}</Typography>
-                                <Typography variant="caption" fontWeight={500} textAlign="center">
-                                    {t(`meta.form.templates.${template.id}`)}
-                                </Typography>
-                            </Button>
-                        </Grid>
-                    ))}
-                </Grid>
-
-                <Box sx={{
-                    p: 1.5,
-                    bgcolor: alpha(theme.palette.info.main, 0.05),
-                    borderRadius: 1,
-                    border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`
-                }}>
-                    <Typography variant="caption" color="info.main">
-                        💡 <strong>{t('meta.quickTemplates.tip')}</strong> {t('meta.quickTemplates.tipText')}
-                    </Typography>
-                </Box>
+                    return (
+                        <Paper
+                            key={template.id}
+                            onClick={() => onSelectTemplate(template)}
+                            sx={{
+                                p: 1.5,
+                                bgcolor: 'background.default',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                '&:hover': {
+                                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                                    borderColor: 'primary.main',
+                                    transform: 'translateX(4px)'
+                                }
+                            }}
+                        >
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                <Box sx={{ flex: 1 }}>
+                                    <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                                        <Typography variant="body1">{template.icon}</Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                            {t(`meta.form.templates.${template.id}`)}
+                                        </Typography>
+                                    </Stack>
+                                    {center && (
+                                        <Typography variant="caption" color="text.secondary">
+                                            {center}
+                                            {radius && unit && ` • ${radius} ${t(`meta.form.radiusUnit.${unit}`)}`}
+                                        </Typography>
+                                    )}
+                                </Box>
+                                <Button size="small" variant="text" sx={{ minWidth: 'auto', px: 1 }}>
+                                    {t('blueprint.preview.useArrow')}
+                                </Button>
+                            </Stack>
+                        </Paper>
+                    );
+                })}
             </Stack>
-        </Paper>
+            <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', mt: 1.5, textAlign: 'center' }}
+            >
+                {t('blueprint.preview.clickTemplateHelp')}
+            </Typography>
+        </Box>
     );
 }

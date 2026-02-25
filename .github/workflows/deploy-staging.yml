@@ -190,6 +190,12 @@ jobs:
             # Create/Update .env.production from secret
             echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
             
+            # Inject API keys from GitHub secrets
+            echo "" >> .env.production
+            echo "# API Keys (injected from GitHub Secrets)" >> .env.production
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env.production
+            echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env.production
+            
             # Run deployment script
             chmod +x ./scripts/deploy-staging.sh
             ./scripts/deploy-staging.sh --seed

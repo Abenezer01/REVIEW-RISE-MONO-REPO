@@ -20,19 +20,41 @@ export class ReviewSourceRepository extends BaseRepository<
         });
     }
 
+    async findActiveByLocationId(locationId: string) {
+        return this.delegate.findMany({
+            where: { locationId, status: 'active' },
+        });
+    }
+
     async findByLocationIdAndPlatform(locationId: string, platform: string) {
         return this.delegate.findFirst({
             where: { locationId, platform },
         });
     }
 
-    async updateTokens(id: string, accessToken: string, refreshToken?: string, expiresAt?: number) {
-        return this.update(id, {
-            accessToken,
-            ...(refreshToken && { refreshToken }),
-            ...(expiresAt && { expiresAt })
+    async updateStatus(id: string, status: 'active' | 'error' | 'disconnected') {
+        return this.update(id, { status });
+    }
+
+    async upsertLocationPlatform(locationId: string, platform: string) {
+        return (this.delegate as any).upsert({
+            where: {
+                locationId_platform: {
+                    locationId,
+                    platform
+                }
+            },
+            update: {
+                status: 'active'
+            },
+            create: {
+                locationId,
+                platform,
+                status: 'active'
+            }
         });
     }
 }
 
 export const reviewSourceRepository = new ReviewSourceRepository();
+
