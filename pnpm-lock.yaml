@@ -416,9 +416,15 @@ importers:
       '@platform/contracts':
         specifier: workspace:*
         version: link:../../packages/@platform/contracts
+      '@platform/db':
+        specifier: workspace:*
+        version: link:../../packages/@platform/db
       '@platform/middleware':
         specifier: workspace:*
         version: link:../../packages/@platform/middleware
+      axios:
+        specifier: ^1.7.2
+        version: 1.13.4
       cors:
         specifier: ^2.8.5
         version: 2.8.5
