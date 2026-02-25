@@ -5,12 +5,9 @@ import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import Checkbox from '@mui/material/Checkbox';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { useTranslations } from 'next-intl';
 
@@ -110,40 +107,13 @@ const ConnectGoogleModal = ({ open, onClose, onConnect }: ConnectGoogleModalProp
                      ))}
                 </Card>
 
-                {/* Mock Location Selection (Visual Only as per "Clone" request, logic might differ) */}
-                <Typography variant="h6" sx={{ mb: 2 }}>{t('selectTitle')}</Typography>
-                <Card variant="outlined" sx={{ mb: 2, border: '1px solid', borderColor: 'warning.main', bgcolor: 'transparent' }}>
-                    <ListItem 
-                        secondaryAction={<Box sx={{ bgcolor: 'success.dark', px: 1, py: 0.5, borderRadius: 1, fontSize: '0.75rem', color: 'white' }}>{t('reviewsCount', { count: 284 })}</Box>}
-                        sx={{ py: 1.5 }}
-                    >
-                         <Checkbox defaultChecked color="warning" />
-                         <ListItemText 
-                            primary={<Typography variant="subtitle1" fontWeight="bold">{ t('mockData.downtownOffice') }</Typography>}
-                            secondary={ t('mockData.downtownAddress') }
-                        />
-                    </ListItem>
-                </Card>
-                <Card variant="outlined" sx={{ mb: 2, border: '1px solid', borderColor: 'warning.main', bgcolor: 'transparent' }}>
-                    <ListItem 
-                        secondaryAction={<Box sx={{ bgcolor: 'success.dark', px: 1, py: 0.5, borderRadius: 1, fontSize: '0.75rem', color: 'white' }}>{t('reviewsCount', { count: 192 })}</Box>}
-                         sx={{ py: 1.5 }}
-                    >
-                         <Checkbox defaultChecked color="warning" />
-                         <ListItemText 
-                            primary={<Typography variant="subtitle1" fontWeight="bold">{ t('mockData.westsideBranch') }</Typography>}
-                            secondary={ t('mockData.westsideAddress') }
-                        />
-                    </ListItem>
-                </Card>
-
                  <Box sx={{ bgcolor: 'background.default', p: 2, borderRadius: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 4 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Typography variant="caption" color="text.secondary">{t('secure')}</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 2 }}>
                         <Button onClick={onClose} variant="text" color="inherit">{tc('common.cancel')}</Button>
-                        <Button onClick={onConnect} variant="contained" color="warning" size="large" sx={{ fontWeight: 'bold' }}>
+                        <Button onClick={onConnect} variant="contained" color="primary" size="large" sx={{ fontWeight: 'bold' }}>
                             {t('connectBtn')}
                         </Button>
                     </Box>

@@ -45,6 +45,8 @@ export { PublishingJobRepository, publishingJobRepository } from './publishing-j
 export { AdriseSessionRepository, adriseSessionRepository } from './adrise-session.repository';
 export { AdriseSessionVersionRepository, adriseSessionVersionRepository } from './adrise-session-version.repository';
 export { AdriseOutputRepository, adriseOutputRepository } from './adrise-output.repository';
+export { PendingGoogleConnectionRepository, pendingGoogleConnectionRepository } from './pending-google-connection.repository';
+export { PlatformIntegrationRepository, platformIntegrationRepository } from './platform-integration.repository';
 
 // Import repositories for the convenience object
 import { userRepository } from './user.repository';
@@ -79,6 +81,8 @@ import { publishingJobRepository } from './publishing-job.repository';
 import { adriseSessionRepository } from './adrise-session.repository';
 import { adriseSessionVersionRepository } from './adrise-session-version.repository';
 import { adriseOutputRepository } from './adrise-output.repository';
+import { pendingGoogleConnectionRepository } from './pending-google-connection.repository';
+import { platformIntegrationRepository } from './platform-integration.repository';
 
 // Re-export all repositories as a single object for convenience
 export const repositories = {
@@ -114,4 +118,6 @@ export const repositories = {
     adriseSession: adriseSessionRepository,
     adriseSessionVersion: adriseSessionVersionRepository,
     adriseOutput: adriseOutputRepository,
+    pendingGoogleConnection: pendingGoogleConnectionRepository,
+    platformIntegration: platformIntegrationRepository,
 } as const;

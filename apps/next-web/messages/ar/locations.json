@@ -102,7 +102,36 @@
       "mockTime": "2:00 صباحاً",
       "mockDurationValue": "دقيقتان"
     },
+    "selector": {
+      "title": "اختر الموقع",
+      "subtitle": "اختر موقع ملف Google التجاري للاتصال به.",
+      "foundLocations": "تم العثور على {count} مواقع",
+      "noAddress": "لم يتم تقديم عنوان",
+      "confirm": "الاتصال بهذا الموقع",
+      "connecting": "جاري الاتصال..."
+    },
+    "errors": {
+      "accessDenied": "تم إلغاء اتصال Google.",
+      "noAccounts": "لم يتم العثور على حسابات ملف Google التجاري.",
+      "noLocations": "لم يتم العثور على مواقع في حساب Google الخاص بك.",
+      "sessionExpired": "انتهت الجلسة. يرجى المحاولة للاتصال مرة أخرى.",
+      "serverError": "حدث خطأ في الخادم أثناء الاتصال.",
+      "invalidCallback": "فشل الاتصال: بيانات رد نداء غير صالحة."
+    },
     "configure": "تكوين",
-    "disconnect": "فصل"
+    "disconnect": "فصل",
+    "connectedPlatforms": "المنصات المتصلة",
+    "integrationsDesc": "قم بتوصيل موقعك بمنصات خارجية مثل ملف Google التجاري. بمجرد الاتصال، تدعم هذه التكاملات ميزات مثل مزامنة المراجعات و GBP Rocket عبر المنصة.",
+    "connected": "متصل",
+    "to": "بـ",
+    "connectionActiveDesc": "اتصالك نشط. يمكن لميزات مثل مزامنة المراجعات والردود التلقائية استخدام هذا الاتصال.",
+    "connectionError": "خطأ في الاتصال",
+    "lostAccessDesc": "لقد فقدنا الوصول إلى حسابك على Google. يرجى إعادة الاتصال لاستعادة الوظائف.",
+    "reconnectGoogle": "إعادة الاتصال بـ Google",
+    "connectGoogleDesc": "اتصل بملف Google التجاري لتمكين المزامنة التلقائية للمراجعات، وإنشاء الردود المدعومة بالذكاء الاصطناعي، والنشر على Google.",
+    "googleConnectedDesc": "Google متصل. انقر فوق تمكين لبدء مزامنة المراجعات.",
+    "googleNotConnectedDesc": "انتقل إلى علامة التبويب المكاملات لربط حساب Google الخاص بك.",
+    "enableSync": "تمكين المزامنة",
+    "goToIntegrations": "الذهاب إلى المكاملات"
   }
 }

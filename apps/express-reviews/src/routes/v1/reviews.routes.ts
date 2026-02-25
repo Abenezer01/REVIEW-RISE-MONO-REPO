@@ -30,6 +30,7 @@ router.get('/locations/:locationId/sources', validateRequest(LocationIdParamSche
 router.get('/locations/:locationId/reviews', validateRequest(LocationIdParamSchema, 'params'), validateRequest(ListReviewsQuerySchema, 'query'), reviewsController.listLocationReviews);
 router.delete('/sources/:id', validateRequest(SourceIdParamSchema, 'params'), reviewsController.disconnectReviewSource);
 router.post('/locations/:locationId/sync', validateRequest(LocationIdParamSchema, 'params'), reviewsController.syncReviews);
+router.post('/locations/:locationId/enable-google-sync', validateRequest(LocationIdParamSchema, 'params'), reviewsController.enableGoogleSync);
 router.get('/locations/:locationId/stats', validateRequest(LocationIdParamSchema, 'params'), reviewsController.getReviewStats);
 router.get('/locations/:locationId/keywords', validateRequest(LocationIdParamSchema, 'params'), reviewsController.getLocationKeywords);
 
@@ -47,8 +48,12 @@ router.get('/analytics/competitor-comparison', validateRequest(AnalyticsQuerySch
 router.get('/analytics/metrics', validateRequest(AnalyticsQuerySchema, 'query'), analyticsController.getDashboardMetrics);
 router.post('/analytics/competitors', validateRequest(AddCompetitorDataSchema), analyticsController.addCompetitorData);
 
-// OAuth
+// Google OAuth – 3-Phase Flow
 router.get('/auth/google/connect', authController.connectGoogle);
 router.get('/auth/google/callback', authController.googleCallback);
+router.get('/auth/google/pending/:id', authController.getPendingConnection);
+router.post('/auth/google/finalize', authController.finalizeConnection);
+router.post('/auth/google/disconnect/:locationId', authController.disconnectGoogle);
+router.get('/auth/google/status/:locationId', authController.getConnectionStatus);
 
 export default router;

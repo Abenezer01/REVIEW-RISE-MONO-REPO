@@ -1,5 +1,6 @@
-import { reviewRepository, reviewSourceRepository, reviewReplyRepository, Prisma } from '@platform/db';
+import { platformIntegrationRepository, Prisma, reviewReplyRepository, reviewRepository } from '@platform/db';
 import { googleReviewsService } from './google-reviews.service';
+import { tokenGuardService } from './token-guard.service';
 
 export interface ListReviewsParams {
     locationId: string;
@@ -100,19 +101,11 @@ export const postReviewReply = async (
 
     // Handle both 'google' and 'gbp' as platform identifiers
     if (review.platform === 'google' || review.platform === 'gbp') {
-        // 1. Get the ReviewSource to get the accessToken
-        if (!review.reviewSourceId) {
-            const errorMsg = 'Review source not found for this review';
-            await Promise.all([
-                reviewRepository.update(reviewId, { replyStatus: 'failed', replyError: errorMsg } as any),
-                reviewReplyRepository.update(replyRecord.id, { status: 'failed' })
-            ]);
-            throw new Error(errorMsg);
-        }
-        
-        const source = await reviewSourceRepository.findById(review.reviewSourceId);
-        if (!source) {
-            const errorMsg = 'Review source not found in database';
+        // 1. Get the PlatformIntegration for the location
+        if (!review.locationId) throw new Error('Review must have a locationId to post a reply');
+        const integration = await platformIntegrationRepository.findByLocationIdAndPlatform(review.locationId, 'google');
+        if (!integration || integration.status !== 'active') {
+            const errorMsg = 'Active Google Platform Integration not found for this location';
             await Promise.all([
                 reviewRepository.update(reviewId, { replyStatus: 'failed', replyError: errorMsg } as any),
                 reviewReplyRepository.update(replyRecord.id, { status: 'failed' })
@@ -120,38 +113,12 @@ export const postReviewReply = async (
             throw new Error(errorMsg);
         }
 
-        let accessToken = source.accessToken;
-
-        // 2. Check if token is expired and refresh if necessary (with 5 min buffer)
-        const now = Date.now();
-        if (source.refreshToken && source.expiresAt && Number(source.expiresAt) <= (now + 300000)) {
-            console.log(`[GBP] Token expired for source ${source.id}, refreshing...`);
-            try {
-                const credentials = await googleReviewsService.refreshAccessToken(source.refreshToken);
-                if (credentials.access_token) {
-                    accessToken = credentials.access_token;
-                    const expiresAt = credentials.expiry_date || (now + 3600 * 1000);
-                    
-                    await reviewSourceRepository.updateTokens(
-                        source.id, 
-                        accessToken, 
-                        credentials.refresh_token || undefined, 
-                        expiresAt
-                    );
-                    console.log(`[GBP] Token refreshed successfully for source ${source.id}`);
-                }
-            } catch (refreshError: any) {
-                const errorMsg = `Failed to refresh Google token: ${refreshError.message}`;
-                await Promise.all([
-                    reviewRepository.update(reviewId, { replyStatus: 'failed', replyError: errorMsg } as any),
-                    reviewReplyRepository.update(replyRecord.id, { status: 'failed' })
-                ]);
-                throw new Error(errorMsg);
-            }
-        }
-
-        if (!accessToken) {
-            const errorMsg = 'No access token available for GBP';
+        // 2. Get valid access token (TokenGuard handles decrypt and refresh)
+        let accessToken;
+        try {
+            accessToken = await tokenGuardService.getValidAccessToken(integration);
+        } catch (tokenError: any) {
+            const errorMsg = `Failed to get valid Google token: ${tokenError.message}`;
             await Promise.all([
                 reviewRepository.update(reviewId, { replyStatus: 'failed', replyError: errorMsg } as any),
                 reviewReplyRepository.update(replyRecord.id, { status: 'failed' })
@@ -159,9 +126,9 @@ export const postReviewReply = async (
             throw new Error(errorMsg);
         }
 
-        const metadata = source.metadata as any;
-        if (!metadata?.locationName) {
-            const errorMsg = 'Missing locationName in source metadata';
+        const gbpLocationName = integration.gbpLocationName;
+        if (!gbpLocationName) {
+            const errorMsg = 'Missing GBP locationName in integration';
             await Promise.all([
                 reviewRepository.update(reviewId, { replyStatus: 'failed', replyError: errorMsg } as any),
                 reviewReplyRepository.update(replyRecord.id, { status: 'failed' })
@@ -170,9 +137,8 @@ export const postReviewReply = async (
         }
 
         // 3. Reconstruct the full review name
-        // locationName format: "accounts/{accountId}/locations/{locationId}"
         // externalId is the platform-specific reviewId
-        const reviewName = `${metadata.locationName}/reviews/${review.externalId}`;
+        const reviewName = `${gbpLocationName}/reviews/${review.externalId}`;
 
         try {
             console.log(`[GBP] Posting/Updating reply for review ${reviewId} (${reviewName})`);
