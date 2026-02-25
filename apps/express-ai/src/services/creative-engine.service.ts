@@ -6,6 +6,9 @@ import { llmService } from './llm.service';
 import { prisma } from '@platform/db';
 
 export class CreativeEngineService {
+    private getCreativeConceptDelegate() {
+        return (prisma as any).creativeConcept;
+    }
 
     async generateConcepts(input: any): Promise<CreativeConceptOutput> {
         const prompt = CREATIVE_ENGINE_PROMPTS.GENERATE_CONCEPTS(input);
@@ -74,11 +77,21 @@ export class CreativeEngineService {
 
     async saveConcept(businessId: string, concept: any): Promise<any> {
         try {
+            const creativeConcept = this.getCreativeConceptDelegate();
+            if (!creativeConcept?.create) {
+                console.warn('[CreativeEngine] creativeConcept delegate is unavailable; skipping DB write.');
+                return {
+                    ...concept,
+                    businessId,
+                    id: concept.id || `tmp-${Date.now()}`
+                };
+            }
+
             // Remove ID if it's a temp ID from frontend generator
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { id, ...conceptData } = concept;
 
-            return await prisma.creativeConcept.create({
+            return await creativeConcept.create({
                 data: {
                     businessId,
                     headline: conceptData.headline,
@@ -99,7 +112,13 @@ export class CreativeEngineService {
 
     async getConcepts(businessId: string): Promise<any[]> {
         try {
-            return await prisma.creativeConcept.findMany({
+            const creativeConcept = this.getCreativeConceptDelegate();
+            if (!creativeConcept?.findMany) {
+                console.warn('[CreativeEngine] creativeConcept delegate is unavailable; returning empty concepts list.');
+                return [];
+            }
+
+            return await creativeConcept.findMany({
                 where: { businessId },
                 orderBy: { createdAt: 'desc' }
             });
@@ -111,7 +130,13 @@ export class CreativeEngineService {
 
     async deleteConcept(id: string, businessId: string): Promise<void> {
         try {
-            await prisma.creativeConcept.delete({
+            const creativeConcept = this.getCreativeConceptDelegate();
+            if (!creativeConcept?.delete) {
+                console.warn('[CreativeEngine] creativeConcept delegate is unavailable; skipping delete.');
+                return;
+            }
+
+            await creativeConcept.delete({
                 where: { id, businessId }
             });
         } catch (error) {

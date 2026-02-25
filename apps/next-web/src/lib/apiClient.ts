@@ -26,6 +26,19 @@ const apiClient = axios.create({
   headers: { 'Content-Type': 'application/json' }
 })
 
+const shouldEmitSystemMessage = (config?: AxiosRequestConfig): boolean => {
+  const headers = (config?.headers || {}) as Record<string, any>;
+
+  const rawFlag =
+    headers['x-skip-system-message'] ??
+    headers['X-Skip-System-Message'] ??
+    headers['x-skip-systemmessage'];
+
+  if (rawFlag === undefined || rawFlag === null) return true;
+
+  return !(rawFlag === '1' || rawFlag === 1 || rawFlag === true || rawFlag === 'true');
+};
+
 // Add request interceptor
 apiClient.interceptors.request.use(
   (config) => {
@@ -53,7 +66,7 @@ apiClient.interceptors.response.use(
     const data = response.data as ApiResponse;
 
     // Emit system message if present
-    if (data && data.messageCode) {
+    if (data && data.messageCode && shouldEmitSystemMessage(response.config)) {
       systemMessageEvents.emit(SYSTEM_MESSAGE_EVENT, {
         code: data.messageCode,
         options: { variant: 'TOAST' }
@@ -87,12 +100,12 @@ apiClient.interceptors.response.use(
     const data = error.response?.data as ApiResponse;
 
     // Emit system message for errors
-    if (data && data.messageCode) {
+    if (data && data.messageCode && shouldEmitSystemMessage(error.config)) {
       systemMessageEvents.emit(SYSTEM_MESSAGE_EVENT, {
         code: data.messageCode,
         options: { variant: 'TOAST' }
       });
-    } else if (error.code === 'ERR_NETWORK') {
+    } else if (error.code === 'ERR_NETWORK' && shouldEmitSystemMessage(error.config)) {
       systemMessageEvents.emit(SYSTEM_MESSAGE_EVENT, {
         code: 'NETWORK_ERROR',
         options: { variant: 'TOAST' }
