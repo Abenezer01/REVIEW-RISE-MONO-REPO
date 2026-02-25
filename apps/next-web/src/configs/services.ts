@@ -70,6 +70,19 @@ export const SERVICES_CONFIG = {
             return 'http://localhost:3006/api/v1';
         },
     },
+    gbp: {
+        get url() {
+            if (typeof window === 'undefined') {
+                return process.env.EXPRESS_GBP_ROCKET_URL || 'http://localhost:3005/api/v1';
+            }
+
+            if (isProduction()) {
+                return `${getClientBaseUrl()}/api/gbp`;
+            }
+
+            return '/api/gbp';
+        },
+    },
     ai: {
         get url() {
             if (typeof window === 'undefined') {

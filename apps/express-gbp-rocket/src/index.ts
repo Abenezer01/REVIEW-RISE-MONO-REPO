@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { createSuccessResponse } from '@platform/contracts';
 import { requestIdMiddleware, errorHandler } from '@platform/middleware';
+import v1Routes from './routes/v1';
 
 dotenv.config();
 
@@ -24,6 +25,8 @@ app.get('/health', (req, res) => {
     const response = createSuccessResponse({ service: 'express-gbp-rocket' }, 'Service is healthy', 200, { requestId: req.id });
     res.status(response.statusCode).json(response);
 });
+
+app.use('/api/v1', v1Routes);
 
 app.use(errorHandler);
 
