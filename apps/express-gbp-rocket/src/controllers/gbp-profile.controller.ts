@@ -3,7 +3,13 @@ import axios from 'axios';
 
 import { createErrorResponse, createSuccessResponse, SystemMessageCode } from '@platform/contracts';
 
-import { getLocationBusinessProfile, syncLocationBusinessProfile } from '../services/gbp-profile.service';
+import {
+  createLocationSnapshot,
+  getLocationBusinessProfile,
+  getLocationSnapshotDetail,
+  listLocationSnapshots,
+  syncLocationBusinessProfile
+} from '../services/gbp-profile.service';
 
 // Accept canonical UUID strings without enforcing RFC variant/version bits.
 // Seed/dev data can contain UUID-like ids that are still valid DB keys.
@@ -77,6 +83,95 @@ export const syncBusinessProfile = async (req: Request, res: Response) => {
       code,
       statusCode,
       axios.isAxiosError(error) ? error.response?.data : undefined,
+      req.id
+    );
+
+    return res.status(response.statusCode).json(response);
+  }
+};
+
+export const createSnapshot = async (req: Request, res: Response) => {
+  try {
+    const { locationId } = req.params;
+
+    if (!isUuid(locationId)) {
+      const badRequest = createErrorResponse('Invalid locationId', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
+
+      return res.status(badRequest.statusCode).json(badRequest);
+    }
+
+    const userId = (req as any)?.user?.id as string | undefined;
+    const suggestionRefs = req.body?.suggestionRefs;
+    const snapshot = await createLocationSnapshot(locationId, userId || null, suggestionRefs);
+    const response = createSuccessResponse(snapshot, 'GBP snapshot created successfully', 201, { requestId: req.id }, SystemMessageCode.SUCCESS);
+
+    return res.status(response.statusCode).json(response);
+  } catch (error: any) {
+    const message = error?.message || 'Failed to create GBP snapshot';
+    const statusCode = message.includes('Location not found') ? 404 : 500;
+    const code = statusCode === 404 ? SystemMessageCode.NOT_FOUND : SystemMessageCode.INTERNAL_SERVER_ERROR;
+    const response = createErrorResponse(message, code, statusCode, undefined, req.id);
+
+    return res.status(response.statusCode).json(response);
+  }
+};
+
+export const listSnapshots = async (req: Request, res: Response) => {
+  try {
+    const { locationId } = req.params;
+    const limit = Math.max(1, Math.min(100, Number(req.query.limit || 20)));
+    const offset = Math.max(0, Number(req.query.offset || 0));
+
+    if (!isUuid(locationId)) {
+      const badRequest = createErrorResponse('Invalid locationId', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
+
+      return res.status(badRequest.statusCode).json(badRequest);
+    }
+
+    const data = await listLocationSnapshots(locationId, limit, offset);
+    const response = createSuccessResponse(data, 'GBP snapshots fetched successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
+
+    return res.status(response.statusCode).json(response);
+  } catch (error: any) {
+    const response = createErrorResponse(
+      error?.message || 'Failed to fetch GBP snapshots',
+      SystemMessageCode.INTERNAL_SERVER_ERROR,
+      500,
+      undefined,
+      req.id
+    );
+
+    return res.status(response.statusCode).json(response);
+  }
+};
+
+export const getSnapshotDetail = async (req: Request, res: Response) => {
+  try {
+    const { locationId, snapshotId } = req.params;
+
+    if (!isUuid(locationId) || !isUuid(snapshotId)) {
+      const badRequest = createErrorResponse('Invalid locationId or snapshotId', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
+
+      return res.status(badRequest.statusCode).json(badRequest);
+    }
+
+    const snapshot = await getLocationSnapshotDetail(locationId, snapshotId);
+
+    if (!snapshot) {
+      const notFound = createErrorResponse('Snapshot not found', SystemMessageCode.NOT_FOUND, 404, undefined, req.id);
+
+      return res.status(notFound.statusCode).json(notFound);
+    }
+
+    const response = createSuccessResponse(snapshot, 'GBP snapshot fetched successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
+
+    return res.status(response.statusCode).json(response);
+  } catch (error: any) {
+    const response = createErrorResponse(
+      error?.message || 'Failed to fetch GBP snapshot',
+      SystemMessageCode.INTERNAL_SERVER_ERROR,
+      500,
+      undefined,
       req.id
     );
 
