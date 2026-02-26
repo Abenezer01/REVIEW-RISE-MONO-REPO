@@ -122,9 +122,22 @@ const menuData: MenuItem[] = [
   },
   {
     title: 'navigation.gbp-rocket',
-    href: '/admin/gbp-rocket',
     icon: 'tabler-rocket',
-    allowedRoles: [ROLES.ADMIN]
+    allowedRoles: [ROLES.ADMIN],
+    children: [
+      {
+        title: 'navigation.gbp-overview',
+        href: '/admin/gbp-rocket',
+        icon: 'tabler-dashboard',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
+        title: 'navigation.gbp-photos',
+        href: '/admin/gbp-rocket/photos',
+        icon: 'tabler-photo',
+        allowedRoles: [ROLES.ADMIN]
+      }
+    ]
   },
   {
     title: 'navigation.ad-rise',

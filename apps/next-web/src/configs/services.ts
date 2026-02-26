@@ -73,7 +73,7 @@ export const SERVICES_CONFIG = {
     gbp: {
         get url() {
             if (typeof window === 'undefined') {
-                return process.env.EXPRESS_GBP_ROCKET_URL || 'http://localhost:3005/api/v1';
+                return process.env.EXPRESS_GBP_ROCKET_URL || 'http://localhost:3004/api/v1';
             }
 
             if (isProduction()) {

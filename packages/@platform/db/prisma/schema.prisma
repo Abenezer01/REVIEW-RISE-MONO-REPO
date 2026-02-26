@@ -140,6 +140,8 @@ model Location {
   visibilityMetrics   VisibilityMetric[]
   pendingGoogleConnections  PendingGoogleConnection[]
   platformIntegrations PlatformIntegration[]
+  photos              LocationPhoto[]
+  lastPhotoSyncAt     DateTime?
 
   @@index([businessId])
 }
@@ -796,6 +798,27 @@ model BrandRecommendation {
   @@index([status])
   @@index([priorityScore])
   @@index([generatedAt])
+}
+
+model LocationPhoto {
+  id              String    @id
+  locationId      String    @db.Uuid
+  accountId       String?
+  googleUrl       String
+  thumbnailUrl    String
+  category        String?
+  createTime      DateTime?
+  updateTime      DateTime?
+  sourceUrl       String?
+  attribution     String?
+  mediaFormat     String    @default("PHOTO")
+  lastSyncedAt    DateTime  @default(now())
+  hash            String?
+
+  location        Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@index([locationId])
+  @@index([category])
 }
 
 model BrandScore {

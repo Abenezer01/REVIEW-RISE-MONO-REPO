@@ -1,0 +1,57 @@
+{
+  "photos": {
+    "title": "Location Photos",
+    "subtitle": "Manage and analyze Google Business Profile images",
+    "connectedLocation": "Connected Location",
+    "selectLocation": "Select a location to manage photos.",
+    "lastSynced": "Last synced {time} min ago",
+    "syncPhotos": "Sync Photos",
+    "syncing": "Syncing...",
+    "stats": {
+      "total": "Total Photos",
+      "cover": "Cover Photos",
+      "interior": "Interior Photos",
+      "lastUpdated": "Last Updated"
+    },
+    "filter": {
+      "searchPlaceholder": "Search by category or type...",
+      "category": "Category:",
+      "sort": "Sort:",
+      "all": "All",
+      "cover": "Cover",
+      "interior": "Interior",
+      "exterior": "Exterior",
+      "food": "Food",
+      "team": "Team",
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "gridView": "Grid View",
+      "listView": "List View"
+    },
+    "grid": {
+      "noPhotosFound": "No photos found for this category.",
+      "errorLoading": "Error loading photos:",
+      "updatedDaysAgo": "Updated {days} days ago",
+      "loadMore": "Load More Photos"
+    },
+    "details": {
+      "title": "Photo Details",
+      "category": "Category",
+      "createdDate": "Created Date",
+      "updatedDate": "Updated Date",
+      "source": "Source",
+      "gbp": "Google Business Profile",
+      "dimensions": "Dimensions",
+      "fileSize": "File Size",
+      "viewOnGbp": "View on Google Business Profile",
+      "unknown": "Unknown",
+      "aiPowered": "AI Powered",
+      "highQualityComposition": "High quality composition",
+      "goodLighting": "Good lighting conditions",
+      "containsText": "Contains text overlay",
+      "analyzeAgain": "Analyze Again",
+      "viewOnGoogle": "View on Google",
+      "deletePhoto": "Delete Photo"
+    }
+  }
+}
