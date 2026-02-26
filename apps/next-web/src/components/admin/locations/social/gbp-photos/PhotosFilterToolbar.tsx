@@ -34,7 +34,7 @@ export const PhotosFilterToolbar = ({
   view,
   onViewChange
 }: PhotosFilterToolbarProps) => {
-  const t = useTranslations('gbp-rocket.photos');
+  const t = useTranslations('gbpRocket.photos');
   const theme = useTheme();
 
   return (
