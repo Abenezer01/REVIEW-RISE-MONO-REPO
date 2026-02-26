@@ -108,6 +108,7 @@ model Business {
   adriseSessions       AdriseSession[]
   creativeEngineAnalytics CreativeEngineAnalytics[]
   creativeConcepts     CreativeConcept[]
+  gbpProfileSnapshots  GbpProfileSnapshot[]
 
   @@index([name])
   @@index([status])
@@ -142,6 +143,7 @@ model Location {
   platformIntegrations PlatformIntegration[]
   photos              LocationPhoto[]
   lastPhotoSyncAt     DateTime?
+  gbpProfileSnapshots  GbpProfileSnapshot[]
 
   @@index([businessId])
 }
@@ -237,10 +239,35 @@ model AuditLog {
   details    Json?
   createdAt  DateTime @default(now())
   user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gbpProfileSnapshots GbpProfileSnapshot[]
 
   @@index([userId])
   @@index([entityId])
   @@index([createdAt])
+}
+
+model GbpProfileSnapshot {
+  id                 String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId         String              @db.Uuid
+  locationId         String              @db.Uuid
+  captureType        String              @default("sync")
+  snapshot           Json
+  changedFields      Json?
+  diffBaseSnapshotId String?             @db.Uuid
+  auditLogId         String?             @db.Uuid
+  suggestionRefs     Json?
+  capturedAt         DateTime            @default(now())
+  createdAt          DateTime            @default(now())
+  business           Business            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location           Location            @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  auditLog           AuditLog?           @relation(fields: [auditLogId], references: [id], onDelete: SetNull)
+  diffBaseSnapshot   GbpProfileSnapshot? @relation("GbpSnapshotDiffBase", fields: [diffBaseSnapshotId], references: [id], onDelete: SetNull)
+  diffChildren       GbpProfileSnapshot[] @relation("GbpSnapshotDiffBase")
+
+  @@index([businessId])
+  @@index([locationId])
+  @@index([capturedAt])
+  @@index([auditLogId])
 }
 
 model ReviewSyncLog {

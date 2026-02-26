@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { platformIntegrationRepository, businessRepository, locationRepository } from '@platform/db';
+import { auditLogRepository, businessRepository, locationRepository, platformIntegrationRepository, prisma } from '@platform/db';
 
 const GOOGLE_OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const GOOGLE_GBP_LOCATION_URL = 'https://mybusinessbusinessinformation.googleapis.com/v1';
@@ -29,6 +29,22 @@ type NormalizedGbpProfile = {
         }>;
         weekdayDescriptions: string[];
     };
+};
+
+type SnapshotCaptureType = 'sync' | 'manual';
+
+type SnapshotListItem = {
+    id: string;
+    captureType: string;
+    changedFields: string[];
+    auditLogId: string | null;
+    suggestionRefs: any;
+    capturedAt: Date;
+    diffBaseSnapshotId: string | null;
+};
+
+type SnapshotDetail = SnapshotListItem & {
+    snapshot: any;
 };
 
 const normalizeGbpProfile = (raw: any): NormalizedGbpProfile => {
@@ -78,6 +94,170 @@ const normalizeGbpProfile = (raw: any): NormalizedGbpProfile => {
 };
 
 export class GbpProfileService {
+    private isMissingSnapshotTableError(error: any): boolean {
+        const message = String(error?.message || '');
+        const code = String(error?.code || '');
+        const metaCode = String(error?.meta?.code || '');
+
+        return code === '42P01' || metaCode === '42P01' || message.includes('relation "GbpProfileSnapshot" does not exist');
+    }
+
+    private toFieldMap(profile: any) {
+        return {
+            description: profile?.description ?? null,
+            category: profile?.category ?? null,
+            phone: profile?.phone ?? null,
+            website: profile?.website ?? null,
+            address: profile?.address ?? null,
+            hours: profile?.hours ?? { periods: [], weekdayDescriptions: [] }
+        };
+    }
+
+    private computeChangedFields(previousSnapshot: any, currentSnapshot: any): string[] {
+        if (!previousSnapshot) {
+            return Object.keys(this.toFieldMap(currentSnapshot));
+        }
+
+        const previousFields = this.toFieldMap(previousSnapshot);
+        const currentFields = this.toFieldMap(currentSnapshot);
+        const changed: string[] = [];
+
+        for (const key of Object.keys(currentFields)) {
+            if (JSON.stringify(previousFields[key as keyof typeof previousFields]) !== JSON.stringify(currentFields[key as keyof typeof currentFields])) {
+                changed.push(key);
+            }
+        }
+
+        return changed;
+    }
+
+    private async getLatestSnapshot(locationId: string): Promise<SnapshotDetail | null> {
+        try {
+            const rows = await prisma.$queryRawUnsafe<Array<SnapshotDetail>>(
+                `
+                SELECT
+                    "id",
+                    "captureType",
+                    "changedFields",
+                    "auditLogId",
+                    "suggestionRefs",
+                    "capturedAt",
+                    "diffBaseSnapshotId",
+                    "snapshot"
+                FROM "GbpProfileSnapshot"
+                WHERE "locationId" = $1::uuid
+                ORDER BY "capturedAt" DESC
+                LIMIT 1
+                `,
+                locationId
+            );
+
+            return rows[0] || null;
+        } catch (error: any) {
+            if (this.isMissingSnapshotTableError(error)) {
+                return null;
+            }
+
+            throw error;
+        }
+    }
+
+    private async createSnapshot(params: {
+        businessId: string;
+        locationId: string;
+        captureType: SnapshotCaptureType;
+        profile: any;
+        userId?: string | null;
+        suggestionRefs?: any;
+    }) {
+        const previous = await this.getLatestSnapshot(params.locationId);
+        const changedFields = this.computeChangedFields(previous?.snapshot, params.profile);
+        const snapshotPayload = {
+            schemaVersion: 1,
+            capturedAt: new Date().toISOString(),
+            fields: this.toFieldMap(params.profile),
+            profile: params.profile
+        };
+
+        const auditLog = await auditLogRepository.log({
+            user: params.userId ? { connect: { id: params.userId } } : undefined,
+            action: 'gbp_profile_snapshot_created',
+            entityType: 'location',
+            entityId: params.locationId,
+            details: {
+                captureType: params.captureType,
+                changedFields
+            }
+        });
+
+        try {
+            const rows = await prisma.$queryRawUnsafe<Array<SnapshotDetail>>(
+                `
+                INSERT INTO "GbpProfileSnapshot" (
+                    "businessId",
+                    "locationId",
+                    "captureType",
+                    "snapshot",
+                    "changedFields",
+                    "diffBaseSnapshotId",
+                    "auditLogId",
+                    "suggestionRefs",
+                    "capturedAt",
+                    "createdAt"
+                )
+                VALUES (
+                    $1::uuid,
+                    $2::uuid,
+                    $3,
+                    $4::jsonb,
+                    $5::jsonb,
+                    $6::uuid,
+                    $7::uuid,
+                    $8::jsonb,
+                    $9::timestamp,
+                    $10::timestamp
+                )
+                RETURNING
+                    "id",
+                    "captureType",
+                    "changedFields",
+                    "auditLogId",
+                    "suggestionRefs",
+                    "capturedAt",
+                    "diffBaseSnapshotId",
+                    "snapshot"
+                `,
+                params.businessId,
+                params.locationId,
+                params.captureType,
+                JSON.stringify(snapshotPayload),
+                JSON.stringify(changedFields),
+                previous?.id || null,
+                auditLog.id,
+                JSON.stringify(params.suggestionRefs ?? null),
+                new Date(),
+                new Date()
+            );
+
+            return rows[0];
+        } catch (error: any) {
+            if (this.isMissingSnapshotTableError(error)) {
+                console.warn('[GBP Snapshot] GbpProfileSnapshot table is missing. Apply DB migration to enable snapshot storage.');
+                return {
+                    id: '',
+                    captureType: params.captureType,
+                    changedFields,
+                    auditLogId: auditLog.id,
+                    suggestionRefs: params.suggestionRefs ?? null,
+                    capturedAt: new Date(),
+                    diffBaseSnapshotId: previous?.id || null,
+                    snapshot: snapshotPayload
+                };
+            }
+
+            throw error;
+        }
+    }
 
     /**
      * Get the Google connection for a location
@@ -219,6 +399,19 @@ export class GbpProfileService {
             await businessRepository.update(location.businessId, businessUpdate as any);
         }
 
+        try {
+            await this.createSnapshot({
+                businessId: location.businessId,
+                locationId,
+                captureType: 'sync',
+                profile: normalized
+            });
+        } catch (error: any) {
+            if (!this.isMissingSnapshotTableError(error)) {
+                throw error;
+            }
+        }
+
         return {
             locationId,
             businessId: location.businessId,
@@ -259,9 +452,114 @@ export class GbpProfileService {
             lastSynced
         };
     }
+
+    async createOnDemandSnapshot(locationId: string, userId?: string | null, suggestionRefs?: any) {
+        const profile = await this.getLocationBusinessProfile(locationId);
+
+        if (!profile) {
+            throw new Error('Location not found');
+        }
+
+        return this.createSnapshot({
+            businessId: profile.businessId,
+            locationId,
+            captureType: 'manual',
+            profile,
+            userId,
+            suggestionRefs
+        });
+    }
+
+    async listSnapshots(locationId: string, limit = 20, offset = 0): Promise<{ total: number; items: SnapshotListItem[] }> {
+        try {
+            const countRows = await prisma.$queryRawUnsafe<Array<{ total: bigint }>>(
+                `SELECT COUNT(*)::bigint AS total FROM "GbpProfileSnapshot" WHERE "locationId" = $1::uuid`,
+                locationId
+            );
+
+            const items = await prisma.$queryRawUnsafe<Array<SnapshotListItem>>(
+                `
+                SELECT
+                    "id",
+                    "captureType",
+                    "changedFields",
+                    "auditLogId",
+                    "suggestionRefs",
+                    "capturedAt",
+                    "diffBaseSnapshotId"
+                FROM "GbpProfileSnapshot"
+                WHERE "locationId" = $1::uuid
+                ORDER BY "capturedAt" DESC
+                LIMIT $2 OFFSET $3
+                `,
+                locationId,
+                limit,
+                offset
+            );
+
+            return {
+                total: Number(countRows[0]?.total || 0),
+                items: items.map((item) => ({
+                    ...item,
+                    changedFields: Array.isArray(item.changedFields) ? item.changedFields : []
+                }))
+            };
+        } catch (error: any) {
+            if (this.isMissingSnapshotTableError(error)) {
+                return { total: 0, items: [] };
+            }
+
+            throw error;
+        }
+    }
+
+    async getSnapshotDetail(locationId: string, snapshotId: string): Promise<SnapshotDetail | null> {
+        try {
+            const rows = await prisma.$queryRawUnsafe<Array<SnapshotDetail>>(
+                `
+                SELECT
+                    "id",
+                    "captureType",
+                    "changedFields",
+                    "auditLogId",
+                    "suggestionRefs",
+                    "capturedAt",
+                    "diffBaseSnapshotId",
+                    "snapshot"
+                FROM "GbpProfileSnapshot"
+                WHERE "locationId" = $1::uuid
+                  AND "id" = $2::uuid
+                LIMIT 1
+                `,
+                locationId,
+                snapshotId
+            );
+
+            if (!rows[0]) {
+                return null;
+            }
+
+            return {
+                ...rows[0],
+                changedFields: Array.isArray(rows[0].changedFields) ? rows[0].changedFields : []
+            };
+        } catch (error: any) {
+            if (this.isMissingSnapshotTableError(error)) {
+                return null;
+            }
+
+            throw error;
+        }
+    }
 }
 
 export const gbpProfileService = new GbpProfileService();
 
 export const syncLocationBusinessProfile = (locationId: string) => gbpProfileService.syncLocationBusinessProfile(locationId);
 export const getLocationBusinessProfile = (locationId: string) => gbpProfileService.getLocationBusinessProfile(locationId);
+export const createLocationSnapshot = (locationId: string, userId?: string | null, suggestionRefs?: any) =>
+    gbpProfileService.createOnDemandSnapshot(locationId, userId, suggestionRefs);
+export const listLocationSnapshots = (locationId: string, limit?: number, offset?: number) =>
+    gbpProfileService.listSnapshots(locationId, limit, offset);
+export const getLocationSnapshotDetail = (locationId: string, snapshotId: string) =>
+    gbpProfileService.getSnapshotDetail(locationId, snapshotId);
