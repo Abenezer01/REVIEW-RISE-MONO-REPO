@@ -12,3 +12,6 @@ export * from './posts.schema';
 
 // Social connection management schemas
 export * from './social-connection.schema';
+
+// GBP Photos schema
+export * from './gbp-photos.schema';

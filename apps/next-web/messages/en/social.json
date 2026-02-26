@@ -28,29 +28,17 @@
       "facebook": {
         "name": "Facebook Pages",
         "description": "Connect your Facebook Business Page to schedule posts, track engagement, and manage comments.",
-        "features": [
-          "Post scheduling & publishing",
-          "Engagement analytics",
-          "Comment management"
-        ]
+        "features": ["Post scheduling & publishing", "Engagement analytics", "Comment management"]
       },
       "instagram": {
         "name": "Instagram Business",
         "description": "Link your Instagram Business account via Facebook to publish content and track performance.",
-        "features": [
-          "Photo & video publishing",
-          "Story scheduling",
-          "Insights & metrics"
-        ]
+        "features": ["Photo & video publishing", "Story scheduling", "Insights & metrics"]
       },
       "linkedin": {
         "name": "LinkedIn Pages",
         "description": "Connect your LinkedIn Company Page to share professional content and grow your network.",
-        "features": [
-          "Professional content sharing",
-          "Page analytics",
-          "Follower insights"
-        ]
+        "features": ["Professional content sharing", "Page analytics", "Follower insights"]
       }
     },
     "modals": {
@@ -92,11 +80,7 @@
       "disconnect": "Disconnect"
     },
     "fbConnect": {
-      "steps": [
-        "Authorize",
-        "Select Page",
-        "Complete"
-      ],
+      "steps": ["Authorize", "Select Page", "Complete"],
       "permissionsTitle": "AdRise needs the following permissions to manage your Facebook Page. You can revoke access at any time.",
       "permissions": [
         {

@@ -47,6 +47,7 @@ export { AdriseSessionVersionRepository, adriseSessionVersionRepository } from '
 export { AdriseOutputRepository, adriseOutputRepository } from './adrise-output.repository';
 export { PendingGoogleConnectionRepository, pendingGoogleConnectionRepository } from './pending-google-connection.repository';
 export { PlatformIntegrationRepository, platformIntegrationRepository } from './platform-integration.repository';
+export { LocationPhotoRepository, locationPhotoRepository } from './location-photo.repository';
 
 // Import repositories for the convenience object
 import { userRepository } from './user.repository';
@@ -83,6 +84,7 @@ import { adriseSessionVersionRepository } from './adrise-session-version.reposit
 import { adriseOutputRepository } from './adrise-output.repository';
 import { pendingGoogleConnectionRepository } from './pending-google-connection.repository';
 import { platformIntegrationRepository } from './platform-integration.repository';
+import { locationPhotoRepository } from './location-photo.repository';
 
 // Re-export all repositories as a single object for convenience
 export const repositories = {
@@ -120,4 +122,5 @@ export const repositories = {
     adriseOutput: adriseOutputRepository,
     pendingGoogleConnection: pendingGoogleConnectionRepository,
     platformIntegration: platformIntegrationRepository,
+    locationPhoto: locationPhotoRepository,
 } as const;
