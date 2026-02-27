@@ -124,47 +124,12 @@ const AdminGBPRocketPage = () => {
     return new Date(profile.lastSynced).toLocaleString()
   }, [profile?.lastSynced])
 
-  const selectedSnapshotFields = useMemo(() => {
-    return (selectedSnapshot?.snapshot?.fields || {}) as Record<string, unknown>
-  }, [selectedSnapshot])
-
-  const getCaptureTypeLabel = (captureType: string) => {
-    return captureType === 'sync' ? uiText.snapshotTypeSync : uiText.snapshotTypeManual
-  }
-
-  const getSnapshotTitle = (position: number) => {
-    return `${uiText.snapshotVersion} ${position}`
-  }
-
-  const getSnapshotCapturedText = (capturedAt: string) => {
-    return `${uiText.snapshotAt}: ${new Date(capturedAt).toLocaleString()}`
-  }
-
-  const getSnapshotChangedCountText = (count: number) => {
-    return `${count} ${uiText.snapshotFieldsChangedCount}`
-  }
-
   const isMissingValue = (value: unknown) => {
     if (value === null || value === undefined) return true
     if (typeof value === 'string') return value.trim().length === 0
     if (Array.isArray(value)) return value.length === 0
 
     return false
-  }
-
-  const formatFieldLabel = (key: string) => {
-    return key
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, (char) => char.toUpperCase())
-      .trim()
-  }
-
-  const formatFieldValue = (value: unknown) => {
-    if (value === null || value === undefined) return uiText.notAvailable
-    if (typeof value === 'string' && value.trim().length === 0) return uiText.notAvailable
-    if (typeof value === 'string') return value
-
-    return JSON.stringify(value, null, 2)
   }
 
   const extractErrorMessage = (error: unknown, fallback: string) => {
