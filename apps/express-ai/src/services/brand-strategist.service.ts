@@ -13,7 +13,12 @@ export class BrandStrategistService {
 
     async generateRecommendations(
         category: keyof typeof RECOMMENDATION_PROMPTS,
-        context: { brandDNA: any, currentMetrics: any, competitorInsights: any }
+        context: {
+            brandDNA?: any,
+            currentMetrics?: any,
+            competitorInsights?: any,
+            auditFindings?: any
+        }
     ) {
         if (!RECOMMENDATION_PROMPTS[category]) {
             throw new Error(`Invalid category: ${String(category)}`);
@@ -21,9 +26,9 @@ export class BrandStrategistService {
 
         const promptTemplate = RECOMMENDATION_PROMPTS[category];
         const metricsStr = JSON.stringify(context.currentMetrics || {});
-        
+
         let finalPrompt = promptTemplate;
-        
+
         // Helper to replace all occurrences
         const replaceAll = (str: string, find: string, replace: string) => str.split(find).join(replace);
 
@@ -34,6 +39,7 @@ export class BrandStrategistService {
         finalPrompt = replaceAll(finalPrompt, '{socialMetrics}', metricsStr);
         finalPrompt = replaceAll(finalPrompt, '{reviewMetrics}', metricsStr);
         finalPrompt = replaceAll(finalPrompt, '{websiteMetrics}', metricsStr);
+        finalPrompt = replaceAll(finalPrompt, '{auditFindings}', JSON.stringify(context.auditFindings || {}));
 
         const content = await this.callAI(finalPrompt);
         if (!content) throw new Error('No response from AI');

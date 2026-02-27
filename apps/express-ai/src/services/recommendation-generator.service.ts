@@ -60,6 +60,46 @@ export class RecommendationGeneratorService {
     }
 
     /**
+     * Generates recommendations based on Audit Findings
+     */
+    async generateAuditRecommendations(
+        businessId: string,
+        auditFindings: any
+    ) {
+        // Gather context
+        const brandDNA = await repositories.brandDNA.findByBusinessId(businessId);
+
+        // Build prompt
+        const prompt = RECOMMENDATION_PROMPTS.audit
+            .replace('{brandDNA}', JSON.stringify(brandDNA || {}))
+            .replace('{auditFindings}', JSON.stringify(auditFindings));
+
+        // Call Gemini
+        const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+        const result = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: {
+                temperature: 0.7,
+                responseMimeType: 'application/json',
+            },
+        });
+
+        const responseText = result.response.text();
+        const parsed = JSON.parse(responseText);
+
+        // Validate
+        const validated = RecommendationsOutputSchema.parse(parsed);
+
+        // Normalize category
+        validated.recommendations = validated.recommendations.map(r => ({
+            ...r,
+            category: 'audit'
+        }));
+
+        return validated.recommendations;
+    }
+
+    /**
      * Generate recommendations for all categories
      */
     async generateAllRecommendations(businessId: string) {

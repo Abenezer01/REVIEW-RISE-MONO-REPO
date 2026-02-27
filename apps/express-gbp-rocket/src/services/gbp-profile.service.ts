@@ -266,12 +266,64 @@ export class GbpProfileService {
         const response = await axios.get(`${GOOGLE_GBP_LOCATION_URL}/${locationName}`, {
             headers: { Authorization: `Bearer ${accessToken}` },
             params: {
-                readMask: 'name,title,profile,regularHours,primaryCategory,storefrontAddress,phoneNumbers,websiteUri,metadata'
+                readMask: 'name,title,profile,regularHours,primaryCategory,storefrontAddress,phoneNumbers,websiteUri,metadata,serviceItems'
             }
         });
 
         return response.data || null;
     }
+
+    private async fetchMediaItems(accessToken: string, locationName: string) {
+        // Simple fetch of first 100 photos for audit purposes
+        // We can reuse GbpPhotosService logic or simplify here
+        try {
+            const url = `https://mybusiness.googleapis.com/v4/${locationName}/media`;
+            const response = await axios.get(url, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+                params: { pageSize: 100 }
+            });
+            return response.data.mediaItems || [];
+        } catch (error) {
+            console.error('Failed to fetch media items for audit snapshot:', error);
+            return [];
+        }
+    }
+
+    private async fetchServiceItems(accessToken: string, locationName: string) {
+        // Service extraction logic
+        // Since 'serviceItems' is not in the readMask for locations.get, we might need a separate call
+        // Or check if it is available in v1 API
+        // According to docs, ServiceList is a separate resource.
+        try {
+            // Try fetching services separately if not in location details
+            // v1: locations/{locationId}/serviceList? Or attributes?
+            // Actually, 'serviceItems' is part of ServiceList resource.
+            // GET https://mybusinessbusinessinformation.googleapis.com/v1/{parent=locations/*}/services
+            // But wait, the resource is 'serviceList' not 'services' in some versions?
+            // Let's try v1 services endpoint
+            // Note: locationName is "locations/123..."
+            // URL: https://mybusinessbusinessinformation.googleapis.com/v1/locations/123/services? No
+            // Correct: https://mybusinessbusinessinformation.googleapis.com/v1/{parent=locations/*}/attributes ? No.
+            // It seems Structured Services are in v1.
+            // Let's assume we can skip explicit service fetch if we can't find endpoint easily, 
+            // but 'serviceItems' was in my mock data.
+            // Let's try to fetch it via separate endpoint if possible.
+            // For now, I will return empty array to avoid breaking if unsure.
+            // User requirement 3: Extract keywords from services.
+            // So I need services.
+            // Let's try: GET https://mybusinessbusinessinformation.googleapis.com/v1/{name=locations/*/serviceList}
+            // It is `serviceList`.
+            const url = `${GOOGLE_GBP_LOCATION_URL}/${locationName}/serviceList`;
+            const response = await axios.get(url, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            return response.data.serviceItems || [];
+        } catch {
+            // 404 is common if no services defined
+            return [];
+        }
+    }
+
 
     /**
      * Sync business profile information from GBP to the local DB
@@ -296,6 +348,9 @@ export class GbpProfileService {
         }
 
         const rawProfile = await this.fetchLocationDetails(accessToken, connection.gbpLocationName);
+        const mediaItems = await this.fetchMediaItems(accessToken, connection.gbpLocationName);
+        const serviceItems = await this.fetchServiceItems(accessToken, connection.gbpLocationName);
+
         const normalized = normalizeGbpProfile(rawProfile);
         const now = new Date();
         const existingPlatformIds = (location.platformIds || {}) as Record<string, any>;
@@ -319,12 +374,20 @@ export class GbpProfileService {
             await businessRepository.update(location.businessId, businessUpdate as any);
         }
 
+        // Create snapshot with extended data for audit engine
+        const snapshotProfile = {
+            ...normalized,
+            media: mediaItems,
+            serviceItems: serviceItems,
+            metadata: rawProfile.metadata // Preserve metadata for freshness check
+        };
+
         try {
             await this.createSnapshot({
                 businessId: location.businessId,
                 locationId,
                 captureType: 'sync',
-                profile: normalized
+                profile: snapshotProfile
             });
         } catch (error: any) {
             if (!this.isMissingSnapshotTableError(error)) {

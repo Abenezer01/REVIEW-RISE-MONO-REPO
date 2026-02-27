@@ -6,7 +6,7 @@
  */
 
 export const RECOMMENDATION_PROMPTS = {
-    search: `
+  search: `
 You are an SEO expert analyzing a business's search visibility.
 
 Business Context:
@@ -43,7 +43,7 @@ Return JSON matching this schema:
 }
 `,
 
-    local: `
+  local: `
 You are a Local SEO specialist.
 
 Business Context:
@@ -77,7 +77,7 @@ Return JSON matching this schema:
 }
 `,
 
-    social: `
+  social: `
 You are a Social Media strategist.
 
 Business Context:
@@ -111,7 +111,7 @@ Return JSON matching this schema:
 }
 `,
 
-    reputation: `
+  reputation: `
 You are an Online Reputation Management expert.
 
 Business Context:
@@ -145,7 +145,7 @@ Return JSON matching this schema:
 }
 `,
 
-    conversion: `
+  conversion: `
 You are a Conversion Rate Optimization specialist.
 
 Business Context:
@@ -179,7 +179,7 @@ Return JSON matching this schema:
 }
 `,
 
-    content: `
+  content: `
 You are a Content Marketing strategist.
 
 Business Context:
@@ -196,6 +196,41 @@ Return JSON matching this schema:
   "recommendations": [
     {
       "category": "content",
+      "title": "string (10-200 chars)",
+      "description": "string (50-2000 chars)",
+      "why": ["reason1", "reason2", ...] (1-5 items),
+      "steps": ["step1", "step2", ...] (1-10 items),
+      "impact": "low|medium|high|critical",
+      "effort": "low|medium|high",
+      "confidence": number (0-100),
+      "kpiTarget": {
+        "metric": "string",
+        "target": number,
+        "timeframe": "string"
+      } (optional)
+    }
+  ]
+}
+`,
+
+  audit: `
+You are a Google Business Profile Audit Expert.
+
+Business Context:
+{brandDNA}
+
+Audit Findings:
+{auditFindings}
+
+Analyze the provided audit findings (missing fields, photo quality issues, category mismatches, keyword gaps).
+Generate 3-5 specific, high-impact recommendations to fix these issues and improve the profile's score.
+Prioritize 'critical' issues first.
+
+Return JSON matching this schema:
+{
+  "recommendations": [
+    {
+      "category": "audit",
       "title": "string (10-200 chars)",
       "description": "string (50-2000 chars)",
       "why": ["reason1", "reason2", ...] (1-5 items),

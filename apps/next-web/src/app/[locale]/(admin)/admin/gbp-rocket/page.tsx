@@ -27,7 +27,8 @@ import { SERVICES_CONFIG } from '@/configs/services'
 import { useGbpPhotos, useSyncGbpPhotos } from '@/hooks/gbp/useGbpPhotos'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
 import apiClient from '@/lib/apiClient'
-import AuditTab from './_components/AuditTab'
+import type { GbpSnapshotItem, GbpSnapshotDetail } from './_components/SnapshotHistory';
+import SnapshotHistory from './_components/SnapshotHistory'
 
 type GbpBusinessProfile = {
   description: string | null
@@ -44,18 +45,6 @@ type GbpBusinessProfile = {
   connectionStatus?: string | null
 }
 
-type GbpSnapshotItem = {
-  id: string
-  captureType: string
-  capturedAt: string
-  changedFields: string[]
-}
-
-type GbpSnapshotDetail = GbpSnapshotItem & {
-  snapshot: {
-    fields?: Record<string, unknown>
-  }
-}
 
 const GBP_API_URL = SERVICES_CONFIG.gbp.url
 
@@ -121,7 +110,6 @@ const AdminGBPRocketPage = () => {
   const [loadingSnapshots, setLoadingSnapshots] = useState(false)
   const [capturingSnapshot, setCapturingSnapshot] = useState(false)
   const [activeTab, setActiveTab] = useState(0)
-  const [snapshotDetailTab, setSnapshotDetailTab] = useState(0)
 
   const pageTitle = `${t('navigation.gbp-rocket')}™`
   const hasProfile = Boolean(profile?.category || profile?.phone || profile?.address?.formatted || profile?.description)
@@ -136,47 +124,12 @@ const AdminGBPRocketPage = () => {
     return new Date(profile.lastSynced).toLocaleString()
   }, [profile?.lastSynced])
 
-  const selectedSnapshotFields = useMemo(() => {
-    return (selectedSnapshot?.snapshot?.fields || {}) as Record<string, unknown>
-  }, [selectedSnapshot])
-
-  const getCaptureTypeLabel = (captureType: string) => {
-    return captureType === 'sync' ? uiText.snapshotTypeSync : uiText.snapshotTypeManual
-  }
-
-  const getSnapshotTitle = (position: number) => {
-    return `${uiText.snapshotVersion} ${position}`
-  }
-
-  const getSnapshotCapturedText = (capturedAt: string) => {
-    return `${uiText.snapshotAt}: ${new Date(capturedAt).toLocaleString()}`
-  }
-
-  const getSnapshotChangedCountText = (count: number) => {
-    return `${count} ${uiText.snapshotFieldsChangedCount}`
-  }
-
   const isMissingValue = (value: unknown) => {
     if (value === null || value === undefined) return true
     if (typeof value === 'string') return value.trim().length === 0
     if (Array.isArray(value)) return value.length === 0
 
     return false
-  }
-
-  const formatFieldLabel = (key: string) => {
-    return key
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, (char) => char.toUpperCase())
-      .trim()
-  }
-
-  const formatFieldValue = (value: unknown) => {
-    if (value === null || value === undefined) return uiText.notAvailable
-    if (typeof value === 'string' && value.trim().length === 0) return uiText.notAvailable
-    if (typeof value === 'string') return value
-
-    return JSON.stringify(value, null, 2)
   }
 
   const extractErrorMessage = (error: unknown, fallback: string) => {
@@ -337,7 +290,6 @@ const AdminGBPRocketPage = () => {
       const snapshotDetail = await loadSnapshotDetail(snapshotId)
 
       setSelectedSnapshot(snapshotDetail)
-      setSnapshotDetailTab(0)
     } catch (error) {
       console.error('Failed to fetch GBP snapshot detail:', error)
       setErrorMessage(extractErrorMessage(error, 'Failed to fetch GBP snapshot detail'))
@@ -558,175 +510,14 @@ const AdminGBPRocketPage = () => {
                       </Grid>
                     </Grid>
                   )
-                ) : loadingSnapshots ? (
-                  <Skeleton height={88} />
                 ) : (
-                  <Grid container spacing={2}>
-                    <Grid size={{ xs: 12, md: 5 }}>
-                      <Stack spacing={1}>
-                        {snapshots.length > 0 ? (
-                          snapshots.map((snapshot, index) => (
-                            <Card
-                              key={snapshot.id}
-                              variant='outlined'
-                              sx={{
-                                borderColor: selectedSnapshot?.id === snapshot.id ? 'primary.main' : undefined,
-                                bgcolor: selectedSnapshot?.id === snapshot.id ? alpha(theme.palette.primary.main, 0.08) : undefined
-                              }}
-                            >
-                              <CardContent sx={{ py: 2 }}>
-                                <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={1}>
-                                  <Box>
-                                    <Typography variant='body2' fontWeight={600}>
-                                      {getSnapshotTitle(snapshots.length - index)}
-                                    </Typography>
-                                    <Typography variant='caption' color='text.secondary'>
-                                      {getSnapshotCapturedText(snapshot.capturedAt)}
-                                    </Typography>
-                                  </Box>
-                                  <Chip size='small' color={snapshot.captureType === 'sync' ? 'info' : 'secondary'} label={getCaptureTypeLabel(snapshot.captureType)} />
-                                </Stack>
-                                <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
-                                  {getSnapshotChangedCountText(snapshot.changedFields?.length || 0)}
-                                </Typography>
-                                <Stack direction='row' spacing={1} sx={{ mt: 1, flexWrap: 'wrap', rowGap: 1 }}>
-                                  {(snapshot.changedFields || []).slice(0, 4).map((field) => (
-                                    <Chip key={`${snapshot.id}-${field}`} size='small' variant='outlined' label={field} />
-                                  ))}
-                                </Stack>
-                                <Button fullWidth size='small' sx={{ mt: 1.5 }} onClick={() => handleOpenSnapshot(snapshot.id)}>
-                                  {selectedSnapshot?.id === snapshot.id ? uiText.snapshotSelected : uiText.snapshotOpen}
-                                </Button>
-                              </CardContent>
-                            </Card>
-                          ))
-                        ) : (
-                          <Typography variant='body2' color='text.secondary'>
-                            {uiText.emptySnapshots}
-                          </Typography>
-                        )}
-                      </Stack>
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 7 }}>
-                      <Card variant='outlined'>
-                        <CardContent>
-                          {selectedSnapshot ? (
-                            <Stack spacing={1.5}>
-                              <Typography variant='subtitle1' fontWeight={700}>
-                                {uiText.snapshotDetailTitle}
-                              </Typography>
-                              <Box sx={{ maxHeight: { xs: 'none', md: '72vh' }, overflowY: { xs: 'visible', md: 'auto' }, pr: { xs: 0, md: 1 } }}>
-                                <Stack spacing={1.5}>
-                                  <Tabs value={snapshotDetailTab} onChange={(_, value) => setSnapshotDetailTab(value)}>
-                                    <Tab label={uiText.snapshotTabSummary} />
-                                    <Tab label={uiText.snapshotTabAudit} />
-                                    <Tab label={uiText.snapshotTabRaw} />
-                                  </Tabs>
-
-                                  {snapshotDetailTab === 0 ? (
-                                    <>
-                                      <Grid container spacing={1.5}>
-                                        <Grid size={{ xs: 12, md: 6 }}>
-                                          <Card variant='outlined'>
-                                            <CardContent>
-                                              <Typography variant='subtitle2' sx={{ mb: 1 }}>{uiText.snapshotMetaTitle}</Typography>
-                                              <Stack spacing={1}>
-                                                <Chip size='small' color='primary' label={getSnapshotCapturedText(selectedSnapshot.capturedAt)} />
-                                                <Chip size='small' color='secondary' label={`${uiText.snapshotCaptureType}: ${getCaptureTypeLabel(selectedSnapshot.captureType)}`} />
-                                              </Stack>
-                                            </CardContent>
-                                          </Card>
-                                        </Grid>
-                                        <Grid size={{ xs: 12, md: 6 }}>
-                                          <Card variant='outlined'>
-                                            <CardContent>
-                                              <Typography variant='subtitle2' sx={{ mb: 1 }}>{uiText.snapshotChangedTitle}</Typography>
-                                              <Stack direction='row' spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
-                                                {(selectedSnapshot.changedFields || []).length > 0 ? (
-                                                  (selectedSnapshot.changedFields || []).map((field) => (
-                                                    <Chip key={`detail-${field}`} size='small' variant='outlined' label={field} />
-                                                  ))
-                                                ) : (
-                                                  <Typography variant='body2' color='text.secondary'>{uiText.notAvailable}</Typography>
-                                                )}
-                                              </Stack>
-                                            </CardContent>
-                                          </Card>
-                                        </Grid>
-                                        <Grid size={{ xs: 12 }}>
-                                          <Typography variant='subtitle2'>{uiText.snapshotFieldSummary}</Typography>
-                                        </Grid>
-                                        {Object.entries(selectedSnapshotFields).map(([key, value]) => (
-                                          <Grid key={key} size={{ xs: 12, md: 6 }}>
-                                            <Card variant='outlined' sx={{ height: '100%' }}>
-                                              <CardContent>
-                                                <Typography variant='caption' color='text.secondary'>
-                                                  {formatFieldLabel(key)}
-                                                </Typography>
-                                                <Box
-                                                  component='pre'
-                                                  sx={{
-                                                    m: 0,
-                                                    mt: 0.5,
-                                                    fontSize: 12,
-                                                    fontFamily: 'monospace',
-                                                    whiteSpace: 'pre-wrap',
-                                                    wordBreak: 'break-word'
-                                                  }}
-                                                >
-                                                  {formatFieldValue(value)}
-                                                </Box>
-                                              </CardContent>
-                                            </Card>
-                                          </Grid>
-                                        ))}
-                                      </Grid>
-                                    </>
-                                  ) : null}
-
-                                  {snapshotDetailTab === 1 && locationId && selectedSnapshot ? (
-                                    <AuditTab locationId={locationId} snapshotId={selectedSnapshot.id} />
-                                  ) : null}
-
-                                  {snapshotDetailTab === 2 ? (
-                                    <>
-                                      <Typography variant='subtitle2'>{uiText.snapshotRawJson}</Typography>
-                                      <Typography variant='caption' color='text.secondary'>
-                                        {uiText.snapshotRawHint}
-                                      </Typography>
-                                      <Box
-                                        component='pre'
-                                        sx={{
-                                          m: 0,
-                                          p: 2,
-                                          borderRadius: 1,
-                                          bgcolor: 'action.hover',
-                                          border: `1px solid ${alpha(theme.palette.divider, 0.8)}`,
-                                          fontFamily: 'monospace',
-                                          fontSize: 12,
-                                          lineHeight: 1.55,
-                                          whiteSpace: 'pre',
-                                          overflowX: 'auto',
-                                          overflowY: 'auto',
-                                          maxHeight: 320
-                                        }}
-                                      >
-                                        {JSON.stringify(selectedSnapshot.snapshot || {}, null, 2)}
-                                      </Box>
-                                    </>
-                                  ) : null}
-                                </Stack>
-                              </Box>
-                            </Stack>
-                          ) : (
-                            <Typography variant='body2' color='text.secondary'>
-                              {uiText.snapshotSelectHint}
-                            </Typography>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  </Grid>
+                  <SnapshotHistory
+                    locationId={locationId}
+                    snapshots={snapshots}
+                    selectedSnapshot={selectedSnapshot}
+                    loading={loadingSnapshots}
+                    onSelectSnapshot={handleOpenSnapshot}
+                  />
                 )}
               </Stack>
             )}

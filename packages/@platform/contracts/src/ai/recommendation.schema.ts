@@ -5,7 +5,7 @@ import { z } from 'zod';
  * Defines the structure for a single AI-generated recommendation
  */
 export const RecommendationSchema = z.object({
-    category: z.enum(['search', 'local', 'social', 'reputation', 'conversion', 'content']),
+    category: z.enum(['search', 'local', 'social', 'reputation', 'conversion', 'content', 'audit']),
     title: z.string().min(10).max(200),
     description: z.string().min(50).max(2000),
     why: z.array(z.string()).min(1).max(5),
@@ -15,7 +15,7 @@ export const RecommendationSchema = z.object({
     confidence: z.number().min(0).max(100),
     kpiTarget: z.object({
         metric: z.string(),
-        target: z.number(),
+        target: z.union([z.number(), z.string()]),
         timeframe: z.string(),
     }).optional(),
 });

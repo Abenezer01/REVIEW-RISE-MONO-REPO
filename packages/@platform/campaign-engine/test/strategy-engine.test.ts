@@ -3,7 +3,6 @@
 import { generateCampaignPlan } from '../src/index';
 
 describe('Strategy Engine', () => {
-
     test('SaaS - High Budget - Leads', async () => {
         const plan = await generateCampaignPlan({
             vertical: 'SaaS',
