@@ -88,6 +88,7 @@ export const getSnapshotAudit = async (req: Request, res: Response) => {
 export const runSnapshotAudit = async (req: Request, res: Response) => {
   try {
     const { locationId, snapshotId } = req.params;
+    const { targetKeywords } = req.body;
 
     if (!isUuid(locationId) || !isUuid(snapshotId)) {
       const badRequest = createErrorResponse('Invalid locationId or snapshotId', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
@@ -95,7 +96,7 @@ export const runSnapshotAudit = async (req: Request, res: Response) => {
       return res.status(badRequest.statusCode).json(badRequest);
     }
 
-    const audit = await auditService.runAudit(snapshotId);
+    const audit = await auditService.runAudit(snapshotId, targetKeywords);
 
     const response = createSuccessResponse(audit, 'GBP snapshot audit completed successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
 

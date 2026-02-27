@@ -1,46 +1,27 @@
 import { prisma } from '@platform/db';
+import { categoryEvaluator } from './audit-engine/category-evaluator';
+import { keywordEvaluator } from './audit-engine/keyword-evaluator';
+import { photoEvaluator } from './audit-engine/photo-evaluator';
+import {
+    AuditBreakdown,
+    AuditIssue,
+    AuditResult,
+    GroupedIssues
+} from './audit-engine/types';
 import { NormalizedGbpProfile, normalizeGbpProfile } from './gbp-types';
-
-export interface AuditIssue {
-    code: string;
-    severity: 'critical' | 'warning' | 'opportunity';
-    title: string;
-    whyItMatters: string;
-    recommendation: string;
-    impactWeight: number;
-}
-
-export interface AuditBreakdown {
-    completeness: number;
-    description: number;
-    media: number;
-    freshness: number;
-    categories: number;
-}
-
-export interface GroupedIssues {
-    critical: AuditIssue[];
-    warning: AuditIssue[];
-    opportunity: AuditIssue[];
-}
-
-export interface AuditResult {
-    snapshotId: string;
-    totalScore: number;
-    breakdown: AuditBreakdown;
-    groupedIssues: GroupedIssues;
-    issues: AuditIssue[]; // Kept for backward compatibility or simple listing
-    createdAt: Date;
-}
 
 // 1. Scoring Rubric (Configurable Weights)
 const SCORING_WEIGHTS = {
-    completeness: 40,
-    description: 30,
+    completeness: 25,
+    description: 15,
     media: 10,
     freshness: 10,
-    categories: 10
+    categories: 10,
+    photoQuality: 15,
+    keywordOptimization: 15
 };
+
+const DEFAULT_TARGET_KEYWORDS = ["SEO", "Marketing", "Consultant", "Agency", "Google Ads"];
 
 export class AuditService {
     async getAudit(snapshotId: string): Promise<AuditResult | null> {
@@ -54,25 +35,15 @@ export class AuditService {
         return null;
     }
 
-    async runAudit(snapshotId: string): Promise<AuditResult> {
-        // Check if audit already exists
+    async runAudit(snapshotId: string, targetKeywords: string[] = DEFAULT_TARGET_KEYWORDS): Promise<AuditResult> {
+        // Check if audit already exists - forcing recompute for V2 dev
+        // In production, remove this check or add a 'force' flag
+        /*
         const existingAudit = await prisma.gbpProfileAudit.findUnique({
             where: { snapshotId }
         });
-
-        if (existingAudit && existingAudit.details) {
-            // If we have a stored result, try to return it.
-            // Note: In a real "force recompute" scenario, we'd bypass this.
-            // For now, we assume if it exists, it's valid.
-            // However, the user asked for "Stored audit result", so we should return what's in DB if valid.
-            // But if the structure in DB is old/different, we might want to recompute.
-            // Let's recompute if the structure doesn't match our new expectation or just return it.
-            // Given we are developing, let's recompute to ensure we see changes.
-            // To respect "Do not recompute unless forced", we should strictly return existing.
-            // But since I'm changing the logic, the old result is "invalid" schema-wise.
-            // Let's just recompute for this dev session by ignoring this check effectively or updating it.
-            // I'll implement the recompute logic below and upsert.
-        }
+        if (existingAudit && existingAudit.details) { ... }
+        */
 
         const snapshot = await prisma.gbpProfileSnapshot.findUnique({
             where: { id: snapshotId }
@@ -83,7 +54,19 @@ export class AuditService {
         }
 
         const rawProfile = snapshot.snapshot;
-        const normalizedProfile = normalizeGbpProfile(rawProfile);
+
+        if (!rawProfile || typeof rawProfile !== 'object') {
+            throw new Error('Invalid snapshot data');
+        }
+
+        let normalizedProfile: NormalizedGbpProfile;
+
+        // Check if snapshot is already normalized (new format) or raw (legacy)
+        if ((rawProfile as any).source === 'google_business_profile') {
+            normalizedProfile = rawProfile as unknown as NormalizedGbpProfile;
+        } else {
+            normalizedProfile = normalizeGbpProfile(rawProfile);
+        }
 
         // 2. Completeness Scoring & 3. Missing Fields
         const { completenessScore, completenessIssues } = this.calculateCompleteness(normalizedProfile);
@@ -91,26 +74,44 @@ export class AuditService {
         // 4. Description Analysis
         const { descriptionScore, descriptionIssues } = this.analyzeDescription(normalizedProfile);
 
-        // Media, Freshness, Categories (Stubs/Simple logic)
-        const { mediaScore, mediaIssues } = this.evaluateMedia(rawProfile);
-        const { freshnessScore, freshnessIssues } = this.evaluateFreshness(rawProfile);
-        const { categoriesScore, categoriesIssues } = this.evaluateCategories(normalizedProfile);
+        // 5. V2 Modules
+        const { score: categoriesScore, issues: categoriesIssues, intelligence: categoryIntelligence } = categoryEvaluator.evaluate(normalizedProfile, rawProfile);
 
-        // 5. Score Calculation
+        const {
+            basicScore: mediaScore,
+            score: photoQualityScore,
+            issues: photoIssues,
+            improvementPlan: photoImprovementPlan,
+            details: photoQualityDetails
+        } = photoEvaluator.evaluate(rawProfile);
+
+        const {
+            score: keywordScore,
+            issues: keywordIssues,
+            gapSummary: keywordGapSummary
+        } = keywordEvaluator.evaluate(normalizedProfile, rawProfile, targetKeywords);
+
+        // Freshness (Stub for now, or implement logic)
+        const { freshnessScore, freshnessIssues } = this.evaluateFreshness(rawProfile);
+
+        // 6. Score Calculation
         const totalScore = this.calculateTotalScore({
             completeness: completenessScore,
             description: descriptionScore,
             media: mediaScore,
             freshness: freshnessScore,
-            categories: categoriesScore
+            categories: categoriesScore,
+            photoQuality: photoQualityScore,
+            keywordOptimization: keywordScore
         });
 
         const allIssues = [
             ...completenessIssues,
             ...descriptionIssues,
-            ...mediaIssues,
-            ...freshnessIssues,
-            ...categoriesIssues
+            ...categoriesIssues,
+            ...photoIssues,
+            ...keywordIssues,
+            ...freshnessIssues
         ].sort((a, b) => b.impactWeight - a.impactWeight);
 
         // 7. Severity Grouping
@@ -128,20 +129,26 @@ export class AuditService {
                 description: descriptionScore,
                 media: mediaScore,
                 freshness: freshnessScore,
-                categories: categoriesScore
+                categories: categoriesScore,
+                photoQuality: photoQualityScore,
+                keywordOptimization: keywordScore
             },
             groupedIssues,
             issues: allIssues,
+            keywordGapSummary,
+            categoryIntelligence,
+            photoQualityDetails,
+            photoImprovementPlan,
             createdAt: new Date()
         };
 
-        // 6. Audit Result Storage
+        // 8. Audit Result Storage
         await prisma.gbpProfileAudit.upsert({
             where: { snapshotId },
             create: {
                 snapshotId,
                 score: totalScore,
-                details: result as any // storing the whole result object in details for flexibility
+                details: result as any
             },
             update: {
                 score: totalScore,
@@ -172,18 +179,16 @@ export class AuditService {
             if (isPresent) {
                 presentCount++;
             } else {
-                // Generate Issue
                 let severity: 'critical' | 'warning' | 'opportunity' = 'warning';
                 let impactWeight = 5;
 
-                // Rules from requirements
                 if (field.key === 'phone') { severity = 'critical'; impactWeight = 10; }
                 if (field.key === 'website') { severity = 'warning'; impactWeight = 5; }
                 if (field.key === 'description') { severity = 'critical'; impactWeight = 10; }
                 if (field.key === 'hours') { severity = 'warning'; impactWeight = 5; }
                 if (field.key === 'category') { severity = 'critical'; impactWeight = 10; }
-                if (field.key === 'locationTitle') { severity = 'critical'; impactWeight = 10; } // Implicitly critical
-                if (field.key === 'address') { severity = 'critical'; impactWeight = 10; } // Implicitly critical
+                if (field.key === 'locationTitle') { severity = 'critical'; impactWeight = 10; }
+                if (field.key === 'address') { severity = 'critical'; impactWeight = 10; }
 
                 issues.push({
                     code: `missing_${field.key}`,
@@ -196,10 +201,7 @@ export class AuditService {
             }
         }
 
-        // Score is pure percentage of presence * weight is handled in total calculation
-        // Requirements: "Each field contributes equally to completeness weight"
         const completenessScore = (presentCount / fields.length) * 100;
-
         return { completenessScore, completenessIssues: issues };
     }
 
@@ -209,11 +211,9 @@ export class AuditService {
         let score = 100;
 
         if (!desc) {
-            // Already handled in completeness, but for description-specific score:
             return { descriptionScore: 0, descriptionIssues: [] };
         }
 
-        // Length Rules
         const length = desc.length;
         if (length < 100) {
             score -= 40;
@@ -246,9 +246,7 @@ export class AuditService {
                 impactWeight: 1
             });
         }
-        // 250-750 is Good (no penalty)
 
-        // CTA Detection
         const ctaWords = ["call", "visit", "book", "contact", "order"];
         const lowerDesc = desc.toLowerCase();
         const hasCTA = ctaWords.some(word => lowerDesc.includes(word));
@@ -264,11 +262,8 @@ export class AuditService {
             });
         }
 
-        // Service Keyword Detection (Primary Category)
         if (profile.category) {
             const categoryLower = profile.category.toLowerCase();
-            // Split category into words to be more lenient? Or exact match?
-            // "Must contain primary category keyword" -> lenient
             const catKeywords = categoryLower.split(' ').filter(w => w.length > 3);
             const hasServiceTerm = catKeywords.some(kw => lowerDesc.includes(kw)) || lowerDesc.includes(categoryLower);
 
@@ -285,7 +280,6 @@ export class AuditService {
             }
         }
 
-        // Location Keyword Detection
         const city = profile.address?.locality?.toLowerCase();
         if (city && !lowerDesc.includes(city)) {
             score -= 10;
@@ -302,38 +296,65 @@ export class AuditService {
         return { descriptionScore: Math.max(0, score), descriptionIssues: issues };
     }
 
-    private evaluateMedia(_rawProfile: any): { mediaScore: number; mediaIssues: AuditIssue[] } {
-        // Placeholder logic as we might not have full media data in snapshot yet
-        // Assuming rawProfile might have 'media' or we check other fields.
-        // If no data, default to 50 or 0? "Partial scoring allowed".
-        // Let's check for 'photos' count if available, or just return neutral for now.
-        const issues: AuditIssue[] = [];
-        const score = 50; // Default neutral
-
-        // If we can verify media, update score.
-        // For now, let's assume if profile has a cover photo or logo it's better.
-        // rawProfile.media is not standard in the minimal snapshot I saw, but let's check keys.
-
-        return { mediaScore: score, mediaIssues: issues };
-    }
-
-    private evaluateFreshness(_rawProfile: any): { freshnessScore: number; freshnessIssues: AuditIssue[] } {
-        // Placeholder
-        return { freshnessScore: 100, freshnessIssues: [] };
-    }
-
-    private evaluateCategories(profile: NormalizedGbpProfile): { categoriesScore: number; categoriesIssues: AuditIssue[] } {
+    private evaluateFreshness(rawProfile: any): { freshnessScore: number; freshnessIssues: AuditIssue[] } {
         const issues: AuditIssue[] = [];
         let score = 100;
 
-        if (!profile.category) {
-            score = 0;
-            // Issue already raised in completeness
+        // Try to determine last update time from metadata or media
+        let lastUpdate: Date | null = null;
+
+        if (rawProfile.metadata?.updateTime) {
+            lastUpdate = new Date(rawProfile.metadata.updateTime);
         }
 
-        // If we had secondary categories, we could check them.
+        // Check media if metadata not available or older
+        if (Array.isArray(rawProfile.media)) {
+            const media = rawProfile.media;
+            for (const m of media) {
+                if (m.createTime) {
+                    const d = new Date(m.createTime);
+                    if (!lastUpdate || d > lastUpdate) {
+                        lastUpdate = d;
+                    }
+                }
+            }
+        }
 
-        return { categoriesScore: score, categoriesIssues: issues };
+        if (!lastUpdate) {
+            // If no date found, we can't penalize confidently, or we assume stale?
+            // Let's assume stale if no metadata and no media (which is bad anyway)
+            // But to be safe, we'll give a neutral score or check for empty media
+            return { freshnessScore: 50, freshnessIssues: [] };
+        }
+
+        const now = new Date();
+        const diffDays = (now.getTime() - lastUpdate.getTime()) / (1000 * 3600 * 24);
+
+        if (diffDays > 180) {
+            score -= 50;
+            issues.push({
+                code: 'freshness_critical',
+                severity: 'critical',
+                title: 'Profile is Stale',
+                whyItMatters: 'No updates in over 6 months signals to Google and customers that the business might be closed.',
+                recommendation: 'Update your hours, add a photo, or create a post immediately.',
+                nextAction: 'Make any update to your profile today.',
+                impactWeight: 8
+            });
+        } else if (diffDays > 90) {
+            score -= 20;
+            issues.push({
+                code: 'freshness_warning',
+                severity: 'warning',
+                title: 'No Recent Updates',
+                whyItMatters: 'Regular activity (every 90 days) keeps your ranking high.',
+                recommendation: 'Add a new photo or update your business description.',
+                nextAction: 'Add a new photo or post.',
+                impactWeight: 5
+            });
+        }
+
+        return { freshnessScore: Math.max(0, score), freshnessIssues: issues };
     }
 
     private calculateTotalScore(scores: AuditBreakdown): number {
@@ -343,6 +364,8 @@ export class AuditService {
         total += scores.media * (SCORING_WEIGHTS.media / 100);
         total += scores.freshness * (SCORING_WEIGHTS.freshness / 100);
         total += scores.categories * (SCORING_WEIGHTS.categories / 100);
+        total += scores.photoQuality * (SCORING_WEIGHTS.photoQuality / 100);
+        total += scores.keywordOptimization * (SCORING_WEIGHTS.keywordOptimization / 100);
 
         return Math.min(100, Math.max(0, Math.round(total)));
     }

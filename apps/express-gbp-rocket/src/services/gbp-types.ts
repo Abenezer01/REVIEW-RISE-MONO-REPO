@@ -69,7 +69,7 @@ export const normalizeGbpProfile = (raw: any): NormalizedGbpProfile => {
         locationName: raw?.name || null,
         locationTitle: raw?.title || null,
         description: raw?.profile?.description || null,
-        category: raw?.primaryCategory?.displayName || null,
+        category: raw?.categories?.primaryCategory?.displayName || raw?.primaryCategory?.displayName || null,
         phone: raw?.phoneNumbers?.primaryPhone || raw?.phoneNumbers?.additionalPhones?.[0] || null,
         website: raw?.websiteUri || null,
         address: {
