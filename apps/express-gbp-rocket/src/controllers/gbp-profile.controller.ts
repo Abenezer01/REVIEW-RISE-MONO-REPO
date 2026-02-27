@@ -10,6 +10,7 @@ import {
   listLocationSnapshots,
   syncLocationBusinessProfile
 } from '../services/gbp-profile.service';
+import { auditService } from '../services/audit.service';
 
 // Accept canonical UUID strings without enforcing RFC variant/version bits.
 // Seed/dev data can contain UUID-like ids that are still valid DB keys.
@@ -38,6 +39,73 @@ export const getBusinessProfile = async (req: Request, res: Response) => {
     return res.status(response.statusCode).json(response);
   } catch (error: any) {
     const response = createErrorResponse('Internal server error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error?.message, req.id);
+
+    return res.status(response.statusCode).json(response);
+  }
+};
+
+export const getSnapshotAudit = async (req: Request, res: Response) => {
+  try {
+    const { locationId, snapshotId } = req.params;
+
+    if (!isUuid(locationId) || !isUuid(snapshotId)) {
+      const badRequest = createErrorResponse('Invalid locationId or snapshotId', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
+
+      return res.status(badRequest.statusCode).json(badRequest);
+    }
+
+    let audit = await auditService.getAudit(snapshotId);
+
+    if (!audit) {
+      // If audit doesn't exist, try to run it on the fly
+      try {
+        audit = await auditService.runAudit(snapshotId);
+      } catch (err: any) {
+        if (err.message.includes('Snapshot') && err.message.includes('not found')) {
+          const notFound = createErrorResponse('Snapshot not found', SystemMessageCode.NOT_FOUND, 404, undefined, req.id);
+          return res.status(notFound.statusCode).json(notFound);
+        }
+        throw err;
+      }
+    }
+
+    const response = createSuccessResponse(audit, 'GBP snapshot audit fetched successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
+
+    return res.status(response.statusCode).json(response);
+  } catch (error: any) {
+    const response = createErrorResponse(
+      error?.message || 'Failed to fetch GBP snapshot audit',
+      SystemMessageCode.INTERNAL_SERVER_ERROR,
+      500,
+      undefined,
+      req.id
+    );
+
+    return res.status(response.statusCode).json(response);
+  }
+};
+
+export const runSnapshotAudit = async (req: Request, res: Response) => {
+  try {
+    const { locationId, snapshotId } = req.params;
+
+    if (!isUuid(locationId) || !isUuid(snapshotId)) {
+      const badRequest = createErrorResponse('Invalid locationId or snapshotId', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
+
+      return res.status(badRequest.statusCode).json(badRequest);
+    }
+
+    const audit = await auditService.runAudit(snapshotId);
+
+    const response = createSuccessResponse(audit, 'GBP snapshot audit completed successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
+
+    return res.status(response.statusCode).json(response);
+  } catch (error: any) {
+    const message = error?.message || 'Failed to run GBP snapshot audit';
+    const statusCode = message.includes('Snapshot') && message.includes('not found') ? 404 : 500;
+    const code = statusCode === 404 ? SystemMessageCode.NOT_FOUND : SystemMessageCode.INTERNAL_SERVER_ERROR;
+
+    const response = createErrorResponse(message, code, statusCode, undefined, req.id);
 
     return res.status(response.statusCode).json(response);
   }
