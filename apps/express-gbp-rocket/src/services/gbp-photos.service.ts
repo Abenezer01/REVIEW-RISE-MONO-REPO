@@ -120,11 +120,16 @@ export class GbpPhotosService {
      */
     async proxyPhotoStream(locationId: string, photoId: string) {
         const accessToken = await gbpProfileService.getAccessToken(locationId);
+        const locationPhotoDelegate = (prisma as any).locationPhoto;
+
+        if (!locationPhotoDelegate?.findFirst) {
+            throw new Error('Photo storage is not available yet');
+        }
 
         // Verify photo exists in DB and belongs to location
         // Here photoId must be reconstructed or matched. 
         // We assume photoId might be URL encoded or just the ID part.
-        const dbPhoto = await prisma.locationPhoto.findFirst({
+        const dbPhoto = await locationPhotoDelegate.findFirst({
             where: {
                 locationId,
                 id: { endsWith: photoId } // Safety match

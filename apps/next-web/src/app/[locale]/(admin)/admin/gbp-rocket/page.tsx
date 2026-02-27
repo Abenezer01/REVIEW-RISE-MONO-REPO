@@ -12,6 +12,8 @@ import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import ImageList from '@mui/material/ImageList'
+import ImageListItem from '@mui/material/ImageListItem'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
@@ -22,6 +24,7 @@ import { alpha, useTheme } from '@mui/material/styles'
 import { useTranslations } from 'next-intl'
 
 import { SERVICES_CONFIG } from '@/configs/services'
+import { useGbpPhotos, useSyncGbpPhotos } from '@/hooks/gbp/useGbpPhotos'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
 import apiClient from '@/lib/apiClient'
 import AuditTab from './_components/AuditTab'
@@ -37,6 +40,8 @@ type GbpBusinessProfile = {
     weekdayDescriptions?: string[]
   }
   lastSynced: string | null
+  connectedAt?: string | null
+  connectionStatus?: string | null
 }
 
 type GbpSnapshotItem = {
@@ -68,6 +73,12 @@ const uiText = {
   labelDescription: 'Description',
   labelHours: 'Business Hours',
   labelLastSynced: 'Last synced',
+  labelConnection: 'Connection',
+  missingLabel: 'Missing',
+  photosTitle: 'Photos',
+  photosSubtitle: 'Recent GBP photos for this location.',
+  photosEmpty: 'No photos yet. Run a photo sync.',
+  syncPhotos: 'Sync Photos',
   snapshotTitle: 'Snapshot History',
   createSnapshot: 'Capture Snapshot',
   snapshotTypeSync: 'sync',
@@ -114,6 +125,10 @@ const AdminGBPRocketPage = () => {
 
   const pageTitle = `${t('navigation.gbp-rocket')}™`
   const hasProfile = Boolean(profile?.category || profile?.phone || profile?.address?.formatted || profile?.description)
+  const isConnected = (profile?.connectionStatus || '').toLowerCase() === 'active'
+  const { data: photosResult, isLoading: loadingPhotos } = useGbpPhotos(locationId || '', { skip: 0, take: 6 })
+  const { mutate: syncPhotos, isPending: syncingPhotos } = useSyncGbpPhotos()
+  const photos = photosResult?.data || []
 
   const lastSyncedText = useMemo(() => {
     if (!profile?.lastSynced) return uiText.never
@@ -139,6 +154,14 @@ const AdminGBPRocketPage = () => {
 
   const getSnapshotChangedCountText = (count: number) => {
     return `${count} ${uiText.snapshotFieldsChangedCount}`
+  }
+
+  const isMissingValue = (value: unknown) => {
+    if (value === null || value === undefined) return true
+    if (typeof value === 'string') return value.trim().length === 0
+    if (Array.isArray(value)) return value.length === 0
+
+    return false
   }
 
   const formatFieldLabel = (key: string) => {
@@ -172,6 +195,10 @@ const AdminGBPRocketPage = () => {
     return fallback;
   };
 
+  const isHttpStatus = (error: unknown, statusCode: number) => {
+    return isAxiosError(error) && error.response?.status === statusCode
+  }
+
   const fetchProfile = useCallback(async () => {
     if (!locationId) {
       setProfile(null)
@@ -191,9 +218,14 @@ const AdminGBPRocketPage = () => {
 
       setProfile(response.data || null)
     } catch (error) {
-      console.error('Failed to fetch GBP profile:', error)
       setProfile(null)
-      setErrorMessage(extractErrorMessage(error, 'Failed to fetch GBP profile'))
+
+      if (isHttpStatus(error, 404)) {
+        setErrorMessage('Selected location was not found in GBP data. Choose another location and try again.')
+      } else {
+        console.error('Failed to fetch GBP profile:', error)
+        setErrorMessage(extractErrorMessage(error, 'Failed to fetch GBP profile'))
+      }
     } finally {
       setLoading(false)
     }
@@ -238,9 +270,14 @@ const AdminGBPRocketPage = () => {
         setSelectedSnapshot(null)
       }
     } catch (error) {
-      console.error('Failed to fetch GBP snapshots:', error)
       setSnapshots([])
       setSelectedSnapshot(null)
+
+      if (isHttpStatus(error, 404)) {
+        setErrorMessage('Snapshot history is not available for this location yet.')
+      } else {
+        console.error('Failed to fetch GBP snapshots:', error)
+      }
     } finally {
       setLoadingSnapshots(false)
     }
@@ -328,7 +365,8 @@ const AdminGBPRocketPage = () => {
               </Typography>
             </Box>
             <Stack direction='row' spacing={1}>
-              <Chip color={hasProfile ? 'success' : 'default'} variant='tonal' label={hasProfile ? uiText.stateReady : uiText.statePending} />
+              <Chip color={isConnected ? 'success' : 'default'} variant='tonal' label={isConnected ? 'Connected' : 'Disconnected'} />
+              <Chip color={hasProfile ? 'success' : 'warning'} variant='tonal' label={hasProfile ? uiText.stateReady : uiText.statePending} />
               <Chip variant='tonal' label={`${uiText.labelLastSynced}: ${lastSyncedText}`} />
             </Stack>
           </Stack>
@@ -351,9 +389,19 @@ const AdminGBPRocketPage = () => {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                   <Typography variant='h6'>{activeTab === 0 ? uiText.sectionTitle : uiText.snapshotTitle}</Typography>
                   {activeTab === 0 ? (
-                    <Button variant='contained' color='warning' onClick={handleSync} disabled={syncing}>
-                      {syncing ? uiText.syncing : uiText.syncNow}
-                    </Button>
+                    <Stack direction='row' spacing={1}>
+                      <Button variant='contained' color='warning' onClick={handleSync} disabled={syncing}>
+                        {syncing ? uiText.syncing : uiText.syncNow}
+                      </Button>
+                      <Button
+                        variant='outlined'
+                        color='secondary'
+                        onClick={() => locationId && syncPhotos(locationId)}
+                        disabled={syncingPhotos}
+                      >
+                        {syncingPhotos ? uiText.syncing : uiText.syncPhotos}
+                      </Button>
+                    </Stack>
                   ) : (
                     <Stack direction='row' spacing={1}>
                       <Button variant='outlined' color='inherit' onClick={fetchSnapshots} disabled={loadingSnapshots}>
@@ -381,7 +429,10 @@ const AdminGBPRocketPage = () => {
                       <Grid size={{ xs: 12, md: 6 }}>
                         <Card variant='outlined'>
                           <CardContent>
-                            <Typography variant='caption' color='text.secondary'>{uiText.labelCategory}</Typography>
+                            <Stack direction='row' alignItems='center' justifyContent='space-between'>
+                              <Typography variant='caption' color='text.secondary'>{uiText.labelCategory}</Typography>
+                              {isMissingValue(profile?.category) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
+                            </Stack>
                             <Typography variant='body1' fontWeight={600}>{profile?.category || uiText.notAvailable}</Typography>
                           </CardContent>
                         </Card>
@@ -389,15 +440,42 @@ const AdminGBPRocketPage = () => {
                       <Grid size={{ xs: 12, md: 6 }}>
                         <Card variant='outlined'>
                           <CardContent>
-                            <Typography variant='caption' color='text.secondary'>{uiText.labelPhone}</Typography>
+                            <Stack direction='row' alignItems='center' justifyContent='space-between'>
+                              <Typography variant='caption' color='text.secondary'>{uiText.labelPhone}</Typography>
+                              {isMissingValue(profile?.phone) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
+                            </Stack>
                             <Typography variant='body1' fontWeight={600}>{profile?.phone || uiText.notAvailable}</Typography>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                      <Grid size={{ xs: 12, md: 6 }}>
+                        <Card variant='outlined'>
+                          <CardContent>
+                            <Typography variant='caption' color='text.secondary'>{uiText.labelConnection}</Typography>
+                            <Typography variant='body1' fontWeight={600}>
+                              {isConnected ? 'Connected' : 'Disconnected'}
+                            </Typography>
+                            <Typography variant='caption' color='text.secondary'>
+                              {profile?.connectedAt ? new Date(profile.connectedAt).toLocaleString() : uiText.notAvailable}
+                            </Typography>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                      <Grid size={{ xs: 12, md: 6 }}>
+                        <Card variant='outlined'>
+                          <CardContent>
+                            <Typography variant='caption' color='text.secondary'>{uiText.labelLastSynced}</Typography>
+                            <Typography variant='body1' fontWeight={600}>{lastSyncedText}</Typography>
                           </CardContent>
                         </Card>
                       </Grid>
                       <Grid size={{ xs: 12 }}>
                         <Card variant='outlined'>
                           <CardContent>
-                            <Typography variant='caption' color='text.secondary'>{uiText.labelAddress}</Typography>
+                            <Stack direction='row' alignItems='center' justifyContent='space-between'>
+                              <Typography variant='caption' color='text.secondary'>{uiText.labelAddress}</Typography>
+                              {isMissingValue(profile?.address?.formatted) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
+                            </Stack>
                             <Typography variant='body2'>{profile?.address?.formatted || uiText.notAvailable}</Typography>
                           </CardContent>
                         </Card>
@@ -405,7 +483,10 @@ const AdminGBPRocketPage = () => {
                       <Grid size={{ xs: 12 }}>
                         <Card variant='outlined'>
                           <CardContent>
-                            <Typography variant='caption' color='text.secondary'>{uiText.labelDescription}</Typography>
+                            <Stack direction='row' alignItems='center' justifyContent='space-between'>
+                              <Typography variant='caption' color='text.secondary'>{uiText.labelDescription}</Typography>
+                              {isMissingValue(profile?.description) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
+                            </Stack>
                             <Typography variant='body2'>{profile?.description || uiText.notAvailable}</Typography>
                           </CardContent>
                         </Card>
@@ -413,7 +494,10 @@ const AdminGBPRocketPage = () => {
                       <Grid size={{ xs: 12 }}>
                         <Card variant='outlined'>
                           <CardContent>
-                            <Typography variant='caption' color='text.secondary'>{uiText.labelHours}</Typography>
+                            <Stack direction='row' alignItems='center' justifyContent='space-between'>
+                              <Typography variant='caption' color='text.secondary'>{uiText.labelHours}</Typography>
+                              {isMissingValue(profile?.hours?.weekdayDescriptions || []) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
+                            </Stack>
                             <Stack spacing={0.5} sx={{ mt: 1 }}>
                               {(profile?.hours?.weekdayDescriptions || []).length > 0 ? (
                                 (profile?.hours?.weekdayDescriptions || []).map((line, index) => (
@@ -423,6 +507,52 @@ const AdminGBPRocketPage = () => {
                                 <Typography variant='body2'>{uiText.notAvailable}</Typography>
                               )}
                             </Stack>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                      <Grid size={{ xs: 12 }}>
+                        <Card variant='outlined'>
+                          <CardContent>
+                            <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 1.5 }}>
+                              <Box>
+                                <Typography variant='subtitle2'>{uiText.photosTitle}</Typography>
+                                <Typography variant='caption' color='text.secondary'>{uiText.photosSubtitle}</Typography>
+                              </Box>
+                              <Button
+                                size='small'
+                                variant='outlined'
+                                onClick={() => locationId && syncPhotos(locationId)}
+                                disabled={syncingPhotos}
+                              >
+                                {syncingPhotos ? uiText.syncing : uiText.syncPhotos}
+                              </Button>
+                            </Stack>
+                            {loadingPhotos ? (
+                              <Grid container spacing={1}>
+                                {Array.from({ length: 6 }).map((_, index) => (
+                                  <Grid key={`photo-skeleton-${index}`} size={{ xs: 6, md: 4 }}>
+                                    <Skeleton variant='rounded' height={120} />
+                                  </Grid>
+                                ))}
+                              </Grid>
+                            ) : photos.length > 0 ? (
+                              <ImageList cols={3} gap={10}>
+                                {photos.map((photo: any) => (
+                                  <ImageListItem key={photo.id}>
+                                    <Box
+                                      component='img'
+                                      src={photo.thumbnailUrl || photo.googleUrl}
+                                      alt='GBP photo'
+                                      sx={{ height: 130, width: '100%', objectFit: 'cover', borderRadius: 1.5 }}
+                                    />
+                                  </ImageListItem>
+                                ))}
+                              </ImageList>
+                            ) : (
+                              <Typography variant='body2' color='text.secondary'>
+                                {uiText.photosEmpty}
+                              </Typography>
+                            )}
                           </CardContent>
                         </Card>
                       </Grid>

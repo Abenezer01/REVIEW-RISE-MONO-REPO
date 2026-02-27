@@ -350,9 +350,13 @@ export class GbpProfileService {
             return null;
         }
 
+        const connection = await platformIntegrationRepository.findByLocationIdAndPlatform(locationId, 'google');
+
         const platformIds = (location.platformIds || {}) as any;
         const gbpProfile = (platformIds?.gbpProfile || {}) as any;
         const lastSynced = platformIds?.gbpLastSyncedAt || location.lastSync || null;
+        const connectionStatus = connection?.status || 'disconnected';
+        const connectedAt = connection?.connectedAt || null;
 
         return {
             locationId: location.id,
@@ -369,7 +373,9 @@ export class GbpProfileService {
                 formatted: location.address || null
             },
             hours: gbpProfile?.hours || { periods: [], weekdayDescriptions: [] },
-            lastSynced
+            lastSynced,
+            connectedAt,
+            connectionStatus
         };
     }
 
