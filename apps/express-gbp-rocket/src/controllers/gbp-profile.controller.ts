@@ -136,9 +136,11 @@ export const syncBusinessProfile = async (req: Request, res: Response) => {
       statusCode = 404;
       code = SystemMessageCode.NOT_FOUND;
     } else if (
-      message.includes('Active Google review source not found') ||
-      message.includes('Missing GBP locationName metadata') ||
-      message.includes('Google OAuth credentials missing')
+      message.includes('Active Google PlatformIntegration connection not found') ||
+      message.includes('No Google connection found') ||
+      message.includes('Access token is missing from connection') ||
+      message.includes('Missing GBP locationName on platform integration') ||
+      message.includes('Google OAuth credentials not configured')
     ) {
       statusCode = 400;
       code = SystemMessageCode.VALIDATION_ERROR;

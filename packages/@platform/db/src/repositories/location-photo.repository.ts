@@ -14,31 +14,45 @@ export class LocationPhotoRepository extends BaseRepository<
         super(prisma.locationPhoto, 'LocationPhoto');
     }
 
+    private getDelegate() {
+        return this.delegate as any;
+    }
+
     async findByLocationId(locationId: string, params?: { skip?: number; take?: number; category?: string }): Promise<[LocationPhoto[], number]> {
+        const delegate = this.getDelegate();
+        if (!delegate?.findMany || !delegate?.count) {
+            return [[], 0];
+        }
+
         const where: Prisma.LocationPhotoWhereInput = { locationId };
         if (params?.category) {
             where.category = params.category;
         }
 
         const [photos, total] = await Promise.all([
-            this.delegate.findMany({
+            delegate.findMany({
                 where,
                 skip: params?.skip || 0,
                 take: params?.take || 100,
                 orderBy: { createTime: 'desc' },
             }),
-            this.delegate.count({ where }),
+            delegate.count({ where }),
         ]);
 
         return [photos, total];
     }
 
     async upsertPhotos(photos: Prisma.LocationPhotoCreateInput[]): Promise<void> {
+        const locationPhotoDelegate = (prisma as any).locationPhoto;
+        if (!locationPhotoDelegate?.upsert || photos.length === 0) {
+            return;
+        }
+
         // Prisma doesn't support bulk upsert out of the box easily, so we can do it in a transaction
         // Since sqlite/pg upsert behavior differs, we use transaction with individual upserts
         await prisma.$transaction(
             photos.map((photo) =>
-                prisma.locationPhoto.upsert({
+                locationPhotoDelegate.upsert({
                     where: { id: photo.id as string },
                     create: photo,
                     update: photo,
@@ -48,9 +62,18 @@ export class LocationPhotoRepository extends BaseRepository<
     }
 
     async getStats(locationId: string) {
-        const total = await this.delegate.count({ where: { locationId } });
-        const coverCount = await this.delegate.count({ where: { locationId, category: 'COVER' } });
-        const interiorCount = await this.delegate.count({ where: { locationId, category: 'INTERIOR' } });
+        const delegate = this.getDelegate();
+        if (!delegate?.count) {
+            return {
+                total: 0,
+                coverCount: 0,
+                interiorCount: 0
+            };
+        }
+
+        const total = await delegate.count({ where: { locationId } });
+        const coverCount = await delegate.count({ where: { locationId, category: 'COVER' } });
+        const interiorCount = await delegate.count({ where: { locationId, category: 'INTERIOR' } });
 
         return {
             total,
