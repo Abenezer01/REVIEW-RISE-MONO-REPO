@@ -24,6 +24,7 @@ import { useTranslations } from 'next-intl'
 import { SERVICES_CONFIG } from '@/configs/services'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
 import apiClient from '@/lib/apiClient'
+import AuditTab from './_components/AuditTab'
 
 type GbpBusinessProfile = {
   description: string | null
@@ -85,6 +86,7 @@ const uiText = {
   snapshotRawHint: 'Scrollable view for full payload',
   snapshotTabSummary: 'Overview & Fields',
   snapshotTabRaw: 'Raw JSON',
+  snapshotTabAudit: 'Audit',
   tabProfile: 'Profile',
   tabSnapshots: 'Snapshots',
   refreshSnapshots: 'Refresh List',
@@ -487,6 +489,7 @@ const AdminGBPRocketPage = () => {
                                 <Stack spacing={1.5}>
                                   <Tabs value={snapshotDetailTab} onChange={(_, value) => setSnapshotDetailTab(value)}>
                                     <Tab label={uiText.snapshotTabSummary} />
+                                    <Tab label={uiText.snapshotTabAudit} />
                                     <Tab label={uiText.snapshotTabRaw} />
                                   </Tabs>
 
@@ -551,7 +554,11 @@ const AdminGBPRocketPage = () => {
                                     </>
                                   ) : null}
 
-                                  {snapshotDetailTab === 1 ? (
+                                  {snapshotDetailTab === 1 && locationId && selectedSnapshot ? (
+                                    <AuditTab locationId={locationId} snapshotId={selectedSnapshot.id} />
+                                  ) : null}
+
+                                  {snapshotDetailTab === 2 ? (
                                     <>
                                       <Typography variant='subtitle2'>{uiText.snapshotRawJson}</Typography>
                                       <Typography variant='caption' color='text.secondary'>

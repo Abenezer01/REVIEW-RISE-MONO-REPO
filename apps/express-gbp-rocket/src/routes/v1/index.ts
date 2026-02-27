@@ -8,6 +8,8 @@ router.get('/locations/:locationId/business-profile', gbpProfileController.getBu
 router.post('/locations/:locationId/business-profile/sync', gbpProfileController.syncBusinessProfile);
 router.get('/locations/:locationId/business-profile/snapshots', gbpProfileController.listSnapshots);
 router.get('/locations/:locationId/business-profile/snapshots/:snapshotId', gbpProfileController.getSnapshotDetail);
+router.get('/locations/:locationId/business-profile/snapshots/:snapshotId/audit', gbpProfileController.getSnapshotAudit);
+router.post('/locations/:locationId/business-profile/snapshots/:snapshotId/audit', gbpProfileController.runSnapshotAudit);
 router.post('/locations/:locationId/business-profile/snapshots', gbpProfileController.createSnapshot);
 
 router.use('/locations', gbpPhotosRoutes);

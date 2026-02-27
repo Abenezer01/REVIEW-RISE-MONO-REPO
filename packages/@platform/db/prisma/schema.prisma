@@ -263,11 +263,24 @@ model GbpProfileSnapshot {
   auditLog           AuditLog?           @relation(fields: [auditLogId], references: [id], onDelete: SetNull)
   diffBaseSnapshot   GbpProfileSnapshot? @relation("GbpSnapshotDiffBase", fields: [diffBaseSnapshotId], references: [id], onDelete: SetNull)
   diffChildren       GbpProfileSnapshot[] @relation("GbpSnapshotDiffBase")
+  audit              GbpProfileAudit?
 
   @@index([businessId])
   @@index([locationId])
   @@index([capturedAt])
   @@index([auditLogId])
+}
+
+model GbpProfileAudit {
+  id              String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  snapshotId      String             @unique @db.Uuid
+  score           Float              // 0-100
+  details         Json               // Full breakdown of the audit
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  snapshot        GbpProfileSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+
+  @@index([snapshotId])
 }
 
 model ReviewSyncLog {

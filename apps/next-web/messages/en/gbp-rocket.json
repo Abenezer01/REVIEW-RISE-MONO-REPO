@@ -53,5 +53,28 @@
       "viewOnGoogle": "View on Google",
       "deletePhoto": "Delete Photo"
     }
+  },
+  "audit": {
+    "errorRetry": "Retry / Run Audit",
+    "runNow": "Run Audit Now",
+    "noResults": "No audit results found for this snapshot.",
+    "profileHealthScore": "Profile Health Score",
+    "scoreDescription": "Based on completeness, description, and optimization factors.",
+    "scoreBreakdown": "Score Breakdown",
+    "completenessLabel": "Completeness (40%)",
+    "descriptionLabel": "Description (30%)",
+    "mediaLabel": "Media (10%)",
+    "freshnessLabel": "Freshness (10%)",
+    "categoriesLabel": "Categories (10%)",
+    "critical": "Critical",
+    "warning": "Warning",
+    "opportunity": "Opportunity",
+    "noIssues": "No issues found in this category.",
+    "recommendation": "Recommendation:",
+    "impactWeight": "Impact Weight:",
+    "code": "Code:",
+    "outOf100": "/ 100",
+    "failedToLoad": "Failed to load audit results.",
+    "failedToRun": "Failed to run audit."
   }
 }
