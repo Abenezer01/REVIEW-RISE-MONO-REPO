@@ -144,6 +144,9 @@ model Location {
   photos              LocationPhoto[]
   lastPhotoSyncAt     DateTime?
   gbpProfileSnapshots  GbpProfileSnapshot[]
+  metrics              LocationMetric[]
+  competitors          LocationCompetitor[]
+  metricJobs           MetricJob[]
 
   @@index([businessId])
 }
@@ -1189,4 +1192,53 @@ model CreativeConcept {
   business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
   
   @@index([businessId])
+}
+
+model LocationMetric {
+  id                    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  locationId            String   @db.Uuid
+  date                  DateTime @db.Date
+  impressionsTotal      Int      @default(0)
+  impressionsDiscovery  Int      @default(0)
+  impressionsDirect     Int      @default(0)
+  photoViews            Int      @default(0)
+  visibilityScore       Float?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  location              Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@index([locationId, date])
+  @@map("location_metrics")
+}
+
+model LocationCompetitor {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  locationId           String   @db.Uuid
+  competitorName       String
+  rating               Float?
+  reviewCount          Int?
+  photoCount           Int?
+  estimatedVisibility  Float?
+  createdAt            DateTime @default(now())
+
+  location             Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@index([locationId])
+  @@map("location_competitors")
+}
+
+model MetricJob {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  locationId     String    @db.Uuid
+  jobType        String
+  status         String
+  errorMessage   String?
+  startedAt      DateTime  @default(now())
+  finishedAt     DateTime?
+
+  location       Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@index([locationId, jobType, status])
+  @@map("metric_jobs")
 }
