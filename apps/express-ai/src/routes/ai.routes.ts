@@ -265,4 +265,144 @@ router.post('/generate-troubleshooting-advice', async (req, res) => {
     }
 });
 
+type GbpGeneratorType =
+    | 'business_description'
+    | 'service_descriptions'
+    | 'category_recommendations'
+    | 'post_generator'
+    | 'qa_suggestions';
+
+const getSafeString = (value: unknown) => (typeof value === 'string' ? value.trim() : '');
+
+const buildGbpGeneratorPrompt = (type: GbpGeneratorType, payload: any) => {
+    const businessName = getSafeString(payload?.businessName) || 'Business';
+    const industry = getSafeString(payload?.industry) || 'General';
+    const location = getSafeString(payload?.location) || 'Local area';
+    const category = getSafeString(payload?.category) || '';
+    const services = Array.isArray(payload?.services) ? payload.services : [];
+    const tone = getSafeString(payload?.tone) || 'Professional and friendly';
+    const objective = getSafeString(payload?.objective) || 'attract more local customers';
+    const offer = getSafeString(payload?.offer) || '';
+    const postType = getSafeString(payload?.postType) || 'update';
+
+    const base = `
+You are a Google Business Profile optimization assistant.
+Business: ${businessName}
+Industry: ${industry}
+Location: ${location}
+Primary Category: ${category || 'Not provided'}
+Services: ${services.length > 0 ? services.join(', ') : 'Not provided'}
+Tone: ${tone}
+Objective: ${objective}
+Offer/Event context: ${offer || 'Not provided'}
+
+Rules for all outputs:
+- Keep language clear and non-spammy.
+- No excessive symbols, no clickbait claims, no keyword stuffing.
+- Use plain text only.
+- Return valid JSON only.
+`;
+
+    if (type === 'business_description') {
+        return `${base}
+Task:
+- Generate 3 GBP business description variations.
+- Each description must be <= 750 characters.
+- Include local intent naturally.
+
+JSON shape:
+{
+  "items": [
+    { "title": "Variation 1", "text": "..." },
+    { "title": "Variation 2", "text": "..." },
+    { "title": "Variation 3", "text": "..." }
+  ]
+}`;
+    }
+
+    if (type === 'service_descriptions') {
+        return `${base}
+Task:
+- Generate 6 service descriptions.
+- Each item should include a serviceName and short blurb (<= 240 characters).
+
+JSON shape:
+{
+  "items": [
+    { "serviceName": "...", "blurb": "..." }
+  ]
+}`;
+    }
+
+    if (type === 'category_recommendations') {
+        return `${base}
+Task:
+- Recommend 5 GBP categories/subcategories.
+- For each recommendation, include a short reason.
+
+JSON shape:
+{
+  "items": [
+    { "category": "...", "reason": "..." }
+  ]
+}`;
+    }
+
+    if (type === 'post_generator') {
+        return `${base}
+Task:
+- Generate 3 GBP post variations for postType="${postType}".
+- Include one clear CTA per post.
+- Keep each post <= 1400 characters.
+
+JSON shape:
+{
+  "items": [
+    { "postType": "${postType}", "text": "...", "cta": "..." }
+  ]
+}`;
+    }
+
+    return `${base}
+Task:
+- Generate 8 common GBP Q&A pairs.
+- Keep answers concise and helpful (<= 300 characters).
+
+JSON shape:
+{
+  "items": [
+    { "question": "...", "answer": "..." }
+  ]
+}`;
+};
+
+router.post('/generate-gbp-content', async (req, res) => {
+    try {
+        const type = req.body?.type as GbpGeneratorType;
+        const allowed: GbpGeneratorType[] = [
+            'business_description',
+            'service_descriptions',
+            'category_recommendations',
+            'post_generator',
+            'qa_suggestions'
+        ];
+
+        if (!allowed.includes(type)) {
+            return res.status(400).json(createErrorResponse('Invalid GBP generator type', SystemMessageCode.VALIDATION_ERROR, 400));
+        }
+
+        const prompt = buildGbpGeneratorPrompt(type, req.body?.input || {});
+        const raw = await llmService.generateJSON<{ items?: any[] }>(prompt, { temperature: 0.5 });
+        const items = Array.isArray(raw?.items) ? raw.items : [];
+
+        return res.json(createSuccessResponse({ type, items }, 'GBP AI content generated', 200, {}, SystemMessageCode.SUCCESS));
+    } catch (error: any) {
+        console.error('GBP AI Content Generation Error:', error);
+
+        return res.status(500).json(
+            createErrorResponse(error?.message || 'Failed to generate GBP AI content', SystemMessageCode.INTERNAL_SERVER_ERROR, 500)
+        );
+    }
+});
+
 export default router;
