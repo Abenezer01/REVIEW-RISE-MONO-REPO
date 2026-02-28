@@ -522,9 +522,11 @@ const AdminGBPRocketPage = () => {
                 </Grid>
               )
             ) : activeTab === 1 ? (
+
               /* Tab 1: Insights */
               <GbpInsightsDashboard locationId={locationId} />
             ) : activeTab === 2 ? (
+
               /* Tab 2: Snapshots */
               <SnapshotHistory
                 locationId={locationId}
@@ -534,6 +536,7 @@ const AdminGBPRocketPage = () => {
                 onSelectSnapshot={handleOpenSnapshot}
               />
             ) : (
+
               /* Tab 3: AI Content */
               <AiContentGenerator
                 locationId={locationId}
