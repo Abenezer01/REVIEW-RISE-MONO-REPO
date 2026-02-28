@@ -27,8 +27,9 @@ import { SERVICES_CONFIG } from '@/configs/services'
 import { useGbpPhotos, useSyncGbpPhotos } from '@/hooks/gbp/useGbpPhotos'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
 import apiClient from '@/lib/apiClient'
-import type { GbpSnapshotItem, GbpSnapshotDetail } from './_components/SnapshotHistory';
+import type { GbpSnapshotItem, GbpSnapshotDetail } from './_components/SnapshotHistory'
 import SnapshotHistory from './_components/SnapshotHistory'
+import GbpInsightsDashboard from './_components/GbpInsightsDashboard'
 import AiContentGenerator from './_components/AiContentGenerator'
 
 type GbpBusinessProfile = {
@@ -89,6 +90,7 @@ const uiText = {
   snapshotTabRaw: 'Raw JSON',
   snapshotTabAudit: 'Audit',
   tabProfile: 'Profile',
+  tabInsights: 'Insights',
   tabSnapshots: 'Snapshots',
   tabAiContent: 'AI Content',
   refreshSnapshots: 'Refresh List',
@@ -328,214 +330,223 @@ const AdminGBPRocketPage = () => {
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-        <Card>
-          <CardContent>
-            {!locationId ? (
-              <Alert severity='info'>{uiText.noLocation}</Alert>
-            ) : (
-              <Stack spacing={3}>
-                {errorMessage ? <Alert severity='error'>{errorMessage}</Alert> : null}
-                <Tabs value={activeTab} onChange={(_, value) => setActiveTab(value)}>
-                  <Tab label={uiText.tabProfile} />
-                  <Tab label={uiText.tabSnapshots} />
-                  <Tab label={uiText.tabAiContent} />
-                </Tabs>
 
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                  <Typography variant='h6'>
-                    {activeTab === 0 ? uiText.sectionTitle : activeTab === 1 ? uiText.snapshotTitle : uiText.tabAiContent}
-                  </Typography>
-                  {activeTab === 0 ? (
-                    <Stack direction='row' spacing={1}>
-                      <Button variant='contained' color='warning' onClick={handleSync} disabled={syncing}>
-                        {syncing ? uiText.syncing : uiText.syncNow}
-                      </Button>
-                      <Button
-                        variant='outlined'
-                        color='secondary'
-                        onClick={() => locationId && syncPhotos(locationId)}
-                        disabled={syncingPhotos}
-                      >
-                        {syncingPhotos ? uiText.syncing : uiText.syncPhotos}
-                      </Button>
-                    </Stack>
-                  ) : activeTab === 1 ? (
-                    <Stack direction='row' spacing={1}>
-                      <Button variant='outlined' color='inherit' onClick={fetchSnapshots} disabled={loadingSnapshots}>
-                        {uiText.refreshSnapshots}
-                      </Button>
-                      <Button variant='contained' color='secondary' onClick={handleCreateSnapshot} disabled={capturingSnapshot}>
-                        {capturingSnapshot ? uiText.syncing : uiText.createSnapshot}
-                      </Button>
-                    </Stack>
-                  ) : null}
-                </Box>
+        {!locationId ? (
+          <Alert severity='info'>{uiText.noLocation}</Alert>
+        ) : (
+          <Stack spacing={3}>
+            {errorMessage ? <Alert severity='error'>{errorMessage}</Alert> : null}
+            <Tabs value={activeTab} onChange={(_, value) => setActiveTab(value)}>
+              <Tab label={uiText.tabProfile} />
+              <Tab label={uiText.tabInsights} />
+              <Tab label={uiText.tabSnapshots} />
+              <Tab label={uiText.tabAiContent} />
+            </Tabs>
 
-                <Divider />
-
+            {/* Header bar with title + action buttons — hidden on Insights tab */}
+            {activeTab !== 1 && (
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                <Typography variant='h6'>
+                  {activeTab === 0 ? uiText.sectionTitle : activeTab === 2 ? uiText.snapshotTitle : uiText.tabAiContent}
+                </Typography>
                 {activeTab === 0 ? (
-                  loading ? (
-                    <Stack spacing={1}>
-                      <Skeleton height={40} />
-                      <Skeleton height={40} />
-                      <Skeleton height={88} />
-                      <Skeleton height={120} />
-                    </Stack>
-                  ) : (
-                    <Grid container spacing={2}>
-                      <Grid size={{ xs: 12, md: 6 }}>
-                        <Card variant='outlined'>
-                          <CardContent>
-                            <Stack direction='row' alignItems='center' justifyContent='space-between'>
-                              <Typography variant='caption' color='text.secondary'>{uiText.labelCategory}</Typography>
-                              {isMissingValue(profile?.category) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
-                            </Stack>
-                            <Typography variant='body1' fontWeight={600}>{profile?.category || uiText.notAvailable}</Typography>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                      <Grid size={{ xs: 12, md: 6 }}>
-                        <Card variant='outlined'>
-                          <CardContent>
-                            <Stack direction='row' alignItems='center' justifyContent='space-between'>
-                              <Typography variant='caption' color='text.secondary'>{uiText.labelPhone}</Typography>
-                              {isMissingValue(profile?.phone) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
-                            </Stack>
-                            <Typography variant='body1' fontWeight={600}>{profile?.phone || uiText.notAvailable}</Typography>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                      <Grid size={{ xs: 12, md: 6 }}>
-                        <Card variant='outlined'>
-                          <CardContent>
-                            <Typography variant='caption' color='text.secondary'>{uiText.labelConnection}</Typography>
-                            <Typography variant='body1' fontWeight={600}>
-                              {isConnected ? 'Connected' : 'Disconnected'}
-                            </Typography>
-                            <Typography variant='caption' color='text.secondary'>
-                              {profile?.connectedAt ? new Date(profile.connectedAt).toLocaleString() : uiText.notAvailable}
-                            </Typography>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                      <Grid size={{ xs: 12, md: 6 }}>
-                        <Card variant='outlined'>
-                          <CardContent>
-                            <Typography variant='caption' color='text.secondary'>{uiText.labelLastSynced}</Typography>
-                            <Typography variant='body1' fontWeight={600}>{lastSyncedText}</Typography>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                      <Grid size={{ xs: 12 }}>
-                        <Card variant='outlined'>
-                          <CardContent>
-                            <Stack direction='row' alignItems='center' justifyContent='space-between'>
-                              <Typography variant='caption' color='text.secondary'>{uiText.labelAddress}</Typography>
-                              {isMissingValue(profile?.address?.formatted) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
-                            </Stack>
-                            <Typography variant='body2'>{profile?.address?.formatted || uiText.notAvailable}</Typography>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                      <Grid size={{ xs: 12 }}>
-                        <Card variant='outlined'>
-                          <CardContent>
-                            <Stack direction='row' alignItems='center' justifyContent='space-between'>
-                              <Typography variant='caption' color='text.secondary'>{uiText.labelDescription}</Typography>
-                              {isMissingValue(profile?.description) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
-                            </Stack>
-                            <Typography variant='body2'>{profile?.description || uiText.notAvailable}</Typography>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                      <Grid size={{ xs: 12 }}>
-                        <Card variant='outlined'>
-                          <CardContent>
-                            <Stack direction='row' alignItems='center' justifyContent='space-between'>
-                              <Typography variant='caption' color='text.secondary'>{uiText.labelHours}</Typography>
-                              {isMissingValue(profile?.hours?.weekdayDescriptions || []) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
-                            </Stack>
-                            <Stack spacing={0.5} sx={{ mt: 1 }}>
-                              {(profile?.hours?.weekdayDescriptions || []).length > 0 ? (
-                                (profile?.hours?.weekdayDescriptions || []).map((line, index) => (
-                                  <Typography key={`${line}-${index}`} variant='body2'>{line}</Typography>
-                                ))
-                              ) : (
-                                <Typography variant='body2'>{uiText.notAvailable}</Typography>
-                              )}
-                            </Stack>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                      <Grid size={{ xs: 12 }}>
-                        <Card variant='outlined'>
-                          <CardContent>
-                            <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 1.5 }}>
-                              <Box>
-                                <Typography variant='subtitle2'>{uiText.photosTitle}</Typography>
-                                <Typography variant='caption' color='text.secondary'>{uiText.photosSubtitle}</Typography>
-                              </Box>
-                              <Button
-                                size='small'
-                                variant='outlined'
-                                onClick={() => locationId && syncPhotos(locationId)}
-                                disabled={syncingPhotos}
-                              >
-                                {syncingPhotos ? uiText.syncing : uiText.syncPhotos}
-                              </Button>
-                            </Stack>
-                            {loadingPhotos ? (
-                              <Grid container spacing={1}>
-                                {Array.from({ length: 6 }).map((_, index) => (
-                                  <Grid key={`photo-skeleton-${index}`} size={{ xs: 6, md: 4 }}>
-                                    <Skeleton variant='rounded' height={120} />
-                                  </Grid>
-                                ))}
-                              </Grid>
-                            ) : photos.length > 0 ? (
-                              <ImageList cols={3} gap={10}>
-                                {photos.map((photo: any) => (
-                                  <ImageListItem key={photo.id}>
-                                    <Box
-                                      component='img'
-                                      src={photo.thumbnailUrl || photo.googleUrl}
-                                      alt='GBP photo'
-                                      sx={{ height: 130, width: '100%', objectFit: 'cover', borderRadius: 1.5 }}
-                                    />
-                                  </ImageListItem>
-                                ))}
-                              </ImageList>
-                            ) : (
-                              <Typography variant='body2' color='text.secondary'>
-                                {uiText.photosEmpty}
-                              </Typography>
-                            )}
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    </Grid>
-                  )
-                ) : activeTab === 1 ? (
-                  <SnapshotHistory
-                    locationId={locationId}
-                    snapshots={snapshots}
-                    selectedSnapshot={selectedSnapshot}
-                    loading={loadingSnapshots}
-                    onSelectSnapshot={handleOpenSnapshot}
-                  />
-                ) : (
-                  <AiContentGenerator
-                    locationId={locationId}
-                    profileCategory={profile?.category}
-                    onError={(message) => setErrorMessage(message)}
-                  />
-                )}
-              </Stack>
+                  <Stack direction='row' spacing={1}>
+                    <Button variant='contained' color='warning' onClick={handleSync} disabled={syncing}>
+                      {syncing ? uiText.syncing : uiText.syncNow}
+                    </Button>
+                    <Button
+                      variant='outlined'
+                      color='secondary'
+                      onClick={() => locationId && syncPhotos(locationId)}
+                      disabled={syncingPhotos}
+                    >
+                      {syncingPhotos ? uiText.syncing : uiText.syncPhotos}
+                    </Button>
+                  </Stack>
+                ) : activeTab === 2 ? (
+                  <Stack direction='row' spacing={1}>
+                    <Button variant='outlined' color='inherit' onClick={fetchSnapshots} disabled={loadingSnapshots}>
+                      {uiText.refreshSnapshots}
+                    </Button>
+                    <Button variant='contained' color='secondary' onClick={handleCreateSnapshot} disabled={capturingSnapshot}>
+                      {capturingSnapshot ? uiText.syncing : uiText.createSnapshot}
+                    </Button>
+                  </Stack>
+                ) : null}
+              </Box>
             )}
-          </CardContent>
-        </Card>
-      </Grid>
 
+            {activeTab !== 1 && <Divider />}
+
+            {/* Tab 0: Profile */}
+            {activeTab === 0 ? (
+              loading ? (
+                <Stack spacing={1}>
+                  <Skeleton height={40} />
+                  <Skeleton height={40} />
+                  <Skeleton height={88} />
+                  <Skeleton height={120} />
+                </Stack>
+              ) : (
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Card variant='outlined'>
+                      <CardContent>
+                        <Stack direction='row' alignItems='center' justifyContent='space-between'>
+                          <Typography variant='caption' color='text.secondary'>{uiText.labelCategory}</Typography>
+                          {isMissingValue(profile?.category) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
+                        </Stack>
+                        <Typography variant='body1' fontWeight={600}>{profile?.category || uiText.notAvailable}</Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Card variant='outlined'>
+                      <CardContent>
+                        <Stack direction='row' alignItems='center' justifyContent='space-between'>
+                          <Typography variant='caption' color='text.secondary'>{uiText.labelPhone}</Typography>
+                          {isMissingValue(profile?.phone) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
+                        </Stack>
+                        <Typography variant='body1' fontWeight={600}>{profile?.phone || uiText.notAvailable}</Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Card variant='outlined'>
+                      <CardContent>
+                        <Typography variant='caption' color='text.secondary'>{uiText.labelConnection}</Typography>
+                        <Typography variant='body1' fontWeight={600}>
+                          {isConnected ? 'Connected' : 'Disconnected'}
+                        </Typography>
+                        <Typography variant='caption' color='text.secondary'>
+                          {profile?.connectedAt ? new Date(profile.connectedAt).toLocaleString() : uiText.notAvailable}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Card variant='outlined'>
+                      <CardContent>
+                        <Typography variant='caption' color='text.secondary'>{uiText.labelLastSynced}</Typography>
+                        <Typography variant='body1' fontWeight={600}>{lastSyncedText}</Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Card variant='outlined'>
+                      <CardContent>
+                        <Stack direction='row' alignItems='center' justifyContent='space-between'>
+                          <Typography variant='caption' color='text.secondary'>{uiText.labelAddress}</Typography>
+                          {isMissingValue(profile?.address?.formatted) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
+                        </Stack>
+                        <Typography variant='body2'>{profile?.address?.formatted || uiText.notAvailable}</Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Card variant='outlined'>
+                      <CardContent>
+                        <Stack direction='row' alignItems='center' justifyContent='space-between'>
+                          <Typography variant='caption' color='text.secondary'>{uiText.labelDescription}</Typography>
+                          {isMissingValue(profile?.description) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
+                        </Stack>
+                        <Typography variant='body2'>{profile?.description || uiText.notAvailable}</Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Card variant='outlined'>
+                      <CardContent>
+                        <Stack direction='row' alignItems='center' justifyContent='space-between'>
+                          <Typography variant='caption' color='text.secondary'>{uiText.labelHours}</Typography>
+                          {isMissingValue(profile?.hours?.weekdayDescriptions || []) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
+                        </Stack>
+                        <Stack spacing={0.5} sx={{ mt: 1 }}>
+                          {(profile?.hours?.weekdayDescriptions || []).length > 0 ? (
+                            (profile?.hours?.weekdayDescriptions || []).map((line, index) => (
+                              <Typography key={`${line}-${index}`} variant='body2'>{line}</Typography>
+                            ))
+                          ) : (
+                            <Typography variant='body2'>{uiText.notAvailable}</Typography>
+                          )}
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Card variant='outlined'>
+                      <CardContent>
+                        <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 1.5 }}>
+                          <Box>
+                            <Typography variant='subtitle2'>{uiText.photosTitle}</Typography>
+                            <Typography variant='caption' color='text.secondary'>{uiText.photosSubtitle}</Typography>
+                          </Box>
+                          <Button
+                            size='small'
+                            variant='outlined'
+                            onClick={() => locationId && syncPhotos(locationId)}
+                            disabled={syncingPhotos}
+                          >
+                            {syncingPhotos ? uiText.syncing : uiText.syncPhotos}
+                          </Button>
+                        </Stack>
+                        {loadingPhotos ? (
+                          <Grid container spacing={1}>
+                            {Array.from({ length: 6 }).map((_, index) => (
+                              <Grid key={`photo-skeleton-${index}`} size={{ xs: 6, md: 4 }}>
+                                <Skeleton variant='rounded' height={120} />
+                              </Grid>
+                            ))}
+                          </Grid>
+                        ) : photos.length > 0 ? (
+                          <ImageList cols={3} gap={10}>
+                            {photos.map((photo: any) => (
+                              <ImageListItem key={photo.id}>
+                                <Box
+                                  component='img'
+                                  src={photo.thumbnailUrl || photo.googleUrl}
+                                  alt='GBP photo'
+                                  sx={{ height: 130, width: '100%', objectFit: 'cover', borderRadius: 1.5 }}
+                                />
+                              </ImageListItem>
+                            ))}
+                          </ImageList>
+                        ) : (
+                          <Typography variant='body2' color='text.secondary'>
+                            {uiText.photosEmpty}
+                          </Typography>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                </Grid>
+              )
+            ) : activeTab === 1 ? (
+
+              /* Tab 1: Insights */
+              <GbpInsightsDashboard locationId={locationId} />
+            ) : activeTab === 2 ? (
+
+              /* Tab 2: Snapshots */
+              <SnapshotHistory
+                locationId={locationId}
+                snapshots={snapshots}
+                selectedSnapshot={selectedSnapshot}
+                loading={loadingSnapshots}
+                onSelectSnapshot={handleOpenSnapshot}
+              />
+            ) : (
+
+              /* Tab 3: AI Content */
+              <AiContentGenerator
+                locationId={locationId}
+                profileCategory={profile?.category}
+                onError={(message) => setErrorMessage(message)}
+              />
+            )}
+          </Stack>
+        )}
+      </Grid>
     </Grid>
   )
 }

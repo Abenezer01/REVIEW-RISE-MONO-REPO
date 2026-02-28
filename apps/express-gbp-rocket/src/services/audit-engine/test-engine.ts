@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { normalizeGbpProfile } from '../gbp-types';
 import { categoryEvaluator } from './category-evaluator';
 import { photoEvaluator } from './photo-evaluator';

@@ -17,6 +17,7 @@ const AI_PROVIDER = process.env.AI_PROVIDER || 'gemini';
 
 export class ReviewSentimentService {
     private async callAI(prompt: string, useJsonFormat: boolean = true): Promise<string | null> {
+        // eslint-disable-next-line no-console
         console.log(`[ReviewSentiment] Calling AI with provider: ${AI_PROVIDER}`);
         try {
             if (AI_PROVIDER === 'gemini') {
@@ -172,6 +173,7 @@ export class ReviewSentimentService {
      * @returns Complete analysis
      */
     async analyzeReview(reviewContent: string, rating: number) {
+        // eslint-disable-next-line no-console
         console.log(`[ReviewSentiment] Analyzing review with rating ${rating}`);
 
         // Run sentiment analysis first
