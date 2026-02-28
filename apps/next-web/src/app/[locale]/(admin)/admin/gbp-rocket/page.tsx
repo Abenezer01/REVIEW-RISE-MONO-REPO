@@ -27,9 +27,10 @@ import { SERVICES_CONFIG } from '@/configs/services'
 import { useGbpPhotos, useSyncGbpPhotos } from '@/hooks/gbp/useGbpPhotos'
 import { useLocationFilter } from '@/hooks/useLocationFilter'
 import apiClient from '@/lib/apiClient'
-import type { GbpSnapshotItem, GbpSnapshotDetail } from './_components/SnapshotHistory';
+import type { GbpSnapshotItem, GbpSnapshotDetail } from './_components/SnapshotHistory'
 import SnapshotHistory from './_components/SnapshotHistory'
 import GbpInsightsDashboard from './_components/GbpInsightsDashboard'
+import AiContentGenerator from './_components/AiContentGenerator'
 
 type GbpBusinessProfile = {
   description: string | null
@@ -91,6 +92,7 @@ const uiText = {
   tabProfile: 'Profile',
   tabInsights: 'Insights',
   tabSnapshots: 'Snapshots',
+  tabAiContent: 'AI Content',
   refreshSnapshots: 'Refresh List',
   emptySnapshots: 'No snapshots yet.',
   snapshotSelectHint: 'Select a snapshot to view details.',
@@ -338,11 +340,15 @@ const AdminGBPRocketPage = () => {
               <Tab label={uiText.tabProfile} />
               <Tab label={uiText.tabInsights} />
               <Tab label={uiText.tabSnapshots} />
+              <Tab label={uiText.tabAiContent} />
             </Tabs>
 
+            {/* Header bar with title + action buttons — hidden on Insights tab */}
             {activeTab !== 1 && (
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                <Typography variant='h6'>{activeTab === 0 ? uiText.sectionTitle : uiText.snapshotTitle}</Typography>
+                <Typography variant='h6'>
+                  {activeTab === 0 ? uiText.sectionTitle : activeTab === 2 ? uiText.snapshotTitle : uiText.tabAiContent}
+                </Typography>
                 {activeTab === 0 ? (
                   <Stack direction='row' spacing={1}>
                     <Button variant='contained' color='warning' onClick={handleSync} disabled={syncing}>
@@ -357,7 +363,7 @@ const AdminGBPRocketPage = () => {
                       {syncingPhotos ? uiText.syncing : uiText.syncPhotos}
                     </Button>
                   </Stack>
-                ) : (
+                ) : activeTab === 2 ? (
                   <Stack direction='row' spacing={1}>
                     <Button variant='outlined' color='inherit' onClick={fetchSnapshots} disabled={loadingSnapshots}>
                       {uiText.refreshSnapshots}
@@ -366,12 +372,13 @@ const AdminGBPRocketPage = () => {
                       {capturingSnapshot ? uiText.syncing : uiText.createSnapshot}
                     </Button>
                   </Stack>
-                )}
+                ) : null}
               </Box>
             )}
 
             {activeTab !== 1 && <Divider />}
 
+            {/* Tab 0: Profile */}
             {activeTab === 0 ? (
               loading ? (
                 <Stack spacing={1}>
@@ -515,8 +522,10 @@ const AdminGBPRocketPage = () => {
                 </Grid>
               )
             ) : activeTab === 1 ? (
+              /* Tab 1: Insights */
               <GbpInsightsDashboard locationId={locationId} />
-            ) : (
+            ) : activeTab === 2 ? (
+              /* Tab 2: Snapshots */
               <SnapshotHistory
                 locationId={locationId}
                 snapshots={snapshots}
@@ -524,12 +533,17 @@ const AdminGBPRocketPage = () => {
                 loading={loadingSnapshots}
                 onSelectSnapshot={handleOpenSnapshot}
               />
+            ) : (
+              /* Tab 3: AI Content */
+              <AiContentGenerator
+                locationId={locationId}
+                profileCategory={profile?.category}
+                onError={(message) => setErrorMessage(message)}
+              />
             )}
           </Stack>
         )}
-
       </Grid>
-
     </Grid>
   )
 }
