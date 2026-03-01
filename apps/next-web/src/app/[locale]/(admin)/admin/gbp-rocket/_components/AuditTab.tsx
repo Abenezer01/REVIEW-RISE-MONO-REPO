@@ -12,6 +12,7 @@ import InfoIcon from '@mui/icons-material/Info'
 import WarningIcon from '@mui/icons-material/Warning'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined'
 
 // MUI Components
 import Alert from '@mui/material/Alert'
@@ -264,6 +265,8 @@ const AuditTab = ({ locationId, snapshotId }: AuditTabProps) => {
   const [error, setError] = useState<string | null>(null)
   const [aiRecommendations, setAiRecommendations] = useState<AIRecommendation[]>([])
   const [generatingAi, setGeneratingAi] = useState(false)
+  const [savingSuggestionIdx, setSavingSuggestionIdx] = useState<number | null>(null)
+  const [savedSuggestionIdxs, setSavedSuggestionIdxs] = useState<number[]>([])
 
   const fetchAudit = useCallback(async () => {
     try {
@@ -331,6 +334,45 @@ const AuditTab = ({ locationId, snapshotId }: AuditTabProps) => {
       // Optional: show error toast
     } finally {
       setGeneratingAi(false)
+    }
+  }
+
+  const saveAiRecommendation = async (rec: AIRecommendation, index: number) => {
+    if (!audit) return
+
+    try {
+      setSavingSuggestionIdx(index)
+
+      const auditFindingCodes = audit.issues
+        .filter((issue) => issue.title.toLowerCase().includes(rec.category.toLowerCase()) || issue.recommendation.toLowerCase().includes(rec.category.toLowerCase()))
+        .slice(0, 5)
+        .map((issue) => issue.code)
+
+      await apiClient.post(
+        `${GBP_API_URL}/locations/${locationId}/suggestions`,
+        {
+          title: rec.title,
+          description: rec.description,
+          category: 'gbp_ai_content',
+          source: 'audit_ai',
+          lifecycleState: 'SAVED',
+          why: rec.why || [],
+          steps: rec.steps || [],
+          impact: rec.impact || 'medium',
+          effort: rec.effort || 'low',
+          confidence: rec.confidence || 0.7,
+          priorityScore: Math.round((rec.confidence || 0.7) * 100),
+          auditSnapshotId: audit.snapshotId,
+          auditFindingCodes
+        },
+        { headers: { 'x-skip-system-message': '1' } }
+      )
+
+      setSavedSuggestionIdxs((prev) => (prev.includes(index) ? prev : [...prev, index]))
+    } catch (err) {
+      console.error('Failed to save audit recommendation as suggestion:', err)
+    } finally {
+      setSavingSuggestionIdx(null)
     }
   }
 
@@ -646,6 +688,22 @@ const AuditTab = ({ locationId, snapshotId }: AuditTabProps) => {
                     <Typography variant="body2" color="text.secondary" paragraph>
                       {rec.description}
                     </Typography>
+
+                    <Button
+                      size="small"
+                      variant={savedSuggestionIdxs.includes(i) ? 'outlined' : 'contained'}
+                      color={savedSuggestionIdxs.includes(i) ? 'success' : 'primary'}
+                      startIcon={<SaveOutlinedIcon />}
+                      onClick={() => saveAiRecommendation(rec, i)}
+                      disabled={savingSuggestionIdx === i || savedSuggestionIdxs.includes(i)}
+                      sx={{ mb: 1.5 }}
+                    >
+                      {savedSuggestionIdxs.includes(i)
+                        ? 'Saved to Suggestions'
+                        : savingSuggestionIdx === i
+                          ? 'Saving...'
+                          : 'Save to Suggestions'}
+                    </Button>
 
                     <Box sx={{ mt: 2, p: 2, bgcolor: alpha(theme.palette.background.default, 0.5), borderRadius: 2 }}>
                       <Typography variant="caption" fontWeight="bold" display="block" gutterBottom color="text.primary">

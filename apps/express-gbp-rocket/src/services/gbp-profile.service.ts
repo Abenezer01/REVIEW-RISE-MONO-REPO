@@ -15,6 +15,21 @@ export class GbpProfileService {
         return code === '42P01' || metaCode === '42P01' || message.includes('relation "GbpProfileSnapshot" does not exist');
     }
 
+    private isMissingPlatformIntegrationTableError(error: any): boolean {
+        const message = String(error?.message || '');
+        const code = String(error?.code || '');
+        const metaCode = String(error?.meta?.code || '');
+        const modelName = String(error?.meta?.modelName || '');
+
+        return (
+            code === 'P2021' ||
+            metaCode === 'P2021' ||
+            modelName === 'PlatformIntegration' ||
+            message.includes('PlatformIntegration') ||
+            message.includes('relation "PlatformIntegration" does not exist')
+        );
+    }
+
     private toFieldMap(profile: any) {
         return {
             description: profile?.description ?? null,
@@ -413,7 +428,18 @@ export class GbpProfileService {
             return null;
         }
 
-        const connection = await platformIntegrationRepository.findByLocationIdAndPlatform(locationId, 'google');
+        let connection: Awaited<ReturnType<typeof platformIntegrationRepository.findByLocationIdAndPlatform>> | null = null;
+
+        try {
+            connection = await platformIntegrationRepository.findByLocationIdAndPlatform(locationId, 'google');
+        } catch (error: any) {
+            if (!this.isMissingPlatformIntegrationTableError(error)) {
+                throw error;
+            }
+
+            // Keep profile readable even when PlatformIntegration schema is not migrated yet.
+            connection = null;
+        }
 
         const platformIds = (location.platformIds || {}) as any;
         const gbpProfile = (platformIds?.gbpProfile || {}) as any;

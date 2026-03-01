@@ -4,6 +4,7 @@ import * as gbpProfileController from '../../controllers/gbp-profile.controller'
 import * as gbpMetricsController from '../../controllers/gbp-metrics.controller';
 import * as gbpCompetitorsController from '../../controllers/gbp-competitors.controller';
 import * as gbpAiContentController from '../../controllers/gbp-ai-content.controller';
+import * as gbpSuggestionsController from '../../controllers/gbp-suggestions.controller';
 import gbpPhotosRoutes from './gbp-photos.routes';
 
 const router = Router();
@@ -16,6 +17,10 @@ router.post('/locations/:locationId/business-profile/snapshots/:snapshotId/audit
 router.post('/locations/:locationId/business-profile/snapshots', gbpProfileController.createSnapshot);
 router.post('/locations/:locationId/ai-content/generate', gbpAiContentController.generateAiContent);
 router.post('/locations/:locationId/ai-content/suggestions', gbpAiContentController.saveAiSuggestion);
+router.get('/locations/:locationId/suggestions', gbpSuggestionsController.listSuggestions);
+router.post('/locations/:locationId/suggestions', gbpSuggestionsController.createSuggestion);
+router.patch('/locations/:locationId/suggestions/:suggestionId/state', gbpSuggestionsController.updateSuggestionState);
+router.get('/locations/:locationId/suggestions/activity', gbpSuggestionsController.listSuggestionActivity);
 
 router.get('/locations/:locationId/metrics', gbpMetricsController.getMetrics);
 router.post('/locations/:locationId/metrics/sync', gbpMetricsController.syncMetrics);
