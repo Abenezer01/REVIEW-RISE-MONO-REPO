@@ -26,6 +26,7 @@ import Collapse from '@mui/material/Collapse'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
+import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import { alpha, useTheme, styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
@@ -123,93 +124,6 @@ export interface AuditResult {
   createdAt: string
 }
 
-const MOCK_CRITICAL: AuditIssue[] = [
-  {
-    code: 'cat-01',
-    severity: 'critical',
-    title: 'Primary category is too generic',
-    whyItMatters: 'Generic categories compete with thousands of businesses. Specific categories improve local ranking.',
-    recommendation: 'Change to a more specific primary category such as "Coffee Shop".',
-    impactWeight: 9,
-    nextAction: 'Change to "Coffee Shop"',
-  },
-  {
-    code: 'desc-01',
-    severity: 'critical',
-    title: 'Missing business description',
-    whyItMatters: 'Description helps Google understand your services and improves search relevance.',
-    recommendation: 'Add a 250-word description highlighting your specialty coffee, ambiance, and location.',
-    impactWeight: 8,
-  }
-];
-
-const MOCK_WARNING: AuditIssue[] = [
-  {
-    code: 'photo-01',
-    severity: 'warning',
-    title: 'Only 8 photos uploaded',
-    whyItMatters: 'Profiles with 20+ photos receive 42% more requests for directions.',
-    recommendation: 'Upload 12 more photos showing interior, products, team, and exterior views.',
-    impactWeight: 5,
-  }
-];
-
-const MOCK_OPPORTUNITY: AuditIssue[] = [
-  {
-    code: 'kw-01',
-    severity: 'opportunity',
-    title: 'Add more target keywords to description',
-    whyItMatters: 'Your description is missing important keywords like wifi, organic, breakfast.',
-    recommendation: 'Naturally incorporate these keywords into your business description.',
-    impactWeight: 4,
-  }
-];
-
-const MOCK_AUDIT_DATA: AuditResult = {
-  snapshotId: 'mock-snapshot',
-  totalScore: 68,
-  createdAt: new Date().toISOString(),
-  breakdown: {
-    completeness: 85,
-    description: 62,
-    categories: 45,
-    photoQuality: 70,
-    keywordOptimization: 58,
-    media: 70,
-    freshness: 88,
-  },
-  issues: [...MOCK_CRITICAL, ...MOCK_WARNING, ...MOCK_OPPORTUNITY],
-  groupedIssues: {
-    critical: MOCK_CRITICAL,
-    warning: MOCK_WARNING,
-    opportunity: MOCK_OPPORTUNITY
-  },
-  photoImprovementPlan: [
-    'Upload 12 more photos',
-    'Add interior shots',
-    'High resolution images'
-  ],
-  keywordGapSummary: {
-    missingCount: 3,
-    topPriorityKeywords: ['specialty coffee', 'artisan pastries', 'coworking space'],
-    extractedKeywords: ['coffee', 'downtown', 'breakfast', 'wifi', 'organic', 'espresso', 'cafe']
-  },
-  categoryIntelligence: {
-    primaryCategory: 'Restaurant',
-    isGeneric: true,
-    suggestedAlternatives: ['Coffee Shop', 'Café', 'Espresso Bar']
-  },
-  photoQualityDetails: {
-    totalPhotos: 8,
-    hasCoverPhoto: true,
-    hasLogo: true,
-    recency: {
-      last30Days: 3,
-      last30To90Days: 3,
-      older: 2
-    }
-  }
-}
 
 
 interface AuditTabProps {
@@ -259,8 +173,7 @@ const AuditTab = ({ locationId, snapshotId }: AuditTabProps) => {
   const t = useTranslations('gbpRocket')
   const theme = useTheme()
 
-  const [audit, setAudit] = useState<AuditResult | null>(MOCK_AUDIT_DATA)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [audit, setAudit] = useState<AuditResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [aiRecommendations, setAiRecommendations] = useState<AIRecommendation[]>([])
@@ -300,7 +213,6 @@ const AuditTab = ({ locationId, snapshotId }: AuditTabProps) => {
     } catch (err: any) {
       console.error('Failed to run audit:', err)
       setError(err.message || t('audit.failedToRun'))
-      setAudit(MOCK_AUDIT_DATA) // Show mock data if it fails, so we can preview the layout
     } finally {
       setLoading(false)
     }
@@ -477,7 +389,73 @@ const AuditTab = ({ locationId, snapshotId }: AuditTabProps) => {
   // --- Render Helpers ---
 
 
-  if (!audit) return null;
+  if (loading) {
+    return (
+      <Box sx={{ p: { xs: 2, md: 3 } }}>
+        <Stack spacing={3}>
+          <Skeleton variant="rounded" height={220} sx={{ borderRadius: 4 }} />
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, lg: 8 }}>
+              <Skeleton variant="rounded" height={320} sx={{ borderRadius: 3 }} />
+            </Grid>
+            <Grid size={{ xs: 12, lg: 4 }}>
+              <Skeleton variant="rounded" height={320} sx={{ borderRadius: 3 }} />
+            </Grid>
+          </Grid>
+        </Stack>
+      </Box>
+    )
+  }
+
+  if (!audit) {
+    return (
+      <Box sx={{ p: { xs: 2, md: 3 }, textAlign: 'center' }}>
+        {error && (
+          <Alert severity="warning" sx={{ mb: 3, textAlign: 'left' }}>
+            {error}
+          </Alert>
+        )}
+        <Paper
+          variant="outlined"
+          sx={{
+            p: { xs: 4, md: 6 },
+            borderRadius: 4,
+            border: '1px dashed',
+            borderColor: 'divider',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2
+          }}
+        >
+          <Box
+            sx={{
+              mb: 1,
+              p: 2.5,
+              borderRadius: '50%',
+              bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
+              color: 'primary.main'
+            }}
+          >
+            <AutoAwesomeIcon fontSize="large" />
+          </Box>
+          <Typography variant="h6" fontWeight="bold">
+            {t('audit.noResults')}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 400 }}>
+            {t('audit.runAuditDescription')}
+          </Typography>
+          <GradientButton
+            onClick={runAudit}
+            startIcon={<AutoAwesomeIcon />}
+            sx={{ mt: 1 }}
+          >
+            {t('audit.runNow')}
+          </GradientButton>
+        </Paper>
+      </Box>
+    )
+  }
 
 
   const renderIssuesList = (issues: AuditIssue[]) => {
