@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
     loginAttemptLimiter,
+    googleSignInLimiter,
     createUserLimiter,
     passwordResetLimiter,
     refreshTokenLimiter,
@@ -8,7 +9,7 @@ import {
     verifyEmailLimiter,
     resendVerificationEmailLimiter,
 } from '../../middleware/rateLimiter';
-import { register, login, refreshToken, forgotPassword, resetPassword, verifyEmail, resendVerificationEmail, me, logout } from '../../controllers/auth.controller';
+import { register, login, googleSignIn, refreshToken, forgotPassword, resetPassword, verifyEmail, resendVerificationEmail, me, logout } from '../../controllers/auth.controller';
 import { validateRequest } from '@platform/middleware';
 import { LoginRequestSchema, RegisterRequestSchema, ForgotPasswordRequestSchema, ResetPasswordRequestSchema, RefreshTokenRequestSchema } from '@platform/contracts';
 
@@ -16,6 +17,7 @@ const router = Router();
 
 router.post('/register', createUserLimiter, validateRequest(RegisterRequestSchema), register);
 router.post('/login', loginAttemptLimiter, validateRequest(LoginRequestSchema), login);
+router.post('/google/signin', googleSignInLimiter, googleSignIn);
 router.post('/refresh-token', refreshTokenLimiter, validateRequest(RefreshTokenRequestSchema), refreshToken);
 router.post('/forgot-password', forgotPasswordLimiter, validateRequest(ForgotPasswordRequestSchema), forgotPassword);
 router.post('/reset-password', passwordResetLimiter, validateRequest(ResetPasswordRequestSchema), resetPassword);

@@ -66,7 +66,20 @@ export const authOptions: NextAuthOptions = {
 
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      
+      // Allow linking Google login to an existing user with the same email.
+      // This resolves OAuthAccountNotLinked for accounts created via credentials first.
+      allowDangerousEmailAccountLinking: true,
+      
+      // Force explicit OAuth interaction to avoid silent callback flows that can miss state cookie.
+      authorization: {
+        params: {
+          prompt: 'select_account',
+          access_type: 'offline',
+          response_type: 'code'
+        }
+      }
     })
 
     // ** ...add more providers here
@@ -112,6 +125,8 @@ export const authOptions: NextAuthOptions = {
         const userPayload = user.data?.user || user.user || user;
         
         token.name = userPayload.name
+        token.email = userPayload.email || token.email
+        token.image = userPayload.image || token.image || token.picture
         token.locationId = userPayload.locationId
         token.role = userPayload.role
         token.id = userPayload.id
@@ -123,6 +138,8 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         // ** Add custom params to user in session which are added in `jwt()` callback via `token` parameter
         session.user.name = token.name
+        session.user.email = token.email || session.user.email
+        session.user.image = token.image || token.picture || session.user.image
         session.user.locationId = token.locationId
         session.user.role = token.role
         session.user.id = token.id

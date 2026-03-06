@@ -34,7 +34,9 @@ import { runAutoReplyJob } from './jobs/auto-reply.job';
 
 app.post('/jobs/auto-reply', async (req, res) => {
     runAutoReplyJob()
+        // eslint-disable-next-line no-console
         .then(() => console.log('Auto-reply job completed'))
+        // eslint-disable-next-line no-console
         .catch(err => console.error('Auto-reply job failed:', err));
     
     const response = createSuccessResponse(null, 'Auto-reply job started', 202, { requestId: req.id });
@@ -42,6 +44,7 @@ app.post('/jobs/auto-reply', async (req, res) => {
 });
 
 app.post('/jobs/compute-visibility', async (req, res) => {
+    // eslint-disable-next-line no-console
     runVisibilityJob().catch(err => console.error('Job failed:', err));
 
     const response = createSuccessResponse(null, 'Visibility computation job started', 202, { requestId: req.id });
@@ -50,7 +53,9 @@ app.post('/jobs/compute-visibility', async (req, res) => {
 
 app.post('/jobs/rank-tracking/daily', async (req, res) => {
     runRankTrackingJob()
+        // eslint-disable-next-line no-console
         .then(result => console.log('Rank tracking job result:', result))
+        // eslint-disable-next-line no-console
         .catch(err => console.error('Rank tracking job failed:', err))
 
     const response = createSuccessResponse(null, 'Rank tracking job started', 202, { requestId: req.id });
@@ -68,6 +73,7 @@ app.post('/jobs/brand-recommendations', async (req, res) => {
     }
 
     brandRecommendationsJob(jobId, { businessId })
+        // eslint-disable-next-line no-console
         .catch(err => console.error(`Brand recommendations job ${jobId} failed:`, err));
 
     const response = createSuccessResponse({ jobId }, 'Brand recommendations job started', 202, { requestId: req.id });
@@ -82,6 +88,7 @@ app.post('/jobs/visibility-plan', async (req, res) => {
     }
 
     visibilityPlanJob(jobId, { businessId })
+        // eslint-disable-next-line no-console
         .catch(err => console.error(`Visibility plan job ${jobId} failed:`, err));
 
     const response = createSuccessResponse({ jobId }, 'Visibility plan job started', 202, { requestId: req.id });
@@ -98,6 +105,7 @@ app.post('/jobs/brand-scores', async (req, res) => {
     }
 
     computeBrandScoresJob(jobId, { businessId })
+        // eslint-disable-next-line no-console
         .catch(err => console.error(`Brand scores job ${jobId} failed:`, err));
 
     const response = createSuccessResponse({ jobId }, 'Brand scores job started', 202, { requestId: req.id });
@@ -108,7 +116,9 @@ import { runReviewSyncJob } from './jobs/review-sync.job';
 
 app.post('/jobs/review-sync', async (req, res) => {
     runReviewSyncJob()
+        // eslint-disable-next-line no-console
         .then(() => console.log('Review sync job finished'))
+        // eslint-disable-next-line no-console
         .catch(err => console.error('Review sync job failed:', err));
 
     const response = createSuccessResponse(null, 'Review sync job started', 202, { requestId: req.id });
@@ -123,13 +133,17 @@ app.post('/jobs/review-sentiment', async (req, res) => {
     
     if (reprocess) {
         reprocessReviews(batchSize)
+            // eslint-disable-next-line no-console
             .then(result => console.log('Review sentiment re-processing finished:', result))
+            // eslint-disable-next-line no-console
             .catch(err => console.error('Review sentiment re-processing failed:', err));
         const response = createSuccessResponse(null, 'Review sentiment re-processing job started', 202, { requestId: req.id });
         res.status(response.statusCode).json(response);
     } else {
         runReviewSentimentJob()
+            // eslint-disable-next-line no-console
             .then(result => console.log('Review sentiment analysis finished:', result))
+            // eslint-disable-next-line no-console
             .catch(err => console.error('Review sentiment analysis failed:', err));
         const response = createSuccessResponse(null, 'Review sentiment analysis job started', 202, { requestId: req.id });
         res.status(response.statusCode).json(response);
@@ -138,7 +152,9 @@ app.post('/jobs/review-sentiment', async (req, res) => {
 
 app.post('/jobs/refresh-social-tokens', async (req, res) => {
     refreshSocialTokensJob()
+        // eslint-disable-next-line no-console
         .then(() => console.log('Social token refresh job completed'))
+        // eslint-disable-next-line no-console
         .catch(err => console.error('Social token refresh job failed:', err));
 
     const response = createSuccessResponse(null, 'Social token refresh job started', 202, { requestId: req.id });
@@ -152,12 +168,18 @@ const scheduleDaily = (hour: number = 2) => {
     if (next <= now) next.setDate(next.getDate() + 1)
     const delay = next.getTime() - now.getTime()
     setTimeout(() => {
+        // eslint-disable-next-line no-console
         runRankTrackingJob().catch(err => console.error('Scheduled rank job failed:', err))
+        // eslint-disable-next-line no-console
         runReviewSyncJob().catch(err => console.error('Scheduled review sync job failed:', err))
+        // eslint-disable-next-line no-console
         runReviewSentimentJob().catch(err => console.error('Scheduled review sentiment job failed:', err))
         setInterval(() => {
+            // eslint-disable-next-line no-console
             runRankTrackingJob().catch(err => console.error('Scheduled rank job failed:', err))
+            // eslint-disable-next-line no-console
             runReviewSyncJob().catch(err => console.error('Scheduled review sync job failed:', err))
+            // eslint-disable-next-line no-console
             runReviewSentimentJob().catch(err => console.error('Scheduled review sentiment job failed:', err))
         }, 24 * 60 * 60 * 1000)
     }, delay)
@@ -166,10 +188,12 @@ const scheduleDaily = (hour: number = 2) => {
 // Schedule social token refresh every 6 hours
 const scheduleSocialTokenRefresh = () => {
     // Run immediately on startup
+    // eslint-disable-next-line no-console
     refreshSocialTokensJob().catch(err => console.error('Initial social token refresh failed:', err));
     
     // Then run every 6 hours
     setInterval(() => {
+        // eslint-disable-next-line no-console
         refreshSocialTokensJob().catch(err => console.error('Scheduled social token refresh failed:', err));
     }, 6 * 60 * 60 * 1000); // 6 hours
 }
@@ -177,12 +201,14 @@ const scheduleSocialTokenRefresh = () => {
 app.use(errorHandler);
 
 app.listen(PORT, () => {
+    // eslint-disable-next-line no-console
     console.log(`Server is running on port ${PORT}`);
     // Create health check file for Docker
     try {
         const healthFile = path.join(os.tmpdir(), 'worker-healthy');
         fs.writeFileSync(healthFile, 'ok');
     } catch (e) {
+        // eslint-disable-next-line no-console
         console.warn('Could not write health check file:', e);
     }
     scheduleDaily(2);

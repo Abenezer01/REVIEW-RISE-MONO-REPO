@@ -13,7 +13,7 @@ const menuData: MenuItem[] = [
     title: 'navigation.dashboard',
     href: '/admin',
     icon: 'tabler-smart-home',
-    allowedRoles: [ROLES.ADMIN]
+    allowedRoles: [ROLES.ADMIN, ROLES.OWNER]
   },
   {
     title: 'navigation.accounts',

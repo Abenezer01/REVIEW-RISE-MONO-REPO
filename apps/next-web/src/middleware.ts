@@ -104,7 +104,7 @@ export async function middleware(request: NextRequest) {
   let refreshResponseCookie: string | null = null
 
   // Public paths that don't require authentication (without locale prefix)
-  const publicPaths = ['/login', '/register', '/forgot-password']
+  const publicPaths = ['/login', '/register', '/forgot-password', '/verify-email']
 
   // Check if the current path is an API route
   if (pathname.startsWith('/api')) {
@@ -273,6 +273,23 @@ export async function middleware(request: NextRequest) {
           (role === ROLES.ADMIN && match.allowedRoles.includes(ROLES.ADMIN)))
 
       if (!isAllowed) {
+        const fallback = findFirstAllowedMenuPath(menuData, role)
+
+        if (fallback) {
+          const redirectResponse = NextResponse.redirect(new URL(`/${locale}${fallback}`, request.url))
+
+          if (refreshedThisRequest && refreshResponseCookie) {
+            redirectResponse.cookies.set('accessToken', refreshResponseCookie, {
+              httpOnly: true,
+              secure: process.env.NODE_ENV === 'production' && process.env.USE_SECURE_COOKIES === 'true',
+              sameSite: 'lax',
+              path: '/',
+              maxAge: 60 * 60 * 24 * 7
+            })
+          }
+
+          return redirectResponse
+        }
 
         const rewriteResponse = NextResponse.rewrite(notFoundUrl)
 
