@@ -24,9 +24,11 @@ app.use((req, res, next) => {
     const store = new Map<string, any>();
     const authHeader = req.headers.authorization;
     if (authHeader) {
+        // eslint-disable-next-line no-console
         console.log('[AdRise Middleware] Received Auth Header:', authHeader.substring(0, 20) + '...');
         store.set('authToken', authHeader);
     } else {
+        // eslint-disable-next-line no-console
         console.warn('[AdRise Middleware] No Auth Header received');
     }
     requestContext.run(store, () => {

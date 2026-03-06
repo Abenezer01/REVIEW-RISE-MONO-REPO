@@ -151,15 +151,58 @@ export class UserRepository extends BaseRepository<
     }
 
     /**
-     * Create user with "Customer" role
+     * Ensure user has at least one role.
+     * Useful for users auto-provisioned by external auth adapters.
      */
-    async createCustomer(data: Prisma.UserCreateInput) {
-        const customerRole = await prisma.role.findUnique({
-            where: { name: 'Customer' },
+    async ensureRoleAssignment(userId: string, preferredRoles: string[] = ['Owner', 'Admin', 'Viewer']) {
+        const existing = await prisma.userRole.findFirst({
+            where: { userId },
+            select: { id: true }
         });
 
-        if (!customerRole) {
-            throw new Error('Default Customer role not found in database');
+        if (existing) {
+            return;
+        }
+
+        const roles = await prisma.role.findMany({
+            where: { name: { in: preferredRoles } },
+            select: { id: true, name: true }
+        });
+
+        const selected = preferredRoles
+            .map(name => roles.find(role => role.name === name))
+            .find(Boolean);
+
+        if (!selected) {
+            throw new Error(`No default role found in database (expected one of ${preferredRoles.join(', ')})`);
+        }
+
+        await prisma.userRole.create({
+            data: {
+                userId,
+                roleId: selected.id
+            }
+        });
+    }
+
+    /**
+     * Create a newly registered user with a default seeded system role.
+     */
+    async createCustomer(data: Prisma.UserCreateInput) {
+        // Prefer Owner for self-serve signup.
+        // Fallback to Admin/Viewer if Owner is not present in the environment.
+        const candidateRoles = ['Owner', 'Admin', 'Viewer'];
+        const roles = await prisma.role.findMany({
+            where: { name: { in: candidateRoles } },
+            select: { id: true, name: true }
+        });
+
+        const defaultRole = candidateRoles
+            .map(name => roles.find(role => role.name === name))
+            .find(Boolean);
+
+        if (!defaultRole) {
+            throw new Error('No default role found in database (expected one of Admin, Owner, Viewer)');
         }
 
         return this.delegate.create({
@@ -168,7 +211,7 @@ export class UserRepository extends BaseRepository<
                 userRoles: {
                     create: {
                         role: {
-                            connect: { id: customerRole.id },
+                            connect: { id: defaultRole.id },
                         },
                     },
                 },

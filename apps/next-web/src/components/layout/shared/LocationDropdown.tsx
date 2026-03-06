@@ -32,6 +32,7 @@ interface Location {
   id: number | string
   name: string
   address?: string
+  businessId?: string
 }
 
 const LocationDropdown = () => {
@@ -41,6 +42,7 @@ const LocationDropdown = () => {
   // States
   const [open, setOpen] = useState(false)
   const [locations, setLocations] = useState<Location[]>([])
+  const [allowedBusinessIds, setAllowedBusinessIds] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -58,14 +60,39 @@ const LocationDropdown = () => {
   const { user } = useAuth()
 
   useEffect(() => {
-    if (!locationId) {
-      if (user?.locationId) {
-        setLocationId(user.locationId)
-      } else if (locations.length > 0) {
-        setLocationId(locations[0].id)
+    const fetchUserBusinesses = async () => {
+      if (!user?.id) {
+        setAllowedBusinessIds([])
+
+        return
+      }
+
+      try {
+        const response = await apiClient.get<{ data: { id: string }[] }>(`/api/admin/users/${user.id}/businesses`)
+        const businesses = response.data?.data || response.data || []
+        const ids = Array.isArray(businesses) ? businesses.map((b: any) => String(b.id)).filter(Boolean) : []
+
+        setAllowedBusinessIds(ids)
+      } catch (error) {
+        console.error('Failed to fetch user businesses', error)
+        setAllowedBusinessIds([])
       }
     }
-  }, [locationId, user?.locationId, setLocationId, locations])
+
+    fetchUserBusinesses()
+  }, [user?.id])
+
+  useEffect(() => {
+    // Do not auto-set locationId.
+    // We only keep a selected location if it's still valid within the filtered list.
+    if (!locationId) return
+
+    const exists = locations.some(l => String(l.id) === String(locationId))
+
+    if (!exists) {
+      setLocationId(null)
+    }
+  }, [locationId, setLocationId, locations])
 
   const fetchLocations = useCallback(async (search = '') => {
     try {
@@ -81,19 +108,32 @@ const LocationDropdown = () => {
       })
 
       if (response.data) {
-        setLocations(response.data.data)
+        const source = response.data.data || []
+
+        if (!allowedBusinessIds.length) {
+          setLocations(source)
+
+          return
+        }
+
+        const filtered = source.filter((location: Location) =>
+          location.businessId ? allowedBusinessIds.includes(String(location.businessId)) : false
+        )
+
+        setLocations(filtered)
       }
     } catch (error) {
       console.error('Failed to fetch locations', error)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [allowedBusinessIds])
 
   // Fetch initial locations
   useEffect(() => {
+    if (!user?.id) return
     fetchLocations()
-  }, [fetchLocations])
+  }, [fetchLocations, user?.id])
 
   // Debounced search when dropdown is open
   useEffect(() => {

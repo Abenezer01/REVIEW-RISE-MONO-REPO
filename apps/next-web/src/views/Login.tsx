@@ -3,6 +3,7 @@
 
 // React Imports
 import { useState, useActionState, useEffect } from 'react'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
 // MUI Imports
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -13,9 +14,11 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Checkbox from '@mui/material/Checkbox'
 import Button from '@mui/material/Button'
 import FormControlLabel from '@mui/material/FormControlLabel'
+import Divider from '@mui/material/Divider'
 
 // Third-party Imports
 import classnames from 'classnames'
+import { signIn } from 'next-auth/react'
 
 import { SystemMessageCode } from '@platform/contracts'
 
@@ -87,8 +90,13 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   const { settings } = useSettings()
   const theme = useTheme()
   const { login } = useAuth()
+  const router = useRouter()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
   const authBackground = useImageVariant(mode, lightImg, darkImg)
+  const params = useParams<{ locale?: string }>()
+  const searchParams = useSearchParams()
+  const socialDividerLabel = 'or'
+  const googleCtaLabel = 'Continue with Google'
 
   useEffect(() => {
     if (state?.success && state.user) {
@@ -100,13 +108,22 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
 
       login(state.user)
     } else if (state?.success === false) {
+      if (state.messageCode === SystemMessageCode.AUTH_EMAIL_NOT_VERIFIED) {
+        const locale = typeof params?.locale === 'string' ? params.locale : 'en'
+        const target = `/${locale}/verify-email?email=${encodeURIComponent(email)}`
+
+        router.push(target)
+
+        return
+      }
+
       if (state.messageCode) {
         notify(state.messageCode)
       } else {
         notify(SystemMessageCode.AUTH_LOGIN_FAILED)
       }
     }
-  }, [state, login, notify])
+  }, [state, login, notify, email, params?.locale, router])
 
   const characterIllustration = useImageVariant(
     mode,
@@ -117,6 +134,14 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   )
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
+
+  const handleGoogleSignIn = async () => {
+    const locale = typeof params?.locale === 'string' ? params.locale : 'en'
+    const returnUrl = searchParams.get('returnUrl') || '/admin'
+    const callbackUrl = `/api/auth/google/exchange?locale=${encodeURIComponent(locale)}&returnUrl=${encodeURIComponent(returnUrl)}`
+
+    await signIn('google', { callbackUrl })
+  }
 
   return (
     <div className='flex bs-full justify-center'>
@@ -198,25 +223,20 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
             </Button>
             <div className='flex justify-center items-center flex-wrap gap-2'>
               <Typography>{t('login.newOnPlatform')}</Typography>
-              <Typography component={Link} color='primary.main'>
+              <Typography component={Link} href='/register' color='primary.main'>
                 {t('login.createAccount')}
               </Typography>
             </div>
-            {/* <Divider className='gap-2 text-textPrimary'>or</Divider>
-            <div className='flex justify-center items-center gap-1.5'>
-              <IconButton className='text-facebook' size='small'>
-                <i className='tabler-brand-facebook-filled' />
-              </IconButton>
-              <IconButton className='text-twitter' size='small'>
-                <i className='tabler-brand-twitter-filled' />
-              </IconButton>
-              <IconButton className='text-textPrimary' size='small'>
-                <i className='tabler-brand-github-filled' />
-              </IconButton>
-              <IconButton className='text-error' size='small'>
-                <i className='tabler-brand-google-filled' />
-              </IconButton>
-            </div> */}
+            <Divider className='gap-2 text-textPrimary'>{socialDividerLabel}</Divider>
+            <Button
+              fullWidth
+              variant='outlined'
+              color='inherit'
+              onClick={handleGoogleSignIn}
+              startIcon={<i className='tabler-brand-google-filled' />}
+            >
+              {googleCtaLabel}
+            </Button>
           </form>
         </div>
       </div>

@@ -45,7 +45,30 @@ export const register = async (req: Request, res: Response) => {
             name: `${firstName} ${lastName}`,
         });
 
-        const response = createSuccessResponse({ userId: user.id }, 'User created successfully', 201, { requestId: req.id }, SystemMessageCode.AUTH_REGISTER_SUCCESS);
+        // Manual registration requires email verification before login.
+        await emailVerificationTokenRepository.deleteByEmail(email);
+
+        const verificationToken = crypto.randomUUID();
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24);
+
+        await emailVerificationTokenRepository.createToken({
+            email,
+            token: verificationToken,
+            expires: expiresAt
+        });
+
+        await sendVerificationEmail(email, verificationToken);
+
+        const response = createSuccessResponse(
+            {
+                userId: user.id
+            },
+            'User created successfully. Please verify your email before logging in.',
+            201,
+            { requestId: req.id },
+            SystemMessageCode.AUTH_REGISTER_SUCCESS
+        );
         res.status(response.statusCode).json(response);
     } catch (error: any) {
         if (error instanceof z.ZodError) {
@@ -149,6 +172,108 @@ export const login = async (req: Request, res: Response) => {
         console.error('Login error:', error);
         const response = createErrorResponse('Internal server error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
         res.status(response.statusCode).json(response);
+    }
+};
+
+export const googleSignIn = async (req: Request, res: Response) => {
+    try {
+        const email = String(req.body?.email || '').trim().toLowerCase();
+        const name = typeof req.body?.name === 'string' ? req.body.name.trim() : undefined;
+        const image = typeof req.body?.image === 'string' ? req.body.image.trim() : undefined;
+
+        if (!email) {
+            const response = createErrorResponse('Email is required', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
+            return res.status(response.statusCode).json(response);
+        }
+
+        const foundUser = await userRepository.findByEmailWithRoles(email);
+
+        if (!foundUser) {
+            const response = createErrorResponse('Account not found. Please contact administrator.', SystemMessageCode.AUTH_USER_NOT_FOUND, 404, undefined, req.id);
+            return res.status(response.statusCode).json(response);
+        }
+
+        let user: any = foundUser;
+
+        // Users auto-created by NextAuth adapter may exist without app roles.
+        // Ensure they get Owner role by default before issuing JWT.
+        if (!user.userRoles || user.userRoles.length === 0) {
+            await userRepository.ensureRoleAssignment(user.id, ['Owner', 'Admin', 'Viewer']);
+            user = await userRepository.findByEmailWithRoles(email);
+        }
+
+        if (!user) {
+            const response = createErrorResponse('Account not found. Please contact administrator.', SystemMessageCode.AUTH_USER_NOT_FOUND, 404, undefined, req.id);
+            return res.status(response.statusCode).json(response);
+        }
+
+        const defaultLocationId = user.userBusinessRoles?.[0]?.business?.locations?.[0]?.id;
+        const roles = user.userRoles.map((ur: any) => ur.role.name);
+
+        const accessToken = jwt.sign(
+            {
+                userId: user.id,
+                email: user.email,
+                roles,
+                locationId: defaultLocationId
+            },
+            JWT_SECRET,
+            { expiresIn: '15m' }
+        );
+
+        const refreshToken = crypto.randomUUID();
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7);
+
+        await sessionRepository.createSession({
+            sessionToken: refreshToken,
+            userId: user.id,
+            expires: expiresAt
+        });
+
+        // Keep profile updated with Google metadata if provided.
+        // Persist Google image whenever available so local profile stays in sync.
+        const profilePatch: any = {
+            ...(name ? { name } : {}),
+            ...(image ? { image } : {})
+        };
+
+        if (!user.emailVerified) {
+            profilePatch.emailVerified = new Date();
+        }
+
+        if (Object.keys(profilePatch).length > 0) {
+            await userRepository.update(user.id, profilePatch);
+        }
+
+        const userResponse = {
+            id: user.id,
+            email: user.email,
+            name: name || user.name,
+            image: image || user.image,
+            role: user.userRoles?.[0]?.role?.name || 'user',
+            locationId: defaultLocationId,
+            hasBusinessRole: (user.userBusinessRoles?.length || 0) > 0
+        };
+
+        const response = createSuccessResponse(
+            {
+                user: userResponse,
+                accessToken,
+                refreshToken
+            },
+            'Google sign-in successful',
+            200,
+            { requestId: req.id },
+            SystemMessageCode.AUTH_LOGIN_SUCCESS
+        );
+
+        return res.status(response.statusCode).json(response);
+    } catch (error: any) {
+        // eslint-disable-next-line no-console
+        console.error('Google sign-in error:', error);
+        const response = createErrorResponse('Internal server error', SystemMessageCode.INTERNAL_SERVER_ERROR, 500, error.message, req.id);
+        return res.status(response.statusCode).json(response);
     }
 };
 
@@ -349,7 +474,8 @@ export const verifyEmail = async (req: Request, res: Response) => {
         }
 
         if (user.emailVerified) {
-            const response = createErrorResponse('Email is already verified', SystemMessageCode.AUTH_EMAIL_ALREADY_VERIFIED, 400, undefined, req.id);
+            // Keep this endpoint idempotent and avoid leaking verification status through hard errors.
+            const response = createSuccessResponse({}, 'If an account exists with this email, a verification email has been sent.', 200, { requestId: req.id }, SystemMessageCode.AUTH_VERIFICATION_EMAIL_SENT);
             return res.status(response.statusCode).json(response);
         }
 

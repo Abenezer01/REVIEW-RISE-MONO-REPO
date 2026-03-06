@@ -6,9 +6,12 @@ import { useMemo, useState } from 'react'
 import { isAxiosError } from 'axios'
 
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
+import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import FlagCircleIcon from '@mui/icons-material/FlagCircle'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined'
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined'
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import Button from '@mui/material/Button'
@@ -45,6 +48,7 @@ type GeneratedItem = {
   question?: string
   answer?: string
   cta?: string
+  postType?: string
   charCount?: number
   compliance?: {
     maxRecommended?: number
@@ -62,33 +66,38 @@ type Props = {
 
 const GBP_API_URL = SERVICES_CONFIG.gbp.url
 
-const generatorMeta: Record<GeneratorType, { title: string; helper: string }> = {
+const generatorMeta: Record<GeneratorType, { title: string; helper: string; icon: React.ReactNode }> = {
   business_description: {
     title: 'Business Description',
-    helper: 'Generate 3 GBP-ready business descriptions with character checks.'
+    helper: 'Generate 2-3 GBP-ready business descriptions.',
+    icon: <LightbulbOutlinedIcon fontSize='small' />
   },
   service_descriptions: {
     title: 'Service Descriptions',
-    helper: 'Create concise service blurbs users can copy directly to GBP.'
+    helper: 'Create short service blurbs users can copy to GBP.',
+    icon: <LocalOfferOutlinedIcon fontSize='small' />
   },
   category_recommendations: {
     title: 'Category Recommendations',
-    helper: 'Get category ideas with brief reasoning text.'
+    helper: 'Get category ideas with quick reasoning.',
+    icon: <CategoryOutlinedIcon fontSize='small' />
   },
   post_generator: {
     title: 'GBP Post Generator',
-    helper: 'Generate offer/event/update posts with CTA and compliance checks.'
+    helper: 'Generate post-ready text with CTA and policy checks.',
+    icon: <AutoAwesomeIcon fontSize='small' />
   },
   qa_suggestions: {
     title: 'Q&A Suggestions',
-    helper: 'Generate common customer Q&A pairs for GBP.'
+    helper: 'Generate customer question/answer pairs.',
+    icon: <HelpOutlineIcon fontSize='small' />
   }
 }
 
 const getItemTitle = (item: GeneratedItem, index: number) =>
   item.title || item.serviceName || item.category || item.question || `Suggestion ${index + 1}`
 
-const getItemText = (item: GeneratedItem) => item.text || item.blurb || item.reason || item.answer || 'N/A'
+const getPrimaryText = (item: GeneratedItem) => item.text || item.blurb || item.reason || item.answer || 'N/A'
 
 const isCompliant = (item: GeneratedItem) => {
   if (!item.compliance) return true
@@ -100,6 +109,89 @@ const getCharProgress = (charCount?: number, maxRecommended?: number) => {
   if (!charCount || !maxRecommended || maxRecommended <= 0) return 0
 
   return Math.min(100, Math.round((charCount / maxRecommended) * 100))
+}
+
+const buildCopyText = (type: GeneratorType, item: GeneratedItem) => {
+  if (type === 'service_descriptions') {
+    return `${item.serviceName || 'Service'}\n${item.blurb || ''}`.trim()
+  }
+
+  if (type === 'category_recommendations') {
+    return `Category: ${item.category || ''}\nReason: ${item.reason || ''}`.trim()
+  }
+
+  if (type === 'qa_suggestions') {
+    return `Q: ${item.question || ''}\nA: ${item.answer || ''}`.trim()
+  }
+
+  if (type === 'post_generator') {
+    return `Post (${item.postType || 'update'})\n${item.text || ''}${item.cta ? `\nCTA: ${item.cta}` : ''}`.trim()
+  }
+
+  return item.text || getPrimaryText(item)
+}
+
+function ContentPreview({ type, item }: { type: GeneratorType; item: GeneratedItem }) {
+  const boxStyle = {
+    p: 1.25,
+    borderRadius: 1.5,
+    border: '1px solid',
+    borderColor: 'divider',
+    bgcolor: 'background.paper'
+  } as const
+
+  if (type === 'service_descriptions') {
+    return (
+      <Stack spacing={1} sx={boxStyle}>
+        <Typography variant='caption' color='text.secondary'>Service</Typography>
+        <Typography variant='subtitle2'>{item.serviceName || 'N/A'}</Typography>
+        <Typography variant='caption' color='text.secondary'>Description</Typography>
+        <Typography variant='body2'>{item.blurb || 'N/A'}</Typography>
+      </Stack>
+    )
+  }
+
+  if (type === 'category_recommendations') {
+    return (
+      <Stack spacing={1} sx={boxStyle}>
+        <Typography variant='caption' color='text.secondary'>Recommended Category</Typography>
+        <Typography variant='subtitle2'>{item.category || 'N/A'}</Typography>
+        <Typography variant='caption' color='text.secondary'>Why</Typography>
+        <Typography variant='body2'>{item.reason || 'N/A'}</Typography>
+      </Stack>
+    )
+  }
+
+  if (type === 'qa_suggestions') {
+    return (
+      <Stack spacing={1} sx={boxStyle}>
+        <Typography variant='caption' color='text.secondary'>Question</Typography>
+        <Typography variant='subtitle2'>{item.question || 'N/A'}</Typography>
+        <Typography variant='caption' color='text.secondary'>Answer</Typography>
+        <Typography variant='body2'>{item.answer || 'N/A'}</Typography>
+      </Stack>
+    )
+  }
+
+  if (type === 'post_generator') {
+    return (
+      <Stack spacing={1} sx={boxStyle}>
+        <Stack direction='row' justifyContent='space-between' alignItems='center'>
+          <Typography variant='caption' color='text.secondary'>Post Content</Typography>
+          <Chip size='small' variant='outlined' label={(item.postType || 'update').toUpperCase()} />
+        </Stack>
+        <Typography variant='body2' sx={{ whiteSpace: 'pre-wrap' }}>{item.text || 'N/A'}</Typography>
+        {item.cta ? <Chip size='small' color='secondary' variant='outlined' label={`CTA: ${item.cta}`} sx={{ width: 'fit-content' }} /> : null}
+      </Stack>
+    )
+  }
+
+  return (
+    <Stack spacing={1} sx={boxStyle}>
+      <Typography variant='caption' color='text.secondary'>Description</Typography>
+      <Typography variant='body2' sx={{ whiteSpace: 'pre-wrap' }}>{item.text || 'N/A'}</Typography>
+    </Stack>
+  )
 }
 
 export default function AiContentGenerator({ locationId, profileCategory, onError }: Props) {
@@ -161,7 +253,7 @@ export default function AiContentGenerator({ locationId, profileCategory, onErro
 
       await apiClient.post(
         `${GBP_API_URL}/locations/${locationId}/ai-content/suggestions`,
-        { type: generatorType, item },
+        { type: generatorType, item: { ...item, postType } },
         { headers: { 'x-skip-system-message': '1' } }
       )
 
@@ -177,7 +269,7 @@ export default function AiContentGenerator({ locationId, profileCategory, onErro
     const itemId = item.id || `${index}`
 
     try {
-      await navigator.clipboard.writeText(getItemText(item))
+      await navigator.clipboard.writeText(buildCopyText(generatorType, { ...item, postType }))
       setCopiedId(itemId)
       setTimeout(() => setCopiedId((prev) => (prev === itemId ? null : prev)), 1600)
     } catch {
@@ -191,7 +283,7 @@ export default function AiContentGenerator({ locationId, profileCategory, onErro
         variant='outlined'
         sx={{
           borderColor: alpha(theme.palette.secondary.main, 0.35),
-          background: `linear-gradient(145deg, ${alpha(theme.palette.secondary.main, 0.14)} 0%, ${alpha(theme.palette.info.main, 0.08)} 100%)`
+          background: `linear-gradient(135deg, ${alpha(theme.palette.secondary.main, 0.15)} 0%, ${alpha(theme.palette.info.main, 0.1)} 100%)`
         }}
       >
         <CardContent>
@@ -201,7 +293,7 @@ export default function AiContentGenerator({ locationId, profileCategory, onErro
               <Typography variant='h6' fontWeight={700}>AI Content Studio</Typography>
             </Stack>
             <Typography variant='body2' color='text.secondary'>
-              Pick a generator, create GBP-ready variations, then copy or save the best ones as suggestions.
+              Generate structured GBP-ready content, then copy or save the best option as a suggestion.
             </Typography>
           </Stack>
         </CardContent>
@@ -221,7 +313,10 @@ export default function AiContentGenerator({ locationId, profileCategory, onErro
             >
               {(Object.keys(generatorMeta) as GeneratorType[]).map((key) => (
                 <ToggleButton key={key} value={key} size='small'>
-                  {generatorMeta[key].title}
+                  <Stack direction='row' spacing={0.75} alignItems='center'>
+                    {generatorMeta[key].icon}
+                    <span>{generatorMeta[key].title}</span>
+                  </Stack>
                 </ToggleButton>
               ))}
             </ToggleButtonGroup>
@@ -263,7 +358,7 @@ export default function AiContentGenerator({ locationId, profileCategory, onErro
         <Card variant='outlined'>
           <CardContent>
             <Typography variant='body2' color='text.secondary'>
-              Generate content to see suggestions.
+              Generate content to see structured suggestions.
             </Typography>
           </CardContent>
         </Card>
@@ -273,13 +368,13 @@ export default function AiContentGenerator({ locationId, profileCategory, onErro
             const itemId = item.id || `${index}`
             const compliant = isCompliant(item)
             const saved = Boolean(savedIds[itemId])
-            const charCount = item.charCount || getItemText(item).length
+            const charCount = item.charCount || getPrimaryText(item).length
             const max = item.compliance?.maxRecommended
             const progress = getCharProgress(charCount, max)
 
             return (
               <Grid key={itemId} size={{ xs: 12, md: 6 }}>
-                <Card variant='outlined' sx={{ height: '100%', borderColor: compliant ? alpha(theme.palette.success.main, 0.5) : alpha(theme.palette.warning.main, 0.5) }}>
+                <Card variant='outlined' sx={{ height: '100%', borderColor: compliant ? alpha(theme.palette.success.main, 0.45) : alpha(theme.palette.warning.main, 0.45) }}>
                   <CardContent>
                     <Stack spacing={1.25}>
                       <Stack direction='row' justifyContent='space-between' alignItems='center' spacing={1}>
@@ -292,13 +387,7 @@ export default function AiContentGenerator({ locationId, profileCategory, onErro
                         />
                       </Stack>
 
-                      <Typography variant='body2' sx={{ whiteSpace: 'pre-wrap', minHeight: 84 }}>
-                        {getItemText(item)}
-                      </Typography>
-
-                      {item.cta ? (
-                        <Chip size='small' variant='outlined' icon={<FlagCircleIcon />} label={`CTA: ${item.cta}`} sx={{ width: 'fit-content' }} />
-                      ) : null}
+                      <ContentPreview type={generatorType} item={{ ...item, postType }} />
 
                       <Stack spacing={0.5}>
                         <Stack direction='row' justifyContent='space-between'>
@@ -311,20 +400,19 @@ export default function AiContentGenerator({ locationId, profileCategory, onErro
                           <LinearProgress
                             variant='determinate'
                             value={progress}
-                            color={progress > 100 ? 'warning' : progress > 85 ? 'warning' : 'success'}
+                            color={progress > 85 ? 'warning' : 'success'}
                           />
                         ) : null}
                       </Stack>
 
                       <Stack direction='row' spacing={1}>
-                        <Tooltip title='Copy text'>
+                        <Tooltip title='Copy formatted content'>
                           <span>
                             <Button
                               size='small'
                               variant='outlined'
                               startIcon={<ContentCopyIcon />}
                               onClick={() => handleCopy(item, index)}
-                              sx={{ minWidth: 0 }}
                             >
                               {copiedId === itemId ? 'Copied' : 'Copy'}
                             </Button>

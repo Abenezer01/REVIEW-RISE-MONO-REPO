@@ -62,6 +62,7 @@ export default function GbpInsightsDashboard({ locationId }: { locationId: strin
     const [dateRange, setDateRange] = useState(30);
 
     const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [metrics, setMetrics] = useState<any>(null);
     const [competitors, setCompetitors] = useState<any[]>([]);
     const [jobStatus, setJobStatus] = useState<any>(null);
@@ -82,6 +83,7 @@ export default function GbpInsightsDashboard({ locationId }: { locationId: strin
         if (!locationId) return;
 
         setLoading(true);
+        setErrorMessage(null);
 
         try {
             const end = new Date();
@@ -92,7 +94,7 @@ export default function GbpInsightsDashboard({ locationId }: { locationId: strin
             const startStr = start.toISOString().split('T')[0];
             const endStr = end.toISOString().split('T')[0];
 
-            const [metricsRes, compRes, jobRes] = await Promise.all([
+            const [metricsRes, compRes, jobRes] = await Promise.allSettled([
                 apiClient.get(`${GBP_API_URL}/locations/${locationId}/metrics`, {
                     params: { start_date: startStr, end_date: endStr, granularity, compare }
                 }),
@@ -100,11 +102,27 @@ export default function GbpInsightsDashboard({ locationId }: { locationId: strin
                 apiClient.get(`${GBP_API_URL}/locations/${locationId}/metrics/job-status`)
             ]);
 
-            setMetrics(metricsRes.data);
-            setCompetitors(compRes.data);
-            setJobStatus(jobRes.data);
+            if (metricsRes.status === 'fulfilled') {
+                setMetrics(metricsRes.value.data);
+            } else {
+                setMetrics(null);
+                setErrorMessage('Unable to load metrics for this location.');
+            }
+
+            if (compRes.status === 'fulfilled') {
+                setCompetitors(compRes.value.data || []);
+            } else {
+                setCompetitors([]);
+            }
+
+            if (jobRes.status === 'fulfilled') {
+                setJobStatus(jobRes.value.data || null);
+            } else {
+                setJobStatus(null);
+            }
         } catch (error) {
             console.error('Error fetching insights data', error);
+            setErrorMessage('Failed to load insights data.');
         } finally {
             setLoading(false);
         }
@@ -266,6 +284,11 @@ export default function GbpInsightsDashboard({ locationId }: { locationId: strin
     return (
         <>
             <Box sx={{ bgcolor: '#F9FAFB', p: { xs: 2, md: 4 }, mx: -3, mt: -3 }}>
+                {errorMessage && (
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                        {errorMessage}
+                    </Alert>
+                )}
                 {/* Header */}
                 <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'flex-end' }} mb={4} gap={2}>
                     <Box>

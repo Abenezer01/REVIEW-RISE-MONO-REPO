@@ -1,6 +1,7 @@
 /* eslint-disable import/no-unresolved */
 // MUI Imports
 import Button from '@mui/material/Button'
+import { prisma } from '@platform/db'
 
 // Type Imports
 import type { ChildrenType } from '@core/types'
@@ -21,6 +22,8 @@ import ScrollToTop from '@core/components/scroll-to-top'
 
 // Util Imports
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
+import { getServerUser } from '@/utils/serverAuth'
+import Onboarding from '@views/Onboarding'
 
 const Layout = async (props: ChildrenType) => {
     const { children } = props
@@ -29,6 +32,29 @@ const Layout = async (props: ChildrenType) => {
     const direction = 'ltr'
     const mode = await getMode()
     const systemMode = await getSystemMode()
+    const user = await getServerUser()
+
+    let needsBusinessOnboarding = false
+
+    if (user?.id) {
+      const hasBusinessRole = await prisma.userBusinessRole.findFirst({
+        where: {
+          userId: user.id,
+          deletedAt: null
+        },
+        select: { id: true }
+      })
+
+      needsBusinessOnboarding = !hasBusinessRole
+    }
+
+    if (needsBusinessOnboarding) {
+      return (
+        <Providers direction={direction}>
+          <Onboarding modalOnly />
+        </Providers>
+      )
+    }
 
     return (
         <Providers direction={direction}>
