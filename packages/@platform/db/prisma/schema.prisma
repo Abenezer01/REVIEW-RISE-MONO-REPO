@@ -52,6 +52,8 @@ model User {
   userRoles         UserRole[]
   adriseSessions    AdriseSession[]
   creativeEngineAnalytics CreativeEngineAnalytics[]
+  gbpAppliedRecommendations BrandRecommendation[] @relation("AppliedRecommendationUser")
+  gbpSuggestionActivities    GbpSuggestionActivity[]
 }
 
 model UserRole {
@@ -109,6 +111,7 @@ model Business {
   creativeEngineAnalytics CreativeEngineAnalytics[]
   creativeConcepts     CreativeConcept[]
   gbpProfileSnapshots  GbpProfileSnapshot[]
+  gbpSuggestionActivities GbpSuggestionActivity[]
 
   @@index([name])
   @@index([status])
@@ -147,6 +150,8 @@ model Location {
   metrics              LocationMetric[]
   competitors          LocationCompetitor[]
   metricJobs           MetricJob[]
+  gbpRecommendations   BrandRecommendation[]
+  gbpSuggestionActivities GbpSuggestionActivity[]
 
   @@index([businessId])
 }
@@ -267,6 +272,7 @@ model GbpProfileSnapshot {
   diffBaseSnapshot   GbpProfileSnapshot? @relation("GbpSnapshotDiffBase", fields: [diffBaseSnapshotId], references: [id], onDelete: SetNull)
   diffChildren       GbpProfileSnapshot[] @relation("GbpSnapshotDiffBase")
   audit              GbpProfileAudit?
+  recommendations    BrandRecommendation[]
 
   @@index([businessId])
   @@index([locationId])
@@ -818,6 +824,11 @@ model PendingGoogleConnection {
 model BrandRecommendation {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   businessId    String    @db.Uuid
+  locationId    String?   @db.Uuid
+  source        String?   @default("general")
+  lifecycleState String   @default("SAVED")
+  auditSnapshotId String? @db.Uuid
+  auditFindingCodes String[] @default([])
   category      String
   title         String
   description   String
@@ -834,13 +845,48 @@ model BrandRecommendation {
   updatedAt     DateTime  @updatedAt
   dismissedAt   DateTime?
   completedAt   DateTime?
+  appliedAt     DateTime?
+  appliedByUserId String? @db.Uuid
+  appliedNotes  String?
+  rejectedAt    DateTime?
+  rejectedReason String?
   business      Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location      Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  auditSnapshot GbpProfileSnapshot? @relation(fields: [auditSnapshotId], references: [id], onDelete: SetNull)
+  appliedByUser User? @relation("AppliedRecommendationUser", fields: [appliedByUserId], references: [id], onDelete: SetNull)
+  activities    GbpSuggestionActivity[]
 
   @@index([businessId])
+  @@index([locationId])
+  @@index([source])
+  @@index([lifecycleState])
+  @@index([auditSnapshotId])
   @@index([category])
   @@index([status])
   @@index([priorityScore])
   @@index([generatedAt])
+}
+
+model GbpSuggestionActivity {
+  id               String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  recommendationId String              @db.Uuid
+  businessId       String              @db.Uuid
+  locationId       String              @db.Uuid
+  userId           String?             @db.Uuid
+  action           String
+  notes            String?
+  details          Json?
+  createdAt        DateTime            @default(now())
+  recommendation   BrandRecommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+  business         Business            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  location         Location            @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  user             User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([recommendationId])
+  @@index([businessId])
+  @@index([locationId])
+  @@index([action])
+  @@index([createdAt])
 }
 
 model LocationPhoto {

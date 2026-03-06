@@ -31,6 +31,7 @@ import type { GbpSnapshotItem, GbpSnapshotDetail } from './_components/SnapshotH
 import SnapshotHistory from './_components/SnapshotHistory'
 import GbpInsightsDashboard from './_components/GbpInsightsDashboard'
 import AiContentGenerator from './_components/AiContentGenerator'
+import SuggestionManager from './_components/SuggestionManager'
 
 type GbpBusinessProfile = {
   description: string | null
@@ -93,6 +94,7 @@ const uiText = {
   tabInsights: 'Insights',
   tabSnapshots: 'Snapshots',
   tabAiContent: 'AI Content',
+  tabSuggestions: 'Suggestions',
   refreshSnapshots: 'Refresh List',
   emptySnapshots: 'No snapshots yet.',
   snapshotSelectHint: 'Select a snapshot to view details.',
@@ -340,6 +342,7 @@ const AdminGBPRocketPage = () => {
               <Tab label={uiText.tabProfile} />
               <Tab label={uiText.tabInsights} />
               <Tab label={uiText.tabSnapshots} />
+              <Tab label={uiText.tabSuggestions} />
               <Tab label={uiText.tabAiContent} />
             </Tabs>
 
@@ -347,7 +350,13 @@ const AdminGBPRocketPage = () => {
             {activeTab !== 1 && (
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                 <Typography variant='h6'>
-                  {activeTab === 0 ? uiText.sectionTitle : activeTab === 2 ? uiText.snapshotTitle : uiText.tabAiContent}
+                  {activeTab === 0
+                    ? uiText.sectionTitle
+                    : activeTab === 2
+                      ? uiText.snapshotTitle
+                      : activeTab === 3
+                        ? uiText.tabSuggestions
+                        : uiText.tabAiContent}
                 </Typography>
                 {activeTab === 0 ? (
                   <Stack direction='row' spacing={1}>
@@ -535,9 +544,16 @@ const AdminGBPRocketPage = () => {
                 loading={loadingSnapshots}
                 onSelectSnapshot={handleOpenSnapshot}
               />
+            ) : activeTab === 3 ? (
+
+              /* Tab 3: Suggestions */
+              <SuggestionManager
+                locationId={locationId}
+                onError={(message) => setErrorMessage(message)}
+              />
             ) : (
 
-              /* Tab 3: AI Content */
+              /* Tab 4: AI Content */
               <AiContentGenerator
                 locationId={locationId}
                 profileCategory={profile?.category}

@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { createSuccessResponse } from '@platform/contracts';
 import { requestIdMiddleware, errorHandler } from '@platform/middleware';
 import v1Routes from './routes/v1';
+import { attachUserContext } from './middleware/user-context.middleware';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(cors());
 app.use(requestIdMiddleware);
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(attachUserContext);
 
 app.get('/', (req, res) => {
     const response = createSuccessResponse(null, 'Express GBP Rocket Service is running', 200, { requestId: req.id });

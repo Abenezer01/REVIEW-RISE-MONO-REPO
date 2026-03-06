@@ -137,7 +137,7 @@ export class GbpAiContentService {
         };
     }
 
-    async saveSuggestion(locationId: string, payload: { type: GeneratorType; item: any }) {
+    async saveSuggestion(locationId: string, payload: { type: GeneratorType; item: any; auditSnapshotId?: string; auditFindingCodes?: string[] }) {
         const location = await locationRepository.findWithBusiness(locationId);
         if (!location) {
             throw new Error('Location not found');
@@ -156,7 +156,12 @@ export class GbpAiContentService {
         const suggestion = await prisma.brandRecommendation.create({
             data: {
                 businessId: location.businessId,
+                locationId,
                 category: 'gbp_ai_content',
+                source: 'ai_content',
+                lifecycleState: 'SAVED',
+                auditSnapshotId: payload.auditSnapshotId || null,
+                auditFindingCodes: payload.auditFindingCodes || [],
                 title,
                 description: body || detailJson,
                 why: ['AI-generated GBP suggestion', `Type: ${payload.type}`],
@@ -169,6 +174,25 @@ export class GbpAiContentService {
                 status: 'open'
             }
         });
+
+        try {
+            await prisma.gbpSuggestionActivity.create({
+                data: {
+                    recommendationId: suggestion.id,
+                    businessId: location.businessId,
+                    locationId,
+                    action: 'created',
+                    details: {
+                        source: 'ai_content',
+                        type: payload.type,
+                        auditSnapshotId: payload.auditSnapshotId || null,
+                        auditFindingCodes: payload.auditFindingCodes || []
+                    }
+                }
+            });
+        } catch {
+            // Keep suggestion save resilient when activity table is not migrated yet.
+        }
 
         return {
             id: suggestion.id,
