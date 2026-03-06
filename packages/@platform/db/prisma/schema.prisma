@@ -1208,7 +1208,7 @@ model LocationMetric {
 
   location              Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
-  @@index([locationId, date])
+  @@unique([locationId, date])
   @@map("location_metrics")
 }
 
