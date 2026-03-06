@@ -89,6 +89,15 @@ export const resendVerificationEmailLimiter = rateLimit({
     legacyHeaders: false,
 });
 
+// POST /google/signin: IP only, allow higher burst for OAuth callback retries
+export const googleSignInLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 30,
+    message: { error: 'Too many Google sign-in attempts, please try again after 15 minutes' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 // Any /auth/*: IP global, Max 100 requests / 15 min per IP
 export const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes

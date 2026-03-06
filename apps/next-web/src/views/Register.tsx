@@ -1,24 +1,17 @@
 /* eslint-disable import/no-unresolved */
 'use client'
 
-// React Imports
-import { useState, useActionState, useEffect } from 'react'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useActionState, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
-// MUI Imports
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
-import Checkbox from '@mui/material/Checkbox'
 import Button from '@mui/material/Button'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Divider from '@mui/material/Divider'
 
-// Third-party Imports
 import classnames from 'classnames'
-import { signIn } from 'next-auth/react'
 
 import { SystemMessageCode } from '@platform/contracts'
 
@@ -26,28 +19,19 @@ import { useTranslations } from 'next-intl'
 
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
-// Type Imports
 import type { SystemMode } from '@core/types'
 
-// Component Imports
 import Link from '@components/Link'
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
 
-
-// Config Imports
 import themeConfig from '@configs/themeConfig'
 
-// Hook Imports
 import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
+import { registerAction } from '@/app/actions/auth'
 
-// Context Imports
-import { useAuth } from '@/contexts/AuthContext'
-import { loginAction } from '@/app/actions/auth'
-
-// Styled Custom Components
-const LoginIllustration = styled('img')(({ theme }) => ({
+const RegisterIllustration = styled('img')(({ theme }) => ({
   zIndex: 2,
   blockSize: 'auto',
   maxBlockSize: 680,
@@ -70,15 +54,15 @@ const MaskImg = styled('img')({
   zIndex: -1
 })
 
-const LoginV2 = ({ mode }: { mode: SystemMode }) => {
+const Register = ({ mode }: { mode: SystemMode }) => {
   const { notify } = useSystemMessages()
   const t = useTranslations('auth')
+  const router = useRouter()
 
-  // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [state, dispatch, isPending] = useActionState(loginAction, null)
+  const [isConfirmPasswordShown, setIsConfirmPasswordShown] = useState(false)
+  const [state, dispatch, isPending] = useActionState(registerAction, null)
+
   const darkImg = '/images/pages/auth-mask-dark.png'
   const lightImg = '/images/pages/auth-mask-light.png'
   const darkIllustration = '/images/illustrations/auth/v2-login-dark.png'
@@ -86,44 +70,26 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
   const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
 
-  // Hooks
   const { settings } = useSettings()
   const theme = useTheme()
-  const { login } = useAuth()
-  const router = useRouter()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
   const authBackground = useImageVariant(mode, lightImg, darkImg)
-  const params = useParams<{ locale?: string }>()
-  const searchParams = useSearchParams()
-  const socialDividerLabel = 'or'
-  const googleCtaLabel = 'Continue with Google'
 
   useEffect(() => {
-    if (state?.success && state.user) {
-      if (state.messageCode) {
-        notify(state.messageCode)
-      } else {
-        notify(SystemMessageCode.AUTH_LOGIN_SUCCESS)
-      }
+    if (state?.success) {
+      notify(state.messageCode || SystemMessageCode.AUTH_REGISTER_SUCCESS)
+      const email = state.registeredEmail || ''
+      const query = email ? `?email=${encodeURIComponent(email)}` : ''
 
-      login(state.user)
-    } else if (state?.success === false) {
-      if (state.messageCode === SystemMessageCode.AUTH_EMAIL_NOT_VERIFIED) {
-        const locale = typeof params?.locale === 'string' ? params.locale : 'en'
-        const target = `/${locale}/verify-email?email=${encodeURIComponent(email)}`
-
-        router.push(target)
-
-        return
-      }
-
-      if (state.messageCode) {
-        notify(state.messageCode)
-      } else {
-        notify(SystemMessageCode.AUTH_LOGIN_FAILED)
-      }
+      router.push(`/verify-email${query}`)
+      
+      return
     }
-  }, [state, login, notify, email, params?.locale, router])
+
+    if (state?.success === false) {
+      notify(state.messageCode || SystemMessageCode.GENERIC_ERROR)
+    }
+  }, [state, notify, router])
 
   const characterIllustration = useImageVariant(
     mode,
@@ -132,16 +98,6 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
     borderedLightIllustration,
     borderedDarkIllustration
   )
-
-  const handleClickShowPassword = () => setIsPasswordShown(show => !show)
-
-  const handleGoogleSignIn = async () => {
-    const locale = typeof params?.locale === 'string' ? params.locale : 'en'
-    const returnUrl = searchParams.get('returnUrl') || '/admin'
-    const callbackUrl = `/api/auth/google/exchange?locale=${encodeURIComponent(locale)}&returnUrl=${encodeURIComponent(returnUrl)}`
-
-    await signIn('google', { callbackUrl })
-  }
 
   return (
     <div className='flex bs-full justify-center'>
@@ -153,7 +109,7 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
           }
         )}
       >
-        <LoginIllustration src={characterIllustration} alt='character-illustration' />
+        <RegisterIllustration src={characterIllustration} alt='character-illustration' />
         {!hidden && (
           <MaskImg
             alt='mask'
@@ -163,48 +119,56 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
         )}
       </div>
       <div className='flex justify-center items-center bs-full bg-backgroundPaper min-is-full! p-6 md:min-is-[unset]! md:p-12 md:is-[480px]'>
-        <Link className='absolute block-start-5 sm:block-start-[33px] inline-start-6 sm:start-[38px]'>
+        <Link href='/' className='absolute block-start-5 sm:block-start-[33px] inline-start-6 sm:start-[38px]'>
           <Logo />
         </Link>
         <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[400px] md:max-is-[unset] mbs-11 sm:mbs-14 md:mbs-0'>
           <div className='flex flex-col gap-1'>
-            <Typography variant='h4'>{t('login.welcome', { appName: themeConfig.templateName })}</Typography>
-            <Typography>{t('login.subtitle')}</Typography>
+            <Typography variant='h4'>{t('register.title')}</Typography>
+            <Typography>{t('register.subtitle')}</Typography>
+            <Typography variant='body2'>{themeConfig.templateName}</Typography>
           </div>
-          <form
-            noValidate
-            autoComplete='off'
-            action={dispatch}
-            className='flex flex-col gap-5'
-          >
+          <form noValidate autoComplete='off' action={dispatch} className='flex flex-col gap-5'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+              <CustomTextField
+                fullWidth
+                name='firstName'
+                label={t('register.firstName')}
+                placeholder={t('register.firstName')}
+                error={!!state?.errors?.firstName}
+                helperText={state?.errors?.firstName?.[0]}
+              />
+              <CustomTextField
+                fullWidth
+                name='lastName'
+                label={t('register.lastName')}
+                placeholder={t('register.lastName')}
+                error={!!state?.errors?.lastName}
+                helperText={state?.errors?.lastName?.[0]}
+              />
+            </div>
             <CustomTextField
-              autoFocus
               fullWidth
               name='email'
-              label={t('login.email')}
-              placeholder={t('login.email')}
-              value={email}
+              label={t('register.email')}
+              placeholder={t('register.email')}
               type='email'
-              onChange={e => setEmail(e.target.value)}
               error={!!state?.errors?.email}
               helperText={state?.errors?.email?.[0]}
             />
             <CustomTextField
               fullWidth
               name='password'
-              label={t('login.password')}
+              label={t('register.password')}
               placeholder='············'
-              id='outlined-adornment-password'
               type={isPasswordShown ? 'text' : 'password'}
-              value={password}
-              onChange={e => setPassword(e.target.value)}
               error={!!state?.errors?.password}
               helperText={state?.errors?.password?.[0]}
               slotProps={{
                 input: {
                   endAdornment: (
                     <InputAdornment position='end'>
-                      <IconButton edge='end' onClick={handleClickShowPassword} onMouseDown={e => e.preventDefault()}>
+                      <IconButton edge='end' onClick={() => setIsPasswordShown(show => !show)} onMouseDown={e => e.preventDefault()}>
                         <i className={isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
                       </IconButton>
                     </InputAdornment>
@@ -212,31 +176,39 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
                 }
               }}
             />
-            <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
-              <FormControlLabel control={<Checkbox />} label={t('login.rememberMe')} />
-              <Typography className='text-end' color='primary.main' component={Link}>
-                {t('login.forgotPassword')}
-              </Typography>
-            </div>
+            <CustomTextField
+              fullWidth
+              name='confirmPassword'
+              label={t('register.confirmPassword')}
+              placeholder='············'
+              type={isConfirmPasswordShown ? 'text' : 'password'}
+              error={!!state?.errors?.confirmPassword}
+              helperText={state?.errors?.confirmPassword?.[0]}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <IconButton
+                        edge='end'
+                        onClick={() => setIsConfirmPasswordShown(show => !show)}
+                        onMouseDown={e => e.preventDefault()}
+                      >
+                        <i className={isConfirmPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }
+              }}
+            />
             <Button fullWidth variant='contained' type='submit' disabled={isPending}>
-              {isPending ? t('login.loggingIn') : t('login.login')}
+              {isPending ? t('register.creatingAccount') : t('register.createAccount')}
             </Button>
             <div className='flex justify-center items-center flex-wrap gap-2'>
-              <Typography>{t('login.newOnPlatform')}</Typography>
-              <Typography component={Link} href='/register' color='primary.main'>
-                {t('login.createAccount')}
+              <Typography>{t('register.haveAccount')}</Typography>
+              <Typography component={Link} href='/login' color='primary.main'>
+                {t('register.signIn')}
               </Typography>
             </div>
-            <Divider className='gap-2 text-textPrimary'>{socialDividerLabel}</Divider>
-            <Button
-              fullWidth
-              variant='outlined'
-              color='inherit'
-              onClick={handleGoogleSignIn}
-              startIcon={<i className='tabler-brand-google-filled' />}
-            >
-              {googleCtaLabel}
-            </Button>
           </form>
         </div>
       </div>
@@ -244,4 +216,4 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   )
 }
 
-export default LoginV2
+export default Register

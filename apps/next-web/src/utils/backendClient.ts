@@ -51,6 +51,7 @@ export async function backendClient<T = any>(
       const apiError: any = new Error(message)
 
       apiError.status = error.response.status
+      apiError.code = error.response.data?.messageCode || error.response.data?.code || error.response.data?.errorCode
       throw apiError
     }
 

@@ -31,18 +31,57 @@ export const getServerUser = async (): Promise<User | null> => {
 
     const userInfoCookie = cookieStore.get('userInfo')
 
-    if (userInfoCookie?.value) {
-      try {
-        const parsed = JSON.parse(userInfoCookie.value)
+    const parseUserCookie = (raw: string): User | null => {
+      const attempts = [raw]
 
-        if (parsed && parsed.id && parsed.email) {
-          return parsed as User
+      try {
+        attempts.push(decodeURIComponent(raw))
+      } catch {
+        // ignore decode failures and try raw parsing only
+      }
+
+      for (const candidate of attempts) {
+        try {
+          const parsed = JSON.parse(candidate)
+
+          if (parsed && parsed.id && parsed.email) {
+            return parsed as User
+          }
+        } catch {
+          // try next parse strategy
         }
-      } catch { }
+      }
+
+      return null
+    }
+
+    if (userInfoCookie?.value) {
+      const parsed = parseUserCookie(userInfoCookie.value)
+
+      if (parsed) return parsed
     }
 
     if (!accessToken) {
       return null
+    }
+
+    // Use token claims as a safe fallback during the same request where middleware refreshed
+    // the token and set a new cookie on the response (not yet visible to server components).
+    if (claims?.userId && claims?.email) {
+      const roles = Array.isArray(claims.roles) ? claims.roles : (claims.role ? [claims.role] : [])
+
+      return {
+        id: claims.userId,
+        email: claims.email,
+        role: claims.role || roles[0],
+        roles,
+        permissions: Array.isArray(claims.permissions) ? claims.permissions : [],
+        firstName: claims.given_name,
+        lastName: claims.family_name,
+        avatar: claims.picture,
+        username: claims.preferred_username || claims.email,
+        locationId: claims.locationId
+      }
     }
 
     if (AUTH_SERVICE_URL) {
@@ -56,9 +95,6 @@ export const getServerUser = async (): Promise<User | null> => {
 
         const data = apiResponse?.data ?? apiResponse
         const u = data?.user
-
-        console.log("User", u);
-
 
         if (u) {
           const name = typeof u.name === 'string' ? u.name : ''

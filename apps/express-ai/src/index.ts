@@ -18,7 +18,9 @@ app.use(express.urlencoded({ limit: '2mb', extended: true }));
 
 // Debug Middleware
 app.use((req, res, next) => {
+    // eslint-disable-next-line no-console
     console.log(`[Express AI] ${req.method} ${req.path}`);
+    // eslint-disable-next-line no-console
     console.log('[Express AI] Headers:', JSON.stringify(req.headers));
     next();
 });

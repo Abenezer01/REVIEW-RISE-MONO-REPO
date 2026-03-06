@@ -10,7 +10,6 @@ export const RegisterRequestSchema = z.object({
   password: z.string().min(8),
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  businessName: z.string().min(1),
 });
 
 export const ForgotPasswordRequestSchema = z.object({
