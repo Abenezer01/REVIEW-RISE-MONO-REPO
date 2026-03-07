@@ -767,13 +767,7 @@ async function main() {
             id: '77777777-7777-4777-8777-777777777777',
             locationId: '11111111-1111-4111-8111-111111111111',
             platform: 'gbp',
-            accessToken: 'dummy_access_token',
-            refreshToken: 'dummy_refresh_token',
-            expiresAt: BigInt(Date.now() + 3600 * 1000),
             status: 'active',
-            metadata: {
-                locationName: 'accounts/12345/locations/67890'
-            }
         }
     });
     console.log('✅ Created review source\n');
