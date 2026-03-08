@@ -65,7 +65,7 @@ RUN pnpm --filter @apps/express-brand run build
 RUN echo "Checking build output structure..." && \
   ls -R apps/express-brand/dist && \
   # Find the main index.js file (looking for src/index.js or just index.js)
-  FOUND_INDEX=$(find apps/express-brand/dist -name "index.js" | grep "/src/index.js$" | head -n 1) && \
+  FOUND_INDEX=$(find apps/express-brand/dist -name "index.js" | grep "/apps/.*/src/index.js$" | head -n 1) && \
   if [ -z "$FOUND_INDEX" ]; then \
   FOUND_INDEX=$(find apps/express-brand/dist -name "index.js" | head -n 1); \
   fi && \
