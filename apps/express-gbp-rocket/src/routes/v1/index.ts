@@ -5,7 +5,7 @@ import * as gbpMetricsController from '../../controllers/gbp-metrics.controller'
 import * as gbpCompetitorsController from '../../controllers/gbp-competitors.controller';
 import * as gbpAiContentController from '../../controllers/gbp-ai-content.controller';
 import * as gbpSuggestionsController from '../../controllers/gbp-suggestions.controller';
-import gbpPhotosRoutes from './gbp-photos.routes';
+import * as gbpPhotosController from '../../controllers/gbp-photos.controller';
 
 const router = Router();
 router.get('/locations/:locationId/business-profile', gbpProfileController.getBusinessProfile);
@@ -32,6 +32,7 @@ router.post('/locations/:locationId/competitors', gbpCompetitorsController.addCo
 router.put('/locations/:locationId/competitors/:competitorId', gbpCompetitorsController.updateCompetitor);
 router.delete('/locations/:locationId/competitors/:competitorId', gbpCompetitorsController.removeCompetitor);
 
-router.use('/locations', gbpPhotosRoutes);
+router.get('/locations/:locationId/photos', gbpPhotosController.getPhotos);
+router.post('/locations/:locationId/photos/sync', gbpPhotosController.syncPhotos);
 
 export default router;

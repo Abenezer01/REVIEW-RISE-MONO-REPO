@@ -4,12 +4,12 @@ import { spawn } from 'child_process';
 
 const envPath = path.resolve(__dirname, '../../../../.env');
 try {
-    const result = dotenv.config({ path: envPath });
-    if (result.error) {
-        // console.warn('⚠️  Dotenv loaded with error (ignoring if env vars exist):', result.error.message);
-    }
+  const result = dotenv.config({ path: envPath });
+  if (result.error) {
+    // console.warn('⚠️  Dotenv loaded with error (ignoring if env vars exist):', result.error.message);
+  }
 } catch (error) {
-    // console.log('ℹ️  Skipping .env load (likely in production/docker)');
+  // console.log('ℹ️  Skipping .env load (likely in production/docker)');
 }
 
 function runScript(scriptRelPath: string) {
@@ -44,7 +44,13 @@ async function main() {
 
   console.log('🌱 Seeding: reviews data');
   await runScript('scripts/seed-reviews.ts');
-  
+
+  console.log('🌱 Seeding: metrics data');
+  await runScript('scripts/seed-metrics.ts');
+
+  console.log('🌱 Seeding: GBP profile snapshots');
+  await runScript('scripts/seed-snapshot.ts');
+
   console.log('✅ All seeders completed');
 }
 
