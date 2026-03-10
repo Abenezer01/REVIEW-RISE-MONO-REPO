@@ -18,6 +18,7 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
+import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
@@ -37,11 +38,23 @@ type GbpBusinessProfile = {
   description: string | null
   category: string | null
   phone: string | null
+  website?: string | null
   address?: {
     formatted?: string | null
+    addressLines?: string[]
+    locality?: string | null
+    administrativeArea?: string | null
+    postalCode?: string | null
+    countryCode?: string | null
   }
   hours?: {
     weekdayDescriptions?: string[]
+    periods?: Array<{
+      openDay?: string | null
+      openTime?: string | null
+      closeDay?: string | null
+      closeTime?: string | null
+    }>
   }
   lastSynced: string | null
   connectedAt?: string | null
@@ -63,6 +76,7 @@ const uiText = {
   labelPhone: 'Phone',
   labelAddress: 'Address',
   labelDescription: 'Description',
+  labelWebsite: 'Website',
   labelHours: 'Business Hours',
   labelLastSynced: 'Last synced',
   labelConnection: 'Connection',
@@ -95,6 +109,17 @@ const uiText = {
   tabSnapshots: 'Snapshots',
   tabAiContent: 'AI Content',
   tabSuggestions: 'Suggestions',
+  editProfile: 'Edit Profile',
+  saveLocal: 'Save Draft',
+  pushGoogle: 'Push to Google',
+  cancelEdit: 'Cancel',
+  editHint: 'Update fields locally or push changes to Google Business Profile.',
+  labelAddressLines: 'Address lines',
+  labelLocality: 'City / Locality',
+  labelAdministrativeArea: 'State / Region',
+  labelPostalCode: 'Postal code',
+  labelCountryCode: 'Country code',
+  labelWeekdayHours: 'Weekday hours',
   refreshSnapshots: 'Refresh List',
   emptySnapshots: 'No snapshots yet.',
   snapshotSelectHint: 'Select a snapshot to view details.',
@@ -108,6 +133,11 @@ const AdminGBPRocketPage = () => {
   const theme = useTheme()
 
   const [profile, setProfile] = useState<GbpBusinessProfile | null>(null)
+  const [draftProfile, setDraftProfile] = useState<GbpBusinessProfile | null>(null)
+  const [editingProfile, setEditingProfile] = useState(false)
+  const [savingDraft, setSavingDraft] = useState(false)
+  const [pushingProfile, setPushingProfile] = useState(false)
+  const [updateWarnings, setUpdateWarnings] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -137,6 +167,30 @@ const AdminGBPRocketPage = () => {
 
     return false
   }
+
+  const buildDraft = useCallback((source: GbpBusinessProfile | null) => {
+    if (!source) return null
+
+    return {
+      ...source,
+      description: source.description || '',
+      category: source.category || '',
+      phone: source.phone || '',
+      website: source.website || '',
+      address: {
+        addressLines: source.address?.addressLines || (source.address?.formatted ? [source.address.formatted] : []),
+        locality: source.address?.locality || '',
+        administrativeArea: source.address?.administrativeArea || '',
+        postalCode: source.address?.postalCode || '',
+        countryCode: source.address?.countryCode || '',
+        formatted: source.address?.formatted || ''
+      },
+      hours: {
+        periods: source.hours?.periods || [],
+        weekdayDescriptions: source.hours?.weekdayDescriptions || []
+      }
+    }
+  }, [])
 
   const extractErrorMessage = (error: unknown, fallback: string) => {
     if (isAxiosError(error)) {
@@ -175,7 +229,12 @@ const AdminGBPRocketPage = () => {
         { headers: { 'x-skip-system-message': '1' } }
       )
 
-      setProfile(response.data || null)
+      const nextProfile = response.data || null
+      setProfile(nextProfile)
+
+      if (!editingProfile) {
+        setDraftProfile(buildDraft(nextProfile))
+      }
     } catch (error) {
       setProfile(null)
 
@@ -188,7 +247,7 @@ const AdminGBPRocketPage = () => {
     } finally {
       setLoading(false)
     }
-  }, [locationId])
+  }, [locationId, editingProfile, buildDraft])
 
   const loadSnapshotDetail = useCallback(async (snapshotId: string) => {
     if (!locationId) return null
@@ -267,6 +326,101 @@ const AdminGBPRocketPage = () => {
       setErrorMessage(extractErrorMessage(error, 'Failed to sync GBP profile'))
     } finally {
       setSyncing(false)
+    }
+  }
+
+  const updateDraft = (patch: Partial<GbpBusinessProfile>) => {
+    setDraftProfile(prev => (prev ? { ...prev, ...patch } : prev))
+  }
+
+  const handleEditProfile = () => {
+    setEditingProfile(true)
+    setUpdateWarnings([])
+    setDraftProfile(buildDraft(profile))
+  }
+
+  const handleCancelEdit = () => {
+    setEditingProfile(false)
+    setUpdateWarnings([])
+    setDraftProfile(buildDraft(profile))
+  }
+
+  const buildUpdatePayload = (source: GbpBusinessProfile | null) => {
+    if (!source) return {}
+
+    return {
+      description: source.description ?? null,
+      category: source.category ?? null,
+      phone: source.phone ?? null,
+      website: source.website ?? null,
+      address: {
+        addressLines: source.address?.addressLines || [],
+        locality: source.address?.locality ?? null,
+        administrativeArea: source.address?.administrativeArea ?? null,
+        postalCode: source.address?.postalCode ?? null,
+        countryCode: source.address?.countryCode ?? null,
+        formatted: source.address?.formatted ?? null
+      },
+      hours: {
+        weekdayDescriptions: source.hours?.weekdayDescriptions || [],
+        periods: source.hours?.periods || []
+      }
+    }
+  }
+
+  const handleSaveDraft = async () => {
+    if (!locationId || !draftProfile) return
+
+    try {
+      setSavingDraft(true)
+      setErrorMessage(null)
+      setUpdateWarnings([])
+
+      const response = await apiClient.patch(
+        `${GBP_API_URL}/locations/${locationId}/business-profile`,
+        buildUpdatePayload(draftProfile),
+        { headers: { 'x-skip-system-message': '1' } }
+      )
+
+      const nextProfile = response.data?.profile || response.data || null
+      setProfile(nextProfile)
+      setDraftProfile(buildDraft(nextProfile))
+      setEditingProfile(false)
+      setUpdateWarnings(response.data?.warnings || [])
+      await fetchSnapshots()
+    } catch (error) {
+      console.error('Failed to update GBP profile:', error)
+      setErrorMessage(extractErrorMessage(error, 'Failed to update GBP profile'))
+    } finally {
+      setSavingDraft(false)
+    }
+  }
+
+  const handlePushProfile = async () => {
+    if (!locationId || !draftProfile) return
+
+    try {
+      setPushingProfile(true)
+      setErrorMessage(null)
+      setUpdateWarnings([])
+
+      const response = await apiClient.post(
+        `${GBP_API_URL}/locations/${locationId}/business-profile/push`,
+        buildUpdatePayload(draftProfile),
+        { headers: { 'x-skip-system-message': '1' } }
+      )
+
+      const nextProfile = response.data?.profile || response.data || null
+      setProfile(nextProfile)
+      setDraftProfile(buildDraft(nextProfile))
+      setEditingProfile(false)
+      setUpdateWarnings(response.data?.warnings || [])
+      await Promise.all([fetchProfile(), fetchSnapshots()])
+    } catch (error) {
+      console.error('Failed to push GBP profile:', error)
+      setErrorMessage(extractErrorMessage(error, 'Failed to push GBP profile'))
+    } finally {
+      setPushingProfile(false)
     }
   }
 
@@ -397,7 +551,162 @@ const AdminGBPRocketPage = () => {
                   <Skeleton height={120} />
                 </Stack>
               ) : (
-                <Grid container spacing={2}>
+                editingProfile ? (
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 12 }}>
+                      <Card variant='outlined'>
+                        <CardContent>
+                          <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'flex-start', md: 'center' }} justifyContent='space-between' spacing={2}>
+                            <Box>
+                              <Typography variant='subtitle2'>{uiText.editProfile}</Typography>
+                              <Typography variant='caption' color='text.secondary'>{uiText.editHint}</Typography>
+                            </Box>
+                            <Stack direction='row' spacing={1}>
+                              <Button variant='outlined' color='inherit' onClick={handleCancelEdit}>
+                                {uiText.cancelEdit}
+                              </Button>
+                              <Button variant='outlined' color='secondary' onClick={handleSaveDraft} disabled={savingDraft}>
+                                {savingDraft ? uiText.syncing : uiText.saveLocal}
+                              </Button>
+                              <Button variant='contained' color='primary' onClick={handlePushProfile} disabled={pushingProfile}>
+                                {pushingProfile ? uiText.syncing : uiText.pushGoogle}
+                              </Button>
+                            </Stack>
+                          </Stack>
+
+                          {updateWarnings.length > 0 && (
+                            <Alert severity='warning' sx={{ mt: 2 }}>
+                              {updateWarnings.map((warning) => (
+                                <Typography key={warning} variant='body2'>{warning}</Typography>
+                              ))}
+                            </Alert>
+                          )}
+
+                          {draftProfile && (
+                            <Stack spacing={2.5} sx={{ mt: 3 }}>
+                              <TextField
+                                fullWidth
+                                label={uiText.labelDescription}
+                                value={draftProfile.description || ''}
+                                multiline
+                                minRows={3}
+                                onChange={(event) => updateDraft({ description: event.target.value })}
+                              />
+                              <Grid container spacing={2}>
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                  <TextField
+                                    fullWidth
+                                    label={uiText.labelCategory}
+                                    value={draftProfile.category || ''}
+                                    onChange={(event) => updateDraft({ category: event.target.value })}
+                                  />
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                  <TextField
+                                    fullWidth
+                                    label={uiText.labelPhone}
+                                    value={draftProfile.phone || ''}
+                                    onChange={(event) => updateDraft({ phone: event.target.value })}
+                                  />
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                  <TextField
+                                    fullWidth
+                                    label={uiText.labelWebsite}
+                                    value={draftProfile.website || ''}
+                                    onChange={(event) => updateDraft({ website: event.target.value })}
+                                  />
+                                </Grid>
+                              </Grid>
+                              <TextField
+                                fullWidth
+                                label={uiText.labelAddressLines}
+                                value={(draftProfile.address?.addressLines || []).join('\n')}
+                                multiline
+                                minRows={2}
+                                onChange={(event) => {
+                                  const lines = event.target.value.split('\n').map(line => line.trim()).filter(Boolean)
+                                  updateDraft({
+                                    address: {
+                                      ...(draftProfile.address || {}),
+                                      addressLines: lines
+                                    }
+                                  })
+                                }}
+                              />
+                              <Grid container spacing={2}>
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                  <TextField
+                                    fullWidth
+                                    label={uiText.labelLocality}
+                                    value={draftProfile.address?.locality || ''}
+                                    onChange={(event) => updateDraft({ address: { ...(draftProfile.address || {}), locality: event.target.value } })}
+                                  />
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                  <TextField
+                                    fullWidth
+                                    label={uiText.labelAdministrativeArea}
+                                    value={draftProfile.address?.administrativeArea || ''}
+                                    onChange={(event) => updateDraft({ address: { ...(draftProfile.address || {}), administrativeArea: event.target.value } })}
+                                  />
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                  <TextField
+                                    fullWidth
+                                    label={uiText.labelPostalCode}
+                                    value={draftProfile.address?.postalCode || ''}
+                                    onChange={(event) => updateDraft({ address: { ...(draftProfile.address || {}), postalCode: event.target.value } })}
+                                  />
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                  <TextField
+                                    fullWidth
+                                    label={uiText.labelCountryCode}
+                                    value={draftProfile.address?.countryCode || ''}
+                                    onChange={(event) => updateDraft({ address: { ...(draftProfile.address || {}), countryCode: event.target.value } })}
+                                  />
+                                </Grid>
+                              </Grid>
+                              <TextField
+                                fullWidth
+                                label={uiText.labelWeekdayHours}
+                                value={(draftProfile.hours?.weekdayDescriptions || []).join('\n')}
+                                multiline
+                                minRows={3}
+                                onChange={(event) => {
+                                  const lines = event.target.value.split('\n').map(line => line.trim()).filter(Boolean)
+                                  updateDraft({
+                                    hours: {
+                                      ...(draftProfile.hours || {}),
+                                      weekdayDescriptions: lines
+                                    }
+                                  })
+                                }}
+                              />
+                            </Stack>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  </Grid>
+                ) : (
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 12 }}>
+                      <Card variant='outlined'>
+                        <CardContent>
+                          <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'flex-start', md: 'center' }} justifyContent='space-between' spacing={2}>
+                            <Box>
+                              <Typography variant='subtitle2'>{uiText.editProfile}</Typography>
+                              <Typography variant='caption' color='text.secondary'>{uiText.editHint}</Typography>
+                            </Box>
+                            <Button variant='outlined' onClick={handleEditProfile} disabled={!profile}>
+                              {uiText.editProfile}
+                            </Button>
+                          </Stack>
+                        </CardContent>
+                      </Card>
+                    </Grid>
                   <Grid size={{ xs: 12, md: 6 }}>
                     <Card variant='outlined'>
                       <CardContent>
@@ -423,25 +732,15 @@ const AdminGBPRocketPage = () => {
                   <Grid size={{ xs: 12, md: 6 }}>
                     <Card variant='outlined'>
                       <CardContent>
-                        <Typography variant='caption' color='text.secondary'>{uiText.labelConnection}</Typography>
-                        <Typography variant='body1' fontWeight={600}>
-                          {isConnected ? 'Connected' : 'Disconnected'}
-                        </Typography>
-                        <Typography variant='caption' color='text.secondary'>
-                          {profile?.connectedAt ? new Date(profile.connectedAt).toLocaleString() : uiText.notAvailable}
-                        </Typography>
+                        <Stack direction='row' alignItems='center' justifyContent='space-between'>
+                          <Typography variant='caption' color='text.secondary'>{uiText.labelWebsite}</Typography>
+                          {isMissingValue(profile?.website) ? <Chip size='small' color='warning' label={uiText.missingLabel} /> : null}
+                        </Stack>
+                        <Typography variant='body1' fontWeight={600}>{profile?.website || uiText.notAvailable}</Typography>
                       </CardContent>
                     </Card>
                   </Grid>
                   <Grid size={{ xs: 12, md: 6 }}>
-                    <Card variant='outlined'>
-                      <CardContent>
-                        <Typography variant='caption' color='text.secondary'>{uiText.labelLastSynced}</Typography>
-                        <Typography variant='body1' fontWeight={600}>{lastSyncedText}</Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
                     <Card variant='outlined'>
                       <CardContent>
                         <Stack direction='row' alignItems='center' justifyContent='space-between'>
@@ -452,7 +751,7 @@ const AdminGBPRocketPage = () => {
                       </CardContent>
                     </Card>
                   </Grid>
-                  <Grid size={{ xs: 12 }}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Card variant='outlined'>
                       <CardContent>
                         <Stack direction='row' alignItems='center' justifyContent='space-between'>
@@ -463,7 +762,7 @@ const AdminGBPRocketPage = () => {
                       </CardContent>
                     </Card>
                   </Grid>
-                  <Grid size={{ xs: 12 }}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Card variant='outlined'>
                       <CardContent>
                         <Stack direction='row' alignItems='center' justifyContent='space-between'>
@@ -529,6 +828,7 @@ const AdminGBPRocketPage = () => {
                     </Card>
                   </Grid>
                 </Grid>
+                )
               )
             ) : activeTab === 1 ? (
 

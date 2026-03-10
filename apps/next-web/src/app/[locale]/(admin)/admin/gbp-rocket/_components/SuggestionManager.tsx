@@ -18,6 +18,11 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import LinearProgress from '@mui/material/LinearProgress'
 import MenuItem from '@mui/material/MenuItem'
@@ -25,6 +30,7 @@ import Select from '@mui/material/Select'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+import Checkbox from '@mui/material/Checkbox'
 import { alpha, useTheme } from '@mui/material/styles'
 
 import { SERVICES_CONFIG } from '@/configs/services'
@@ -38,6 +44,7 @@ type SuggestionItem = {
   description: string
   source: string | null
   lifecycleState: LifecycleState
+  contentType?: string | null
   auditSnapshotId: string | null
   auditFindingCodes: string[]
   appliedAt: string | null
@@ -45,6 +52,11 @@ type SuggestionItem = {
   updatedAt: string
   generatedAt: string
   reAuditGuidance?: string | null
+}
+
+type GbpProfileSummary = {
+  description?: string | null
+  category?: string | null
 }
 
 type ActivityItem = {
@@ -59,6 +71,13 @@ type ActivityItem = {
     name?: string | null
     email?: string | null
   } | null
+}
+
+type ApplyProfileField = {
+  key: string
+  label: string
+  enabled: boolean
+  value: string
 }
 
 type Props = {
@@ -129,8 +148,38 @@ export default function SuggestionManager({ locationId, onError }: Props) {
   const [applyNotes, setApplyNotes] = useState<Record<string, string>>({})
   const [applyDate, setApplyDate] = useState<Record<string, string>>({})
   const [linkFields, setLinkFields] = useState<Record<string, string>>({})
+  const [applyDialogOpen, setApplyDialogOpen] = useState(false)
+  const [applySuggestion, setApplySuggestion] = useState<SuggestionItem | null>(null)
+  const [applyFields, setApplyFields] = useState<ApplyProfileField[]>([])
+  const [applySubmitting, setApplySubmitting] = useState(false)
+  const [applyPushToGoogle, setApplyPushToGoogle] = useState(true)
+  const [applyMarkApplied, setApplyMarkApplied] = useState(true)
+  const [profilePreview, setProfilePreview] = useState<GbpProfileSummary | null>(null)
 
   const parseCodes = (raw: string) => raw.split(',').map((v) => v.trim()).filter(Boolean)
+
+  const extractPrefillValue = (text: string, label: string) => {
+    const regex = new RegExp(`${label}\\s*[:\\-]\\s*(.+)`, 'i')
+    const match = text.match(regex)
+    return match?.[1]?.trim() || ''
+  }
+
+  const buildApplyFields = (item: SuggestionItem): ApplyProfileField[] => {
+    const content = `${item.title}\n${item.description}`
+    const normalizedType = (item.contentType || '').toLowerCase()
+    const isCategorySuggestion = normalizedType === 'category' || item.title.toLowerCase().includes('category')
+    const categoryGuess = extractPrefillValue(content, 'Category')
+      || extractPrefillValue(content, 'Primary Category')
+      || (isCategorySuggestion ? item.title : '')
+    const descriptionGuess =
+      extractPrefillValue(content, 'Description')
+      || (normalizedType === 'description' ? item.description : (!isCategorySuggestion ? item.description : ''))
+
+    return [
+      { key: 'description', label: 'Business description', enabled: Boolean(descriptionGuess), value: descriptionGuess },
+      { key: 'category', label: 'Category', enabled: Boolean(categoryGuess), value: categoryGuess }
+    ]
+  }
 
   const extractMessage = (error: unknown, fallback: string) => {
     if (isAxiosError(error)) {
@@ -242,6 +291,88 @@ export default function SuggestionManager({ locationId, onError }: Props) {
       onError(extractMessage(error, 'Failed to update suggestion'))
     } finally {
       setSubmitting(null)
+    }
+  }
+
+  const openApplyDialog = (item: SuggestionItem) => {
+    setApplySuggestion(item)
+    setApplyFields(buildApplyFields(item))
+    setApplyPushToGoogle(true)
+    setApplyMarkApplied(true)
+    setApplyDialogOpen(true)
+
+    apiClient
+      .get<GbpProfileSummary>(`${GBP_API_URL}/locations/${locationId}/business-profile`, {
+        headers: { 'x-skip-system-message': '1' }
+      })
+      .then((response) => {
+        setProfilePreview(response.data || null)
+      })
+      .catch(() => {
+        setProfilePreview(null)
+      })
+  }
+
+  const closeApplyDialog = () => {
+    setApplyDialogOpen(false)
+    setApplySuggestion(null)
+    setApplyFields([])
+    setProfilePreview(null)
+  }
+
+  const updateApplyField = (key: string, patch: Partial<ApplyProfileField>) => {
+    setApplyFields((prev) => prev.map((field) => (field.key === key ? { ...field, ...patch } : field)))
+  }
+
+  const buildProfilePayload = () => {
+    const payload: any = {}
+    const getValue = (key: string) => applyFields.find((f) => f.key === key)
+
+    const description = getValue('description')
+    if (description?.enabled) payload.description = description.value || ''
+
+    const category = getValue('category')
+    if (category?.enabled) payload.category = category.value || ''
+
+    return payload
+  }
+
+  const applyToProfile = async () => {
+    if (!locationId || !applySuggestion) return
+
+    const payload = buildProfilePayload()
+    if (!Object.keys(payload).length) {
+      onError('Select at least one field to apply')
+      return
+    }
+
+    try {
+      setApplySubmitting(true)
+      const endpoint = applyPushToGoogle
+        ? `${GBP_API_URL}/locations/${locationId}/business-profile/push`
+        : `${GBP_API_URL}/locations/${locationId}/business-profile`
+
+      await apiClient[applyPushToGoogle ? 'post' : 'patch'](
+        endpoint,
+        payload,
+        { headers: { 'x-skip-system-message': '1' } }
+      )
+
+      if (applyMarkApplied) {
+        await patchState(applySuggestion, 'APPLIED', {
+          notes: `Applied to GBP profile${applyPushToGoogle ? ' and pushed to Google' : ''}.`,
+          appliedDate: new Date().toISOString().split('T')[0],
+          links: linkFields[applySuggestion.id]
+        })
+      } else {
+        await fetchAll()
+      }
+
+      closeApplyDialog()
+    } catch (error) {
+      onError(extractMessage(error, 'Failed to apply suggestion to profile'))
+    } finally {
+      setApplySubmitting(false)
     }
   }
 
@@ -425,6 +556,14 @@ export default function SuggestionManager({ locationId, onError }: Props) {
                       <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap'>
                         <Button
                           size='small'
+                          variant='outlined'
+                          onClick={() => openApplyDialog(item)}
+                          disabled={submitting === item.id}
+                        >
+                          Apply to Profile
+                        </Button>
+                        <Button
+                          size='small'
                           variant='contained'
                           color='success'
                           startIcon={<CheckCircleIcon />}
@@ -521,6 +660,77 @@ export default function SuggestionManager({ locationId, onError }: Props) {
           </Card>
         </Grid>
       </Grid>
+
+      <Dialog open={applyDialogOpen} onClose={closeApplyDialog} fullWidth maxWidth='sm'>
+        <DialogTitle>Apply Suggestion To GBP Profile</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <Typography variant='body2' color='text.secondary'>
+              Review which fields to apply from this suggestion before updating the profile.
+            </Typography>
+            {applyFields.map((field) => (
+              <Box key={field.key} sx={{ border: `1px solid ${alpha(theme.palette.divider, 0.6)}`, borderRadius: 2, p: 2 }}>
+                <Stack spacing={1}>
+                  <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={field.enabled}
+                          onChange={(event) => updateApplyField(field.key, { enabled: event.target.checked })}
+                        />
+                      }
+                      label={field.label}
+                    />
+                  </Stack>
+                  <TextField
+                    fullWidth
+                    size='small'
+                    multiline
+                    minRows={field.key === 'description' ? 3 : 3}
+                    disabled={!field.enabled}
+                    helperText={
+                      field.key === 'description'
+                        ? `Current GBP: ${profilePreview?.description || 'Empty'}`
+                        : `Current GBP: ${profilePreview?.category || 'Empty'}`
+                    }
+                    value={field.value}
+                    onChange={(event) => updateApplyField(field.key, { value: event.target.value })}
+                  />
+                </Stack>
+              </Box>
+            ))}
+
+            <Stack spacing={1}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={applyPushToGoogle}
+                    onChange={(event) => setApplyPushToGoogle(event.target.checked)}
+                  />
+                }
+                label='Push changes to Google Business Profile'
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={applyMarkApplied}
+                    onChange={(event) => setApplyMarkApplied(event.target.checked)}
+                  />
+                }
+                label='Mark suggestion as applied'
+              />
+            </Stack>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button variant='text' onClick={closeApplyDialog}>
+            Cancel
+          </Button>
+          <Button variant='contained' onClick={applyToProfile} disabled={applySubmitting}>
+            {applySubmitting ? 'Applying...' : 'Apply'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Stack>
   )
 }

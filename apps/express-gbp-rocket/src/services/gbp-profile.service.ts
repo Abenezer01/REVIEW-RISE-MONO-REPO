@@ -6,6 +6,33 @@ import { auditService } from './audit.service';
 const GOOGLE_OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const GOOGLE_GBP_LOCATION_URL = 'https://mybusinessbusinessinformation.googleapis.com/v1';
 
+type GbpProfileUpdateInput = {
+    description?: string | null;
+    serviceItems?: Array<{ name: string; description?: string | null }>;
+    category?: string | null;
+    categoryResourceName?: string | null;
+    categoryId?: string | null;
+    phone?: string | null;
+    website?: string | null;
+    address?: {
+        addressLines?: string[];
+        locality?: string | null;
+        administrativeArea?: string | null;
+        postalCode?: string | null;
+        countryCode?: string | null;
+        formatted?: string | null;
+    };
+    hours?: {
+        periods?: Array<{
+            openDay?: string | null;
+            openTime?: string | null;
+            closeDay?: string | null;
+            closeTime?: string | null;
+        }>;
+        weekdayDescriptions?: string[];
+    };
+};
+
 export class GbpProfileService {
     private isMissingSnapshotTableError(error: any): boolean {
         const message = String(error?.message || '');
@@ -39,6 +66,100 @@ export class GbpProfileService {
             address: profile?.address ?? null,
             hours: profile?.hours ?? { periods: [], weekdayDescriptions: [] }
         };
+    }
+
+    private toNonEmptyString(value: string | null | undefined): string | undefined {
+        if (value === null) return '';
+        if (value === undefined) return undefined;
+        return String(value).trim();
+    }
+
+    private buildPatchPayload(update: GbpProfileUpdateInput, locationName: string) {
+        const updateMask: string[] = [];
+        const payload: Record<string, any> = { name: locationName };
+        const warnings: string[] = [];
+
+        if (update.description !== undefined) {
+            payload.profile = { ...(payload.profile || {}), description: this.toNonEmptyString(update.description) };
+            updateMask.push('profile.description');
+        }
+
+        if (update.website !== undefined) {
+            payload.websiteUri = this.toNonEmptyString(update.website);
+            updateMask.push('websiteUri');
+        }
+
+        if (update.phone !== undefined) {
+            payload.phoneNumbers = {
+                ...(payload.phoneNumbers || {}),
+                primaryPhone: this.toNonEmptyString(update.phone)
+            };
+            updateMask.push('phoneNumbers.primaryPhone');
+        }
+
+        if (update.address) {
+            const address = update.address;
+            payload.storefrontAddress = {
+                addressLines: Array.isArray(address.addressLines) ? address.addressLines.filter(Boolean) : [],
+                locality: address.locality || undefined,
+                administrativeArea: address.administrativeArea || undefined,
+                postalCode: address.postalCode || undefined,
+                regionCode: address.countryCode || undefined
+            };
+            updateMask.push('storefrontAddress');
+        }
+
+        if (update.hours) {
+            const periods = Array.isArray(update.hours.periods) ? update.hours.periods : undefined;
+            const weekdayDescriptions = Array.isArray(update.hours.weekdayDescriptions)
+                ? update.hours.weekdayDescriptions.filter(Boolean)
+                : undefined;
+
+            payload.regularHours = {
+                ...(periods ? { periods } : {}),
+                ...(weekdayDescriptions ? { weekdayDescriptions } : {})
+            };
+            updateMask.push('regularHours');
+        }
+
+        if (update.category !== undefined || update.categoryId || update.categoryResourceName) {
+            const resource =
+                update.categoryResourceName ||
+                (update.categoryId ? `categories/${update.categoryId}` : null);
+
+            if (resource) {
+                payload.categories = {
+                    ...(payload.categories || {}),
+                    primaryCategory: { name: resource }
+                };
+                updateMask.push('categories.primaryCategory');
+            } else if (update.category) {
+                warnings.push('Category update skipped because category resource name is missing. Provide a categoryId or categoryResourceName to push to Google.');
+            }
+        }
+
+        return { payload, updateMask: updateMask.filter(Boolean), warnings };
+    }
+
+    private buildServiceListPayload(serviceItems: Array<{ name: string; description?: string | null }>, locationName: string) {
+        const normalized = serviceItems
+            .map((item) => ({
+                name: (item.name || '').trim(),
+                description: item.description ? String(item.description).trim() : ''
+            }))
+            .filter((item) => item.name.length > 0);
+
+        const payload = {
+            name: `${locationName}/serviceList`,
+            serviceItems: normalized.map((item) => ({
+                structuredServiceItem: {
+                    serviceName: { value: item.name },
+                    ...(item.description ? { description: { value: item.description } } : {})
+                }
+            }))
+        };
+
+        return { payload, hasItems: payload.serviceItems.length > 0 };
     }
 
     private computeChangedFields(previousSnapshot: any, currentSnapshot: any): string[] {
@@ -453,6 +574,7 @@ export class GbpProfileService {
             description: gbpProfile?.description || location.business?.description || null,
             category: gbpProfile?.category || null,
             phone: gbpProfile?.phone || location.business?.phone || null,
+            website: gbpProfile?.website || location.business?.website || null,
             address: gbpProfile?.address || {
                 addressLines: [],
                 locality: null,
@@ -465,6 +587,150 @@ export class GbpProfileService {
             lastSynced,
             connectedAt,
             connectionStatus
+        };
+    }
+
+    async updateLocationBusinessProfile(locationId: string, input: GbpProfileUpdateInput, options?: { pushToGbp?: boolean; userId?: string | null }) {
+        const location = await locationRepository.findWithBusiness(locationId);
+
+        if (!location) {
+            throw new Error('Location not found');
+        }
+
+        const existingPlatformIds = (location.platformIds || {}) as Record<string, any>;
+        const existingProfile = (existingPlatformIds.gbpProfile || {}) as any;
+
+        const mergedProfile = {
+            ...existingProfile,
+            ...(input.description !== undefined ? { description: input.description } : {}),
+            ...(input.serviceItems ? { serviceItems: input.serviceItems } : {}),
+            ...(input.category !== undefined ? { category: input.category } : {}),
+            ...(input.phone !== undefined ? { phone: input.phone } : {}),
+            ...(input.website !== undefined ? { website: input.website } : {}),
+            ...(input.address ? { address: { ...(existingProfile.address || {}), ...input.address } } : {}),
+            ...(input.hours ? { hours: { ...(existingProfile.hours || {}), ...input.hours } } : {})
+        };
+
+        const now = new Date();
+        const nextPlatformIds = {
+            ...existingPlatformIds,
+            gbpProfile: mergedProfile,
+            gbpLastEditedAt: now.toISOString()
+        };
+
+        await locationRepository.update(locationId, {
+            address: mergedProfile?.address?.formatted || location.address || null,
+            platformIds: nextPlatformIds
+        });
+
+        const businessUpdate: Record<string, string> = {};
+        if (input.description !== undefined && typeof input.description === 'string') businessUpdate.description = input.description;
+        if (input.phone !== undefined && typeof input.phone === 'string') businessUpdate.phone = input.phone;
+        if (input.website !== undefined && typeof input.website === 'string') businessUpdate.website = input.website;
+
+        if (Object.keys(businessUpdate).length > 0) {
+            await businessRepository.update(location.businessId, businessUpdate as any);
+        }
+
+        let warnings: string[] = [];
+
+        if (options?.pushToGbp) {
+            const connection = await platformIntegrationRepository.findByLocationIdAndPlatform(locationId, 'google');
+
+            if (!connection || connection.status !== 'active' || !connection.gbpLocationName) {
+                throw new Error('Active Google PlatformIntegration connection not found for this location');
+            }
+
+            const accessToken = await this.getAccessToken(locationId);
+            const patch = this.buildPatchPayload(input, connection.gbpLocationName);
+            warnings = patch.warnings;
+
+            if (patch.updateMask.length === 0) {
+                if (!input.serviceItems || input.serviceItems.length === 0) {
+                    throw new Error('No valid fields provided for Google update');
+                }
+            }
+
+            if (patch.updateMask.length > 0) {
+                await axios.patch(`${GOOGLE_GBP_LOCATION_URL}/${connection.gbpLocationName}`, patch.payload, {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                    params: { updateMask: patch.updateMask.join(',') }
+                });
+            }
+
+            if (input.serviceItems && input.serviceItems.length > 0) {
+                const servicePayload = this.buildServiceListPayload(input.serviceItems, connection.gbpLocationName);
+
+                if (servicePayload.hasItems) {
+                    await axios.patch(`${GOOGLE_GBP_LOCATION_URL}/${connection.gbpLocationName}/serviceList`, servicePayload.payload, {
+                        headers: { Authorization: `Bearer ${accessToken}` },
+                        params: { updateMask: 'serviceItems' }
+                    });
+                }
+            }
+
+            const rawProfile = await this.fetchLocationDetails(accessToken, connection.gbpLocationName);
+            const normalized = normalizeGbpProfile(rawProfile);
+            const updatedPlatformIds = {
+                ...nextPlatformIds,
+                gbpProfile: normalized,
+                gbpLastSyncedAt: now.toISOString()
+            };
+
+            await locationRepository.update(locationId, {
+                address: normalized.address.formatted || location.address || null,
+                lastSync: now,
+                platformIds: updatedPlatformIds
+            });
+
+            const businessSyncUpdate: Record<string, string> = {};
+            if (normalized.description) businessSyncUpdate.description = normalized.description;
+            if (normalized.phone) businessSyncUpdate.phone = normalized.phone;
+            if (normalized.website) businessSyncUpdate.website = normalized.website;
+
+            if (Object.keys(businessSyncUpdate).length > 0) {
+                await businessRepository.update(location.businessId, businessSyncUpdate as any);
+            }
+
+            try {
+                await this.createSnapshot({
+                    businessId: location.businessId,
+                    locationId,
+                    captureType: 'manual',
+                    profile: normalized,
+                    userId: options?.userId || null
+                });
+            } catch (error: any) {
+                if (!this.isMissingSnapshotTableError(error)) {
+                    throw error;
+                }
+            }
+
+            return {
+                profile: await this.getLocationBusinessProfile(locationId),
+                pushed: true,
+                warnings
+            };
+        }
+
+        try {
+            await this.createSnapshot({
+                businessId: location.businessId,
+                locationId,
+                captureType: 'manual',
+                profile: mergedProfile,
+                userId: options?.userId || null
+            });
+        } catch (error: any) {
+            if (!this.isMissingSnapshotTableError(error)) {
+                throw error;
+            }
+        }
+
+        return {
+            profile: await this.getLocationBusinessProfile(locationId),
+            pushed: false,
+            warnings
         };
     }
 
@@ -578,3 +844,5 @@ export const listLocationSnapshots = (locationId: string, limit?: number, offset
     gbpProfileService.listSnapshots(locationId, limit, offset);
 export const getLocationSnapshotDetail = (locationId: string, snapshotId: string) =>
     gbpProfileService.getSnapshotDetail(locationId, snapshotId);
+export const updateLocationBusinessProfile = (locationId: string, input: GbpProfileUpdateInput, options?: { pushToGbp?: boolean; userId?: string | null }) =>
+    gbpProfileService.updateLocationBusinessProfile(locationId, input, options);
