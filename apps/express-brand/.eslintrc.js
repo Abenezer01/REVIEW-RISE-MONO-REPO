@@ -9,7 +9,7 @@ module.exports = {
     rules: {
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-        'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
+        'no-console': ['warn', { allow: ['warn', 'error', 'info', 'log'] }],
     },
     env: {
         node: true,

@@ -160,9 +160,11 @@ const LocationDropdown = () => {
 
   const handleLocationSelect = (location: Location) => {
     setLocationId(location.id)
+
     try {
       localStorage.setItem('rr:lastLocationId', String(location.id))
     } catch {}
+
     setOpen(false)
   }
 
@@ -171,6 +173,7 @@ const LocationDropdown = () => {
       try {
         localStorage.setItem('rr:lastLocationId', String(locationId))
       } catch {}
+
       return
     }
 

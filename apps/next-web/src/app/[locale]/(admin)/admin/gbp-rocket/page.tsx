@@ -230,6 +230,7 @@ const AdminGBPRocketPage = () => {
       )
 
       const nextProfile = response.data || null
+
       setProfile(nextProfile)
 
       if (!editingProfile) {
@@ -383,6 +384,7 @@ const AdminGBPRocketPage = () => {
       )
 
       const nextProfile = response.data?.profile || response.data || null
+
       setProfile(nextProfile)
       setDraftProfile(buildDraft(nextProfile))
       setEditingProfile(false)
@@ -411,6 +413,7 @@ const AdminGBPRocketPage = () => {
       )
 
       const nextProfile = response.data?.profile || response.data || null
+
       setProfile(nextProfile)
       setDraftProfile(buildDraft(nextProfile))
       setEditingProfile(false)
@@ -626,6 +629,7 @@ const AdminGBPRocketPage = () => {
                                 minRows={2}
                                 onChange={(event) => {
                                   const lines = event.target.value.split('\n').map(line => line.trim()).filter(Boolean)
+
                                   updateDraft({
                                     address: {
                                       ...(draftProfile.address || {}),
@@ -676,6 +680,7 @@ const AdminGBPRocketPage = () => {
                                 minRows={3}
                                 onChange={(event) => {
                                   const lines = event.target.value.split('\n').map(line => line.trim()).filter(Boolean)
+
                                   updateDraft({
                                     hours: {
                                       ...(draftProfile.hours || {}),

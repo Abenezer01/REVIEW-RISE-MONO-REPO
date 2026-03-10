@@ -161,6 +161,7 @@ export default function SuggestionManager({ locationId, onError }: Props) {
   const extractPrefillValue = (text: string, label: string) => {
     const regex = new RegExp(`${label}\\s*[:\\-]\\s*(.+)`, 'i')
     const match = text.match(regex)
+
     return match?.[1]?.trim() || ''
   }
 
@@ -168,9 +169,11 @@ export default function SuggestionManager({ locationId, onError }: Props) {
     const content = `${item.title}\n${item.description}`
     const normalizedType = (item.contentType || '').toLowerCase()
     const isCategorySuggestion = normalizedType === 'category' || item.title.toLowerCase().includes('category')
+
     const categoryGuess = extractPrefillValue(content, 'Category')
       || extractPrefillValue(content, 'Primary Category')
       || (isCategorySuggestion ? item.title : '')
+
     const descriptionGuess =
       extractPrefillValue(content, 'Description')
       || (normalizedType === 'description' ? item.description : (!isCategorySuggestion ? item.description : ''))
@@ -329,9 +332,11 @@ export default function SuggestionManager({ locationId, onError }: Props) {
     const getValue = (key: string) => applyFields.find((f) => f.key === key)
 
     const description = getValue('description')
+
     if (description?.enabled) payload.description = description.value || ''
 
     const category = getValue('category')
+
     if (category?.enabled) payload.category = category.value || ''
 
     return payload
@@ -341,13 +346,16 @@ export default function SuggestionManager({ locationId, onError }: Props) {
     if (!locationId || !applySuggestion) return
 
     const payload = buildProfilePayload()
+
     if (!Object.keys(payload).length) {
       onError('Select at least one field to apply')
+
       return
     }
 
     try {
       setApplySubmitting(true)
+
       const endpoint = applyPushToGoogle
         ? `${GBP_API_URL}/locations/${locationId}/business-profile/push`
         : `${GBP_API_URL}/locations/${locationId}/business-profile`
