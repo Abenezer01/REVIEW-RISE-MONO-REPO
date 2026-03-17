@@ -8,8 +8,12 @@ import CollectionsOutlinedIcon from '@mui/icons-material/CollectionsOutlined';
 import PhotoOutlinedIcon from '@mui/icons-material/PhotoOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
-import { useGbpPhotos, useSyncGbpPhotos } from '@/hooks/gbp/useGbpPhotos';
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import { useGbpPhotos, useSyncGbpPhotos, useUploadGbpPhoto } from '@/hooks/gbp/useGbpPhotos';
 import { LocationPhotosGrid } from './LocationPhotosGrid';
+import { Menu, MenuItem, ListItemIcon } from '@mui/material';
+import { GbpPhotoCategory } from '@platform/contracts';
+import { PHOTO_CATEGORIES } from './PhotosFilterToolbar';
 
 interface LocationPhotosSectionProps {
     locationId: string;
@@ -57,6 +61,35 @@ export const LocationPhotosSection = ({ locationId }: LocationPhotosSectionProps
     const theme = useTheme();
     const { data: result } = useGbpPhotos(locationId);
     const { mutate: syncPhotos, isPending: isSyncing } = useSyncGbpPhotos();
+    const { mutate: uploadPhoto, isPending: isUploading } = useUploadGbpPhoto();
+
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [uploadCategory, setUploadCategory] = React.useState<GbpPhotoCategory>(GbpPhotoCategory.COVER);
+
+    const handleUploadClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseMenu = () => {
+        setAnchorEl(null);
+    };
+
+    const handleSelectCategory = (category: GbpPhotoCategory) => {
+        setUploadCategory(category);
+        setAnchorEl(null);
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            uploadPhoto({ locationId, file, category: uploadCategory });
+        }
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
 
     const stats = result?.meta?.stats || { total: 0, coverCount: 0, interiorCount: 0 };
 
@@ -94,6 +127,16 @@ export const LocationPhotosSection = ({ locationId }: LocationPhotosSectionProps
                     </Typography>
 
                     <Button
+                        variant="outlined"
+                        onClick={handleUploadClick}
+                        disabled={isUploading}
+                        startIcon={isUploading ? <CircularProgress size={20} color="inherit" /> : <CloudUploadOutlinedIcon />}
+                        sx={{ fontWeight: 600, px: 3, textTransform: 'none', borderRadius: 1.5, borderColor: 'divider', color: 'text.primary', '&:hover': { borderColor: 'text.primary', bgcolor: alpha(theme.palette.text.primary, 0.05) } }}
+                    >
+                        {isUploading ? t('uploading') : t('uploadPhoto')}
+                    </Button>
+
+                    <Button
                         variant="contained"
                         color="warning"
                         startIcon={isSyncing ? <CircularProgress size={20} color="inherit" /> : <SyncIcon />}
@@ -105,6 +148,28 @@ export const LocationPhotosSection = ({ locationId }: LocationPhotosSectionProps
                     </Button>
                 </Stack>
             </Stack>
+
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleCloseMenu}
+                PaperProps={{ sx: { minWidth: 200, mt: 1, borderRadius: 2, boxShadow: theme.shadows[8], maxHeight: 400 } }}
+            >
+                {PHOTO_CATEGORIES.filter(cat => cat.value !== 'All').map((cat) => (
+                    <MenuItem key={cat.value} onClick={() => handleSelectCategory(cat.value as GbpPhotoCategory)}>
+                        <ListItemIcon><PhotoOutlinedIcon fontSize="small" /></ListItemIcon>
+                        {t(`filter.${cat.labelKey}`)}
+                    </MenuItem>
+                ))}
+            </Menu>
+
+            <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                accept="image/*"
+                onChange={handleFileChange}
+            />
 
             {/* Stats Row */}
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} mb={4}>

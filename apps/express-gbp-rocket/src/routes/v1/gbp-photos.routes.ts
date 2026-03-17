@@ -1,8 +1,11 @@
 import { Router } from 'express';
+import multer from 'multer';
 import { gbpPhotosService } from '../../services/gbp-photos.service';
 import { createSuccessResponse, createErrorResponse } from '@platform/contracts';
+import { getPhotos, syncPhotos, uploadPhoto, deletePhoto } from '../../controllers/gbp-photos.controller';
 
 const router = Router();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 // Endpoint to trigger a photo sync
 router.post('/:locationId/photos/sync', async (req: any, res) => {
@@ -61,5 +64,11 @@ router.get('/:locationId/photos/proxy/:photoId', async (req: any, res) => {
         res.status(500).send('Failed to proxy photo stream');
     }
 });
+
+// Endpoint to upload a photo
+router.post('/:locationId/photos', upload.single('photo'), uploadPhoto);
+
+// Endpoint to delete a photo
+router.delete('/:locationId/photos/:photoId', deletePhoto);
 
 export default router;

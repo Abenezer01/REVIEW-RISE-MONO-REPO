@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { locationPhotoRepository, locationRepository, prisma } from '@platform/db';
+import { GbpPhotoCategory } from '@platform/contracts';
 import { gbpProfileService } from './gbp-profile.service';
 
 const GOOGLE_GBP_MEDIA_URL_BASE = 'https://mybusiness.googleapis.com/v4';
@@ -150,6 +151,103 @@ export class GbpPhotosService {
             contentType: response.headers['content-type'],
             contentLength: response.headers['content-length']
         };
+    }
+
+    /**
+     * Uploads a photo to Google Business Profile and saves it to the local database
+     */
+    async uploadPhoto(locationId: string, file: Express.Multer.File, category: string) {
+        const connection = await gbpProfileService.getConnection(locationId);
+
+        if (!connection || connection.status !== 'active' || !connection.gbpLocationName) {
+            throw new Error('Active Google PlatformIntegration connection with gbpLocationName not found for this location');
+        }
+
+        const accessToken = await gbpProfileService.getAccessToken(locationId);
+
+        // 1. Start the upload process
+        const startUploadUrl = `${GOOGLE_GBP_MEDIA_URL_BASE}/${connection.gbpLocationName}/media:startUpload`;
+        const startRes = await axios.post(startUploadUrl, {}, {
+            headers: { Authorization: `Bearer ${accessToken}` }
+        });
+
+        const resourceName = startRes.data.resourceName;
+        if (!resourceName) {
+            throw new Error('Failed to start media upload: resourceName is missing');
+        }
+
+        // 2. Upload the file bytes
+        const uploadUrl = `https://mybusiness.googleapis.com/upload/v1/media/${resourceName}?upload_type=media`;
+        await axios.post(uploadUrl, file.buffer, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': file.mimetype,
+                'Content-Length': file.size.toString()
+            }
+        });
+
+        // 3. Create the media item in Google Business Profile
+        const createUrl = `${GOOGLE_GBP_MEDIA_URL_BASE}/${connection.gbpLocationName}/media`;
+        const createRes = await axios.post(createUrl, {
+            mediaFormat: 'PHOTO',
+            locationAssociation: { category: category || GbpPhotoCategory.COVER },
+            dataRef: { resourceName }
+        }, {
+            headers: { Authorization: `Bearer ${accessToken}` }
+        });
+
+        const item = createRes.data;
+
+        // 4. Save to local database
+        const photoData: any = {
+            id: item.name,
+            locationId,
+            accountId: connection.gbpAccountId as string,
+            googleUrl: item.googleUrl,
+            thumbnailUrl: item.thumbnailUrl,
+            category: item.locationAssociation?.category || category,
+            createTime: item.createTime ? new Date(item.createTime) : new Date(),
+            updateTime: item.updateTime ? new Date(item.updateTime) : new Date(),
+            sourceUrl: item.sourceUrl || null,
+            attribution: item.attribution?.attributionName || null,
+            mediaFormat: item.mediaFormat,
+            lastSyncedAt: new Date(),
+        };
+
+        await locationPhotoRepository.upsertPhotos([photoData]);
+
+        return photoData;
+    }
+
+    /**
+     * Deletes a photo from Google Business Profile and the local database
+     */
+    async deletePhoto(locationId: string, photoId: string) {
+        const connection = await gbpProfileService.getConnection(locationId);
+
+        if (!connection || connection.status !== 'active' || !connection.gbpLocationName) {
+            throw new Error('Active Google PlatformIntegration connection with gbpLocationName not found for this location');
+        }
+
+        const accessToken = await gbpProfileService.getAccessToken(locationId);
+
+        try {
+            // Delete from Google Business Profile
+            const photoUrl = `${GOOGLE_GBP_MEDIA_URL_BASE}/${photoId}`;
+            await axios.delete(photoUrl, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+        } catch (error: any) {
+            // If it's already deleted (404), we can ignore it and just delete from our DB
+            if (error.response?.status !== 404) {
+                throw error;
+            }
+        }
+
+        // Delete from local database
+        await locationPhotoRepository.delete(photoId);
+
+        return { success: true };
     }
 }
 

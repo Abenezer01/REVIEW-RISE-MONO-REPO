@@ -341,6 +341,59 @@ export class GbpProfileService {
 
 
     /**
+     * Update business profile information on Google Business Profile
+     */
+    async updateBusinessProfile(locationId: string, payload: any) {
+        const connection = await platformIntegrationRepository.findByLocationIdAndPlatform(locationId, 'google');
+
+        if (!connection || !connection.accessToken || connection.status !== 'active') {
+            throw new Error('Active Google PlatformIntegration connection not found for this location');
+        }
+
+        const location = await locationRepository.findById(locationId);
+
+        if (!location) {
+            throw new Error('Location not found');
+        }
+
+        const accessToken = await this.getAccessToken(locationId);
+
+        if (!connection.gbpLocationName) {
+            throw new Error('Missing GBP locationName on platform integration');
+        }
+
+        const updateMask: string[] = [];
+        const requestBody: any = {};
+
+        if (payload.description !== undefined) {
+            updateMask.push('profile.description');
+            requestBody.profile = { description: payload.description };
+        }
+
+        if (payload.category !== undefined) {
+            // For category changes, the mask is usually 'primaryCategory'
+            updateMask.push('primaryCategory');
+            requestBody.primaryCategory = { displayName: payload.category }; // Needs proper formatted category usually
+        }
+
+        if (updateMask.length === 0) return null;
+
+        // Perform Google API Update
+        const response = await axios.patch(
+            `${GOOGLE_GBP_LOCATION_URL}/${connection.gbpLocationName}`,
+            requestBody,
+            {
+                headers: { Authorization: `Bearer ${accessToken}` },
+                params: { updateMask: updateMask.join(',') }
+            }
+        );
+
+        // Sync immediately to reflect changes in our database and generate a new snapshot
+        const syncResult = await this.syncLocationBusinessProfile(locationId);
+        return syncResult;
+    }
+
+    /**
      * Sync business profile information from GBP to the local DB
      */
     async syncLocationBusinessProfile(locationId: string) {
@@ -571,6 +624,7 @@ export class GbpProfileService {
 export const gbpProfileService = new GbpProfileService();
 
 export const syncLocationBusinessProfile = (locationId: string) => gbpProfileService.syncLocationBusinessProfile(locationId);
+export const updateBusinessProfile = (locationId: string, payload: any) => gbpProfileService.updateBusinessProfile(locationId, payload);
 export const getLocationBusinessProfile = (locationId: string) => gbpProfileService.getLocationBusinessProfile(locationId);
 export const createLocationSnapshot = (locationId: string, userId?: string | null, suggestionRefs?: any) =>
     gbpProfileService.createOnDemandSnapshot(locationId, userId, suggestionRefs);

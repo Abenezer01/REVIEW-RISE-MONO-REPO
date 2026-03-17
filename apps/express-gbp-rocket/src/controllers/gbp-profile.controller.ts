@@ -8,7 +8,8 @@ import {
   getLocationBusinessProfile,
   getLocationSnapshotDetail,
   listLocationSnapshots,
-  syncLocationBusinessProfile
+  syncLocationBusinessProfile,
+  updateBusinessProfile as updateBusinessProfileService
 } from '../services/gbp-profile.service';
 import { auditService } from '../services/audit.service';
 
@@ -145,6 +146,43 @@ export const syncBusinessProfile = async (req: Request, res: Response) => {
       statusCode = 400;
       code = SystemMessageCode.VALIDATION_ERROR;
     } else if (axios.isAxiosError(error) && error.response?.status) {
+      statusCode = error.response.status;
+      code = statusCode >= 500 ? SystemMessageCode.INTERNAL_SERVER_ERROR : SystemMessageCode.VALIDATION_ERROR;
+    }
+
+    const response = createErrorResponse(
+      message,
+      code,
+      statusCode,
+      axios.isAxiosError(error) ? error.response?.data : undefined,
+      req.id
+    );
+
+    return res.status(response.statusCode).json(response);
+  }
+};
+
+export const updateBusinessProfile = async (req: Request, res: Response) => {
+  try {
+    const { locationId } = req.params;
+    const payload = req.body;
+
+    if (!isUuid(locationId)) {
+      const badRequest = createErrorResponse('Invalid locationId', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
+      return res.status(badRequest.statusCode).json(badRequest);
+    }
+
+    const profile = await updateBusinessProfileService(locationId, payload);
+
+    const response = createSuccessResponse(profile, 'GBP business profile updated successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
+
+    return res.status(response.statusCode).json(response);
+  } catch (error: any) {
+    const message = error?.message || 'Failed to update GBP business profile';
+    let statusCode = 500;
+    let code = SystemMessageCode.INTERNAL_SERVER_ERROR;
+
+    if (axios.isAxiosError(error) && error.response?.status) {
       statusCode = error.response.status;
       code = statusCode >= 500 ? SystemMessageCode.INTERNAL_SERVER_ERROR : SystemMessageCode.VALIDATION_ERROR;
     }

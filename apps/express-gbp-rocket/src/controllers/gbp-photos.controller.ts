@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { createErrorResponse, createSuccessResponse, SystemMessageCode } from '@platform/contracts';
+import { createErrorResponse, createSuccessResponse, SystemMessageCode, GbpPhotoCategory } from '@platform/contracts';
 import { gbpPhotosService } from '../services/gbp-photos.service';
 
 const isUuid = (value: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
@@ -60,6 +60,57 @@ export const syncPhotos = async (req: Request, res: Response) => {
             req.id
         );
 
+        return res.status(response.statusCode).json(response);
+    }
+};
+
+export const uploadPhoto = async (req: Request, res: Response) => {
+    try {
+        const { locationId } = req.params;
+        const category = req.body.category as string || GbpPhotoCategory.COVER;
+
+        if (!isUuid(locationId)) {
+            const badRequest = createErrorResponse('Invalid locationId', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
+            return res.status(badRequest.statusCode).json(badRequest);
+        }
+
+        const multerReq = req as any;
+        if (!multerReq.file) {
+            const badRequest = createErrorResponse('No photo uploaded', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
+            return res.status(badRequest.statusCode).json(badRequest);
+        }
+
+        const result = await gbpPhotosService.uploadPhoto(locationId, multerReq.file, category);
+
+        const response = createSuccessResponse(result, 'GBP photo uploaded successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
+
+        return res.status(response.statusCode).json(response);
+    } catch (error: any) {
+        const message = error?.message || 'Failed to upload GBP photo';
+        const response = createErrorResponse(message, SystemMessageCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
+        return res.status(response.statusCode).json(response);
+    }
+};
+
+export const deletePhoto = async (req: Request, res: Response) => {
+    try {
+        const { locationId, photoId } = req.params;
+
+        if (!isUuid(locationId)) {
+            const badRequest = createErrorResponse('Invalid locationId', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
+            return res.status(badRequest.statusCode).json(badRequest);
+        }
+
+        const decodedPhotoId = decodeURIComponent(photoId);
+
+        await gbpPhotosService.deletePhoto(locationId, decodedPhotoId);
+
+        const response = createSuccessResponse(null, 'GBP photo deleted successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
+
+        return res.status(response.statusCode).json(response);
+    } catch (error: any) {
+        const message = error?.message || 'Failed to delete GBP photo';
+        const response = createErrorResponse(message, SystemMessageCode.INTERNAL_SERVER_ERROR, 500, undefined, req.id);
         return res.status(response.statusCode).json(response);
     }
 };
