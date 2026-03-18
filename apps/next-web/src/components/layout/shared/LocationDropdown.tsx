@@ -160,8 +160,37 @@ const LocationDropdown = () => {
 
   const handleLocationSelect = (location: Location) => {
     setLocationId(location.id)
+
+    try {
+      localStorage.setItem('rr:lastLocationId', String(location.id))
+    } catch {}
+
     setOpen(false)
   }
+
+  useEffect(() => {
+    if (locationId) {
+      try {
+        localStorage.setItem('rr:lastLocationId', String(locationId))
+      } catch {}
+
+      return
+    }
+
+    if (!locations.length) return
+
+    try {
+      const stored = localStorage.getItem('rr:lastLocationId')
+
+      if (!stored) return
+
+      const exists = locations.some(l => String(l.id) === String(stored))
+
+      if (exists) {
+        setLocationId(stored)
+      }
+    } catch {}
+  }, [locationId, locations, setLocationId])
 
   return (
     <>

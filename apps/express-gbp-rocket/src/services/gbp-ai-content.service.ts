@@ -8,6 +8,8 @@ type GeneratorType =
     | 'post_generator'
     | 'qa_suggestions';
 
+type ContentType = 'description' | 'category' | 'service' | 'post' | 'qa' | 'other';
+
 type ComplianceMeta = {
     maxRecommended?: number;
     withinLimit: boolean;
@@ -56,6 +58,15 @@ const withCompliance = (type: GeneratorType, item: any) => {
         charCount,
         compliance
     };
+};
+
+const toContentType = (type: GeneratorType): ContentType => {
+    if (type === 'business_description') return 'description';
+    if (type === 'category_recommendations') return 'category';
+    if (type === 'service_descriptions') return 'service';
+    if (type === 'post_generator') return 'post';
+    if (type === 'qa_suggestions') return 'qa';
+    return 'other';
 };
 
 const fallbackItems = (type: GeneratorType, input: any) => {
@@ -171,6 +182,10 @@ export class GbpAiContentService {
                 confidence: 0.75,
                 priorityScore: 70,
                 notes: detailJson,
+                kpiTarget: {
+                    contentType: toContentType(payload.type),
+                    generatorType: payload.type
+                },
                 status: 'open'
             }
         });

@@ -9,7 +9,7 @@ import {
   getLocationSnapshotDetail,
   listLocationSnapshots,
   syncLocationBusinessProfile,
-  updateBusinessProfile as updateBusinessProfileService
+  updateLocationBusinessProfile
 } from '../services/gbp-profile.service';
 import { auditService } from '../services/audit.service';
 
@@ -165,16 +165,16 @@ export const syncBusinessProfile = async (req: Request, res: Response) => {
 export const updateBusinessProfile = async (req: Request, res: Response) => {
   try {
     const { locationId } = req.params;
-    const payload = req.body;
 
     if (!isUuid(locationId)) {
       const badRequest = createErrorResponse('Invalid locationId', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
+
       return res.status(badRequest.statusCode).json(badRequest);
     }
 
-    const profile = await updateBusinessProfileService(locationId, payload);
-
-    const response = createSuccessResponse(profile, 'GBP business profile updated successfully', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
+    const userId = (req as any)?.user?.id as string | undefined;
+    const result = await updateLocationBusinessProfile(locationId, req.body || {}, { pushToGbp: false, userId: userId || null });
+    const response = createSuccessResponse(result, 'GBP business profile updated locally', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
 
     return res.status(response.statusCode).json(response);
   } catch (error: any) {
@@ -182,7 +182,53 @@ export const updateBusinessProfile = async (req: Request, res: Response) => {
     let statusCode = 500;
     let code = SystemMessageCode.INTERNAL_SERVER_ERROR;
 
-    if (axios.isAxiosError(error) && error.response?.status) {
+    if (message.includes('Location not found')) {
+      statusCode = 404;
+      code = SystemMessageCode.NOT_FOUND;
+    } else if (message.includes('No valid fields provided')) {
+      statusCode = 400;
+      code = SystemMessageCode.VALIDATION_ERROR;
+    }
+
+    const response = createErrorResponse(message, code, statusCode, undefined, req.id);
+    return res.status(response.statusCode).json(response);
+  }
+};
+
+export const pushBusinessProfile = async (req: Request, res: Response) => {
+  try {
+    const { locationId } = req.params;
+
+    if (!isUuid(locationId)) {
+      const badRequest = createErrorResponse('Invalid locationId', SystemMessageCode.VALIDATION_ERROR, 400, undefined, req.id);
+
+      return res.status(badRequest.statusCode).json(badRequest);
+    }
+
+    const userId = (req as any)?.user?.id as string | undefined;
+    const result = await updateLocationBusinessProfile(locationId, req.body || {}, { pushToGbp: true, userId: userId || null });
+    const response = createSuccessResponse(result, 'GBP business profile pushed to Google', 200, { requestId: req.id }, SystemMessageCode.SUCCESS);
+
+    return res.status(response.statusCode).json(response);
+  } catch (error: any) {
+    const message = error?.message || 'Failed to push GBP business profile';
+    let statusCode = 500;
+    let code = SystemMessageCode.INTERNAL_SERVER_ERROR;
+
+    if (message.includes('Location not found')) {
+      statusCode = 404;
+      code = SystemMessageCode.NOT_FOUND;
+    } else if (
+      message.includes('Active Google PlatformIntegration connection not found') ||
+      message.includes('No Google connection found') ||
+      message.includes('Access token is missing from connection') ||
+      message.includes('Missing GBP locationName on platform integration') ||
+      message.includes('Google OAuth credentials not configured') ||
+      message.includes('No valid fields provided')
+    ) {
+      statusCode = 400;
+      code = SystemMessageCode.VALIDATION_ERROR;
+    } else if (axios.isAxiosError(error) && error.response?.status) {
       statusCode = error.response.status;
       code = statusCode >= 500 ? SystemMessageCode.INTERNAL_SERVER_ERROR : SystemMessageCode.VALIDATION_ERROR;
     }
