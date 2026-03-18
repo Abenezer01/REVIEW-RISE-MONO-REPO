@@ -10,6 +10,8 @@ import gbpPhotosRoutes from './gbp-photos.routes';
 const router = Router();
 router.get('/locations/:locationId/business-profile', gbpProfileController.getBusinessProfile);
 router.post('/locations/:locationId/business-profile/sync', gbpProfileController.syncBusinessProfile);
+router.patch('/locations/:locationId/business-profile', gbpProfileController.updateBusinessProfile);
+router.post('/locations/:locationId/business-profile/push', gbpProfileController.pushBusinessProfile);
 router.get('/locations/:locationId/business-profile/snapshots', gbpProfileController.listSnapshots);
 router.get('/locations/:locationId/business-profile/snapshots/:snapshotId', gbpProfileController.getSnapshotDetail);
 router.get('/locations/:locationId/business-profile/snapshots/:snapshotId/audit', gbpProfileController.getSnapshotAudit);

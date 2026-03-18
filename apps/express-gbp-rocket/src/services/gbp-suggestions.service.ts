@@ -7,6 +7,7 @@ type CreateSuggestionInput = {
   description: string;
   category?: string;
   source?: string;
+  contentType?: string;
   why?: string[];
   steps?: string[];
   impact?: string;
@@ -112,6 +113,22 @@ export class GbpSuggestionsService {
     return state;
   }
 
+  private toContentType(kpiTarget: any): string | null {
+    const direct = kpiTarget?.contentType;
+    if (direct && typeof direct === 'string') return direct;
+
+    const generatorType = kpiTarget?.generatorType;
+    if (typeof generatorType === 'string') {
+      if (generatorType === 'business_description') return 'description';
+      if (generatorType === 'category_recommendations') return 'category';
+      if (generatorType === 'service_descriptions') return 'service';
+      if (generatorType === 'post_generator') return 'post';
+      if (generatorType === 'qa_suggestions') return 'qa';
+    }
+
+    return null;
+  }
+
   private async createActivityLog(params: {
     recommendationId: string;
     businessId: string;
@@ -178,7 +195,8 @@ export class GbpSuggestionsService {
           rejectedAt: true,
           rejectedReason: true,
           updatedAt: true,
-          generatedAt: true
+          generatedAt: true,
+          kpiTarget: true
         }
       });
     } catch (error: any) {
@@ -201,6 +219,7 @@ export class GbpSuggestionsService {
           notes: true,
           updatedAt: true,
           generatedAt: true,
+          kpiTarget: true,
           completedAt: true,
           dismissedAt: true
         }
@@ -220,7 +239,8 @@ export class GbpSuggestionsService {
         rejectedAt: item.dismissedAt || null,
         rejectedReason: item.status === 'dismissed' ? item.notes || null : null,
         updatedAt: item.updatedAt,
-        generatedAt: item.generatedAt
+        generatedAt: item.generatedAt,
+        kpiTarget: item.kpiTarget || null
       }));
 
       if (normalizedState) {
@@ -230,6 +250,7 @@ export class GbpSuggestionsService {
 
     return items.map((item) => ({
       ...item,
+      contentType: this.toContentType(item?.kpiTarget),
       reAuditGuidance: this.getReauditGuidance(item.lifecycleState, item.appliedAt, latestSnapshotAt),
       latestSnapshotAt: toIso(latestSnapshotAt)
     }));
@@ -256,6 +277,7 @@ export class GbpSuggestionsService {
           effort: payload.effort || 'low',
           confidence: payload.confidence ?? 0.75,
           priorityScore: payload.priorityScore ?? 70,
+          kpiTarget: payload.contentType ? { contentType: payload.contentType } : undefined,
           notes: payload.notes || null,
           status: 'open',
           lifecycleState,
