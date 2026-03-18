@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography, Button, Stack, useTheme, alpha, CircularProgress } from '@mui/material';
+import { Box, Typography, Button, Stack, useTheme, alpha, CircularProgress , Menu, MenuItem, ListItemIcon } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import SyncIcon from '@mui/icons-material/Sync';
 import CollectionsOutlinedIcon from '@mui/icons-material/CollectionsOutlined';
@@ -11,7 +11,6 @@ import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import { useGbpPhotos, useSyncGbpPhotos, useUploadGbpPhoto } from '@/hooks/gbp/useGbpPhotos';
 import { LocationPhotosGrid } from './LocationPhotosGrid';
-import { Menu, MenuItem, ListItemIcon } from '@mui/material';
 import { GbpPhotoCategory } from '@platform/contracts';
 import { PHOTO_CATEGORIES } from './PhotosFilterToolbar';
 
@@ -84,8 +83,10 @@ export const LocationPhotosSection = ({ locationId }: LocationPhotosSectionProps
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0];
+
             uploadPhoto({ locationId, file, category: uploadCategory });
         }
+
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }

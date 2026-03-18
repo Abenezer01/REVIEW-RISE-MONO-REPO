@@ -1,8 +1,8 @@
+import { createErrorResponse, createSuccessResponse } from '@platform/contracts';
 import { Router } from 'express';
 import multer from 'multer';
+import { deletePhoto, uploadPhoto } from '../../controllers/gbp-photos.controller';
 import { gbpPhotosService } from '../../services/gbp-photos.service';
-import { createSuccessResponse, createErrorResponse } from '@platform/contracts';
-import { getPhotos, syncPhotos, uploadPhoto, deletePhoto } from '../../controllers/gbp-photos.controller';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });

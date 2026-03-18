@@ -77,7 +77,9 @@ const CategoryPill = ({ category }: { category: string }) => {
     if (!cat) return 'PHOTO';
 
     const config = PHOTO_CATEGORIES.find(c => c.value === cat);
-    return config ? t(`filter.${config.labelKey}`) : cat;
+
+    
+return config ? t(`filter.${config.labelKey}`) : cat;
   };
 
   return (

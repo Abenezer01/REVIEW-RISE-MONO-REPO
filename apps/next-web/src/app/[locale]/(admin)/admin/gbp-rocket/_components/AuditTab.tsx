@@ -298,9 +298,11 @@ const AuditTab = ({ locationId, snapshotId }: AuditTabProps) => {
   const handleApplyFix = async (issue: AuditIssue) => {
     try {
       setFixingIssue(issue.code)
+
       if (issue.code.startsWith('desc_')) {
         // AI fallback mock for presentation or real backend integration
         const newDesc = "Welcome to our business! We are dedicated to providing excellent " + (audit?.categoryIntelligence?.primaryCategory || "services") + " to all our customers. Call us today to learn more and book an appointment!";
+
         await apiClient.patch(`${GBP_API_URL}/locations/${locationId}/business-profile`, { description: newDesc });
         await runAudit();
       }

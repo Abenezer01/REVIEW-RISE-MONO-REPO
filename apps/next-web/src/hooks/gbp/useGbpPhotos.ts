@@ -42,12 +42,14 @@ export const useSyncGbpPhotos = () => {
         }
     });
 };
+
 export const useUploadGbpPhoto = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async ({ locationId, file, category }: { locationId: string; file: File; category: string }) => {
             const formData = new FormData();
+
             formData.append('photo', file);
             formData.append('category', category);
 
@@ -58,7 +60,9 @@ export const useUploadGbpPhoto = () => {
                     headers: { 'Content-Type': 'multipart/form-data', 'x-skip-system-message': '1' }
                 }
             );
-            return res.data;
+
+            
+return res.data;
         },
         onSuccess: (_, { locationId }) => {
             queryClient.invalidateQueries({ queryKey: ['gbp-photos', locationId] });
@@ -72,11 +76,14 @@ export const useDeleteGbpPhoto = () => {
     return useMutation({
         mutationFn: async ({ locationId, photoId }: { locationId: string; photoId: string }) => {
             const encodedPhotoId = encodeURIComponent(photoId);
+
             const res = await apiClient.delete(
                 `${SERVICES.gbp.url}/locations/${locationId}/photos/${encodedPhotoId}`,
                 { headers: { 'x-skip-system-message': '1' } }
             );
-            return res.data;
+
+            
+return res.data;
         },
         onSuccess: (_, { locationId }) => {
             queryClient.invalidateQueries({ queryKey: ['gbp-photos', locationId] });
