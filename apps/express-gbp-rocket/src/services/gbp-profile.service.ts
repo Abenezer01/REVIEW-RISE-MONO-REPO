@@ -379,7 +379,7 @@ export class GbpProfileService {
         if (updateMask.length === 0) return null;
 
         // Perform Google API Update
-        const response = await axios.patch(
+        await axios.patch(
             `${GOOGLE_GBP_LOCATION_URL}/${connection.gbpLocationName}`,
             requestBody,
             {

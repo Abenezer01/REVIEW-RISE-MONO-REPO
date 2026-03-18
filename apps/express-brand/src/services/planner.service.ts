@@ -36,8 +36,8 @@ export const generateMonthlyPlan = async (businessId: string, options: {
   try {
     const aiContext = {
       brandDNA: business?.dna || {},
-      seasonalEvents: events.map(e => ({ 
-        name: e.name, 
+      seasonalEvents: events.map(e => ({
+        name: e.name,
         date: e.date.toISOString(), // Ensure date is stringified correctly for JSON
         description: e.description,
         day: e.date.getDate() // Use local date day
@@ -45,6 +45,7 @@ export const generateMonthlyPlan = async (businessId: string, options: {
       requestedPlatforms: options.platforms
     };
 
+    // eslint-disable-next-line no-console
     console.log('Sending AI Context with Seasonal Events:', JSON.stringify(aiContext.seasonalEvents, null, 2));
 
     const aiResponse = await axios.post(`${AI_SERVICE_URL}/api/v1/studio/plan`, {
@@ -65,10 +66,10 @@ export const generateMonthlyPlan = async (businessId: string, options: {
       const filteredDays = planData.days.filter((d: any) => {
         // Always include days that have a seasonal hook/event name in the topic or hook field
         if (d.seasonalHook) return true;
-        
+
         // Check if any event name from our database is mentioned in the topic or copy
-        const isSeasonalEvent = events.some(e => 
-          (d.topic && d.topic.toLowerCase().includes(e.name.toLowerCase())) || 
+        const isSeasonalEvent = events.some(e =>
+          (d.topic && d.topic.toLowerCase().includes(e.name.toLowerCase())) ||
           (d.suggestedCopy && d.suggestedCopy.toLowerCase().includes(e.name.toLowerCase()))
         );
         if (isSeasonalEvent) return true;
