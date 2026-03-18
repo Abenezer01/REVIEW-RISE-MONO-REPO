@@ -117,6 +117,10 @@ const menuData: MenuItem[] = [
       {
         title: 'navigation.seo-keywords',
         href: '/admin/seo-intelligence/keywords'
+      },
+      {
+        title: 'navigation.seo-listings',
+        href: '/admin/seo-intelligence/listings'
       }
     ]
   },
