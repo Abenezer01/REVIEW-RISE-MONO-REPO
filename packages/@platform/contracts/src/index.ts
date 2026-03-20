@@ -3,6 +3,9 @@
  * Shared API contracts for ReviewRise platform
  */
 
+// GBP enums
+export * from './gbp/photo-category.enum';
+
 // Request types
 export * from './requests';
 export * from './auth.schema';

@@ -83,16 +83,16 @@ const LocationDropdown = () => {
   }, [user?.id])
 
   useEffect(() => {
-    // Do not auto-set locationId.
-    // We only keep a selected location if it's still valid within the filtered list.
-    if (!locationId) return
+    // Only invalidate locationId when loading is complete — avoids clearing a
+    // valid selection during the transient empty-state of a re-fetch.
+    if (!locationId || loading) return
 
     const exists = locations.some(l => String(l.id) === String(locationId))
 
     if (!exists) {
       setLocationId(null)
     }
-  }, [locationId, setLocationId, locations])
+  }, [locationId, setLocationId, locations, loading])
 
   const fetchLocations = useCallback(async (search = '') => {
     try {
@@ -108,16 +108,19 @@ const LocationDropdown = () => {
       })
 
       if (response.data) {
-        const source = response.data.data || []
+        const source: Location[] = response.data.data || []
 
         if (!allowedBusinessIds.length) {
+          // allowedBusinessIds not loaded yet — show all locations
           setLocations(source)
 
           return
         }
 
+        // Include the location if it either matches an allowed businessId,
+        // OR has no businessId set (treat as globally accessible).
         const filtered = source.filter((location: Location) =>
-          location.businessId ? allowedBusinessIds.includes(String(location.businessId)) : false
+          !location.businessId || allowedBusinessIds.includes(String(location.businessId))
         )
 
         setLocations(filtered)
@@ -163,7 +166,7 @@ const LocationDropdown = () => {
 
     try {
       localStorage.setItem('rr:lastLocationId', String(location.id))
-    } catch {}
+    } catch { }
 
     setOpen(false)
   }
@@ -172,7 +175,7 @@ const LocationDropdown = () => {
     if (locationId) {
       try {
         localStorage.setItem('rr:lastLocationId', String(locationId))
-      } catch {}
+      } catch { }
 
       return
     }
@@ -189,7 +192,7 @@ const LocationDropdown = () => {
       if (exists) {
         setLocationId(stored)
       }
-    } catch {}
+    } catch { }
   }, [locationId, locations, setLocationId])
 
   return (

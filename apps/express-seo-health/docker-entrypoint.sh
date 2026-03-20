@@ -24,10 +24,13 @@ fi
 # Switch back to app directory
 cd /app/apps/express-seo-health
 
-# If arguments are provided (e.g. running a script), execute them
-if [ $# -gt 0 ]; then
-    exec dumb-init -- "$@"
-else
-    # Otherwise start the main application
+# If the only argument is the default "node" from the base image, 
+# or if no arguments are provided, start the application.
+if [ "$#" -eq 0 ] || [ "$1" = "node" ]; then
+    echo "▶️ Starting Express application..."
     exec dumb-init -- node dist/index.js
+else
+    # Otherwise run the provided command
+    echo "▶️ Running custom command: $@"
+    exec dumb-init -- "$@"
 fi

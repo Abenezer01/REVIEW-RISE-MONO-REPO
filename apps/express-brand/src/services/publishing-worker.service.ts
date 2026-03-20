@@ -9,9 +9,10 @@ export class PublishingWorker {
   start() {
     if (this.interval) return;
 
+    // eslint-disable-next-line no-console
     console.log('Starting Publishing Worker...');
     this.interval = setInterval(() => this.tick(), POLL_INTERVAL);
-    
+
     // Run immediately on start
     this.tick();
   }
@@ -66,22 +67,23 @@ export class PublishingWorker {
 
       const retryableJobs = potentiallyRetryableJobs.filter(job => {
         if (!job.lastAttemptAt) return true;
-        
+
         // Exponential backoff: base * 2^(attempts-1)
         // 1st retry: 5m * 2^0 = 5m
         // 2nd retry: 5m * 2^1 = 10m
         // 3rd retry: 5m * 2^2 = 20m
         const backoffMs = ScheduledPostService.RETRY_DELAY_BASE * Math.pow(2, job.attemptCount - 1);
         const nextRetryAt = new Date(job.lastAttemptAt.getTime() + backoffMs);
-        
+
         return nextRetryAt <= now;
       });
 
       const allJobsToProcess = [...pendingJobs.map(j => j.id), ...retryableJobs.map(j => j.id)];
 
       if (allJobsToProcess.length > 0) {
+        // eslint-disable-next-line no-console
         console.log(`Publishing Worker: Processing ${allJobsToProcess.length} jobs (${pendingJobs.length} new, ${retryableJobs.length} retries)`);
-        
+
         for (const jobId of allJobsToProcess) {
           await ScheduledPostService.processJob(jobId);
         }

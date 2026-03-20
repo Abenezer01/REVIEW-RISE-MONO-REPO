@@ -6,7 +6,7 @@ import Box from '@mui/material/Box'
 
 import { useTranslations } from 'next-intl'
 
-import AdvancedDashboard from '@/components/admin/dashboard/AdvancedDashboard'
+import HomeDashboard from '@/components/admin/dashboard/home/HomeDashboard'
 import AdminErrorBoundary from '@/components/admin/layout/AdminErrorBoundary'
 
 const AdminPage = () => {
@@ -15,7 +15,7 @@ const AdminPage = () => {
   return (
     <AdminErrorBoundary>
       <Suspense fallback={<Box aria-busy='true' aria-live='polite' sx={{ p: 4 }}>{tCommon('common.loading')}</Box>}>
-        <AdvancedDashboard />
+        <HomeDashboard />
       </Suspense>
     </AdminErrorBoundary>
   )

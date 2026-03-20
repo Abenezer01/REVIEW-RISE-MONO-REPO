@@ -78,7 +78,7 @@ export const listReviewsByLocation = async (params: ListReviewsParams) => {
 };
 
 export const postReviewReply = async (
-    reviewId: string, 
+    reviewId: string,
     comment: string,
     options: {
         authorType?: 'user' | 'auto';
@@ -141,8 +141,9 @@ export const postReviewReply = async (
         const reviewName = `${gbpLocationName}/reviews/${review.externalId}`;
 
         try {
+
             console.log(`[GBP] Posting/Updating reply for review ${reviewId} (${reviewName})`);
-            
+
             // 4. Post the reply (PUT handles both creation and updates in GBP API)
             const result = await googleReviewsService.updateReply(accessToken, reviewName, comment);
 
@@ -163,15 +164,15 @@ export const postReviewReply = async (
         } catch (apiError: any) {
             const errorMsg = `Google API Error: ${apiError.response?.data?.error?.message || apiError.message}`;
             console.error(`[GBP] Error posting reply:`, errorMsg);
-            
+
             await Promise.all([
-                reviewRepository.update(reviewId, { 
-                    replyStatus: 'failed', 
-                    replyError: errorMsg 
+                reviewRepository.update(reviewId, {
+                    replyStatus: 'failed',
+                    replyError: errorMsg
                 } as any),
                 reviewReplyRepository.update(replyRecord.id, { status: 'failed' })
             ]);
-            
+
             throw new Error(errorMsg);
         }
     }

@@ -117,6 +117,18 @@ log_info "Images pulled successfully ✓"
 # Migrations now run automatically via express-auth entrypoint script
 log_info "Database migrations will run automatically when express-auth starts ✓"
 
+# ==============================================================================
+# Schema Sync (db push) — MUST run before seeding
+# ==============================================================================
+# This ensures the DB schema matches the Prisma schema (catches any models
+# added after the last migration, e.g. LocationMetric, LocationCompetitor, MetricJob)
+log_info "Running schema sync (db push) to ensure database integrity..."
+docker compose -f "$COMPOSE_FILE" run --rm \
+    express-auth \
+    sh -c "cd /app && npx prisma db push --accept-data-loss" || {
+    log_warn "Schema sync failed (check logs)"
+}
+log_info "Schema sync completed ✓"
 
 # ==============================================================================
 # Seed Database (Optional - First Time Only)
@@ -135,18 +147,6 @@ if [[ "$*" == *"--seed"* ]]; then
 else
     log_info "Skipping database seeding (use --seed flag to seed)"
 fi
-
-# ==============================================================================
-# EMERGENCY FIX: Schema Sync (db push)
-# ==============================================================================
-# This ensures DB matches code even if migrations are out of sync
-log_info "Running schema sync (db push) to ensure database integrity..."
-docker compose -f "$COMPOSE_FILE" run --rm \
-    express-auth \
-    sh -c "cd /app && npx prisma db push --accept-data-loss" || {
-    log_warn "Schema sync failed (check logs)"
-}
-log_info "Schema sync completed ✓"
 
 # ==============================================================================
 # SSL Certificate Check & Cleanup

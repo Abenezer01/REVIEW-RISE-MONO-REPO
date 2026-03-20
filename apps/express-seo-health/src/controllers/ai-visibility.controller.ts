@@ -160,6 +160,7 @@ export class AIVisibilityController {
         }
       });
 
+      // eslint-disable-next-line no-console
       console.log(`Saved AI metrics for business ${business.id}, Metric ID: ${savedMetric.id}`);
 
       // 7. Generate Tips

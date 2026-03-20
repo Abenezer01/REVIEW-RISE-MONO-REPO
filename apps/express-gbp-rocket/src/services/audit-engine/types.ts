@@ -21,6 +21,8 @@ export interface AuditBreakdown {
     categories: number;
     photoQuality: number;
     keywordOptimization: number;
+    reputation: number;
+    competitorBenchmark: number;
 }
 
 export interface GroupedIssues {
@@ -55,6 +57,7 @@ export interface PhotoQualityDetails {
 export interface AuditResult {
     snapshotId: string;
     totalScore: number;
+    previousScore?: number;
     breakdown: AuditBreakdown;
     groupedIssues: GroupedIssues;
     issues: AuditIssue[];
@@ -62,6 +65,8 @@ export interface AuditResult {
     categoryIntelligence?: CategoryIntelligence;
     photoQualityDetails?: PhotoQualityDetails;
     photoImprovementPlan?: string[];
+    reputationDetails?: { reviewCount: number; averageRating: number; responseRate: number | null };
+    competitorInsights?: { competitorCount: number; avgCompetitorRating: number | null; avgCompetitorReviewCount: number | null; avgCompetitorPhotoCount: number | null };
     createdAt: Date;
 }
 

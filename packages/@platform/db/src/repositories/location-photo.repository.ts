@@ -1,4 +1,5 @@
 import { Prisma, LocationPhoto } from '@prisma/client';
+import { GbpPhotoCategory } from '@platform/contracts';
 import { prisma } from '../client';
 import { BaseRepository } from './base.repository';
 
@@ -72,14 +73,20 @@ export class LocationPhotoRepository extends BaseRepository<
         }
 
         const total = await delegate.count({ where: { locationId } });
-        const coverCount = await delegate.count({ where: { locationId, category: 'COVER' } });
-        const interiorCount = await delegate.count({ where: { locationId, category: 'INTERIOR' } });
+        const coverCount = await delegate.count({ where: { locationId, category: GbpPhotoCategory.COVER } });
+        const interiorCount = await delegate.count({ where: { locationId, category: GbpPhotoCategory.INTERIOR } });
 
         return {
             total,
             coverCount,
             interiorCount
         };
+    }
+
+    async delete(id: string) {
+        const delegate = this.getDelegate();
+        if (!delegate?.delete) return null as any;
+        return delegate.delete({ where: { id } });
     }
 }
 

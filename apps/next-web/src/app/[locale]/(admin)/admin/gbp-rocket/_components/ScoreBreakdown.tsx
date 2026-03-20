@@ -22,14 +22,16 @@ const ScoreBreakdown = ({ audit }: ScoreBreakdownProps) => {
     { label: t('audit.categoriesLabel') || 'Category Optimization', value: audit.breakdown.categories },
     { label: t('audit.photoQualityLabel') || 'Photo Quality', value: audit.breakdown.photoQuality || 0 },
     { label: t('audit.keywordOptimizationLabel') || 'Keyword Optimization', value: audit.breakdown.keywordOptimization || 0 },
-    { label: t('audit.freshnessLabel') || 'Content Freshness', value: audit.breakdown.freshness }
+    { label: t('audit.freshnessLabel') || 'Content Freshness', value: audit.breakdown.freshness },
+    { label: t('audit.reputationLabel') || 'Reputation & Reviews', value: audit.breakdown.reputation || 0 },
+    { label: t('audit.competitorBenchmarkLabel') || 'Competitor Benchmark', value: audit.breakdown.competitorBenchmark || 0 }
   ]
 
   const getColor = (value: number) => {
     if (value >= 80) return theme.palette.success.main
     if (value >= 50) return theme.palette.warning.main
-    
-return theme.palette.error.main
+
+    return theme.palette.error.main
   }
 
   return (

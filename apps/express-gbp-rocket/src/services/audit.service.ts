@@ -1,24 +1,29 @@
 import { prisma } from '@platform/db';
 import { categoryEvaluator } from './audit-engine/category-evaluator';
+import { competitorEvaluator } from './audit-engine/competitor-evaluator';
 import { keywordEvaluator } from './audit-engine/keyword-evaluator';
 import { photoEvaluator } from './audit-engine/photo-evaluator';
+import { reviewEvaluator } from './audit-engine/review-evaluator';
 import {
     AuditBreakdown,
     AuditIssue,
     AuditResult,
     GroupedIssues
 } from './audit-engine/types';
+import { gbpCompetitorsService } from './gbp-competitors.service';
 import { NormalizedGbpProfile, normalizeGbpProfile } from './gbp-types';
 
-// 1. Scoring Rubric (Configurable Weights)
+// 1. Scoring Rubric (Configurable Weights) — must sum to 100
 const SCORING_WEIGHTS = {
-    completeness: 25,
+    completeness: 20,
     description: 15,
-    media: 10,
-    freshness: 10,
-    categories: 10,
-    photoQuality: 15,
-    keywordOptimization: 15
+    media: 8,
+    freshness: 9,
+    categories: 8,
+    photoQuality: 8,
+    keywordOptimization: 8,
+    reputation: 12,
+    competitorBenchmark: 12
 };
 
 const DEFAULT_TARGET_KEYWORDS = ["SEO", "Marketing", "Consultant", "Agency", "Google Ads"];
@@ -59,6 +64,28 @@ export class AuditService {
             throw new Error('Invalid snapshot data');
         }
 
+        let previousScore: number | undefined;
+        try {
+            const previousSnapshot = await prisma.gbpProfileSnapshot.findFirst({
+                where: {
+                    locationId: snapshot.locationId,
+                    capturedAt: { lt: snapshot.capturedAt }
+                },
+                orderBy: { capturedAt: 'desc' }
+            });
+
+            if (previousSnapshot) {
+                const previousAudit = await prisma.gbpProfileAudit.findUnique({
+                    where: { snapshotId: previousSnapshot.id }
+                });
+                if (previousAudit) {
+                    previousScore = previousAudit.score;
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to fetch previous score', e);
+        }
+
         let normalizedProfile: NormalizedGbpProfile;
 
         // Check if snapshot is already normalized (new format) or raw (legacy)
@@ -91,6 +118,26 @@ export class AuditService {
             gapSummary: keywordGapSummary
         } = keywordEvaluator.evaluate(normalizedProfile, rawProfile, targetKeywords);
 
+        const {
+            score: reputationScore,
+            issues: reputationIssues,
+            reputationDetails
+        } = reviewEvaluator.evaluate(rawProfile);
+
+        // Competitor Benchmarking
+        let competitorScore = 100;
+        let competitorIssues: any[] = [];
+        let competitorInsights: any = undefined;
+        try {
+            const competitors = await gbpCompetitorsService.getCompetitors(snapshot.locationId);
+            const compResult = competitorEvaluator.evaluate(rawProfile, competitors);
+            competitorScore = compResult.score;
+            competitorIssues = compResult.issues;
+            competitorInsights = compResult.competitorInsights;
+        } catch (e) {
+            console.warn('[Audit] Competitor evaluator failed, skipping:', e);
+        }
+
         // Freshness (Stub for now, or implement logic)
         const { freshnessScore, freshnessIssues } = this.evaluateFreshness(rawProfile);
 
@@ -102,7 +149,9 @@ export class AuditService {
             freshness: freshnessScore,
             categories: categoriesScore,
             photoQuality: photoQualityScore,
-            keywordOptimization: keywordScore
+            keywordOptimization: keywordScore,
+            reputation: reputationScore,
+            competitorBenchmark: competitorScore
         });
 
         const allIssues = [
@@ -111,7 +160,9 @@ export class AuditService {
             ...categoriesIssues,
             ...photoIssues,
             ...keywordIssues,
-            ...freshnessIssues
+            ...freshnessIssues,
+            ...reputationIssues,
+            ...competitorIssues
         ].sort((a, b) => b.impactWeight - a.impactWeight);
 
         // 7. Severity Grouping
@@ -131,7 +182,9 @@ export class AuditService {
                 freshness: freshnessScore,
                 categories: categoriesScore,
                 photoQuality: photoQualityScore,
-                keywordOptimization: keywordScore
+                keywordOptimization: keywordScore,
+                reputation: reputationScore,
+                competitorBenchmark: competitorScore
             },
             groupedIssues,
             issues: allIssues,
@@ -139,6 +192,9 @@ export class AuditService {
             categoryIntelligence,
             photoQualityDetails,
             photoImprovementPlan,
+            reputationDetails,
+            competitorInsights,
+            previousScore,
             createdAt: new Date()
         };
 
@@ -156,6 +212,26 @@ export class AuditService {
                 updatedAt: new Date()
             }
         });
+
+        // 9. Automated Health Alerts
+        const hasCriticalIssues = groupedIssues.critical.length > 0;
+        const scoreDrop = previousScore !== undefined ? (previousScore - totalScore) : 0;
+        const isScoreUnderThreshold = totalScore < 70;
+        const hasSignificantDrop = scoreDrop >= 5;
+
+        if (isScoreUnderThreshold || hasCriticalIssues || hasSignificantDrop) {
+            const alertReasons: string[] = [];
+            if (isScoreUnderThreshold) alertReasons.push(`Score is below 70 (current: ${totalScore})`);
+            if (hasCriticalIssues) alertReasons.push(`${groupedIssues.critical.length} critical issue(s) detected`);
+            if (hasSignificantDrop) alertReasons.push(`Score dropped by ${scoreDrop} points vs last audit`);
+
+            console.warn(
+                `[Audit Health Alert] Location snapshot ${snapshotId}: ${alertReasons.join(' | ')}`
+            );
+
+            // TODO: Extend this with email/notification dispatch
+            // await notificationService.sendHealthAlert({ locationId: snapshot.locationId, snapshotId, alertReasons, totalScore });
+        }
 
         return result;
     }
@@ -366,6 +442,8 @@ export class AuditService {
         total += scores.categories * (SCORING_WEIGHTS.categories / 100);
         total += scores.photoQuality * (SCORING_WEIGHTS.photoQuality / 100);
         total += scores.keywordOptimization * (SCORING_WEIGHTS.keywordOptimization / 100);
+        total += scores.reputation * (SCORING_WEIGHTS.reputation / 100);
+        total += (scores.competitorBenchmark ?? 100) * (SCORING_WEIGHTS.competitorBenchmark / 100);
 
         return Math.min(100, Math.max(0, Math.round(total)));
     }

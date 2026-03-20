@@ -1,6 +1,6 @@
 'use client';
 
-import { getGbpPhotoProxyUrl, useGbpPhotos } from '@/hooks/gbp/useGbpPhotos';
+import { getGbpPhotoProxyUrl, useGbpPhotos, useDeleteGbpPhoto } from '@/hooks/gbp/useGbpPhotos';
 import {
   alpha,
   Box,
@@ -21,8 +21,9 @@ import {
 } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { GbpPhotoCategory } from '@platform/contracts';
 
-import { PhotosFilterToolbar } from './PhotosFilterToolbar';
+import { PhotosFilterToolbar, PHOTO_CATEGORIES } from './PhotosFilterToolbar';
 
 // Icons
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
@@ -49,12 +50,20 @@ const MOCK_DATA = {
 };
 
 const getCategoryColor = (category: string | undefined, theme: any) => {
-  switch (category?.toUpperCase()) {
-    case 'INTERIOR': return theme.palette.info.main;
-    case 'COVER': return theme.palette.secondary.main;
-    case 'FOOD': return theme.palette.warning.main;
-    case 'TEAM': return theme.palette.success.main;
-    case 'EXTERIOR': return theme.palette.error.main;
+  switch (category) {
+    case GbpPhotoCategory.INTERIOR: return theme.palette.info.main;
+    case GbpPhotoCategory.COVER: return theme.palette.secondary.main;
+    case GbpPhotoCategory.FOOD_AND_DRINK: return theme.palette.warning.main;
+    case GbpPhotoCategory.TEAMS: return theme.palette.success.main;
+    case GbpPhotoCategory.EXTERIOR: return theme.palette.error.main;
+    case GbpPhotoCategory.PROFILE: return theme.palette.primary.main;
+    case GbpPhotoCategory.LOGO: return theme.palette.info.dark;
+    case GbpPhotoCategory.PRODUCT: return theme.palette.success.light;
+    case GbpPhotoCategory.AT_WORK: return theme.palette.secondary.light;
+    case GbpPhotoCategory.MENU: return theme.palette.warning.dark;
+    case GbpPhotoCategory.COMMON_AREA: return theme.palette.secondary.dark;
+    case GbpPhotoCategory.ROOMS: return theme.palette.info.light;
+    case GbpPhotoCategory.ADDITIONAL: return theme.palette.grey[700];
     default: return theme.palette.primary.main;
   }
 };
@@ -66,17 +75,11 @@ const CategoryPill = ({ category }: { category: string }) => {
 
   const getCategoryLabel = (cat: string) => {
     if (!cat) return 'PHOTO';
-    const key = cat.toLowerCase();
 
+    const config = PHOTO_CATEGORIES.find(c => c.value === cat);
 
-    // specific mapping to match keys in json
-    if (key === 'cover') return t('filter.cover');
-    if (key === 'interior') return t('filter.interior');
-    if (key === 'exterior') return t('filter.exterior');
-    if (key === 'food') return t('filter.food');
-    if (key === 'team') return t('filter.team');
-
-    return cat;
+    
+return config ? t(`filter.${config.labelKey}`) : cat;
   };
 
   return (
@@ -110,6 +113,8 @@ export const LocationPhotosGrid = ({ locationId }: LocationPhotosGridProps) => {
   const { data: result, isLoading, isError, error } = useGbpPhotos(locationId, {
     category: category === 'All' ? undefined : category
   });
+
+  const { mutate: deletePhoto, isPending: isDeleting } = useDeleteGbpPhoto();
 
   if (isLoading) {
     return <Box p={4} display="flex" justifyContent="center"><CircularProgress /></Box>;
@@ -381,8 +386,14 @@ export const LocationPhotosGrid = ({ locationId }: LocationPhotosGridProps) => {
                 <Button fullWidth variant="contained" color="warning" sx={{ py: 1.5, borderRadius: 1.5, textTransform: 'none', fontWeight: 600 }}>
                   {t('details.viewOnGoogle')}
                 </Button>
-                <Button fullWidth variant="contained" sx={{ py: 1.5, borderRadius: 1.5, textTransform: 'none', fontWeight: 600, bgcolor: alpha(theme.palette.error.main, 0.2), color: 'error.main', '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.3) } }}>
-                  <DeleteOutlineIcon sx={{ mr: 1, fontSize: 18 }} /> {t('details.deletePhoto')}
+                <Button
+                  fullWidth
+                  variant="contained"
+                  disabled={isDeleting}
+                  onClick={() => deletePhoto({ locationId, photoId: selectedPhoto.id }, { onSuccess: () => setSelectedPhoto(null) })}
+                  sx={{ py: 1.5, borderRadius: 1.5, textTransform: 'none', fontWeight: 600, bgcolor: alpha(theme.palette.error.main, 0.2), color: 'error.main', '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.3) } }}
+                >
+                  {isDeleting ? <CircularProgress size={18} color="inherit" sx={{ mr: 1 }} /> : <DeleteOutlineIcon sx={{ mr: 1, fontSize: 18 }} />} {t('details.deletePhoto')}
                 </Button>
               </Stack>
             </Box>

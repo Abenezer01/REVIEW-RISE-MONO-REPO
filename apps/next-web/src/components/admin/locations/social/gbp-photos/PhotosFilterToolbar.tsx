@@ -11,6 +11,7 @@ import {
   useTheme
 } from '@mui/material';
 import { useTranslations } from 'next-intl';
+import { GbpPhotoCategory } from '@platform/contracts';
 
 // Icons
 import SearchIcon from '@mui/icons-material/Search';
@@ -25,6 +26,23 @@ interface PhotosFilterToolbarProps {
   view: 'grid' | 'list';
   onViewChange: (value: 'grid' | 'list') => void;
 }
+
+export const PHOTO_CATEGORIES = [
+  { value: 'All', labelKey: 'all', icon: null },
+  { value: GbpPhotoCategory.COVER, labelKey: 'cover' },
+  { value: GbpPhotoCategory.PROFILE, labelKey: 'profile' },
+  { value: GbpPhotoCategory.LOGO, labelKey: 'logo' },
+  { value: GbpPhotoCategory.EXTERIOR, labelKey: 'exterior' },
+  { value: GbpPhotoCategory.INTERIOR, labelKey: 'interior' },
+  { value: GbpPhotoCategory.PRODUCT, labelKey: 'product' },
+  { value: GbpPhotoCategory.AT_WORK, labelKey: 'atWork' },
+  { value: GbpPhotoCategory.FOOD_AND_DRINK, labelKey: 'foodAndDrink' },
+  { value: GbpPhotoCategory.MENU, labelKey: 'menu' },
+  { value: GbpPhotoCategory.COMMON_AREA, labelKey: 'commonArea' },
+  { value: GbpPhotoCategory.ROOMS, labelKey: 'rooms' },
+  { value: GbpPhotoCategory.TEAMS, labelKey: 'team' },
+  { value: GbpPhotoCategory.ADDITIONAL, labelKey: 'additional' }
+];
 
 export const PhotosFilterToolbar = ({
   category,
@@ -89,12 +107,11 @@ export const PhotosFilterToolbar = ({
               '& .MuiSelect-icon': { right: 0 }
             }}
           >
-            <MenuItem value="All">{t('filter.all')}</MenuItem>
-            <MenuItem value="COVER">{t('filter.cover')}</MenuItem>
-            <MenuItem value="INTERIOR">{t('filter.interior')}</MenuItem>
-            <MenuItem value="EXTERIOR">{t('filter.exterior')}</MenuItem>
-            <MenuItem value="FOOD">{t('filter.food')}</MenuItem>
-            <MenuItem value="TEAM">{t('filter.team')}</MenuItem>
+            {PHOTO_CATEGORIES.map((cat) => (
+              <MenuItem key={cat.value} value={cat.value}>
+                {t(`filter.${cat.labelKey}`)}
+              </MenuItem>
+            ))}
           </Select>
         </Stack>
 

@@ -111,6 +111,11 @@ const menuData: MenuItem[] = [
         href: '/admin/seo-intelligence'
       },
       {
+        title: 'navigation.seo-analyzer',
+        href: '/admin/seo-intelligence/analyzer',
+        icon: 'tabler-activity'
+      },
+      {
         title: 'navigation.seo-visibility',
         href: '/admin/seo-intelligence/visibility'
       },
