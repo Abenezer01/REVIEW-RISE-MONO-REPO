@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
+import dashboardRoutes from './dashboard.routes';
 
 import * as gbpProfileController from '../../controllers/gbp-profile.controller';
 import * as gbpMetricsController from '../../controllers/gbp-metrics.controller';
@@ -42,5 +43,7 @@ router.get('/locations/:locationId/photos', gbpPhotosController.getPhotos);
 router.post('/locations/:locationId/photos/sync', gbpPhotosController.syncPhotos);
 router.post('/locations/:locationId/photos', upload.single('photo'), gbpPhotosController.uploadPhoto);
 router.delete('/locations/:locationId/photos/:photoId', gbpPhotosController.deletePhoto);
+
+router.use('/dashboard', dashboardRoutes);
 
 export default router;

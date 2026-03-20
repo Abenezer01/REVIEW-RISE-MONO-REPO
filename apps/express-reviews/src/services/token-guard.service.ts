@@ -37,6 +37,7 @@ export class TokenGuardService {
             );
         }
 
+        // eslint-disable-next-line no-console
         console.log(`[TokenGuard] Refreshing token for PlatformIntegration ${integration.id}`);
         const plainRefreshToken = this.decryptSafe(integration.refreshToken);
 
@@ -62,7 +63,7 @@ export class TokenGuardService {
             return newCredentials.access_token;
         } catch (error: any) {
             // Mark integration as error so the frontend shows "Reconnect"
-            await platformIntegrationRepository.updateStatus(integration.id, 'error').catch(() => {});
+            await platformIntegrationRepository.updateStatus(integration.id, 'error').catch(() => { });
             throw new Error(
                 `Failed to refresh Google token for integration ${integration.id}: ${error.message}. ` +
                 `The connection has been marked as errored.`

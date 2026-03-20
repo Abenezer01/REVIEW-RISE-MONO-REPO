@@ -8,6 +8,11 @@ const horizontalMenuData = (): HorizontalMenuDataType[] => [
     icon: 'tabler-smart-home'
   },
   {
+    label: 'SEO Intelligence',
+    href: '/admin/seo-intelligence/analyzer',
+    icon: 'tabler-search'
+  },
+  {
     label: 'About',
     href: '/about',
     icon: 'tabler-info-circle'
