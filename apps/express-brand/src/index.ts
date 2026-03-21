@@ -23,6 +23,7 @@ import v1Routes from './routes/v1';
 import uploadRoutes from './routes/v1/upload.routes';
 import path from 'path';
 import { publishingWorker } from './services/publishing-worker.service';
+import { reportsCenterWorker } from './services/reports-center-worker.service';
 
 app.use('/api/v1', v1Routes);
 app.use('/api/v1/uploads', uploadRoutes);
@@ -46,4 +47,5 @@ app.listen(PORT, () => {
 
     // Start background publishing worker
     publishingWorker.start();
+    reportsCenterWorker.start();
 });

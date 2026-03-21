@@ -5,4 +5,4 @@ import { createContextualCan } from '@casl/react';
 
 export const AbilityContext = createContext<AnyAbility>(undefined!);
 
-export default createContextualCan(AbilityContext.Consumer);
+export default createContextualCan(AbilityContext.Consumer as any);

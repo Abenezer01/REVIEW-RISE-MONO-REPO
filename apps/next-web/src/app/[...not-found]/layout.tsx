@@ -32,7 +32,7 @@ const publicSans = { variable: 'font-sans-serif', className: 'font-sans-serif' }
 export default async function NotFoundLayout({
   children
 }: {
-  children: React.ReactNode
+  children: any
 }) {
   const systemMode = await getSystemMode()
   const direction = getLocaleDirection(defaultLocale)
@@ -42,7 +42,7 @@ export default async function NotFoundLayout({
       <body className={`flex is-full min-bs-full flex-auto flex-col ${publicSans.className}`}>
         <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
         <NextIntlClientProvider locale={defaultLocale}>
-          {children}
+          {children as any}
         </NextIntlClientProvider>
       </body>
     </html>

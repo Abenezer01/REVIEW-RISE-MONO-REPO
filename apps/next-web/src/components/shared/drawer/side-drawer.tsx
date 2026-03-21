@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { BoxProps } from '@mui/material';
 import { Box, Drawer, IconButton, styled, Typography } from '@mui/material';
 
@@ -19,7 +17,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   justifyContent: 'space-between'
 }));
 
-const CustomSideDrawer: React.FC<CustomSideDrawerProps> = ({ open, handleClose, title, translatedTitle, children, width }) => {
+function CustomSideDrawer({ open, handleClose, title, translatedTitle, children, width }: CustomSideDrawerProps) {
   return (
     <div className="customizer">
       <Drawer
@@ -57,6 +55,6 @@ const CustomSideDrawer: React.FC<CustomSideDrawerProps> = ({ open, handleClose, 
       </Drawer>
     </div>
   );
-};
+}
 
 export default CustomSideDrawer;
