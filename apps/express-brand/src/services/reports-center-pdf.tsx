@@ -13,10 +13,11 @@ type BuildPdfInput = {
   sections: string[];
   whiteLabel: WhiteLabelConfig;
   formatSectionTitle: (value: string) => string;
+  sectionContent?: Record<string, { bullets: string[] }>;
 };
 
 export const buildReportsCenterPdf = async (input: BuildPdfInput): Promise<Buffer> => {
-  const { sections, whiteLabel, formatSectionTitle } = input;
+  const { sections, whiteLabel, formatSectionTitle, sectionContent = {} } = input;
 
   const {
     Document: Doc,
@@ -73,6 +74,20 @@ export const buildReportsCenterPdf = async (input: BuildPdfInput): Promise<Buffe
       fontSize: 11,
       lineHeight: 1.5
     },
+    bulletRow: {
+      display: 'flex',
+      flexDirection: 'row',
+      gap: 6,
+      marginBottom: 4
+    },
+    bulletDot: {
+      fontSize: 10,
+      marginTop: 2
+    },
+    bulletText: {
+      fontSize: 11,
+      lineHeight: 1.4
+    },
     footer: {
       padding: 16,
       position: 'absolute' as const,
@@ -97,9 +112,14 @@ export const buildReportsCenterPdf = async (input: BuildPdfInput): Promise<Buffe
           {sections.map((section) => (
             <Vw key={section} style={styles.section}>
               <Txt style={styles.sectionTitle}>{formatSectionTitle(section)}</Txt>
-              <Txt style={styles.sectionBody}>
-                Key findings and highlights for {formatSectionTitle(section)} will appear here.
-              </Txt>
+              {(sectionContent[section]?.bullets || [
+                `Key findings and highlights for ${formatSectionTitle(section)} will appear here.`
+              ]).map((item, index) => (
+                <Vw key={`${section}-${index}`} style={styles.bulletRow}>
+                  <Txt style={styles.bulletDot}>•</Txt>
+                  <Txt style={styles.bulletText}>{item}</Txt>
+                </Vw>
+              ))}
             </Vw>
           ))}
         </Vw>
