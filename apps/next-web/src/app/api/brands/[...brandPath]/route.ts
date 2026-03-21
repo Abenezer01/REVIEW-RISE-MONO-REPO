@@ -31,7 +31,8 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
     'content-ideas',
     'image-prompts',
     'carousel-drafts',
-    'script-drafts'
+    'script-drafts',
+    'reports-center'
   ];
 
   if (path.length === 0) {
@@ -77,6 +78,32 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
       return new NextResponse(null, { status: 204 });
     }
 
+    const responseContentType = response.headers.get('content-type') || '';
+
+    // Pass through binary/download responses without wrapping
+    if (
+      responseContentType.includes('application/pdf') ||
+      responseContentType.includes('application/octet-stream') ||
+      responseContentType.includes('text/csv') ||
+      responseContentType.includes('application/vnd') ||
+      responseContentType.includes('application/zip')
+    ) {
+      const buffer = await response.arrayBuffer();
+      const passthroughHeaders = new Headers();
+
+      passthroughHeaders.set('content-type', responseContentType);
+
+      const contentDisposition = response.headers.get('content-disposition');
+
+      if (contentDisposition) passthroughHeaders.set('content-disposition', contentDisposition);
+
+      const contentLength = response.headers.get('content-length');
+
+      if (contentLength) passthroughHeaders.set('content-length', contentLength);
+
+      return new NextResponse(buffer, { status: response.status, headers: passthroughHeaders });
+    }
+
     const text = await response.text();
     let data;
 
@@ -88,26 +115,24 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ brandPath
 
     // If it's already standardized, pass it through
     if (data && typeof data === 'object' && ('success' in data) && ('data' in data || 'error' in data)) {
-        return NextResponse.json(data, { status: response.status });
+      return NextResponse.json(data, { status: response.status });
     }
 
     // Otherwise wrap it
     if (response.ok) {
-        const wrapped = createSuccessResponse(data, 'Success', response.status);
+      const wrapped = createSuccessResponse(data, 'Success', response.status);
 
-        
-return NextResponse.json(wrapped, { status: response.status });
-    } else {
-        const wrapped = createErrorResponse(
-            data.message || data.error || 'Proxy Error',
-            data.code || ErrorCode.INTERNAL_SERVER_ERROR,
-            response.status,
-            data.details || data
-        );
-
-        
-return NextResponse.json(wrapped, { status: response.status });
+      return NextResponse.json(wrapped, { status: response.status });
     }
+
+    const wrapped = createErrorResponse(
+      data.message || data.error || 'Proxy Error',
+      data.code || ErrorCode.INTERNAL_SERVER_ERROR,
+      response.status,
+      data.details || data
+    );
+
+    return NextResponse.json(wrapped, { status: response.status });
   } catch (error) {
     console.error('Proxy error:', error);
 

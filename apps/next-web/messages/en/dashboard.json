@@ -28,6 +28,7 @@
     "seo-analyzer": "SEO Analyzer",
     "seo-visibility": "SERP Visibility",
     "seo-keywords": "SEO Keywords",
+    "reports-center": "Reports Center",
     "seo-listings": "Listings Manager",
     "gbp-rocket": "GBPRocket",
     "gbp-overview": "Overview",
@@ -1392,6 +1393,116 @@
       "regenerate": "Regenerate Plan",
       "mockDateRange": "Feb 1-7, 2024",
       "launchSubtitle": "Actionable steps to improve your AI presence"
+    }
+  },
+  "reportsCenter": {
+    "title": "Reports Center",
+    "subtitle": "Build, brand, schedule, and archive high-fidelity reports.",
+    "business": "Business",
+    "loading": "Loading reports center...",
+    "emptyBusiness": "No businesses found for this user.",
+    "loadFailed": "Unable to load reports center data.",
+    "saveFailed": "Changes could not be saved.",
+    "generateFailed": "Report generation failed.",
+    "exportFailed": "Export generation failed.",
+    "generateReport": "Generate Report",
+    "preview": {
+      "cta": "Preview Report",
+      "close": "Close Preview",
+      "title": "Report Preview",
+      "introTitle": "Executive Overview",
+      "generatedOn": "Generated {date}",
+      "logoAlt": "Brand logo",
+      "logoFallback": "RR"
+    },
+    "builder": {
+      "title": "Report Builder",
+      "subtitle": "Select and reorder modules for a custom report."
+    },
+    "sections": {
+      "seo": "SEO Performance",
+      "reputation": "Reputation & Reviews",
+      "listings": "Listings Consistency"
+    },
+    "sectionHints": {
+      "seo": "Visibility trends, keyword gains, and technical signals.",
+      "reputation": "Sentiment, review velocity, and response coverage.",
+      "listings": "NAP accuracy, directory coverage, and fixes."
+    },
+    "templates": {
+      "title": "Template Library",
+      "executive": "Executive Summary",
+      "technical": "Technical Deep-Dive",
+      "reputation": "Reputation Growth"
+    },
+    "whiteLabel": {
+      "title": "White-Label Hub",
+      "subtitle": "Brand every report with your logo, colors, and voice.",
+      "uploadLogo": "Upload Logo",
+      "logoPreview": "Logo preview",
+      "logoTooLarge": "Logo must be under 1MB.",
+      "logoUploadFailed": "Logo upload failed.",
+      "primaryColor": "Primary Color",
+      "accentColor": "Accent Color",
+      "reportTitle": "Report Title",
+      "footer": "Footer Text",
+      "intro": "Intro Notes"
+    },
+    "schedule": {
+      "title": "Scheduling & Delivery",
+      "subtitle": "Automate delivery and alerts for every report run.",
+      "frequency": "Frequency",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "recipients": "Recipients",
+      "recipientsHint": "Type email and press Enter",
+      "invalidEmail": "Enter a valid email address.",
+      "enableTrigger": "Enable Trigger-Based Reporting",
+      "triggerLabel": "Send if SEO score drops by (points)",
+      "save": "Save Schedule",
+      "saving": "Saving...",
+      "nextRun": "Next run: {date}"
+    },
+    "vault": {
+      "title": "The Vault",
+      "empty": "No archived reports yet.",
+      "download": "Download",
+      "copyLink": "Copy Link",
+      "rerun": "Re-run",
+      "columns": {
+        "name": "Report",
+        "date": "Generated",
+        "type": "Type",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    },
+    "exports": {
+      "title": "Raw Data Export Suite",
+      "subtitle": "Queue background exports for deep analysis.",
+      "keywordHistory": "Keyword History",
+      "reviewList": "Review Lists",
+      "syncLogs": "Sync Logs",
+      "download": "Download File"
+    },
+    "share": {
+      "title": "Secure Report Access",
+      "previewTitle": "Shared Report Preview",
+      "loading": "Loading shared report...",
+      "passwordRequired": "A password is required to access this report.",
+      "passwordInvalid": "That password didn’t work. Please try again.",
+      "loadFailed": "Unable to load the shared report.",
+      "password": "Password",
+      "unlock": "Unlock Report",
+      "dialogTitle": "Generate Secure Share Link",
+      "dialogSubtitle": "Set a password to protect this share link. Leave it blank if you want no password.",
+      "passwordConfirm": "Confirm password",
+      "cancel": "Cancel",
+      "generateLink": "Generate link",
+      "generating": "Generating link...",
+      "passwordMismatch": "Passwords do not match.",
+      "generateFailed": "Could not generate a share link."
     }
   },
   "common": {

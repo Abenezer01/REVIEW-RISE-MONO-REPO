@@ -1,4 +1,4 @@
-import type { ReactNode, Ref } from 'react';
+import type { Ref } from 'react';
 import { forwardRef } from 'react';
 
 import Head from 'next/head';
@@ -12,8 +12,8 @@ import useTranslation from '@/hooks/useTranslation';
 // ==============================|| Page - SET TITLE & META TAGS ||============================== //
 
 interface Props extends BoxProps {
-  children: ReactNode;
-  meta?: ReactNode;
+  children?: any;
+  meta?: any;
   title?: string;
   titleId?: string;
 }

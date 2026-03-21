@@ -12,6 +12,8 @@ import studioDraftsRoutes from './studio-drafts.routes';
 
 import recommendationsRoutes from './recommendations.routes';
 import opportunitiesReportRoutes from './opportunities-report.routes';
+import reportsCenterRoutes from './reports-center.routes';
+import reportsCenterShareRoutes from './reports-center-share.routes';
 
 const router = Router();
 
@@ -27,6 +29,7 @@ router.use('/brands/:id/reviews', reviewRoutes);
 router.use('/brands/:id/planner', plannerRoutes);
 router.use('/brands/:id', studioDraftsRoutes); // studio drafts
 router.use('/brand-profiles', brandProfileRoutes);
+router.use('/brands', reportsCenterRoutes);
+router.use('/', reportsCenterShareRoutes);
 
 export default router;
-

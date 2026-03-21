@@ -58,6 +58,51 @@ export interface Job {
   brand?: string;
 }
 
+export interface ReportsCenterConfig {
+  id: string;
+  preset: string;
+  sections: Record<string, boolean>;
+  sectionOrder: string[];
+  whiteLabel: {
+    logoDataUrl: string | null;
+    primaryColor: string;
+    accentColor: string;
+    title: string;
+    footer: string;
+    intro: string;
+  };
+  updatedAt: string;
+}
+
+export interface ReportsCenterSchedule {
+  id: string;
+  frequency: 'daily' | 'weekly' | 'monthly';
+  recipients: string[];
+  triggerEnabled: boolean;
+  seoDropThreshold: number;
+  nextRunAt: string;
+  lastRunAt?: string | null;
+}
+
+export interface ReportsCenterRun {
+  id: string;
+  name: string;
+  type: 'PDF' | 'CSV' | 'Excel';
+  status: 'Sent' | 'Opened' | 'Failed';
+  generatedAt: string;
+  deliveredAt?: string | null;
+  webUrl?: string | null;
+  shareToken?: string | null;
+}
+
+export interface ReportsCenterExportJob {
+  id: string;
+  type: string;
+  status: 'Processing' | 'Ready' | 'Failed';
+  createdAt: string;
+  resultUrl?: string | null;
+}
+
 export interface ScheduledPost {
   id: string;
   businessId: string;
@@ -469,6 +514,60 @@ export const BrandService = {
 
   deletePlannerEvent: async (businessId: string, eventId: string) => {
     await apiClient.delete(`/api/brands/${businessId}/planner/events/${eventId}`);
+  },
+
+  getReportsCenterConfig: async (businessId: string) => {
+    const response = await apiClient.get<ReportsCenterConfig>(`/api/brands/${businessId}/reports-center/config`);
+
+    return response.data;
+  },
+
+  updateReportsCenterConfig: async (businessId: string, payload: Partial<ReportsCenterConfig>) => {
+    const response = await apiClient.patch<ReportsCenterConfig>(`/api/brands/${businessId}/reports-center/config`, payload);
+
+    return response.data;
+  },
+
+  getReportsCenterSchedule: async (businessId: string) => {
+    const response = await apiClient.get<ReportsCenterSchedule>(`/api/brands/${businessId}/reports-center/schedule`);
+
+    return response.data;
+  },
+
+  updateReportsCenterSchedule: async (businessId: string, payload: Partial<ReportsCenterSchedule>) => {
+    const response = await apiClient.patch<ReportsCenterSchedule>(`/api/brands/${businessId}/reports-center/schedule`, payload);
+
+    return response.data;
+  },
+
+  generateReportsCenterRun: async (businessId: string, payload?: { password?: string | null }) => {
+    const response = await apiClient.post<ReportsCenterRun>(`/api/brands/${businessId}/reports-center/runs`, payload || {});
+
+    return response.data;
+  },
+
+  listReportsCenterVault: async (businessId: string) => {
+    const response = await apiClient.get<ReportsCenterRun[]>(`/api/brands/${businessId}/reports-center/vault`);
+
+    return response.data || [];
+  },
+
+  rerunReportsCenter: async (businessId: string, runId: string) => {
+    const response = await apiClient.post<ReportsCenterRun>(`/api/brands/${businessId}/reports-center/vault/${runId}/rerun`);
+
+    return response.data;
+  },
+
+  listReportsCenterExports: async (businessId: string) => {
+    const response = await apiClient.get<ReportsCenterExportJob[]>(`/api/brands/${businessId}/reports-center/exports`);
+
+    return response.data || [];
+  },
+
+  createReportsCenterExport: async (businessId: string, payload: { type: string }) => {
+    const response = await apiClient.post<ReportsCenterExportJob>(`/api/brands/${businessId}/reports-center/exports`, payload);
+
+    return response.data;
   },
 
   uploadFile: async (file: File) => {

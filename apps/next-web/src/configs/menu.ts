@@ -210,6 +210,12 @@ const menuData: MenuItem[] = [
     ]
   },
   {
+    title: 'navigation.reports-center',
+    href: '/admin/reports-center',
+    icon: 'tabler-file-analytics',
+    allowedRoles: [ROLES.ADMIN]
+  },
+  {
     title: 'navigation.failed-jobs',
     href: '/admin/failed-jobs',
     icon: 'tabler-alert-circle',

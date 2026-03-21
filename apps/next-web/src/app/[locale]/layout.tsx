@@ -36,7 +36,7 @@ export const metadata = {
 }
 
 type Props = {
-    children: React.ReactNode
+    children: any
     params: Promise<{ locale: string }>
 }
 
@@ -73,7 +73,7 @@ const LocaleLayout = async (props: Props) => {
             </head>
             <body className={`flex is-full min-bs-full flex-auto flex-col ${publicSans.className}`} suppressHydrationWarning>
                 <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
-                <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+                <NextIntlClientProvider messages={messages}>{children as any}</NextIntlClientProvider>
             </body>
         </html>
     )

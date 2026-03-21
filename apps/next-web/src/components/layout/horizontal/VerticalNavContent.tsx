@@ -49,7 +49,7 @@ const VerticalNavContent = ({ children }: ChildrenType) => {
   const shadowRef = useRef(null)
 
   // Vars
-  const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
+  const ScrollWrapper: any = (isBreakpointReached ? 'div' : PerfectScrollbar) as any
 
   const scrollMenu = (container: any, isPerfectScrollbar: boolean) => {
     container = isBreakpointReached || !isPerfectScrollbar ? container.target : container
@@ -83,11 +83,11 @@ const VerticalNavContent = ({ children }: ChildrenType) => {
         {...(isBreakpointReached
           ? {
             className: 'bs-full overflow-y-auto overflow-x-hidden',
-            onScroll: container => scrollMenu(container, false)
+            onScroll: (container: any) => scrollMenu(container, false)
           }
           : {
             options: { wheelPropagation: false, suppressScrollX: true },
-            onScrollY: container => scrollMenu(container, true)
+            onScrollY: (container: any) => scrollMenu(container, true)
           })}
       >
         {mapHorizontalToVerticalMenu(children)}

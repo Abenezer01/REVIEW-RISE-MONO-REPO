@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
 type Theme = 'light' | 'dark';
 
@@ -9,9 +9,14 @@ interface ThemeContextType {
   toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const defaultContext: ThemeContextType = {
+  theme: 'dark',
+  toggleTheme: () => {}
+};
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
+const ThemeContext = createContext<ThemeContextType>(defaultContext);
+
+export function ThemeProvider({ children }: { children: ReactNode }): any {
   const [theme, setTheme] = useState<Theme>('dark');
   const [mounted, setMounted] = useState(false);
 
@@ -40,17 +45,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // Render children immediately but with default theme
   // This prevents hydration mismatch
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return React.createElement(ThemeContext.Provider, { value: { theme, toggleTheme } }, children) as any;
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within ThemeProvider');
-  }
-  return context;
+  return useContext(ThemeContext);
 }

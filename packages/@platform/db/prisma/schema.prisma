@@ -113,6 +113,10 @@ model Business {
   gbpProfileSnapshots  GbpProfileSnapshot[]
   gbpSuggestionActivities GbpSuggestionActivity[]
   napMasterRecords     NapMasterRecord[]
+  reportsCenterConfig  ReportsCenterConfig?
+  reportsCenterSchedules ReportsCenterSchedule[]
+  reportsCenterRuns    ReportsCenterRun[]
+  reportsCenterExportJobs ReportsCenterExportJob[]
 
   @@index([name])
   @@index([status])
@@ -694,6 +698,82 @@ model Report {
 
   @@index([businessId])
   @@index([generatedAt])
+}
+
+model ReportsCenterConfig {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId   String   @unique @db.Uuid
+  preset       String
+  sections     Json
+  sectionOrder Json
+  whiteLabel   Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  business     Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  schedule     ReportsCenterSchedule?
+  runs         ReportsCenterRun[]
+
+  @@index([businessId])
+}
+
+model ReportsCenterSchedule {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId      String   @db.Uuid
+  configId        String   @unique @db.Uuid
+  frequency       String
+  recipients      Json
+  triggerEnabled  Boolean  @default(false)
+  seoDropThreshold Int     @default(5)
+  nextRunAt       DateTime
+  lastRunAt       DateTime?
+  status          String   @default("active")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  business        Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  config          ReportsCenterConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([nextRunAt])
+}
+
+model ReportsCenterRun {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId       String   @db.Uuid
+  configId         String   @db.Uuid
+  name             String
+  type             String
+  status           String
+  generatedAt      DateTime @default(now())
+  deliveredAt      DateTime?
+  openedAt         DateTime?
+  pdfUrl           String?
+  webUrl           String?
+  shareToken       String?  @unique
+  sharePasswordHash String?
+  meta             Json?
+  business         Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  config           ReportsCenterConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([generatedAt])
+  @@index([status])
+}
+
+model ReportsCenterExportJob {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @db.Uuid
+  type        String
+  status      String
+  resultUrl   String?
+  error       Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  completedAt DateTime?
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model OpportunitiesReport {
