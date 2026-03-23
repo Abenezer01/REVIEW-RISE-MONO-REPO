@@ -22,6 +22,11 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
     icon: 'tabler-star',
     children: [
       {
+        label: 'Inbox',
+        href: '/admin/reviews/inbox',
+        icon: 'tabler-message'
+      },
+      {
         label: 'Dashboard',
         href: '/admin/reviews/dashboard',
         icon: 'tabler-chart-pie'

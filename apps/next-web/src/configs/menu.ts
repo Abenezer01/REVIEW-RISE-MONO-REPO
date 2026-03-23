@@ -45,6 +45,12 @@ const menuData: MenuItem[] = [
         allowedRoles: [ROLES.ADMIN]
       },
       {
+        title: 'navigation.reviews-inbox',
+        href: '/admin/reviews/inbox',
+        icon: 'tabler-message',
+        allowedRoles: [ROLES.ADMIN]
+      },
+      {
         title: 'navigation.auto-reply',
         href: '/admin/reviews/auto-reply',
         icon: 'tabler-robot',
