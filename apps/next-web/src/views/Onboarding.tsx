@@ -12,6 +12,8 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import Stack from '@mui/material/Stack'
 
+import { useTranslations } from 'next-intl'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import { createBusinessOnboarding } from '@/app/actions/onboarding'
@@ -22,16 +24,17 @@ type OnboardingProps = {
 
 const Onboarding = ({ modalOnly = false }: OnboardingProps) => {
   const router = useRouter()
+  const t = useTranslations('auth')
   const [state, dispatch, isPending] = useActionState(createBusinessOnboarding, null)
 
   const labels = {
-    title: 'Create Your Business',
-    modalContent: 'Complete setup to access your workspace.',
-    mainContent: 'Your email is verified. Create your business workspace to continue.',
-    businessNameLabel: 'Business Name',
-    businessNamePlaceholder: 'Acme Marketing LLC',
-    creating: 'Creating...',
-    createBusiness: 'Create Business'
+    title: t('onboarding.title'),
+    modalContent: t('onboarding.modalContent'),
+    mainContent: t('onboarding.mainContent'),
+    businessNameLabel: t('onboarding.businessNameLabel'),
+    businessNamePlaceholder: t('onboarding.businessNamePlaceholder'),
+    creating: t('onboarding.creating'),
+    createBusiness: t('onboarding.createBusiness')
   }
 
   useEffect(() => {

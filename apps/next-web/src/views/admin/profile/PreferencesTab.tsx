@@ -9,27 +9,30 @@ import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 
+import { useTranslation } from '@/hooks/useTranslation'
 import CustomTextField from '@core/components/mui/TextField'
 
 const PreferencesTab = () => {
+    const t = useTranslation('dashboard')
+
     return (
         <Card>
             <CardContent sx={{ pb: 4 }}>
-                <Typography variant='h5' sx={{ mb: 6 }}>Localization</Typography>
+                <Typography variant='h5' sx={{ mb: 6 }}>{t('accounts.profile.preferences.localization')}</Typography>
 
                 <Grid container spacing={5}>
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <CustomTextField
                             select
                             fullWidth
-                            label='Language'
+                            label={t('accounts.profile.preferences.language')}
                             defaultValue='english'
                         >
-                            <MenuItem value='english'>English</MenuItem>
-                            <MenuItem value='arabic'>Arabic</MenuItem>
-                            <MenuItem value='french'>French</MenuItem>
-                            <MenuItem value='german'>German</MenuItem>
-                            <MenuItem value='portuguese'>Portuguese</MenuItem>
+                            <MenuItem value='english'>{t('common.language.english')}</MenuItem>
+                            <MenuItem value='arabic'>{t('common.language.arabic')}</MenuItem>
+                            <MenuItem value='french'>{t('common.language.french')}</MenuItem>
+                            <MenuItem value='german'>{t('common.language.german')}</MenuItem>
+                            <MenuItem value='portuguese'>{t('common.language.portuguese')}</MenuItem>
                         </CustomTextField>
                     </Grid>
 
@@ -37,46 +40,49 @@ const PreferencesTab = () => {
                         <CustomTextField
                             select
                             fullWidth
-                            label='Timezone'
+                            label={t('accounts.profile.preferences.timezone')}
                             defaultValue='gmt-4'
                         >
-                            <MenuItem value='gmt-12'>(GMT-12:00) International Date Line West</MenuItem>
-                            <MenuItem value='gmt-11'>(GMT-11:00) Midway Island, Samoa</MenuItem>
-                            <MenuItem value='gmt-10'>(GMT-10:00) Hawaii</MenuItem>
-                            <MenuItem value='gmt-9'>(GMT-09:00) Alaska</MenuItem>
-                            <MenuItem value='gmt-8'>(GMT-08:00) Pacific Time (US & Canada)</MenuItem>
-                            <MenuItem value='gmt-7'>(GMT-07:00) Mountain Time (US & Canada)</MenuItem>
-                            <MenuItem value='gmt-6'>(GMT-06:00) Central Time (US & Canada)</MenuItem>
-                            <MenuItem value='gmt-5'>(GMT-05:00) Eastern Time (US & Canada)</MenuItem>
-                            <MenuItem value='gmt-4'>(GMT-04:00) Atlantic Time (Canada)</MenuItem>
-                            <MenuItem value='gmt-l'>(GMT) London, Edinburgh, Lisbon, London</MenuItem>
-                            <MenuItem value='gmt+1'>(GMT+01:00) Amsterdam, Berlin, Bern, Rome</MenuItem>
-                            <MenuItem value='gmt+2'>(GMT+02:00) Athens, Bucharest, Istanbul</MenuItem>
-                            <MenuItem value='gmt+3'>(GMT+03:00) Moscow, St. Petersburg, Riyadh</MenuItem>
-                            <MenuItem value='gmt+4'>(GMT+04:00) Abu Dhabi, Muscat, Baku</MenuItem>
+                            <MenuItem value='gmt-12'>{t('accounts.profile.timezones.gmt-12')}</MenuItem>
+                            <MenuItem value='gmt-11'>{t('accounts.profile.timezones.gmt-11')}</MenuItem>
+                            <MenuItem value='gmt-10'>{t('accounts.profile.timezones.gmt-10')}</MenuItem>
+                            <MenuItem value='gmt-9'>{t('accounts.profile.timezones.gmt-9')}</MenuItem>
+                            <MenuItem value='gmt-8'>{t('accounts.profile.timezones.gmt-8')}</MenuItem>
+                            <MenuItem value='gmt-7'>{t('accounts.profile.timezones.gmt-7')}</MenuItem>
+                            <MenuItem value='gmt-6'>{t('accounts.profile.timezones.gmt-6')}</MenuItem>
+                            <MenuItem value='gmt-5'>{t('accounts.profile.timezones.gmt-5')}</MenuItem>
+                            <MenuItem value='gmt-4'>{t('accounts.profile.timezones.gmt-4')}</MenuItem>
+                            <MenuItem value='gmt-l'>{t('accounts.profile.timezones.gmt-l')}</MenuItem>
+                            <MenuItem value='gmt+1'>{t('accounts.profile.timezones.gmt+1')}</MenuItem>
+                            <MenuItem value='gmt+2'>{t('accounts.profile.timezones.gmt+2')}</MenuItem>
+                            <MenuItem value='gmt+3'>{t('accounts.profile.timezones.gmt+3')}</MenuItem>
+                            <MenuItem value='gmt+4'>{t('accounts.profile.timezones.gmt+4')}</MenuItem>
                         </CustomTextField>
+
                         <Typography variant='caption' color='text.secondary' sx={{ mt: 1, display: 'block' }}>
-                            Used to display timestamps for reviews and notifications.
+                            {t('accounts.profile.preferences.timezoneDesc')}
                         </Typography>
                     </Grid>
 
                     <Grid size={12}>
                         <Divider sx={{ my: 4 }} />
-                        <Typography variant='h5' sx={{ mb: 4 }}>Notifications</Typography>
+                        <Typography variant='h5' sx={{ mb: 4 }}>{t('accounts.profile.preferences.notifications')}</Typography>
+
                         <Typography variant='body2' sx={{ mb: 4, color: 'text.secondary' }}>
-                            We will email you when these important events occur:
+                            {t('accounts.profile.preferences.notificationsDesc')}
                         </Typography>
 
                         {/* Notification toggles go here - placeholder for now */}
                         <Typography variant='body2' sx={{ fontStyle: 'italic', mb: 6 }}>
-                            Notification settings are currently managed globally.
+                            {t('accounts.profile.preferences.managedGlobally')}
                         </Typography>
 
                         <Button variant='contained' sx={{ mr: 4 }}>
-                            Save Preferences
+                            {t('accounts.profile.preferences.savePreferences')}
                         </Button>
+
                         <Button type='reset' variant='tonal' color='secondary'>
-                            Reset
+                            {t('accounts.profile.general.reset')}
                         </Button>
                     </Grid>
                 </Grid>

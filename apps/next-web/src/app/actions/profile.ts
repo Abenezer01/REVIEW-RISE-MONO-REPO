@@ -8,6 +8,7 @@ import { getServerUser } from '@/utils/serverAuth'
 export async function updateProfile(data: { name: string; email: string; image?: string }) {
     try {
         const user = await getServerUser()
+
         if (!user) throw new Error('Unauthorized')
 
         const updatedUser = await prisma.user.update({
@@ -20,9 +21,11 @@ export async function updateProfile(data: { name: string; email: string; image?:
         })
 
         revalidatePath('/[locale]/admin/profile')
+
         return { success: true, data: updatedUser }
     } catch (error: any) {
         console.error('updateProfile error:', error)
+
         return { success: false, message: error.message }
     }
 }
@@ -30,6 +33,7 @@ export async function updateProfile(data: { name: string; email: string; image?:
 export async function changePassword(data: { currentPassword: string; newPassword: string }) {
     try {
         const user = await getServerUser()
+
         if (!user) throw new Error('Unauthorized')
 
         const dbUser = await prisma.user.findUnique({
@@ -41,6 +45,7 @@ export async function changePassword(data: { currentPassword: string; newPasswor
         }
 
         const isMatch = await bcrypt.compare(data.currentPassword, dbUser.password)
+
         if (!isMatch) {
             return { success: false, message: 'Incorrect current password' }
         }
@@ -55,6 +60,7 @@ export async function changePassword(data: { currentPassword: string; newPasswor
         return { success: true, message: 'Password updated successfully' }
     } catch (error: any) {
         console.error('changePassword error:', error)
+
         return { success: false, message: error.message }
     }
 }

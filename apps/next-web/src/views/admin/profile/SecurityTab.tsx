@@ -11,12 +11,18 @@ import Typography from '@mui/material/Typography'
 import InputAdornment from '@mui/material/InputAdornment'
 import IconButton from '@mui/material/IconButton'
 
-import toast from 'react-hot-toast'
+import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
+import { SystemMessageCode } from '@platform/contracts'
+import { useTranslation } from '@/hooks/useTranslation'
 import { changePassword } from '@/app/actions/profile'
 import CustomTextField from '@core/components/mui/TextField'
 
 const SecurityTab = () => {
+    const t = useTranslation('dashboard')
+    const { notify } = useSystemMessages()
+
     const [isSubmitting, setIsSubmitting] = useState(false)
+
     const [formData, setFormData] = useState({
         currentPassword: '',
         newPassword: '',
@@ -30,6 +36,7 @@ const SecurityTab = () => {
     })
 
     const handleFormChange = (field: string, value: string) => {
+
         setFormData({ ...formData, [field]: value })
     }
 
@@ -41,36 +48,39 @@ const SecurityTab = () => {
         e.preventDefault()
 
         if (formData.newPassword !== formData.confirmPassword) {
-            toast.error('New passwords do not match')
+            notify(SystemMessageCode.AUTH_PASSWORD_MISMATCH)
+
             return
         }
 
         setIsSubmitting(true)
+
         const result = await changePassword({
             currentPassword: formData.currentPassword,
             newPassword: formData.newPassword
         })
 
         setIsSubmitting(false)
+
         if (result.success) {
-            toast.success('Password changed successfully')
+            notify(SystemMessageCode.ITEM_UPDATED)
             setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' })
         } else {
-            toast.error(result.message || 'Failed to change password')
+            notify(SystemMessageCode.UPDATE_FAILED)
         }
     }
 
     return (
         <Card>
             <CardContent sx={{ pb: 4 }}>
-                <Typography variant='h5' sx={{ mb: 6 }}>Change Password</Typography>
+                <Typography variant='h5' sx={{ mb: 6 }}>{t('accounts.profile.security.changePassword')}</Typography>
 
                 <form onSubmit={handleSubmit}>
                     <Grid container spacing={5}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <CustomTextField
                                 fullWidth
-                                label='Current Password'
+                                label={t('accounts.profile.security.currentPassword')}
                                 type={isPasswordShown.current ? 'text' : 'password'}
                                 value={formData.currentPassword}
                                 onChange={e => handleFormChange('currentPassword', e.target.value)}
@@ -91,7 +101,7 @@ const SecurityTab = () => {
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <CustomTextField
                                 fullWidth
-                                label='New Password'
+                                label={t('accounts.profile.security.newPassword')}
                                 type={isPasswordShown.new ? 'text' : 'password'}
                                 value={formData.newPassword}
                                 onChange={e => handleFormChange('newPassword', e.target.value)}
@@ -109,7 +119,7 @@ const SecurityTab = () => {
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <CustomTextField
                                 fullWidth
-                                label='Confirm New Password'
+                                label={t('accounts.profile.security.confirmPassword')}
                                 type={isPasswordShown.confirm ? 'text' : 'password'}
                                 value={formData.confirmPassword}
                                 onChange={e => handleFormChange('confirmPassword', e.target.value)}
@@ -127,17 +137,17 @@ const SecurityTab = () => {
 
                         <Grid size={12} sx={{ mt: 2 }}>
                             <Typography variant='body2' sx={{ mb: 4, color: 'text.secondary' }}>
-                                Password Requirements:
+                                {t('accounts.profile.security.requirements')}
                                 <br />
-                                • Minimum 8 characters long - the more, the better
+                                {t('accounts.profile.security.reqMinChars')}
                                 <br />
-                                • At least one lowercase & one uppercase character
+                                {t('accounts.profile.security.reqLowerUpper')}
                                 <br />
-                                • At least one number, symbol, or whitespace character
+                                {t('accounts.profile.security.reqNumberSymbol')}
                             </Typography>
 
                             <Button type='submit' variant='contained' sx={{ mr: 4 }} disabled={isSubmitting}>
-                                {isSubmitting ? 'Updating...' : 'Change Password'}
+                                {isSubmitting ? t('common.status.processing') : t('accounts.profile.security.changePassword')}
                             </Button>
                         </Grid>
                     </Grid>

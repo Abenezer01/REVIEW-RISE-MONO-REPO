@@ -23,12 +23,16 @@ const AccountPerformanceStrip = ({ data, loading }: AccountPerformanceStripProps
     const theme = useTheme()
 
     const primaryBusiness = data?.userBusinessRoles?.[0]?.business
+
     const locationCount =
         primaryBusiness?._count?.locations ??
         data?._count?.locations ??
         data?.locations?.length ??
         0
+
     const userCount = data?.userBusinessRoles?.length ?? data?._count?.users ?? 0
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const plan = data?.subscriptions?.[0]?.plan ?? 'free'
 
     const kpis: KPI[] = [

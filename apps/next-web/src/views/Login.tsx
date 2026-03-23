@@ -22,7 +22,7 @@ import { signIn } from 'next-auth/react'
 
 import { SystemMessageCode } from '@platform/contracts'
 
-import { useTranslations } from 'next-intl'
+import { useTranslation } from '@/hooks/useTranslation'
 
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
@@ -72,7 +72,7 @@ const MaskImg = styled('img')({
 
 const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   const { notify } = useSystemMessages()
-  const t = useTranslations('auth')
+  const t = useTranslation('auth')
 
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
@@ -95,8 +95,8 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   const authBackground = useImageVariant(mode, lightImg, darkImg)
   const params = useParams<{ locale?: string }>()
   const searchParams = useSearchParams()
-  const socialDividerLabel = 'or'
-  const googleCtaLabel = 'Continue with Google'
+  const socialDividerLabel = t('login.or')
+  const googleCtaLabel = t('login.googleCta')
 
   useEffect(() => {
     if (state?.success && state.user) {

@@ -42,15 +42,19 @@ const StatBlock = ({
     <CustomAvatar skin='light' color={color} size={44} sx={{ mx: 'auto', mb: 2 }}>
       <i className={icon} style={{ fontSize: '1.25rem' }} />
     </CustomAvatar>
+
     {loading ? (
       <>
         <Skeleton width={40} height={28} sx={{ mx: 'auto' }} />
+
         <Skeleton width={70} height={18} sx={{ mx: 'auto', mt: 0.5 }} />
       </>
     ) : (
       <>
         <Typography variant='h5' fontWeight={700}>{value}</Typography>
+
         <Typography variant='body2' fontWeight={600} sx={{ mt: 0.5 }}>{label}</Typography>
+
         <Typography variant='caption' color='text.secondary'>{subLabel}</Typography>
       </>
     )}
@@ -64,15 +68,19 @@ const AccountOverview = ({ data }: { data: any }) => {
   const businessId = primaryBusiness?.id || data?.id
 
   // Fix bug: prefer _count from API, then array length
+
   const locationCount = primaryBusiness?._count?.locations ?? data?._count?.locations ?? data?.locations?.length ?? 0
+
   const userCount = data?.userBusinessRoles?.length ?? 1
 
   const plan = data?.subscriptions?.[0]?.plan || 'free'
+
   const planLimits: Record<string, { locations: number; users: number }> = {
     free: { locations: 1, users: 3 },
     pro: { locations: 10, users: 20 },
     enterprise: { locations: 999, users: 999 }
   }
+
   const limits = planLimits[plan] || planLimits.free
 
   // Real API metrics
@@ -83,9 +91,11 @@ const AccountOverview = ({ data }: { data: any }) => {
 
   const avgRating = metrics ? Number((metrics as any).averageRating ?? 0).toFixed(1) : '—'
   const totalReviews = metrics ? ((metrics as any).totalReviews ?? 0) : '—'
+
   const responseRate = metrics
     ? `${Math.round(((metrics as any).responseCount / Math.max((metrics as any).totalReviews, 1)) * 100)}%`
     : '—'
+
   const unanswered = metrics
     ? Math.max(0, ((metrics as any).totalReviews ?? 0) - ((metrics as any).responseCount ?? 0))
     : '—'
@@ -99,21 +109,21 @@ const AccountOverview = ({ data }: { data: any }) => {
   const platforms: PlatformStatus[] = [
     {
       key: 'google',
-      label: 'Google Business Profile',
+      label: t('accounts.overview.platformConnections.google'),
       icon: 'tabler-brand-google',
       color: hasGoogle ? 'success' : 'error',
       connected: hasGoogle
     },
     {
       key: 'facebook',
-      label: 'Facebook Pages',
+      label: t('accounts.overview.platformConnections.facebook'),
       icon: 'tabler-brand-facebook',
       color: hasFacebook ? 'success' : 'error',
       connected: hasFacebook
     },
     {
       key: 'sync',
-      label: 'Review Sync',
+      label: t('accounts.overview.platformConnections.reviewSync'),
       icon: 'tabler-refresh',
       color: locationConnections ? 'success' : 'secondary',
       connected: locationConnections
@@ -172,10 +182,11 @@ const AccountOverview = ({ data }: { data: any }) => {
             )}
 
             {/* Usage meters */}
+
             <Box sx={{ mt: 4 }}>
               <Box sx={{ mb: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant='caption' color='text.secondary'>Locations Used</Typography>
+                  <Typography variant='caption' color='text.secondary'>{t('accounts.overview.stats.locationsUsed')}</Typography>
                   <Typography variant='caption' fontWeight={600}>
                     {locationCount} / {limits.locations === 999 ? '∞' : limits.locations}
                   </Typography>
@@ -187,9 +198,10 @@ const AccountOverview = ({ data }: { data: any }) => {
                   sx={{ height: 6, borderRadius: 3 }}
                 />
               </Box>
+
               <Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant='caption' color='text.secondary'>Team Members</Typography>
+                  <Typography variant='caption' color='text.secondary'>{t('accounts.overview.stats.teamMembers')}</Typography>
                   <Typography variant='caption' fontWeight={600}>
                     {userCount} / {limits.users === 999 ? '∞' : limits.users}
                   </Typography>
@@ -207,11 +219,12 @@ const AccountOverview = ({ data }: { data: any }) => {
       </Grid>
 
       {/* ── Card 2: Review Performance (Live) ── */}
+
       <Grid size={{ xs: 12, md: 4 }}>
         <Card sx={{ height: '100%' }}>
           <CardHeader
-            title='Review Performance'
-            subheader='Last 30 days · All locations'
+            title={t('accounts.overview.reviewPerformance.title')}
+            subheader={t('accounts.overview.reviewPerformance.subtitle')}
             avatar={
               <CustomAvatar skin='light' variant='rounded' color='warning' sx={{ width: 48, height: 48 }}>
                 <i className='tabler-star' style={{ fontSize: '1.5rem' }} />
@@ -224,39 +237,42 @@ const AccountOverview = ({ data }: { data: any }) => {
               <Grid size={{ xs: 6 }}>
                 <StatBlock
                   icon='tabler-star-filled'
-                  label='Avg Rating'
+                  label={t('accounts.overview.reviewPerformance.avgRating')}
                   value={avgRating}
-                  subLabel='Across platforms'
+                  subLabel={t('accounts.overview.reviewPerformance.avgRatingSub')}
                   color='warning'
                   loading={metricsLoading}
                 />
               </Grid>
+
               <Grid size={{ xs: 6 }}>
                 <StatBlock
                   icon='tabler-messages'
-                  label='Total Reviews'
+                  label={t('accounts.overview.reviewPerformance.totalReviews')}
                   value={totalReviews}
-                  subLabel='All time'
+                  subLabel={t('accounts.overview.reviewPerformance.totalReviewsSub')}
                   color='primary'
                   loading={metricsLoading}
                 />
               </Grid>
+
               <Grid size={{ xs: 6 }}>
                 <StatBlock
                   icon='tabler-message-check'
-                  label='Response Rate'
+                  label={t('accounts.overview.reviewPerformance.responseRate')}
                   value={responseRate}
-                  subLabel='Last 30 days'
+                  subLabel={t('accounts.overview.reviewPerformance.responseRateSub')}
                   color='success'
                   loading={metricsLoading}
                 />
               </Grid>
+
               <Grid size={{ xs: 6 }}>
                 <StatBlock
                   icon='tabler-message-x'
-                  label='Unanswered'
+                  label={t('accounts.overview.reviewPerformance.unanswered')}
                   value={unanswered}
-                  subLabel='Need attention'
+                  subLabel={t('accounts.overview.reviewPerformance.unansweredSub')}
                   color='error'
                   loading={metricsLoading}
                 />
@@ -267,11 +283,12 @@ const AccountOverview = ({ data }: { data: any }) => {
       </Grid>
 
       {/* ── Card 3: Platform Connections ── */}
+
       <Grid size={{ xs: 12, md: 4 }}>
         <Card sx={{ height: '100%' }}>
           <CardHeader
-            title='Platform Connections'
-            subheader='Review & listing integrations'
+            title={t('accounts.overview.platformConnections.title')}
+            subheader={t('accounts.overview.platformConnections.subtitle')}
             avatar={
               <CustomAvatar skin='light' variant='rounded' color='info' sx={{ width: 48, height: 48 }}>
                 <i className='tabler-plug-connected' style={{ fontSize: '1.5rem' }} />
@@ -304,7 +321,7 @@ const AccountOverview = ({ data }: { data: any }) => {
                     size='small'
                     variant='tonal'
                     color={platform.color}
-                    label={platform.connected ? 'Connected' : 'Not Connected'}
+                    label={platform.connected ? t('accounts.overview.platformConnections.connected') : t('accounts.overview.platformConnections.notConnected')}
                   />
                 </Box>
               ))}
@@ -313,7 +330,7 @@ const AccountOverview = ({ data }: { data: any }) => {
             <Box sx={{ mt: 4, p: 3, borderRadius: 1, bgcolor: 'action.hover', display: 'flex', alignItems: 'center', gap: 2 }}>
               <i className='tabler-info-circle' style={{ fontSize: '1.1rem' }} />
               <Typography variant='caption' color='text.secondary'>
-                Connect platforms inside each location&apos;s settings to enable automatic review syncing.
+                {t('accounts.overview.stats.connectPlatformsDesc')}
               </Typography>
             </Box>
           </CardContent>

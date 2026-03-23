@@ -141,7 +141,10 @@
   "language": {
     "select": "Select Language",
     "english": "English",
-    "arabic": "Arabic"
+    "arabic": "Arabic",
+    "french": "French",
+    "german": "German",
+    "portuguese": "Portuguese"
   },
   "userDropdown": {
     "myProfile": "My Profile",
