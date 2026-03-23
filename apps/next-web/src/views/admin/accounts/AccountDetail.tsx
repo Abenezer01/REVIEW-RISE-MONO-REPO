@@ -164,7 +164,7 @@ const AccountDetail = () => {
   if (!data) return <Typography>{t('accounts.notFound')}</Typography>
 
   const primaryBusiness = data.userBusinessRoles?.[0]?.business
-  const businessName = primaryBusiness?.name || data.name || 'Business Account'
+  const businessName = primaryBusiness?.name || data.name || t('accounts.defaultBusinessName')
   const statusColor = data.status === 'active' ? 'success' : 'secondary'
   const plan = data.subscriptions?.[0]?.plan || primaryBusiness?.subscriptions?.[0]?.plan || 'free'
   const planColor = PLAN_COLOR_MAP[plan] || 'secondary'
@@ -214,14 +214,14 @@ const AccountDetail = () => {
                     size='small'
                     variant='tonal'
                     color={statusColor}
-                    label={data.status === 'active' ? 'Active' : 'Inactive'}
+                    label={data.status === 'active' ? t('accounts.active') : t('accounts.inactive')}
                   />
                   <CustomChip
                     round='true'
                     size='small'
                     variant='tonal'
                     color={planColor}
-                    label={`${planLabel} Plan`}
+                    label={t('accounts.planLabel', { plan: planLabel })}
                   />
                 </Box>
 
@@ -245,14 +245,14 @@ const AccountDetail = () => {
 
               {/* Quick Actions */}
               <Box sx={{ display: 'flex', gap: 2, flexShrink: 0 }}>
-                <Tooltip title='Edit account details'>
+                <Tooltip title={t('accounts.editTooltip')}>
                   <Button
                     variant='outlined'
                     size='small'
                     startIcon={<i className='tabler-edit' />}
                     onClick={() => setEditOpen(true)}
                   >
-                    Edit
+                    {t('accounts.edit')}
                   </Button>
                 </Tooltip>
               </Box>

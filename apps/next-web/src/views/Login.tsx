@@ -22,7 +22,7 @@ import { signIn } from 'next-auth/react'
 
 import { SystemMessageCode } from '@platform/contracts'
 
-import { useTranslations } from 'next-intl'
+import { useTranslation } from '@/hooks/useTranslation'
 
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
@@ -72,7 +72,7 @@ const MaskImg = styled('img')({
 
 const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   const { notify } = useSystemMessages()
-  const t = useTranslations('auth')
+  const t = useTranslation('auth')
 
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)

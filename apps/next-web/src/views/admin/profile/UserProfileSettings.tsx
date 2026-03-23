@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography'
 import CustomTabList from '@core/components/mui/TabList'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
+import { useTranslation } from '@/hooks/useTranslation'
 
 // Tab Components
 import GeneralTab from './GeneralTab'
@@ -23,16 +24,18 @@ interface UserProfileSettingsProps {
 }
 
 const UserProfileSettings = ({ user }: UserProfileSettingsProps) => {
+    const t = useTranslation('dashboard')
     const [activeTab, setActiveTab] = useState('general')
 
     return (
         <Grid container spacing={6}>
             <Grid size={12}>
                 <Typography variant='h4' sx={{ mb: 2 }}>
-                    User Profile
+                    {t('accounts.profile.title')}
                 </Typography>
+
                 <Typography variant='body2' color='text.secondary' sx={{ mb: 6 }}>
-                    Manage your personal details, security settings, and notifications.
+                    {t('accounts.profile.subtitle')}
                 </Typography>
             </Grid>
 
@@ -66,25 +69,27 @@ const UserProfileSettings = ({ user }: UserProfileSettingsProps) => {
                                     label={
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                             <i className='tabler-user' />
-                                            General Info
+                                            {t('accounts.profile.tabs.general')}
                                         </Box>
                                     }
                                 />
+
                                 <Tab
                                     value='security'
                                     label={
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                             <i className='tabler-lock' />
-                                            Security
+                                            {t('accounts.profile.tabs.security')}
                                         </Box>
                                     }
                                 />
+
                                 <Tab
                                     value='preferences'
                                     label={
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                             <i className='tabler-bell' />
-                                            Preferences
+                                            {t('accounts.profile.tabs.preferences')}
                                         </Box>
                                     }
                                 />

@@ -32,14 +32,18 @@ export interface InboxReview {
 
 export function useReviewsInbox(locationId: string) {
     const queryClient = useQueryClient()
+
     const [filters, setFilters] = useState<ReviewFeedFilters>({
         replyStatus: 'unanswered',
         rating: 'all',
         sentiment: 'all'
     })
+
     const [isGenerating, setIsGenerating] = useState(false)
 
-    // --------------- Reviews Feed ---------------
+    /**
+     * --------------- Reviews Feed ---------------
+     */
     const reviewsQuery = useApiGet<{ reviews: InboxReview[]; total: number; page: number }>(
         ['reviews', 'inbox', locationId, JSON.stringify(filters)],
         `${REVIEWS_API}/reviews/locations/${locationId}/reviews`,
@@ -52,7 +56,9 @@ export function useReviewsInbox(locationId: string) {
         { enabled: !!locationId }
     )
 
-    // --------------- Review Stats (for the hero card) ---------------
+    /**
+     * --------------- Review Stats (for the hero card) ---------------
+     */
     const statsQuery = useApiGet(
         ['reviews', 'stats', locationId],
         `${REVIEWS_API}/reviews/locations/${locationId}/stats`,
@@ -60,7 +66,9 @@ export function useReviewsInbox(locationId: string) {
         { enabled: !!locationId }
     )
 
-    // --------------- Post Reply ---------------
+    /**
+     * --------------- Post Reply ---------------
+     */
     const postReplyMutation = useApiPost<unknown, { reviewId: string; content: string }>(
         `${REVIEWS_API}/reviews/PLACEHOLDER/reply`,
         {
@@ -71,13 +79,18 @@ export function useReviewsInbox(locationId: string) {
         }
     )
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const postReply = async ({ reviewId, content }: { reviewId: string; content: string }) => {
         await postReplyMutation.mutateAsync({ reviewId, content })
     }
 
-    // --------------- Generate AI Reply ---------------
+    /**
+     * --------------- Generate AI Reply ---------------
+     */
+
     const generateAiReply = async ({ reviewId, tone }: { reviewId: string; tone: string }): Promise<string> => {
         setIsGenerating(true)
+
         try {
             const response = await fetch(`${SERVICES_CONFIG.ai.url}/review-reply/generate`, {
                 method: 'POST',
@@ -91,6 +104,7 @@ export function useReviewsInbox(locationId: string) {
             }
 
             const json = await response.json()
+
             // The service returns { variations: [{ tone, reply }] } — pick the matching tone or first
             const variations: Array<{ tone: string; reply: string }> = json?.data?.variations || []
             const match = variations.find(v => v.tone.toLowerCase() === tone.toLowerCase())
@@ -101,9 +115,15 @@ export function useReviewsInbox(locationId: string) {
         }
     }
 
-    // Expose a normalized post helper that uses the real endpoint
+    /**
+     * Expose a normalized post helper that uses the real endpoint
+     */
+
     const postReplyForReview = async ({ reviewId, content }: { reviewId: string; content: string }) => {
-        // POST /api/v1/reviews/:reviewId/reply
+
+        /**
+         * POST /api/v1/reviews/:reviewId/reply
+         */
         const response = await fetch(`${REVIEWS_API}/reviews/${reviewId}/reply`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

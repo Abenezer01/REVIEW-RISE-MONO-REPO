@@ -101,10 +101,13 @@ export default function ReviewCard({
                                     size="small"
                                     onClick={async () => {
                                         setSelectedTone(tone as any);
+
                                         if (onGenerateReply) {
                                             setIsGenerating(true);
+
                                             try {
                                                 const newDraft = await onGenerateReply(tone);
+
                                                 setDraftReply(newDraft);
                                                 setIsEditing(false);
                                             } finally {
@@ -162,6 +165,7 @@ export default function ReviewCard({
                             onClick={async () => {
                                 if (onPostReply) {
                                     setIsPosting(true);
+
                                     try {
                                         await onPostReply(draftReply);
                                     } finally {
