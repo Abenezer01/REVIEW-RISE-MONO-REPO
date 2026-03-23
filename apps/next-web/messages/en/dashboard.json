@@ -1658,5 +1658,94 @@
       },
       "impact": "Impact"
     }
+  },
+  "widgets": {
+    "reputationActions": {
+      "title": "Reputation Actions",
+      "requestReviews": {
+        "title": "Request Reviews",
+        "desc": "Send review requests to recent customers",
+        "button": "Send"
+      },
+      "shareSocial": {
+        "title": "Share to Social",
+        "desc": "Post 5-star reviews as testimonials",
+        "button": "Share"
+      },
+      "exportReport": {
+        "title": "Export Report",
+        "desc": "Download reputation analysis",
+        "button": "Export"
+      }
+    },
+    "reputationHero": {
+      "overallRating": "Based on {count} reviews",
+      "reviews": "reviews",
+      "excellentReputation": "Excellent Reputation",
+      "unansweredWarning": "You have {count} unanswered reviews. Replying can boost your local SEO by {percent}%.",
+      "responseRate": "RESPONSE RATE",
+      "avgResponseTime": "AVG RESPONSE TIME",
+      "industryAvg": "Industry avg: {avg}",
+      "positiveSentiment": "POSITIVE SENTIMENT",
+      "sentimentIncrease": "↑ {value}% this period",
+      "platformReviews": "{count} reviews"
+    },
+    "reviewCard": {
+      "sentiment": {
+        "Positive": "Positive",
+        "Neutral": "Neutral",
+        "Negative": "Negative"
+      },
+      "aiSuggestedReply": "AI-Suggested Reply",
+      "tones": {
+        "Professional": "Professional",
+        "Friendly": "Friendly",
+        "Apologetic": "Apologetic"
+      },
+      "generating": "Generating response...",
+      "selectTone": "Select a tone to generate a response.",
+      "edit": "Edit",
+      "saveDraft": "Save Draft",
+      "postReply": "Post Reply",
+      "posting": "Posting..."
+    },
+    "reviewInbox": {
+      "searchPlaceholder": "Search reviews...",
+      "status": {
+        "all": "All Reviews",
+        "unanswered": "Unanswered",
+        "replied": "Replied"
+      },
+      "rating": {
+        "all": "All Ratings",
+        "stars5": "5 Stars",
+        "stars4plus": "4+ Stars",
+        "stars3plus": "3+ Stars",
+        "stars2less": "2 or less"
+      },
+      "sentiment": {
+        "all": "All Sentiment"
+      },
+      "loadFailed": "Failed to load reviews. Please try again.",
+      "noResults": "No reviews found matching your filters."
+    },
+    "sentimentTrend": {
+      "title": "Sentiment Trends"
+    },
+    "topicCloud": {
+      "title": "Top Topics"
+    },
+    "seoTopBar": {
+      "title": "SEO Analyzer",
+      "subtitle": "Technical health, on-page audits, and actionable intelligence.",
+      "autoScan": "Auto-Scan:",
+      "schedule": {
+        "off": "Off",
+        "weekly": "Weekly",
+        "monthly": "Monthly"
+      },
+      "runScan": "Run Scan Now",
+      "scanning": "Scanning..."
+    }
   }
 }

@@ -1583,5 +1583,94 @@
       "step2": "توليد",
       "step3": "النتائج"
     }
+  },
+  "widgets": {
+    "reputationActions": {
+      "title": "إجراءات السمعة",
+      "requestReviews": {
+        "title": "طلب تقييمات",
+        "desc": "إرسال طلبات تقييم للعملاء الأخيرين",
+        "button": "إرسال"
+      },
+      "shareSocial": {
+        "title": "مشاركة اجتماعية",
+        "desc": "نشر التقييمات ذات 5 نجوم كشهادات",
+        "button": "مشاركة"
+      },
+      "exportReport": {
+        "title": "تصدير التقرير",
+        "desc": "تحميل تحليل السمعة",
+        "button": "تصدير"
+      }
+    },
+    "reputationHero": {
+      "overallRating": "بناءً على {count} تقييم",
+      "reviews": "تقييم",
+      "excellentReputation": "سمعة ممتازة",
+      "unansweredWarning": "لديك {count} تقييمات لم يتم الرد عليها. الرد يمكن أن يعزز تحسين محركات البحث المحلية بنسبة {percent}٪.",
+      "responseRate": "معدل الاستجابة",
+      "avgResponseTime": "متوسط وقت الاستجابة",
+      "industryAvg": "متوسط الصناعة: {avg}",
+      "positiveSentiment": "المشاعر الإيجابية",
+      "sentimentIncrease": "↑ {value}٪ هذه الفترة",
+      "platformReviews": "{count} تقييم"
+    },
+    "reviewCard": {
+      "sentiment": {
+        "Positive": "إيجابي",
+        "Neutral": "محايد",
+        "Negative": "سلبي"
+      },
+      "aiSuggestedReply": "رد مقترح بالذكاء الاصطناعي",
+      "tones": {
+        "Professional": "احترافي",
+        "Friendly": "ودي",
+        "Apologetic": "اعتذاري"
+      },
+      "generating": "جاري إنشاء الرد...",
+      "selectTone": "اختر نبرة لإنشاء رد.",
+      "edit": "تعديل",
+      "saveDraft": "حفظ المسودة",
+      "postReply": "نشر الرد",
+      "posting": "جاري النشر..."
+    },
+    "reviewInbox": {
+      "searchPlaceholder": "البحث في التقييمات...",
+      "status": {
+        "all": "جميع التقييمات",
+        "unanswered": "لم يتم الرد عليها",
+        "replied": "تم الرد عليها"
+      },
+      "rating": {
+        "all": "جميع التقييمات",
+        "stars5": "5 نجوم",
+        "stars4plus": "+4 نجوم",
+        "stars3plus": "+3 نجوم",
+        "stars2less": "2 أو أقل"
+      },
+      "sentiment": {
+        "all": "جميع المشاعر"
+      },
+      "loadFailed": "فشل تحميل التقييمات. يرجى المحاولة مرة أخرى.",
+      "noResults": "لم يتم العثور على تقييمات تطابق عوامل التصفية الخاصة بك."
+    },
+    "sentimentTrend": {
+      "title": "اتجهات المشاعر"
+    },
+    "topicCloud": {
+      "title": "أبرز المواضيع"
+    },
+    "seoTopBar": {
+      "title": "محلل SEO",
+      "subtitle": "الصحة التقنية، تدقيق الصفحات، والمعلومات القابلة للتنفيذ.",
+      "autoScan": "فحص تلقائي:",
+      "schedule": {
+        "off": "إيقاف",
+        "weekly": "أسبوعي",
+        "monthly": "شهري"
+      },
+      "runScan": "بدء الفحص الآن",
+      "scanning": "جاري الفحص..."
+    }
   }
 }

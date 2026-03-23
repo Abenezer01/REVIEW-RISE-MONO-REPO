@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Typography, Box, Button, useTheme } from '@mui/material';
+import useTranslation from '@/hooks/useTranslation';
 
 const MailIcon = () => <span>✉️</span>;
 const ShareIcon = () => <span>🔗</span>;
@@ -7,10 +8,13 @@ const DownloadIcon = () => <span>📥</span>;
 
 export default function ReputationActionsCard() {
     const theme = useTheme();
+    const t = useTranslation('dashboard');
 
     return (
         <Card sx={{ p: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>Reputation Actions</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
+                {t('widgets.reputationActions.title')}
+            </Typography>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
 
@@ -21,12 +25,16 @@ export default function ReputationActionsCard() {
                             <MailIcon />
                         </Box>
                         <Box>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Request Reviews</Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>Send review requests to recent customers</Typography>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                {t('widgets.reputationActions.requestReviews.title')}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                {t('widgets.reputationActions.requestReviews.desc')}
+                            </Typography>
                         </Box>
                     </Box>
                     <Button variant="contained" color="warning" size="small" sx={{ fontWeight: 600, minWidth: 80 }}>
-                        Send
+                        {t('widgets.reputationActions.requestReviews.button')}
                     </Button>
                 </Box>
 
@@ -37,12 +45,16 @@ export default function ReputationActionsCard() {
                             <ShareIcon />
                         </Box>
                         <Box>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Share to Social</Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>Post 5-star reviews as testimonials</Typography>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                {t('widgets.reputationActions.shareSocial.title')}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                {t('widgets.reputationActions.shareSocial.desc')}
+                            </Typography>
                         </Box>
                     </Box>
                     <Button variant="contained" color="warning" size="small" sx={{ fontWeight: 600, minWidth: 80 }}>
-                        Share
+                        {t('widgets.reputationActions.shareSocial.button')}
                     </Button>
                 </Box>
 
@@ -53,12 +65,16 @@ export default function ReputationActionsCard() {
                             <DownloadIcon />
                         </Box>
                         <Box>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Export Report</Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>Download reputation analysis</Typography>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                {t('widgets.reputationActions.exportReport.title')}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                {t('widgets.reputationActions.exportReport.desc')}
+                            </Typography>
                         </Box>
                     </Box>
                     <Button variant="contained" color="warning" size="small" sx={{ fontWeight: 600, minWidth: 80 }}>
-                        Export
+                        {t('widgets.reputationActions.exportReport.button')}
                     </Button>
                 </Box>
 

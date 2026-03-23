@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Typography, Box, useTheme, Chip } from '@mui/material';
+import useTranslation from '@/hooks/useTranslation';
 
 const MOCK_TOPICS = [
     { text: 'Great Service', sentiment: 'Positive', count: 42 },
@@ -16,10 +17,13 @@ const MOCK_TOPICS = [
 
 export default function TopicCloudCard() {
     const theme = useTheme();
+    const t = useTranslation('dashboard');
 
     return (
         <Card sx={{ p: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Top Topics</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                {t('widgets.topicCloud.title')}
+            </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                 {MOCK_TOPICS.map((topic, index) => (
                     <Chip

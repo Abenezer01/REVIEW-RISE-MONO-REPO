@@ -1,7 +1,7 @@
-/* eslint-disable react/jsx-no-literals */
 'use client'
 import React, { useState } from 'react'
-import { Box, Typography, Button, FormControl, Select, MenuItem, ToggleButtonGroup, ToggleButton, CircularProgress, IconButton } from '@mui/material'
+import { Box, Typography, Button, FormControl, Select, MenuItem, ToggleButtonGroup, ToggleButton, CircularProgress, IconButton, Chip } from '@mui/material'
+import useTranslation from '@/hooks/useTranslation'
 
 export interface SeoTopBarProps {
     urls: { id: string; url: string }[]
@@ -13,16 +13,17 @@ export interface SeoTopBarProps {
 
 export default function SeoTopBar({ urls, selectedUrlId, onUrlChange, isScanning, onRunScan }: SeoTopBarProps) {
     const [schedule, setSchedule] = useState('weekly')
+    const t = useTranslation('dashboard')
 
     return (
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, gap: 2, mb: 4 }}>
             <Box>
                 <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    SEO Analyzer
+                    {t('widgets.seoTopBar.title')}
                     <Chip label="BETA" size="small" color="primary" sx={{ fontWeight: 800, fontSize: '0.65rem', height: 20 }} />
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-                    Technical health, on-page audits, and actionable intelligence.
+                    {t('widgets.seoTopBar.subtitle')}
                 </Typography>
             </Box>
 
@@ -40,7 +41,9 @@ export default function SeoTopBar({ urls, selectedUrlId, onUrlChange, isScanning
                 </FormControl>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'background.paper', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
-                    <Typography variant="caption" sx={{ px: 1.5, color: 'text.secondary', fontWeight: 600 }}>Auto-Scan:</Typography>
+                    <Typography variant="caption" sx={{ px: 1.5, color: 'text.secondary', fontWeight: 600 }}>
+                        {t('widgets.seoTopBar.autoScan')}
+                    </Typography>
                     <ToggleButtonGroup
                         size="small"
                         value={schedule}
@@ -48,9 +51,9 @@ export default function SeoTopBar({ urls, selectedUrlId, onUrlChange, isScanning
                         onChange={(_, v) => v && setSchedule(v)}
                         sx={{ border: 'none', '& .MuiToggleButton-root': { border: 'none', py: 0.5, px: 2, fontSize: '0.75rem', fontWeight: 600 } }}
                     >
-                        <ToggleButton value="off">Off</ToggleButton>
-                        <ToggleButton value="weekly">Weekly</ToggleButton>
-                        <ToggleButton value="monthly">Monthly</ToggleButton>
+                        <ToggleButton value="off">{t('widgets.seoTopBar.schedule.off')}</ToggleButton>
+                        <ToggleButton value="weekly">{t('widgets.seoTopBar.schedule.weekly')}</ToggleButton>
+                        <ToggleButton value="monthly">{t('widgets.seoTopBar.schedule.monthly')}</ToggleButton>
                     </ToggleButtonGroup>
                 </Box>
 
@@ -62,7 +65,7 @@ export default function SeoTopBar({ urls, selectedUrlId, onUrlChange, isScanning
                     startIcon={isScanning ? <CircularProgress size={16} color="inherit" /> : <i className="tabler-scan" />}
                     sx={{ fontWeight: 700, minWidth: 140, height: 40 }}
                 >
-                    {isScanning ? 'Scanning...' : 'Run Scan Now'}
+                    {isScanning ? t('widgets.seoTopBar.scanning') : t('widgets.seoTopBar.runScan')}
                 </Button>
 
                 <Box sx={{ display: 'flex', gap: 0.5 }}>
@@ -77,6 +80,3 @@ export default function SeoTopBar({ urls, selectedUrlId, onUrlChange, isScanning
         </Box>
     )
 }
-
-// Just an inline import definition that missed above
-import { Chip } from '@mui/material'

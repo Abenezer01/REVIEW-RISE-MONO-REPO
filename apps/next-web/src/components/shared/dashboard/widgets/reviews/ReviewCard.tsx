@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Card, Box, Typography, Avatar, Chip, Button, IconButton, useTheme, Rating, Divider, TextField } from '@mui/material';
+import { Card, Box, Typography, Avatar, Chip, Button, useTheme, Rating, TextField } from '@mui/material';
+import useTranslation from '@/hooks/useTranslation';
 
 // Placeholder icons
 const GoogleIcon = () => <Typography variant="caption" sx={{ fontWeight: 'bold' }}>G</Typography>;
@@ -32,6 +33,7 @@ export default function ReviewCard({
     onPostReply?: (content: string) => Promise<any>
 }) {
     const theme = useTheme();
+    const t = useTranslation('dashboard');
     const [selectedTone, setSelectedTone] = useState<'Professional' | 'Friendly' | 'Apologetic'>('Professional');
     const [isEditing, setIsEditing] = useState(false);
     const [draftReply, setDraftReply] = useState(review.aiSuggestedReply || '');
@@ -43,6 +45,8 @@ export default function ReviewCard({
         Neutral: 'info',
         Negative: 'error'
     } as const;
+
+    const tones = ['Professional', 'Friendly', 'Apologetic'] as const;
 
     return (
         <Card sx={{ mb: 3, p: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
@@ -62,7 +66,7 @@ export default function ReviewCard({
                 </Box>
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                     <Chip
-                        label={review.sentiment}
+                        label={t(`widgets.reviewCard.sentiment.${review.sentiment}` as any)}
                         size="small"
                         color={sentimentColor[review.sentiment]}
                         sx={{ fontWeight: 600, height: 24 }}
@@ -91,13 +95,15 @@ export default function ReviewCard({
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'primary.main' }}>
                             <SparkleIcon />
-                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>AI-Suggested Reply</Typography>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                {t('widgets.reviewCard.aiSuggestedReply')}
+                            </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', gap: 1, p: 0.5, bgcolor: 'background.paper', borderRadius: 8, border: `1px solid ${theme.palette.divider}` }}>
-                            {['Professional', 'Friendly', 'Apologetic'].map((tone) => (
+                            {tones.map((tone) => (
                                 <Chip
                                     key={tone}
-                                    label={tone}
+                                    label={t(`widgets.reviewCard.tones.${tone}` as any)}
                                     size="small"
                                     onClick={async () => {
                                         setSelectedTone(tone as any);
@@ -140,7 +146,7 @@ export default function ReviewCard({
                         />
                     ) : (
                         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2, fontStyle: 'italic' }}>
-                            {isGenerating ? "Generating response..." : (draftReply || "Select a tone to generate a response.")}
+                            {isGenerating ? t('widgets.reviewCard.generating') : (draftReply || t('widgets.reviewCard.selectTone'))}
                         </Typography>
                     )}
 
@@ -153,7 +159,7 @@ export default function ReviewCard({
                             sx={{ color: 'text.secondary' }}
                             disabled={isGenerating || isPosting}
                         >
-                            {isEditing ? 'Save Draft' : 'Edit'}
+                            {isEditing ? t('widgets.reviewCard.saveDraft') : t('widgets.reviewCard.edit')}
                         </Button>
                         <Button
                             variant="contained"
@@ -174,7 +180,7 @@ export default function ReviewCard({
                                 }
                             }}
                         >
-                            {isPosting ? 'Posting...' : 'Post Reply'}
+                            {isPosting ? t('widgets.reviewCard.posting') : t('widgets.reviewCard.postReply')}
                         </Button>
                     </Box>
                 </Box>

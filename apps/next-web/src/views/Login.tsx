@@ -193,7 +193,7 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
               fullWidth
               name='password'
               label={t('login.password')}
-              placeholder='············'
+              placeholder={t('login.passwordPlaceholder')}
               id='outlined-adornment-password'
               type={isPasswordShown ? 'text' : 'password'}
               value={password}
