@@ -43,6 +43,7 @@ const LocationDropdown = () => {
   const [open, setOpen] = useState(false)
   const [locations, setLocations] = useState<Location[]>([])
   const [allowedBusinessIds, setAllowedBusinessIds] = useState<string[]>([])
+  const [primaryBusinessName, setPrimaryBusinessName] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -68,11 +69,16 @@ const LocationDropdown = () => {
       }
 
       try {
-        const response = await apiClient.get<{ data: { id: string }[] }>(`/api/admin/users/${user.id}/businesses`)
+        const response = await apiClient.get<{ data: { id: string; name?: string }[] }>(`/api/admin/users/${user.id}/businesses`)
         const businesses = response.data?.data || response.data || []
         const ids = Array.isArray(businesses) ? businesses.map((b: any) => String(b.id)).filter(Boolean) : []
 
         setAllowedBusinessIds(ids)
+
+        // Set the primary business name from the first business
+        const firstName = Array.isArray(businesses) && businesses.length > 0 ? (businesses[0] as any).name : null
+
+        if (firstName) setPrimaryBusinessName(firstName)
       } catch (error) {
         console.error('Failed to fetch user businesses', error)
         setAllowedBusinessIds([])
@@ -215,8 +221,8 @@ const LocationDropdown = () => {
       >
         <i className='tabler-map-pin text-primary' />
         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-          <Typography variant='body2' fontWeight={600} noWrap sx={{ maxWidth: 150 }}>
-            {selectedLocation?.name || t('locations.detail.tabs.overview')}
+          <Typography variant='body2' fontWeight={600} noWrap sx={{ maxWidth: 180 }}>
+            {selectedLocation?.name || primaryBusinessName || t('locations.detail.tabs.overview')}
           </Typography>
         </Box>
         <i className='tabler-chevron-down text-textSecondary' style={{ fontSize: '1rem' }} />

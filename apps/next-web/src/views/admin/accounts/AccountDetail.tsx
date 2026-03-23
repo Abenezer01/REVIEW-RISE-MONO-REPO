@@ -12,21 +12,20 @@ import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 import Box from '@mui/material/Box'
 import Skeleton from '@mui/material/Skeleton'
+import Button from '@mui/material/Button'
+import Tooltip from '@mui/material/Tooltip'
 
 import { SystemMessageCode } from '@platform/contracts'
 
 import { useSystemMessages } from '@/shared/components/SystemMessageProvider'
 
 // Core Component Imports
-import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 
 import ConfirmationDialog from '@components/shared/dialog/confirmation-dialog'
 
 import { getCurrentAccount, deleteAccount, getAccounts } from '@/app/actions/account'
-
-import { useAuth } from '@/contexts/AuthContext'
 
 import AccountDialog from './AccountDialog'
 import UserDialog from './UserDialog'
@@ -35,16 +34,18 @@ import AccountLocations from './account-details/AccountLocations'
 import AccountUsers from './account-details/AccountUsers'
 import AccountChannels from './account-details/AccountChannels'
 import AccountLogs from './account-details/AccountLogs'
+import AccountPerformanceStrip from './account-details/AccountPerformanceStrip'
 import { useTranslation } from '@/hooks/useTranslation'
 
-// Utils
-const getInitials = (string: string) =>
-  string.split(/\s/).reduce((response, word) => (response += word.slice(0, 1)), '')
+const PLAN_COLOR_MAP: Record<string, 'primary' | 'warning' | 'success' | 'secondary'> = {
+  free: 'secondary',
+  pro: 'primary',
+  enterprise: 'warning'
+}
 
 const AccountDetail = () => {
   const { notify } = useSystemMessages()
   const t = useTranslation('dashboard')
-  const { user } = useAuth()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('overview')
@@ -144,9 +145,9 @@ const AccountDetail = () => {
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <Skeleton variant='circular' width={72} height={72} />
+                <Skeleton variant='rounded' width={64} height={64} />
                 <Box sx={{ width: '100%' }}>
-                  <Skeleton width='30%' height={32} sx={{ mb: 1 }} />
+                  <Skeleton width='35%' height={36} sx={{ mb: 1 }} />
                   <Skeleton width='20%' height={20} />
                 </Box>
               </Box>
@@ -162,87 +163,115 @@ const AccountDetail = () => {
 
   if (!data) return <Typography>{t('accounts.notFound')}</Typography>
 
-  const email = user?.email || data.userBusinessRoles?.[0]?.user?.email || data.email
+  const primaryBusiness = data.userBusinessRoles?.[0]?.business
+  const businessName = primaryBusiness?.name || data.name || 'Business Account'
   const statusColor = data.status === 'active' ? 'success' : 'secondary'
-  const userName = user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : (user?.email?.split('@')[0] || data.name)
+  const plan = data.subscriptions?.[0]?.plan || primaryBusiness?.subscriptions?.[0]?.plan || 'free'
+  const planColor = PLAN_COLOR_MAP[plan] || 'secondary'
+  const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1)
+  const ownerEmail = data.email || data.userBusinessRoles?.[0]?.user?.email
 
   return (
     <Grid container spacing={6}>
-      {/* Header Section */}
+      {/* ── Business Identity Header ── */}
       <Grid size={{ xs: 12 }}>
-        <Card sx={{ position: 'relative', overflow: 'visible', mt: { xs: 0, md: 4 } }}>
-          <CardContent sx={{ pb: 4 }}>
+        <Card sx={{ overflow: 'visible' }}>
+          <CardContent sx={{ pb: '20px !important' }}>
             <Box
               sx={{
                 display: 'flex',
                 alignItems: { xs: 'flex-start', md: 'center' },
                 flexDirection: { xs: 'column', md: 'row' },
-                gap: 5
+                gap: 4
               }}
             >
-              <CustomAvatar
-                skin='light'
-                variant='rounded'
-                color='primary'
-                src={user?.avatar}
+              {/* Business Icon */}
+              <Box
                 sx={{
-                  width: 100,
-                  height: 100,
-                  fontSize: '2.5rem',
-                  border: theme => `4px solid ${theme.palette.common.white}`,
-                  boxShadow: 3
+                  width: 72,
+                  height: 72,
+                  borderRadius: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  bgcolor: 'primary.light',
+                  color: 'primary.main',
+                  flexShrink: 0,
+                  border: theme => `2px solid ${theme.palette.primary.main}22`
                 }}
               >
-                {getInitials(userName || 'User')}
-              </CustomAvatar>
+                <i className='tabler-building-store' style={{ fontSize: '2rem' }} />
+              </Box>
 
-              <Box sx={{ flexGrow: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 2, flexWrap: 'wrap' }}>
-                  <Typography variant='h4' sx={{ fontWeight: 600 }}>
-                    {userName}
+              {/* Business Info */}
+              <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', mb: 1 }}>
+                  <Typography variant='h4' fontWeight={700} noWrap>
+                    {businessName}
                   </Typography>
                   <CustomChip
                     round='true'
                     size='small'
                     variant='tonal'
                     color={statusColor}
-                    label={t(`common.status.${data.status}`)}
-                    sx={{ textTransform: 'capitalize', fontWeight: 500 }}
+                    label={data.status === 'active' ? 'Active' : 'Inactive'}
+                  />
+                  <CustomChip
+                    round='true'
+                    size='small'
+                    variant='tonal'
+                    color={planColor}
+                    label={`${planLabel} Plan`}
                   />
                 </Box>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
-                      <CustomAvatar skin='light' color='secondary' sx={{ width: 24, height: 24, mr: 2, fontSize: '0.875rem' }}>
-                        <i className='tabler-mail' />
-                      </CustomAvatar>
-                      <Typography variant='body1'>{email}</Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
-                      <CustomAvatar skin='light' color='secondary' sx={{ width: 24, height: 24, mr: 2, fontSize: '0.875rem' }}>
-                        <i className='tabler-calendar' />
-                      </CustomAvatar>
-                      <Typography variant='body1'>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                  {data.createdAt && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
+                      <i className='tabler-calendar' style={{ fontSize: '0.9rem' }} />
+                      <Typography variant='body2'>
                         {t('accounts.createdOn', { date: new Date(data.createdAt).toLocaleDateString() })}
                       </Typography>
                     </Box>
-                  </Box>
+                  )}
+                  {data.userBusinessRoles?.[0]?.user?.email && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
+                      <i className='tabler-mail' style={{ fontSize: '0.9rem' }} />
+                      <Typography variant='body2'>{ownerEmail}</Typography>
+                    </Box>
+                  )}
                 </Box>
               </Box>
+
+              {/* Quick Actions */}
+              <Box sx={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+                <Tooltip title='Edit account details'>
+                  <Button
+                    variant='outlined'
+                    size='small'
+                    startIcon={<i className='tabler-edit' />}
+                    onClick={() => setEditOpen(true)}
+                  >
+                    Edit
+                  </Button>
+                </Tooltip>
+              </Box>
             </Box>
+
+            {/* ── Performance KPI Strip ── */}
+            <AccountPerformanceStrip data={data} loading={loading} />
           </CardContent>
         </Card>
       </Grid>
 
-      {/* Tabs Section */}
+      {/* ── Tabs ── */}
       <Grid size={{ xs: 12 }}>
         <TabContext value={tab}>
           <CustomTabList pill='true' onChange={handleTabChange} aria-label='account tabs'>
             <Tab
               value='overview'
               label={t('accounts.tabs.overview')}
-              icon={<i className='tabler-info-circle' />}
+              icon={<i className='tabler-chart-bar' />}
               iconPosition='start'
             />
             <Tab

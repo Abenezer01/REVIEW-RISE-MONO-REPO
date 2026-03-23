@@ -90,7 +90,13 @@ export async function getAccount(id: string) {
         },
         userBusinessRoles: {
           include: {
-            business: true,
+            business: {
+              include: {
+                _count: {
+                  select: { locations: true }
+                }
+              }
+            },
             location: true
           }
         }
@@ -102,9 +108,9 @@ export async function getAccount(id: string) {
     }
 
     return {
-        ...user,
-        status: 'active',
-        role: user.userRoles[0]?.role?.name || 'User'
+      ...user,
+      status: 'active',
+      role: user.userRoles[0]?.role?.name || 'User'
     }
   } catch (error: any) {
     console.error('getAccount error:', error)
@@ -144,7 +150,7 @@ export async function createAccount(data: any) {
     const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined
 
     if (!role) {
-       return { success: false, message: 'Role is required' }
+      return { success: false, message: 'Role is required' }
     }
 
     const userRole = await prisma.role.findUnique({
@@ -152,7 +158,7 @@ export async function createAccount(data: any) {
     })
 
     if (!userRole) {
-         return { success: false, message: 'Invalid role' }
+      return { success: false, message: 'Invalid role' }
     }
 
     const result = await prisma.$transaction(async (tx) => {
@@ -166,12 +172,12 @@ export async function createAccount(data: any) {
       })
 
       if (userRole) {
-          await tx.userRole.create({
-            data: {
-              userId: user.id,
-              roleId: userRole.id
-            }
-          })
+        await tx.userRole.create({
+          data: {
+            userId: user.id,
+            roleId: userRole.id
+          }
+        })
       }
 
       if (businessId) {
@@ -205,42 +211,42 @@ export async function updateAccount(id: string, data: any) {
     const updateData: any = { ...userData }
 
     if (password) {
-        updateData.password = await bcrypt.hash(password, 10)
+      updateData.password = await bcrypt.hash(password, 10)
     }
 
     const result = await prisma.$transaction(async (tx) => {
-        const user = await tx.user.update({
-            where: { id },
-            data: updateData
-        })
+      const user = await tx.user.update({
+        where: { id },
+        data: updateData
+      })
 
-        if (role) {
-            const newRole = await tx.role.findUnique({ where: { name: role } })
+      if (role) {
+        const newRole = await tx.role.findUnique({ where: { name: role } })
 
-            if (newRole) {
-                await tx.userRole.deleteMany({ where: { userId: id } })
-                await tx.userRole.create({
-                    data: {
-                        userId: id,
-                        roleId: newRole.id
-                    }
-                })
-
-                if (businessId) {
-                  await tx.userBusinessRole.deleteMany({ where: { userId: id, businessId } })
-                  await tx.userBusinessRole.create({
-                    data: {
-                      userId: id,
-                      businessId,
-                      locationId,
-                      roleId: newRole.id
-                    }
-                  })
-                }
+        if (newRole) {
+          await tx.userRole.deleteMany({ where: { userId: id } })
+          await tx.userRole.create({
+            data: {
+              userId: id,
+              roleId: newRole.id
             }
-        }
+          })
 
-        return user
+          if (businessId) {
+            await tx.userBusinessRole.deleteMany({ where: { userId: id, businessId } })
+            await tx.userBusinessRole.create({
+              data: {
+                userId: id,
+                businessId,
+                locationId,
+                roleId: newRole.id
+              }
+            })
+          }
+        }
+      }
+
+      return user
     })
 
     revalidatePath('/admin/accounts')
