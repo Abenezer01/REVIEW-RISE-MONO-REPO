@@ -95,8 +95,8 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   const authBackground = useImageVariant(mode, lightImg, darkImg)
   const params = useParams<{ locale?: string }>()
   const searchParams = useSearchParams()
-  const socialDividerLabel = 'or'
-  const googleCtaLabel = 'Continue with Google'
+  const socialDividerLabel = t('login.or')
+  const googleCtaLabel = t('login.googleCta')
 
   useEffect(() => {
     if (state?.success && state.user) {

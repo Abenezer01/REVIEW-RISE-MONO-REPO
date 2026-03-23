@@ -15,6 +15,8 @@ import Alert from '@mui/material/Alert'
 import CircularProgress from '@mui/material/CircularProgress'
 import { alpha, useTheme } from '@mui/material/styles'
 
+import { useTranslations } from 'next-intl'
+
 import Link from '@components/Link'
 import CustomTextField from '@core/components/mui/TextField'
 import Logo from '@components/layout/shared/Logo'
@@ -23,6 +25,7 @@ type VerifyStatus = 'idle' | 'verifying' | 'verified' | 'error'
 
 const VerifyEmail = () => {
   const theme = useTheme()
+  const t = useTranslations('auth')
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get('token') || ''
@@ -77,41 +80,41 @@ const VerifyEmail = () => {
 
   const statusConfig = {
     verified: {
-      label: 'Email Verified',
+      label: t('verifyEmail.verifiedTitle'),
       color: 'success' as const,
       icon: 'tabler-circle-check-filled',
-      title: 'Success!',
-      description: 'Your email address has been successfully verified. You now have full access to your Review Rise workspace.',
-      buttonLabel: 'Go to Dashboard'
+      title: t('verifyEmail.verifiedTitle'),
+      description: t('verifyEmail.verifiedDescription'),
+      buttonLabel: t('verifyEmail.verifiedButtonLabel')
     },
     verifying: {
-      label: 'Verifying',
+      label: t('verifyEmail.verifyingTitle'),
       color: 'primary' as const,
       icon: 'tabler-loader-2 animate-spin',
-      title: 'Verifying...',
-      description: 'Please wait a moment while we confirm your email address and activate your account.'
+      title: t('verifyEmail.verifyingTitle'),
+      description: t('verifyEmail.verifyingDescription')
     },
     error: {
-      label: 'Verification Failed',
+      label: t('verifyEmail.errorTitle'),
       color: 'error' as const,
       icon: 'tabler-circle-x-filled',
-      title: 'Verification Failed',
-      description: 'The verification link is invalid or has expired. Please request a new link below to continue.',
-      buttonLabel: 'Send Verification Link',
-      resendingLabel: 'Sending Link...'
+      title: t('verifyEmail.errorTitle'),
+      description: t('verifyEmail.errorDescription'),
+      buttonLabel: t('verifyEmail.buttonLabel'),
+      resendingLabel: t('verifyEmail.resendingLabel')
     },
     idle: {
-      label: 'Pending',
+      label: t('verifyEmail.title'),
       color: 'warning' as const,
       icon: 'tabler-mail-fast',
-      title: 'Verify Your Email',
-      description: 'Please enter your email address below to receive a new verification link.',
-      buttonLabel: 'Send Verification Link',
-      resendingLabel: 'Sending Link...'
+      title: t('verifyEmail.title'),
+      description: t('verifyEmail.description'),
+      buttonLabel: t('verifyEmail.buttonLabel'),
+      resendingLabel: t('verifyEmail.resendingLabel')
     },
-    dividerLabel: 'Authentication',
-    alreadyVerifiedLabel: 'Already verified?',
-    backToLoginLabel: 'Back to login'
+    dividerLabel: t('verifyEmail.dividerLabel'),
+    alreadyVerifiedLabel: t('verifyEmail.alreadyVerified'),
+    backToLoginLabel: t('verifyEmail.backToLogin')
   } as const
 
   const currentConfig = statusConfig[status]
@@ -135,9 +138,9 @@ const VerifyEmail = () => {
         throw new Error(body?.message || 'Failed to resend verification email')
       }
 
-      setResentMessage('A new verification link has been sent to your inbox.')
+      setResentMessage(t('verifyEmail.resentMessage'))
     } catch (err: any) {
-      setError(err?.message || 'Failed to resend verification email')
+      setError(err?.message || t('verifyEmail.resendError'))
     } finally {
       setResending(false)
     }
@@ -227,8 +230,8 @@ const VerifyEmail = () => {
               <Box sx={{ textAlign: 'left' }}>
                 <CustomTextField
                   fullWidth
-                  label='Email'
-                  placeholder='Enter your email address'
+                  label={t('verifyEmail.emailLabel')}
+                  placeholder={t('verifyEmail.emailPlaceholder')}
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   disabled={status === 'verifying' || resending}
