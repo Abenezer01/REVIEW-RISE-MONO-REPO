@@ -66,7 +66,7 @@ const SecurityTab = () => {
             notify(SystemMessageCode.ITEM_UPDATED)
             setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' })
         } else {
-            notify(SystemMessageCode.UPDATE_FAILED)
+            notify(SystemMessageCode.SAVE_FAILED)
         }
     }
 

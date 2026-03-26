@@ -32,6 +32,7 @@ export enum SystemMessageCode {
   AUTH_INVALID_TOKEN = 'AUTH_INVALID_TOKEN',
   AUTH_TOKEN_EXPIRED = 'AUTH_TOKEN_EXPIRED',
   AUTH_USER_NOT_FOUND = 'AUTH_USER_NOT_FOUND',
+  AUTH_PASSWORD_MISMATCH = 'AUTH_PASSWORD_MISMATCH',
 
   // Operations
   ITEM_CREATED = 'ITEM_CREATED',
@@ -144,6 +145,7 @@ export const DefaultSeverityMap: Record<SystemMessageCode, SystemMessageSeverity
   [SystemMessageCode.AUTH_INVALID_TOKEN]: SystemMessageSeverity.ERROR,
   [SystemMessageCode.AUTH_TOKEN_EXPIRED]: SystemMessageSeverity.ERROR,
   [SystemMessageCode.AUTH_USER_NOT_FOUND]: SystemMessageSeverity.ERROR,
+  [SystemMessageCode.AUTH_PASSWORD_MISMATCH]: SystemMessageSeverity.ERROR,
 
   [SystemMessageCode.ITEM_CREATED]: SystemMessageSeverity.SUCCESS,
   [SystemMessageCode.ITEM_UPDATED]: SystemMessageSeverity.SUCCESS,

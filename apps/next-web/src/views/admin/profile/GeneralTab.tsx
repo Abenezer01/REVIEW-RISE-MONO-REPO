@@ -52,7 +52,7 @@ const GeneralTab = ({ user }: GeneralTabProps) => {
             notify(SystemMessageCode.ITEM_UPDATED)
             router.refresh()
         } else {
-            notify(SystemMessageCode.UPDATE_FAILED)
+            notify(SystemMessageCode.SAVE_FAILED)
         }
     }
 
